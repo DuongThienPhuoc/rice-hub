@@ -5,7 +5,7 @@ import bellIcon from '@/components/icon/bell.svg'
 import userIcon from '@/components/icon/user.svg'
 import downArrow from '@/components/icon/downArrow.svg'
 import upArrow from '@/components/icon/upArrow.svg'
-import {useState} from "react";
+import { useState } from "react";
 
 export default function Navbar() {
 
@@ -22,17 +22,17 @@ export default function Navbar() {
             </div>
 
             <div>
-                <ul className='flex items-center gap-x-4 font-bold h-full'>
+                <ul className='flex items-center gap-x-10 font-bold h-full'>
                     <li>Tài chính</li>
                     <div className='relative' onClick={() => handleDropdown()}>
-                        <li className='flex gap-x-1'>
+                        <li className='flex gap-x-2'>
                             Kho
                             {
-                                dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10}/> :
-                                    <Image src={upArrow} alt='down arrow' width={10} height={10}/>
+                                dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                    <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] top-12 left-0 p-2': 'hidden'}>
+                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] top-12 left-0 p-2' : 'hidden'}>
                             <ul className='flex flex-col gap-y-3'>
                                 <li>Danh mục</li>
                                 <li>Sản phẩm</li>
@@ -49,10 +49,10 @@ export default function Navbar() {
 
             <div className='flex items-center'>
                 <div className='flex items-center justify-center w-12 h-12'>
-                    <Image src={bellIcon} alt='bell icon' width={24} height={24}/>
+                    <Image src={bellIcon} alt='bell icon' width={24} height={24} />
                 </div>
                 <div className='flex items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
-                    <Image src={userIcon} alt='bell icon' width={24} height={24}/>
+                    <Image src={userIcon} alt='bell icon' width={24} height={24} />
                 </div>
             </div>
         </div>
