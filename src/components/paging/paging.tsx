@@ -45,11 +45,11 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
 
     return (
         <div className='flex justify-center items-center'>
-            <div className="flex bg-white justify-center rounded-full items-center my-4 py-2">
+            <div className="flex bg-white justify-center rounded-xl items-center my-4 py-2">
                 <button
                     onClick={() => handlePageClick(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-3 rounded-lg mr-1 ml-5 bg-[#f5f5f7] hover:bg-gray-300"
+                    className="px-3 py-2 rounded-lg mr-1 ml-3 bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                 >
                     <Image src={chevronLeftIcon} alt='Previous' width={10} height={10} />
                 </button>
@@ -58,12 +58,12 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                     <>
                         <button
                             onClick={() => handlePageClick(1)}
-                            className="px-4 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300"
+                            className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                         >
                             1
                         </button>
                         {startPage > 2 && (
-                            <button className="px-4 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
+                            <button className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
                         )}
                     </>
                 )}
@@ -72,7 +72,7 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                     <button
                         key={page}
                         onClick={() => handlePageClick(page)}
-                        className={`px-4 py-2 mx-1 rounded-lg ${currentPage === page ? 'bg-[#1d1d1fca] text-white hover:bg-[#1d1d1f7e]' : 'bg-[#f5f5f7] hover:bg-gray-300'}`}
+                        className={`text-[12px] px-3 py-2 mx-1 rounded-lg ${currentPage === page ? 'bg-[#1d1d1fca] text-white hover:bg-[#1d1d1f7e]' : 'bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200'}`}
                     >
                         {page}
                     </button>
@@ -81,11 +81,11 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 {endPage < totalPages && (
                     <>
                         {endPage < totalPages - 1 && (
-                            <button className="px-4 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
+                            <button className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
                         )}
                         <button
                             onClick={() => handlePageClick(totalPages)}
-                            className="px-4 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300"
+                            className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                         >
                             {totalPages}
                         </button>
@@ -95,7 +95,7 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 <button
                     onClick={() => handlePageClick(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-4 py-3 rounded-lg ml-1 mr-5 bg-[#f5f5f7] hover:bg-gray-300"
+                    className="px-3 py-2 rounded-lg ml-1 mr-3 bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                 >
                     <Image src={chevronRightIcon} alt='Next' width={10} height={10} />
                 </button>
