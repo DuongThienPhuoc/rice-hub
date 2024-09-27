@@ -16,13 +16,13 @@ export default function Navbar() {
 
     return (
         // Navbar
-        <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-2'>
-            <div className='logo flex items-center'>
+        <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-4'>
+            <div className='logo flex items-center ms-3'>
                 <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
             </div>
 
             <div>
-                <ul className='flex items-center gap-x-4 font-bold h-full'>
+                <ul className='hidden md:flex items-center gap-x-4 font-bold h-full'>
                     <li>Tài chính</li>
                     <div className='relative' onClick={() => handleDropdown()}>
                         <li className='flex gap-x-1'>
@@ -32,7 +32,8 @@ export default function Navbar() {
                                     <Image src={upArrow} alt='down arrow' width={10} height={10}/>
                             }
                         </li>
-                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] top-12 left-0 p-2': 'hidden'}>
+                        <div
+                            className={`absolute w-32 bg-[#FFFFFF] top-10 left-0 p-2 z-10 transition-all duration-300 transform origin-top ${dropdown ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'}`}>
                             <ul className='flex flex-col gap-y-3'>
                                 <li>Danh mục</li>
                                 <li>Sản phẩm</li>
