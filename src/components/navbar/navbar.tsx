@@ -23,6 +23,23 @@ export default function Navbar() {
         router.push('/products');
     };
 
+    const navigateToCustomer = () => {
+        router.push('/customers');
+    };
+
+    const navigateToEmployee = () => {
+        router.push('/employees');
+    };
+
+    const navigateToCategory = () => {
+        router.push('/categories');
+    };
+
+    const navigateToSupplier = () => {
+        router.push('/suppliers');
+    };
+
+
     return (
         // Navbar
         <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-2'>
@@ -42,16 +59,16 @@ export default function Navbar() {
                         </li>
                         <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] top-12 left-0 p-2' : 'hidden'}>
                             <ul className='flex flex-col gap-y-3'>
-                                <li>Danh mục</li>
+                                <li onClick={navigateToCategory}>Danh mục</li>
                                 <li onClick={navigateToProduct}>Sản phẩm</li>
                                 <li>Nguyên liệu</li>
                             </ul>
                         </div>
                     </div>
                     <li>Giao dịch</li>
-                    <li>Khách hàng</li>
-                    <li>Nhân viên</li>
-                    <li>Nhà cung cấp</li>
+                    <li onClick={navigateToCustomer}>Khách hàng</li>
+                    <li onClick={navigateToEmployee}>Nhân viên</li>
+                    <li onClick={navigateToSupplier}>Nhà cung cấp</li>
                 </ul>
             </div>
 

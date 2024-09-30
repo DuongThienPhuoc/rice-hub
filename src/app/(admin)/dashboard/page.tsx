@@ -13,6 +13,7 @@ import FloatingButton from '@/components/floating/floatingButton';
 const Page = () => {
 
     const [navbarVisible, setNavbarVisible] = useState(false);
+    const [currentPeriod, setCurrentPeriod] = useState("month");
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -28,6 +29,10 @@ const Page = () => {
             window.removeEventListener('resize', updateNavbarVisibility);
         };
     }, []);
+
+    const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setCurrentPeriod(event.target.value as 'week' | 'month' | 'year');
+    };
 
     return (
         <div>
@@ -78,8 +83,26 @@ const Page = () => {
                         </div>
                     </div>
                     <div className='bg-white rounded-md px-5 py-5 mt-7' style={{ boxShadow: '5px 5px 5px lightgray' }}>
-                        <h1 className="text-black font-bold mb-7">Doanh thu tháng này</h1>
-                        <BarChart />
+                        <div className='flex justify-between items-center mb-7'>
+                            {currentPeriod === 'month' && (
+                                <h1 className="text-black font-bold">Doanh thu tháng này</h1>
+                            )}
+                            {currentPeriod === 'week' && (
+                                <h1 className="text-black font-bold">Doanh thu tuần này</h1>
+                            )}
+                            {currentPeriod === 'year' && (
+                                <h1 className="text-black font-bold">Doanh thu năm nay</h1>
+                            )}
+                            <select
+                                className='text-blue-500 bg-transparent outline-none font-bold'
+                                onChange={handlePeriodChange}
+                                value={currentPeriod}>
+                                <option className='text-black' value='month'>Tháng này</option>
+                                <option className='text-black' value='week'>Tuần này</option>
+                                <option className='text-black' value='year'>Năm nay</option>
+                            </select>
+                        </div>
+                        <BarChart period={currentPeriod} />
                     </div>
                     <div className='bg-white rounded-md px-5 py-5 mt-7' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                         <h1 className="text-black font-bold mb-7">Top 10 sản phẩm bán chạy tháng này</h1>

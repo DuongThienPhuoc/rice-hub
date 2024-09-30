@@ -47,7 +47,7 @@ const List: React.FC<DataTableProps> = ({ columns, data }) => {
 
     return (
         <div>
-            <table className="min-w-full bg-white border-collapse">
+            <table className="min-w-[1242.99px] bg-white border-collapse">
                 <thead>
                     <tr className="bg-[#e6f1fe]">
                         {columns.map((column, index) => (

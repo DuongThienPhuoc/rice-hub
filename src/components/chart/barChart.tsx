@@ -10,21 +10,38 @@ const generateRandomRevenue = () => {
     return Math.floor(Math.random() * (1000000000 - 100000000) + 100000000);
 };
 
-const BarChart: React.FC = () => {
-    const [days, setDays] = useState<string[]>([]);
+const BarChart: React.FC<{ period: string }> = ({ period }) => {
+    const [labels, setLabels] = useState<string[]>([]);
     const [revenueData, setRevenueData] = useState<number[]>([]);
 
     useEffect(() => {
-        const currentMonthDays = dayjs().daysInMonth();
-        const currentMonthDates = Array.from({ length: currentMonthDays }, (_, index) => (index + 1).toString());
-        setDays(currentMonthDates);
+        let periodLabels: string[] = [];
+        let periodData: number[] = [];
 
-        const randomRevenue = currentMonthDates.map(() => generateRandomRevenue());
-        setRevenueData(randomRevenue);
-    }, []);
+        switch (period) {
+            case 'week':
+                periodLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+                periodData = Array.from({ length: 7 }, () => generateRandomRevenue());
+                break;
+
+            case 'month':
+                const currentMonthDays = dayjs().daysInMonth();
+                periodLabels = Array.from({ length: currentMonthDays }, (_, index) => (index + 1).toString());
+                periodData = periodLabels.map(() => generateRandomRevenue());
+                break;
+
+            case 'year':
+                periodLabels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+                periodData = Array.from({ length: 12 }, () => generateRandomRevenue());
+                break;
+        }
+
+        setLabels(periodLabels);
+        setRevenueData(periodData);
+    }, [period]);
 
     const data = {
-        labels: days,
+        labels,
         datasets: [
             {
                 label: 'Doanh thu (VND)',
