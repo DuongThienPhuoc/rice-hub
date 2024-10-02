@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import {Toaster} from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "RiceHub",
@@ -7,15 +8,16 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
+                                       children,
+                                   }: Readonly<{
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body>
+    return (
+        <html lang="en">
+        <body>
         {children}
-      </body>
-    </html>
-  );
+        <Toaster/>
+        </body>
+        </html>
+    );
 }
