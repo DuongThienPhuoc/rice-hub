@@ -96,7 +96,7 @@ const Page = () => {
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <SupplierList columns={columns} data={data} />
+                        <SupplierList columns={columns} data={data} tableName="suppliers" />
                     </div>
                     <Paging
                         currentPage={currentPage}

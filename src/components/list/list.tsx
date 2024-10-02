@@ -16,9 +16,10 @@ interface RowData {
 interface DataTableProps {
     columns: string[];
     data: RowData[];
+    tableName: string;
 }
 
-const List: React.FC<DataTableProps> = ({ columns, data }) => {
+const List: React.FC<DataTableProps> = ({ columns, data, tableName }) => {
     const formatCurrency = (value: number | string) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value));
     };
@@ -76,10 +77,10 @@ const List: React.FC<DataTableProps> = ({ columns, data }) => {
                                 ))}
                                 <td className="text-center px-4 py-3">
                                     <div className="flex justify-center space-x-3">
-                                        <button onClick={() => router.push(`/products/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
+                                        <button onClick={() => router.push(`/${tableName.toString()}/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
                                             <Image src={eyeIcon} alt="view icon" width={16} height={16} className="min-w-[16px] min-h-[16px]" />
                                         </button>
-                                        <button onClick={() => router.push(`/products/update/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
+                                        <button onClick={() => router.push(`/${tableName.toString()}/update/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
                                             <Image src={editIcon} alt="edit icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
                                         </button>
                                         <button onClick={showAlert} className="group w-6 h-6 md:w-auto md:h-auto">

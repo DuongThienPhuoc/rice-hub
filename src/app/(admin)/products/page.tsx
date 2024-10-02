@@ -127,7 +127,7 @@ const Page = () => {
                         </div>
                     </div>
                     <div className='overflow-x-auto lg:ml-7'>
-                        <ProductList columns={columns} data={data} />
+                        <ProductList columns={columns} data={data} tableName="products" />
                     </div>
                     <Paging
                         currentPage={currentPage}

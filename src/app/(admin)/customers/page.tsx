@@ -120,7 +120,7 @@ const Page = () => {
                         </div>
                     </div>
                     <div className='overflow-x-auto lg:ml-7'>
-                        <CustomerList columns={columns} data={data} />
+                        <CustomerList columns={columns} data={data} tableName="customers" />
                     </div>
                     <Paging
                         currentPage={currentPage}

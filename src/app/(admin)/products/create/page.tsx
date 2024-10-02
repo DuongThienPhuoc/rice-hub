@@ -30,7 +30,7 @@ const Page = () => {
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files);
-        updateImagePreviews(files);
+        updateImagePreviews([files[0]]);
     };
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
