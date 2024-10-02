@@ -1,18 +1,43 @@
-'use client'
-
+'use client';
+import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import bellIcon from '@/components/icon/bell.svg'
-import userIcon from '@/components/icon/user.svg'
-import downArrow from '@/components/icon/downArrow.svg'
-import upArrow from '@/components/icon/upArrow.svg'
-import {useState} from "react";
+import bellIcon from '@/components/icon/bell.svg';
+import userIcon from '@/components/icon/user.svg';
+import downArrow from '@/components/icon/downArrow.svg';
+import upArrow from '@/components/icon/upArrow.svg';
+import { useState } from 'react';
 
 export default function Navbar() {
+    const router = useRouter();
+    const [dropdown, setDropdown] = useState(false);
 
-    const [dropdown, setDropdown] = useState(false)
     const handleDropdown = () => {
-        setDropdown(!dropdown)
-    }
+        setDropdown(!dropdown);
+    };
+
+    const navigateToDashboard = () => {
+        router.push('/dashboard');
+    };
+
+    const navigateToProduct = () => {
+        router.push('/products');
+    };
+
+    const navigateToCustomer = () => {
+        router.push('/customers');
+    };
+
+    const navigateToEmployee = () => {
+        router.push('/employees');
+    };
+
+    const navigateToCategory = () => {
+        router.push('/categories');
+    };
+
+    const navigateToSupplier = () => {
+        router.push('/suppliers');
+    };
 
     return (
         // Navbar
@@ -20,42 +45,42 @@ export default function Navbar() {
             <div className='logo flex items-center ms-3'>
                 <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
             </div>
-
-            <div>
-                <ul className='hidden md:flex items-center gap-x-4 font-bold h-full'>
-                    <li>Tài chính</li>
+            <div className='flex items-center gap-x-10 font-bold h-full'>
+                <ul className='flex items-center gap-x-10'>
+                    <li onClick={navigateToDashboard} className="cursor-pointer">Tài chính</li>
                     <div className='relative' onClick={() => handleDropdown()}>
-                        <li className='flex gap-x-1'>
-                            Kho
+                        <li className='flex gap-x-2'>
+                            Hàng hóa
                             {
-                                dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10}/> :
-                                    <Image src={upArrow} alt='down arrow' width={10} height={10}/>
+                                dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                    <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div
-                            className={`absolute w-32 bg-[#FFFFFF] top-10 left-0 p-2 z-10 transition-all duration-300 transform origin-top ${dropdown ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'}`}>
-                            <ul className='flex flex-col gap-y-3'>
-                                <li>Danh mục</li>
-                                <li>Sản phẩm</li>
-                                <li>Nguyên liệu</li>
+                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                            <ul className='flex flex-col'>
+                                <li className='hover:bg-gray-200 p-2' onClick={navigateToCategory}>Danh mục</li>
+                                <li className='hover:bg-gray-200 p-2' onClick={navigateToProduct}>Sản phẩm</li>
+                                <li className='hover:bg-gray-200 p-2'>Nguyên liệu</li>
                             </ul>
                         </div>
                     </div>
                     <li>Giao dịch</li>
-                    <li>Khách hàng</li>
-                    <li>Nhân viên</li>
-                    <li>Nhà cung cấp</li>
+                    <li onClick={navigateToCustomer}>Khách hàng</li>
+                    <li onClick={navigateToEmployee}>Nhân viên</li>
+                    <li onClick={navigateToSupplier}>Nhà cung cấp</li>
                 </ul>
             </div>
 
+
             <div className='flex items-center'>
                 <div className='flex items-center justify-center w-12 h-12'>
-                    <Image src={bellIcon} alt='bell icon' width={24} height={24}/>
+                    <Image src={bellIcon} alt='bell icon' width={24} height={24} />
                 </div>
                 <div className='flex items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
-                    <Image src={userIcon} alt='bell icon' width={24} height={24}/>
+                    <Image src={userIcon} alt='user icon' width={24} height={24} />
                 </div>
             </div>
+
         </div>
-    )
+    );
 }
