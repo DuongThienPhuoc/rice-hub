@@ -37,10 +37,10 @@ export default function OrderPage() {
 
     const [open, setOpen] = useState(false);
     const [price, setPrice] = useState(0)
-    const [categorys, setcategorys] = useState(productCategories)
+    const [category, setCategory] = useState(productCategories)
 
     function handleSearchCategory(e: ChangeEvent<HTMLInputElement>) {
-        setcategorys(productCategories.filter(category => category.name.toLowerCase().includes(e.target.value.toLowerCase())))
+        setCategory(productCategories.filter(category => category.name.toLowerCase().includes(e.target.value.toLowerCase())))
     }
 
     return (
@@ -59,7 +59,7 @@ export default function OrderPage() {
                         </div>
                         <div>
                             <ul>
-                                {categorys.map((category) => (
+                                {category.map((category) => (
                                     <li key={category.id}
                                         className='p-2 font-normal hover:bg-gray-100 cursor-pointer'>{category.name}</li>
                                 ))}
