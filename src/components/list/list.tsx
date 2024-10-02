@@ -7,6 +7,7 @@ import eyeIcon from '@/components/icon/eye_icon.svg'
 import Image from "next/image";
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
+import { LinearProgress } from '@mui/material';
 
 interface RowData {
     [key: string]: string | number;
@@ -46,8 +47,8 @@ const List: React.FC<DataTableProps> = ({ columns, data }) => {
     };
 
     return (
-        <div>
-            <table className="min-w-[1242.99px] bg-white border-collapse">
+        <div className='w-full'>
+            <table className="min-w-[1242.99px] w-full bg-white border-collapse">
                 <thead>
                     <tr className="bg-[#e6f1fe]">
                         {columns.map((column, index) => (
@@ -65,28 +66,39 @@ const List: React.FC<DataTableProps> = ({ columns, data }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((row, rowIndex) => (
-                        <tr key={rowIndex} className={`font-semibold border border-gray-200 ${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-200'}`}>
-                            {Object.entries(row).map(([key, cell], cellIndex) => (
-                                <td key={cellIndex} className={`text-center px-4 py-3`}>
-                                    {key === 'giaTien' || key === 'giamGia' ? formatCurrency(cell) : cell}
+                    {data.length !== 0 ? (
+                        data.map((row, rowIndex) => (
+                            <tr key={rowIndex} className={`font-semibold border border-gray-200 ${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-200'}`}>
+                                {Object.entries(row).map(([key, cell], cellIndex) => (
+                                    <td key={cellIndex} className={`text-center px-4 py-3`}>
+                                        {key === 'giaTien' || key === 'giamGia' ? formatCurrency(cell) : cell}
+                                    </td>
+                                ))}
+                                <td className="text-center px-4 py-3">
+                                    <div className="flex justify-center space-x-3">
+                                        <button onClick={() => router.push(`/products/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
+                                            <Image src={eyeIcon} alt="view icon" width={16} height={16} className="min-w-[16px] min-h-[16px]" />
+                                        </button>
+                                        <button onClick={() => router.push(`/products/update/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
+                                            <Image src={editIcon} alt="edit icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
+                                        </button>
+                                        <button onClick={showAlert} className="group w-6 h-6 md:w-auto md:h-auto">
+                                            <Image src={deleteIcon} alt="delete icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
+                                        </button>
+                                    </div>
                                 </td>
-                            ))}
-                            <td className="text-center px-4 py-3">
-                                <div className="flex justify-center space-x-3">
-                                    <button onClick={() => router.push(`/products/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
-                                        <Image src={eyeIcon} alt="view icon" width={16} height={16} className="min-w-[16px] min-h-[16px]" />
-                                    </button>
-                                    <button onClick={() => router.push(`/products/update/${row.ma}`)} className="group w-6 h-6 md:w-auto md:h-auto">
-                                        <Image src={editIcon} alt="edit icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
-                                    </button>
-                                    <button onClick={showAlert} className="group w-6 h-6 md:w-auto md:h-auto">
-                                        <Image src={deleteIcon} alt="delete icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
-                                    </button>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan={columns.length}>
+                                <div className="my-4 mx-4">
+                                    <LinearProgress color="inherit" />
                                 </div>
                             </td>
                         </tr>
-                    ))}
+                    )}
+
                 </tbody>
             </table>
         </div>

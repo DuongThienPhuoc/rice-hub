@@ -2,37 +2,33 @@
 import Navbar from "@/components/navbar/navbar";
 import ResponsiveNavbar from "@/components/navbar/responsiveNavbar";
 import { Button } from '@/components/ui/button';
-import ProductList from "@/components/list/list";
+import PriceList from "@/components/list/listPrice";
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import RadioFilter from "@/components/filter/radioFilter";
 import CheckboxFilter from "@/components/filter/checkboxFilter";
 import FloatingButton from "@/components/floating/floatingButton";
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 const Page = () => {
-    const router = useRouter();
-    const columns = ['Mã sản phẩm', 'Tên sản phẩm', 'Tồn kho (kg)', 'Ngày nhập kho', 'Ngày dự kiến hết hàng', ''];
+    // const router = useRouter();
+    const columns = ['Mã sản phẩm', 'Tên sản phẩm', 'Giá chung (kg)', ''];
     const data = [
-        { ma: 'SP0000001', ten: 'ST21', soLuong: '50', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000002', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000003', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000004', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000005', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000006', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000007', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000008', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000009', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
-        { ma: 'SP0000010', ten: 'ST25', soLuong: '100', ngayNhapKho: '18/09/2024', ngayHetHang: '0 ngày' },
+        { ma: 'SP0000001', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000002', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000003', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000004', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000005', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000006', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000007', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000008', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000009', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000010', ten: 'ST21', giaTien: '12000' },
     ];
 
     const handleSearch = (query: string) => {
         console.log('Searching for:', query);
-    };
-
-    const navigateToCreate = () => {
-        router.push('/products/create');
     };
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -62,8 +58,6 @@ const Page = () => {
             window.removeEventListener('resize', updateNavbarVisibility);
         };
     }, []);
-
-
     return (
         <div>
             {navbarVisible ? (
@@ -75,7 +69,7 @@ const Page = () => {
                 <div style={{ flex: '1' }}></div>
                 {navbarVisible && (
                     <div style={{ flex: '2' }} className="my-16">
-                        <h1 className='font-bold text-[20px] pb-5'><strong>Danh sách sản phẩm</strong></h1>
+                        <h1 className='font-bold text-[20px] pb-5'><strong>Bảng giá</strong></h1>
                         <div className="pt-2">
                             <CheckboxFilter
                                 title="Loại hàng"
@@ -115,19 +109,13 @@ const Page = () => {
                                     { value: 'brand', label: 'Thương hiệu' }
                                 ]}
                             />
-                            <Button onClick={navigateToCreate} className='ml-4 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm sản phẩm
-                            </Button>
-                            <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Import
-                            </Button>
                             <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Xuất file
                             </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto lg:ml-7'>
-                        <ProductList columns={columns} data={data} />
+                        <PriceList columns={columns} data={data} />
                     </div>
                     <Paging
                         currentPage={currentPage}

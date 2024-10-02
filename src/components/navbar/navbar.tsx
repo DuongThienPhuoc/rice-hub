@@ -5,7 +5,7 @@ import bellIcon from '@/components/icon/bell.svg';
 import userIcon from '@/components/icon/user.svg';
 import downArrow from '@/components/icon/downArrow.svg';
 import upArrow from '@/components/icon/upArrow.svg';
-import { useState } from "react";
+import { useState } from 'react';
 
 export default function Navbar() {
     const router = useRouter();
@@ -39,9 +39,7 @@ export default function Navbar() {
         router.push('/suppliers');
     };
 
-
     return (
-        // Navbar
         <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-2'>
             <div className='logo flex items-center'>
                 <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
@@ -57,11 +55,11 @@ export default function Navbar() {
                                     <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] top-12 left-0 p-2' : 'hidden'}>
-                            <ul className='flex flex-col gap-y-3'>
-                                <li onClick={navigateToCategory}>Danh mục</li>
-                                <li onClick={navigateToProduct}>Sản phẩm</li>
-                                <li>Nguyên liệu</li>
+                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                            <ul className='flex flex-col'>
+                                <li className='hover:bg-gray-200 p-2' onClick={navigateToCategory}>Danh mục</li>
+                                <li className='hover:bg-gray-200 p-2' onClick={navigateToProduct}>Sản phẩm</li>
+                                <li className='hover:bg-gray-200 p-2'>Nguyên liệu</li>
                             </ul>
                         </div>
                     </div>

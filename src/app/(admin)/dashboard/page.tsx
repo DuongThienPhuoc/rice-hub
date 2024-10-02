@@ -9,11 +9,18 @@ import ArrowDown from '@/components/icon/circle_arrow_down.svg';
 import BarChart from '@/components/chart/barChart';
 import HorizontalBarChart from '@/components/chart/horizontalBarChart';
 import FloatingButton from '@/components/floating/floatingButton';
+import upArrow from '@/components/icon/upArrow.svg';
+import downArrow from '@/components/icon/downArrow.svg';
 
 const Page = () => {
-
+    const [dropdown, setDropdown] = useState(false);
     const [navbarVisible, setNavbarVisible] = useState(false);
-    const [currentPeriod, setCurrentPeriod] = useState("month");
+    const [chart1Period, setChart1Period] = useState("month");
+    const [chart2Period, setChart2Period] = useState("month");
+
+    const handleDropdown = () => {
+        setDropdown(!dropdown);
+    };
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -29,10 +36,6 @@ const Page = () => {
             window.removeEventListener('resize', updateNavbarVisibility);
         };
     }, []);
-
-    const handlePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setCurrentPeriod(event.target.value as 'week' | 'month' | 'year');
-    };
 
     return (
         <div>
@@ -84,28 +87,71 @@ const Page = () => {
                     </div>
                     <div className='bg-white rounded-md px-5 py-5 mt-7' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                         <div className='flex justify-between items-center mb-7'>
-                            {currentPeriod === 'month' && (
+                            {chart1Period === 'month' && (
                                 <h1 className="text-black font-bold">Doanh thu tháng này</h1>
                             )}
-                            {currentPeriod === 'week' && (
+                            {chart1Period === 'week' && (
                                 <h1 className="text-black font-bold">Doanh thu tuần này</h1>
                             )}
-                            {currentPeriod === 'year' && (
+                            {chart1Period === 'year' && (
                                 <h1 className="text-black font-bold">Doanh thu năm nay</h1>
                             )}
-                            <select
-                                className='text-blue-500 bg-transparent outline-none font-bold'
-                                onChange={handlePeriodChange}
-                                value={currentPeriod}>
-                                <option className='text-black' value='month'>Tháng này</option>
-                                <option className='text-black' value='week'>Tuần này</option>
-                                <option className='text-black' value='year'>Năm nay</option>
-                            </select>
+                            <div className='relative' onClick={() => handleDropdown()}>
+                                <li className='flex items-center gap-x-2 font-bold text-[#0070f4]'>
+                                    {chart1Period === 'month' && (
+                                        <>Tháng này</>
+                                    )}
+                                    {chart1Period === 'week' && (
+                                        <>Tuần này</>
+                                    )}
+                                    {chart1Period === 'year' && (
+                                        <>Năm nay</>
+                                    )}
+                                    {
+                                        dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                            <Image src={upArrow} alt='down arrow' width={10} height={10} />
+                                    }
+                                </li>
+                                <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-8 left-0' : 'hidden'}>
+                                    <ul className='flex flex-col'>
+                                        <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart1Period('month')}>Tháng này</li>
+                                        <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart1Period('week')}>Tuần này</li>
+                                        <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart1Period('year')}>Năm nay</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <BarChart period={currentPeriod} />
+                        <BarChart period={chart1Period} />
                     </div>
                     <div className='bg-white rounded-md px-5 py-5 mt-7' style={{ boxShadow: '5px 5px 5px lightgray' }}>
-                        <h1 className="text-black font-bold mb-7">Top 10 sản phẩm bán chạy tháng này</h1>
+                        <div className='flex justify-between items-center mb-7'>
+                            {chart2Period === 'month' && (
+                                <h1 className="text-black font-bold">Top 10 sản phẩm bán chạy tháng này</h1>
+                            )}
+                            {chart2Period === 'year' && (
+                                <h1 className="text-black font-bold">Top 10 sản phẩm bán chạy năm nay</h1>
+                            )}
+                            <div className='relative' onClick={() => handleDropdown()}>
+                                <li className='flex items-center gap-x-2 font-bold text-[#0070f4]'>
+                                    {chart2Period === 'month' && (
+                                        <>Tháng này</>
+                                    )}
+                                    {chart2Period === 'year' && (
+                                        <>Năm nay</>
+                                    )}
+                                    {
+                                        dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                            <Image src={upArrow} alt='down arrow' width={10} height={10} />
+                                    }
+                                </li>
+                                <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-8 left-0' : 'hidden'}>
+                                    <ul className='flex flex-col'>
+                                        <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart2Period('month')}>Tháng này</li>
+                                        <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart2Period('year')}>Năm nay</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                         <HorizontalBarChart />
                     </div>
                 </div>

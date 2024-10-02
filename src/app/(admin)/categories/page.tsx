@@ -8,22 +8,27 @@ import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import { useRouter } from 'next/navigation';
+import api from "../../../api/axiosConfig";
 
 const Page = () => {
     const router = useRouter();
     const columns = ['Mã danh mục', 'Tên danh mục', 'Mô tả chi tiết', ''];
-    const data = [
-        { ma: 'GAO001', ten: 'Gạo Nàng Thơm Chợ Đào', moTa: 'Loại gạo thơm nổi tiếng tại Long An, hạt dài, mềm, thơm nhẹ.' },
-        { ma: 'GAO002', ten: 'Gạo Tám Thái', moTa: 'Hạt gạo dài, thơm, khi nấu cho cơm dẻo, thích hợp cho các món ăn truyền thống.' },
-        { ma: 'GAO003', ten: 'Gạo ST25', moTa: 'Loại gạo ngon nhất thế giới năm 2019, hạt dài, thơm, dẻo vừa.' },
-        { ma: 'GAO004', ten: 'Gạo Tài Nguyên Chợ Đào', moTa: 'Hạt to, khi nấu cơm khô nhưng ngon, có vị ngọt tự nhiên.' },
-        { ma: 'GAO005', ten: 'Gạo Nếp Cái Hoa Vàng', moTa: 'Loại gạo nếp nổi tiếng, thơm, dẻo, dùng cho các món xôi, bánh.' },
-        { ma: 'GAO006', ten: 'Gạo Hương Lài', moTa: 'Gạo có mùi thơm đặc trưng của hoa lài, hạt dài, dẻo, thơm nhẹ.' },
-        { ma: 'GAO007', ten: 'Gạo Huyết Rồng', moTa: 'Loại gạo lứt có màu đỏ đặc trưng, chứa nhiều chất dinh dưỡng.' },
-        { ma: 'GAO008', ten: 'Gạo Nếp Than', moTa: 'Gạo nếp màu đen, dùng nhiều trong các món chè, bánh.' },
-        { ma: 'GAO009', ten: 'Gạo Lứt', moTa: 'Gạo lứt nguyên vỏ cám, giàu dinh dưỡng, tốt cho sức khỏe.' },
-        { ma: 'GAO010', ten: 'Gạo Đài Loan', moTa: 'Loại gạo nhập khẩu từ Đài Loan, hạt tròn, dẻo và mềm.' },
-    ];
+    const [categories, setCategories] = useState([]);
+
+    const getCategories = async () => {
+        try {
+            const response = await api.get("/categories/all");
+            const data = response.data;
+            setCategories(data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
+
+
+    useEffect(() => {
+        getCategories();
+    }, []);
 
     const handleSearch = (query: string) => {
         console.log('Searching for:', query);
@@ -93,7 +98,7 @@ const Page = () => {
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <CategoryList columns={columns} data={data} />
+                        <CategoryList columns={columns} data={categories} />
                     </div>
                     <Paging
                         currentPage={currentPage}
