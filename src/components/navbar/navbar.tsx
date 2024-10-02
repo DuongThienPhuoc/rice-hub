@@ -40,8 +40,9 @@ export default function Navbar() {
     };
 
     return (
-        <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-2'>
-            <div className='logo flex items-center'>
+        // Navbar
+        <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-4'>
+            <div className='logo flex items-center ms-3'>
                 <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
             </div>
             <div className='flex items-center gap-x-10 font-bold h-full'>
