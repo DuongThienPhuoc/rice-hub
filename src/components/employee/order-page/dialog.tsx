@@ -3,6 +3,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import React, {Dispatch, SetStateAction, useState} from "react";
 import {Button} from "@/components/ui/button";
+import {useToast} from "@/hooks/use-toast";
 
 export default function OrderPageDialog({open, onOpenChange, price}: {
     open: boolean,
@@ -13,6 +14,8 @@ export default function OrderPageDialog({open, onOpenChange, price}: {
     const calculateTotalCost = (mass: number) => {
         return new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(mass * price);
     }
+    const {toast} = useToast();
+
     const handleMassChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setMass(parseInt(e.target.value));
     }
@@ -42,7 +45,13 @@ export default function OrderPageDialog({open, onOpenChange, price}: {
                                disabled/>
                     </div>
                     <div className='w-full flex justify-center'>
-                        <Button onClick={() => onOpenChange(false)} className='w-full max-w-[80%]'>Đặt hàng</Button>
+                        <Button onClick={() => {
+                            onOpenChange(false)
+                            toast({
+                                title: 'Đặt hàng thành công',
+                                description: 'Đơn hàng của bạn đã thêm vào giỏ hàng',
+                            })
+                        }} className='w-full max-w-[80%]'>Đặt hàng</Button>
                     </div>
                 </section>
             </DialogContent>
