@@ -4,11 +4,13 @@ import {Input} from "@/components/ui/input";
 import React, {Dispatch, SetStateAction, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {useToast} from "@/hooks/use-toast";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
-export default function OrderPageDialog({open, onOpenChange, price}: {
+export default function OrderPageDialog({open, onOpenChange, price, type}: {
     open: boolean,
     onOpenChange: Dispatch<SetStateAction<boolean>>,
-    price: number
+    price: number,
+    type: number[]
 }) {
     const [mass, setMass] = useState(1000);
     const calculateTotalCost = (mass: number) => {
@@ -30,6 +32,19 @@ export default function OrderPageDialog({open, onOpenChange, price}: {
                     </DialogDescription>
                 </DialogHeader>
                 <section className='grid gap-4 gap-y-4'>
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                        <Label>Loại</Label>
+                        <Select>
+                            <SelectTrigger className='col-span-3'>
+                                <SelectValue placeholder='Chọn loại hàng'/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {type.map((t, index) => (
+                                    <SelectItem key={index} value={`${t}KG`}>{t} Kg</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                     <div className='grid grid-cols-4 items-center gap-4'>
                         <Label htmlFor='mass'>
                             Nhập khối lượng
