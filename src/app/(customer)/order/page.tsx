@@ -25,19 +25,21 @@ export default function OrderPage() {
         name: string,
         unit: 'kg' | 'ton',
         price: number,
+        type: number[]
     }
 
     const products: Array<Product> = [
-        {id: 'SP001', name: 'Cám con cò 1', unit: 'kg', price: 10000},
-        {id: 'SP002', name: 'Cám con cò 2', unit: 'kg', price: 20000},
-        {id: 'SP003', name: 'Cám con cò 3', unit: 'kg', price: 30000},
-        {id: 'SP004', name: 'Cám cp 1', unit: 'kg', price: 40000},
-        {id: 'SP005', name: 'Cám cp 2', unit: 'kg', price: 50000}
+        {id: 'SP001', name: 'Cám con cò 1', unit: 'kg', price: 10000, type: [10,25,50]},
+        {id: 'SP002', name: 'Cám con cò 2', unit: 'kg', price: 20000, type: [10,25,50]},
+        {id: 'SP003', name: 'Cám con cò 3', unit: 'kg', price: 30000, type: [10,25,50]},
+        {id: 'SP004', name: 'Cám cp 1', unit: 'kg', price: 40000, type: [10,25,50]},
+        {id: 'SP005', name: 'Cám cp 2', unit: 'kg', price: 50000, type: [10,25,50]}
     ]
 
     const [open, setOpen] = useState(false);
     const [price, setPrice] = useState(0)
     const [category, setCategory] = useState(productCategories)
+    const [productType, setProductType] = useState<number[]>([])
 
     function handleSearchCategory(e: ChangeEvent<HTMLInputElement>) {
         setCategory(productCategories.filter(category => category.name.toLowerCase().includes(e.target.value.toLowerCase())))
@@ -91,6 +93,7 @@ export default function OrderPage() {
                                                 <ShoppingCart onClick={() => {
                                                     setOpen(true)
                                                     setPrice(product.price)
+                                                    setProductType(product.type)
                                                 }} className='h-4 w-4 hover:cursor-pointer'/>
                                             </span>
                                         </TableCell>
@@ -101,7 +104,7 @@ export default function OrderPage() {
                     </section>
                 </section>
             </div>
-            <OrderPageDialog open={open} onOpenChange={setOpen} price={price}/>
+            <OrderPageDialog open={open} onOpenChange={setOpen} price={price} type={productType}/>
         </section>
     );
 }

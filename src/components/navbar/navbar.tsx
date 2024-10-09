@@ -2,10 +2,10 @@
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import bellIcon from '@/components/icon/bell.svg';
-import userIcon from '@/components/icon/user.svg';
 import downArrow from '@/components/icon/downArrow.svg';
 import upArrow from '@/components/icon/upArrow.svg';
 import { useState } from 'react';
+import AvatarDropdownMenu from "@/components/navbar/avatar-dropdown-menu";
 
 export default function Navbar() {
     const router = useRouter();
@@ -76,8 +76,8 @@ export default function Navbar() {
                 <div className='flex items-center justify-center w-12 h-12'>
                     <Image src={bellIcon} alt='bell icon' width={24} height={24} />
                 </div>
-                <div className='flex items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
-                    <Image src={userIcon} alt='user icon' width={24} height={24} />
+                <div>
+                    <AvatarDropdownMenu/>
                 </div>
             </div>
 
