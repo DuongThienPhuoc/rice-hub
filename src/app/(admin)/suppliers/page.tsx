@@ -1,47 +1,97 @@
 'use client';
 import Navbar from "@/components/navbar/navbar";
-import ResponsiveNavbar from "@/components/navbar/responsiveNavbar";
+import Sidebar from "@/components/navbar/sidebar";
 import { Button } from '@/components/ui/button';
 import SupplierList from "@/components/list/list";
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
-import { useRouter } from 'next/navigation';
+import api from "../../../api/axiosConfig";
+import PopupCreate from "@/components/popup/popupCreate";
 
 const Page = () => {
-    const router = useRouter();
-    const columns = ['Mã nhà cung cấp', 'Tên nhà cung cấp', 'Email', 'Số điện thoại', 'Người liên hệ', 'Địa chỉ', ''];
-    const data = [
-        { ma: '1', ten: 'Nhà cung cấp 1', email: 'demo1@gmail.com', sdt: '0912345678', contact: 'Chị Hằng', diaChi: 'Hà Nội' },
-        { ma: '2', ten: 'Nhà cung cấp 2', email: 'demo2@gmail.com', sdt: '0912345678', contact: 'Anh Tiến', diaChi: 'Hà Nội' },
-        { ma: '3', ten: 'Nhà cung cấp 3', email: 'demo3@gmail.com', sdt: '0912345678', contact: 'Anh Bằng', diaChi: 'Hà Nội' },
-        { ma: '4', ten: 'Nhà cung cấp 4', email: 'demo4@gmail.com', sdt: '0912345678', contact: 'Chị Ngọc', diaChi: 'Hà Nội' },
-        { ma: '5', ten: 'Nhà cung cấp 5', email: 'demo5@gmail.com', sdt: '0912345678', contact: 'Anh Cường', diaChi: 'Hà Nội' },
-        { ma: '6', ten: 'Nhà cung cấp 6', email: 'demo6@gmail.com', sdt: '0912345678', contact: 'Anh Hiếu', diaChi: 'Hà Nội' },
-        { ma: '7', ten: 'Nhà cung cấp 7', email: 'demo7@gmail.com', sdt: '0912345678', contact: 'Chị Linh', diaChi: 'Hà Nội' },
-        { ma: '8', ten: 'Nhà cung cấp 8', email: 'demo8@gmail.com', sdt: '0912345678', contact: 'Em Thúy', diaChi: 'Hà Nội' },
-        { ma: '9', ten: 'Nhà cung cấp 9', email: 'demo9@gmail.com', sdt: '0912345678', contact: 'Anh Hải', diaChi: 'Hà Nội' },
-        { ma: '10', ten: 'Nhà cung cấp 10', email: 'demo10@gmail.com', sdt: '0912345678', contact: 'Cô Liên', diaChi: 'Hà Nội' },
-
+    const columns = [
+        { name: 'id', displayName: 'Mã nhà cung cấp' },
+        { name: 'name', displayName: 'Tên nhà cung cấp' },
+        { name: 'contactPerson', displayName: 'Người liên hệ' },
+        { name: 'email', displayName: 'Email' },
+        { name: 'phoneNumber', displayName: 'Số điện thoại' },
+        { name: 'address', displayName: 'Địa chỉ' },
+        { name: 'active', displayName: 'Trạng thái' },
+        { name: '', displayName: '' },
+    ];
+    const [suppliers, setSuppliers] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isPopupVisible, setPopupVisible] = useState(false);
+    const [navbarVisible, setNavbarVisible] = useState(false);
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
+    const titles = [
+        { name: 'id', displayName: 'Mã nhà cung cấp', type: 'hidden' },
+        { name: 'name', displayName: 'Tên nhà cung cấp', type: 'text' },
+        { name: 'contactPerson', displayName: 'Người liên hệ', type: 'text' },
+        { name: 'email', displayName: 'Email', type: 'text' },
+        { name: 'phoneNumber', displayName: 'Số điện thoại', type: 'number' },
+        { name: 'address', displayName: 'Địa chỉ', type: 'text' },
+        { name: 'active', displayName: 'Trạng thái', type: 'checkbox' },
     ];
 
-    const handleSearch = (query: string) => {
-        console.log('Searching for:', query);
+    const openPopup = () => setPopupVisible(true);
+    const closeCreate = (reload?: boolean) => {
+        setPopupVisible(false);
+        if (reload == true) {
+            setCurrentPage(1);
+            setCurrentSearch({ field: '', query: '' });
+        }
+    }
+
+    const closeEdit = (reload?: boolean) => {
+        if (reload == true) {
+            getSuppliers(currentPage, currentSearch);
+        }
+    }
+
+    const getSuppliers = async (page?: number, search?: { field?: string, query?: string }) => {
+        try {
+            const params = new URLSearchParams();
+            params.append("pageSize", "10");
+            if (page) {
+                params.append("pageNumber", page.toString());
+            }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
+            }
+            const token = localStorage.getItem("token");
+            const url = `/suppliers/?${params.toString()}`;
+            const response = await api.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = response.data;
+            setSuppliers(data._embedded.supplierList);
+            setTotalPages(data.page.totalPages);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
+        }
     };
 
-    const navigateToCreate = () => {
-        router.push('/suppliers/create');
-    };
+    useEffect(() => {
+        getSuppliers(currentPage, currentSearch);
+    }, [currentPage, currentSearch]);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 10;
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
+    };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
-
-    const [navbarVisible, setNavbarVisible] = useState(false);
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -63,7 +113,7 @@ const Page = () => {
             {navbarVisible ? (
                 <Navbar />
             ) : (
-                <ResponsiveNavbar />
+                <Sidebar />
             )}
             <div className="flex">
                 <div style={{ flex: '1' }}></div>
@@ -81,31 +131,34 @@ const Page = () => {
                                 selectOptions={[
                                     { value: 'name', label: 'Nhà cung cấp' },
                                     { value: 'email', label: 'Email' },
-                                    { value: 'phone', label: 'Số điện thoại' }
+                                    { value: 'phoneNumber', label: 'Số điện thoại' }
                                 ]}
                             />
-                            <Button onClick={navigateToCreate} className='ml-4 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Thêm nhà cung cấp
                             </Button>
-                            <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Import
                             </Button>
-                            <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Xuất file
                             </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <SupplierList columns={columns} data={data} tableName="suppliers" />
+                        <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
                     </div>
-                    <Paging
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
+                    {totalPages > 1 && (
+                        <Paging
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
                 </div>
                 <div style={{ flex: '1' }}></div>
             </div>
+            {isPopupVisible && <PopupCreate tableName="Nhà cung cấp" url="/suppliers/createSupplier" titles={titles} handleClose={closeCreate} />}
             <FloatingButton />
         </div>
     );

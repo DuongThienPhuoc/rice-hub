@@ -1,14 +1,14 @@
 'use client';
 import Navbar from "@/components/navbar/navbar";
-import ResponsiveNavbar from "@/components/navbar/responsiveNavbar";
+import Sidebar from "@/components/navbar/sidebar";
 import { Button } from '@/components/ui/button';
 import PriceList from "@/components/list/listPrice";
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
-import RadioFilter from "@/components/filter/radioFilter";
 import CheckboxFilter from "@/components/filter/checkboxFilter";
 import FloatingButton from "@/components/floating/floatingButton";
+import DropdownSearchBar from "@/components/searchbar/dropdownSearchBar";
 // import { useRouter } from 'next/navigation';
 
 const Page = () => {
@@ -42,6 +42,10 @@ const Page = () => {
 
     }
 
+    const handlePriceChange = (value: string) => {
+        console.log(value);
+    }
+
     const [navbarVisible, setNavbarVisible] = useState(false);
 
     useEffect(() => {
@@ -63,7 +67,7 @@ const Page = () => {
             {navbarVisible ? (
                 <Navbar />
             ) : (
-                <ResponsiveNavbar />
+                <Sidebar />
             )}
             <div className="flex">
                 <div style={{ flex: '1' }}></div>
@@ -74,20 +78,11 @@ const Page = () => {
                             <CheckboxFilter
                                 title="Loại hàng"
                                 options={[
-                                    { label: 'Hàng hóa', value: 1 },
-                                    { label: 'Dịch vụ', value: 2 },
-                                    { label: 'Combo - Đóng gói', value: 3 }
-                                ]}
-                                onChange={handleFilterChange}
-                            />
-                            <RadioFilter
-                                title="Tồn kho"
-                                options={[
-                                    { label: 'Tất cả', value: 1 },
-                                    { label: 'Dưới định mức tồn', value: 2 },
-                                    { label: 'Trên định định tồn', value: 3 },
-                                    { label: 'Còn hàng', value: 4 },
-                                    { label: 'Hết', value: 5 }
+                                    { label: 'Gạo', value: 1 },
+                                    { label: 'Cám', value: 2 },
+                                    { label: 'Thóc', value: 3 },
+                                    { label: 'Trấu', value: 4 },
+                                    { label: 'Thức ăn chăn nuôi', value: 5 }
                                 ]}
                                 onChange={handleFilterChange}
                             />
@@ -107,6 +102,15 @@ const Page = () => {
                                     { value: 'productName', label: 'Tên sản phẩm' },
                                     { value: 'category', label: 'Danh mục' },
                                     { value: 'brand', label: 'Thương hiệu' }
+                                ]}
+                            />
+                            <DropdownSearchBar
+                                onChange={handlePriceChange}
+                                selectOptions={[
+                                    { value: 'basic', label: 'Bảng giá chung' },
+                                    { value: 'customer A', label: 'Bảng giá A' },
+                                    { value: 'customer B', label: 'Bảng giá B' },
+                                    { value: 'customer C', label: 'Bảng giá C' }
                                 ]}
                             />
                             <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>

@@ -1,51 +1,89 @@
 'use client';
 import Navbar from "@/components/navbar/navbar";
-import ResponsiveNavbar from "@/components/navbar/responsiveNavbar";
+import Sidebar from "@/components/navbar/sidebar";
 import { Button } from '@/components/ui/button';
 import CategoryList from "@/components/list/list";
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
-import { useRouter } from 'next/navigation';
 import api from "../../../api/axiosConfig";
+import PopupCreate from "@/components/popup/popupCreate";
 
 const Page = () => {
-    const router = useRouter();
-    const columns = ['Mã danh mục', 'Tên danh mục', 'Mô tả chi tiết', ''];
+    const columns = [
+        { name: 'id', displayName: 'Mã danh mục' },
+        { name: 'name', displayName: 'Tên danh mục' },
+        { name: 'description', displayName: 'Mô tả chi tiết' },
+        { name: '', displayName: '' },
+    ];
     const [categories, setCategories] = useState([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
+    const [isPopupVisible, setPopupVisible] = useState(false);
+    const [navbarVisible, setNavbarVisible] = useState(false);
+    const titles = [
+        { name: 'id', displayName: 'Mã danh mục', type: 'hidden' },
+        { name: 'name', displayName: 'Tên danh mục', type: 'text' },
+        { name: 'description', displayName: 'Mô tả chi tiết', type: 'textArea' },
+    ];
 
-    const getCategories = async () => {
+    const openPopup = () => setPopupVisible(true);
+    const closeCreate = (reload?: boolean) => {
+        setPopupVisible(false);
+        if (reload == true) {
+            setCurrentPage(1);
+            setCurrentSearch({ field: '', query: '' });
+        }
+    }
+
+    const closeEdit = (reload?: boolean) => {
+        if (reload == true) {
+            getCategories(currentPage, currentSearch);
+        }
+    }
+
+    const getCategories = async (page?: number, search?: { field?: string, query?: string }) => {
         try {
-            const response = await api.get("/categories/all");
+            const params = new URLSearchParams();
+            params.append("pageSize", "10");
+            if (page) {
+                params.append("pageNumber", page.toString());
+            }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
+            }
+            const token = localStorage.getItem("token");
+            const url = `/categories/?${params.toString()}`;
+            const response = await api.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             const data = response.data;
-            setCategories(data);
+            setCategories(data._embedded.categoryList);
+            setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Error fetching categories:", error);
+            console.error("Lỗi khi lấy danh sách danh mục:", error);
         }
     };
 
-
     useEffect(() => {
-        getCategories();
-    }, []);
+        getCategories(currentPage, currentSearch);
+    }, [currentPage, currentSearch]);
 
-    const handleSearch = (query: string) => {
-        console.log('Searching for:', query);
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
     };
-
-    const navigateToCreate = () => {
-        router.push('/categories/create');
-    };
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 10;
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
-
-    const [navbarVisible, setNavbarVisible] = useState(false);
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -61,12 +99,13 @@ const Page = () => {
             window.removeEventListener('resize', updateNavbarVisibility);
         };
     }, []);
+
     return (
         <div>
             {navbarVisible ? (
                 <Navbar />
             ) : (
-                <ResponsiveNavbar />
+                <Sidebar />
             )}
             <div className="flex">
                 <div style={{ flex: '1' }}></div>
@@ -82,32 +121,34 @@ const Page = () => {
                             <SearchBar
                                 onSearch={handleSearch}
                                 selectOptions={[
-                                    { value: 'id', label: 'Mã danh mục' },
-                                    { value: 'name', label: 'Tên danh mục' }
+                                    { value: 'name', label: 'Tên danh mục' },
                                 ]}
                             />
-                            <Button onClick={navigateToCreate} className='ml-4 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Thêm danh mục
                             </Button>
-                            <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Import
                             </Button>
-                            <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Xuất file
                             </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <CategoryList columns={columns} data={categories} tableName="categories" />
+                        <CategoryList name="Danh mục" editUrl="/categories/updateCategory" titles={titles} columns={columns} data={categories} tableName="categories" handleClose={closeEdit} />
                     </div>
-                    <Paging
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                    />
+                    {totalPages > 1 && (
+                        <Paging
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
                 </div>
                 <div style={{ flex: '1' }}></div>
             </div>
+            {isPopupVisible && <PopupCreate tableName="Danh mục" url="/categories/createCategory" titles={titles} handleClose={closeCreate} />}
             <FloatingButton />
         </div>
     );

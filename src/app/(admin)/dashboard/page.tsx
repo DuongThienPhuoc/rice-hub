@@ -1,6 +1,6 @@
 'use client';
 import Navbar from '@/components/navbar/navbar';
-import ResponsiveNavbar from '@/components/navbar/responsiveNavbar';
+import Sidebar from '@/components/navbar/sidebar';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import DollarIcon from '@/components/icon/dollar_circle.svg';
@@ -14,12 +14,17 @@ import downArrow from '@/components/icon/downArrow.svg';
 
 const Page = () => {
     const [dropdown, setDropdown] = useState(false);
+    const [dropdown2, setDropdown2] = useState(false);
     const [navbarVisible, setNavbarVisible] = useState(false);
     const [chart1Period, setChart1Period] = useState("month");
     const [chart2Period, setChart2Period] = useState("month");
 
     const handleDropdown = () => {
         setDropdown(!dropdown);
+    };
+    //  Bổ sung chart hiển thị số lượng tấn bán hàng tháng
+    const handleDropdown2 = () => {
+        setDropdown2(!dropdown2);
     };
 
     useEffect(() => {
@@ -42,7 +47,7 @@ const Page = () => {
             {navbarVisible ? (
                 <Navbar />
             ) : (
-                <ResponsiveNavbar />
+                <Sidebar />
             )}
             <div className='flex my-5 justify-center px-5 w-full' >
                 <div className='w-[95%] md:w-[70%]'>
@@ -97,7 +102,7 @@ const Page = () => {
                                 <h1 className="text-black font-bold">Doanh thu năm nay</h1>
                             )}
                             <div className='relative' onClick={() => handleDropdown()}>
-                                <li className='flex items-center gap-x-2 font-bold text-[#0070f4]'>
+                                <li className='flex items-center gap-x-2 font-bold text-black'>
                                     {chart1Period === 'month' && (
                                         <>Tháng này</>
                                     )}
@@ -131,7 +136,7 @@ const Page = () => {
                             {chart2Period === 'year' && (
                                 <h1 className="text-black font-bold">Top 10 sản phẩm bán chạy năm nay</h1>
                             )}
-                            <div className='relative' onClick={() => handleDropdown()}>
+                            <div className='relative' onClick={() => handleDropdown2()}>
                                 <li className='flex items-center gap-x-2 font-bold text-[#0070f4]'>
                                     {chart2Period === 'month' && (
                                         <>Tháng này</>
@@ -140,11 +145,11 @@ const Page = () => {
                                         <>Năm nay</>
                                     )}
                                     {
-                                        dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                        dropdown2 ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
                                             <Image src={upArrow} alt='down arrow' width={10} height={10} />
                                     }
                                 </li>
-                                <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-8 left-0' : 'hidden'}>
+                                <div className={dropdown2 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-8 left-0' : 'hidden'}>
                                     <ul className='flex flex-col'>
                                         <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart2Period('month')}>Tháng này</li>
                                         <li className='hover:bg-gray-200 p-2 font-semibold text-blue-500 border-b-[1px] border-blue-500' onClick={() => setChart2Period('year')}>Năm nay</li>
