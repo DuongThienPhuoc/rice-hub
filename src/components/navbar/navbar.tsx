@@ -2,10 +2,11 @@
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import bellIcon from '@/components/icon/bell.svg';
-import userIcon from '@/components/icon/user.svg';
 import downArrow from '@/components/icon/downArrow.svg';
 import upArrow from '@/components/icon/upArrow.svg';
 import { useEffect, useRef, useState } from 'react';
+import AvatarDropdownMenu from "@/components/navbar/avatar-dropdown-menu";
+import UserProfileDialog from '@/components/navbar/user-profile-dialog';
 
 export default function Navbar() {
     const router = useRouter();
@@ -14,6 +15,7 @@ export default function Navbar() {
     const [dropdown3, setDropdown3] = useState(false);
     const [dropdown4, setDropdown4] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
+    const [isUserProfileDialogOpen, setIsUserProfileDialogOpen] = useState<boolean>(false);
 
     const handleDropdown = () => {
         setDropdown(!dropdown);
@@ -132,12 +134,16 @@ export default function Navbar() {
                 </ul>
             </div>
 
-
-            <div className='flex items-center'>
-                <div className='flex items-center justify-center w-12 h-12'>
-                    <Image src={bellIcon} alt='bell icon' width={24} height={24} />
+            <div className="flex items-center">
+                <div className="flex items-center justify-center w-12 h-12">
+                    <Image
+                        src={bellIcon}
+                        alt="bell icon"
+                        width={24}
+                        height={24}
+                    />
                 </div>
-                <div onClick={() => handleDropdown2()} className='flex cursor-pointer relative items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
+                <div className='flex items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
                     <Image src={userIcon} alt='user icon' width={24} height={24} />
                 </div>
                 <div className={dropdown2 ? 'absolute w-fit bg-[#FFFFFF] shadow-lg top-[75px] right-4' : 'hidden'}>
@@ -151,6 +157,11 @@ export default function Navbar() {
                     </ul>
                 </div>
             </div>
+
+            <UserProfileDialog
+                open={isUserProfileDialogOpen}
+                setOpen={setIsUserProfileDialogOpen}
+            />
         </div>
     );
 }
