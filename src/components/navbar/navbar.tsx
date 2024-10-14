@@ -13,57 +13,44 @@ export default function Navbar() {
     const [dropdown, setDropdown] = useState(false);
     const [dropdown2, setDropdown2] = useState(false);
     const [dropdown3, setDropdown3] = useState(false);
-    const [dropdown4, setDropdown4] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
     const [isUserProfileDialogOpen, setIsUserProfileDialogOpen] = useState<boolean>(false);
 
     const handleDropdown = () => {
         setDropdown(!dropdown);
-        if (dropdown2 == true || dropdown3 == true || dropdown4 == true) {
+        if (dropdown2 == true || dropdown3 == true) {
             setDropdown2(false);
             setDropdown3(false);
-            setDropdown4(false);
         }
     };
 
     const handleDropdown2 = () => {
         setDropdown2(!dropdown2);
-        if (dropdown == true || dropdown3 == true || dropdown4 == true) {
+        if (dropdown == true || dropdown3 == true) {
             setDropdown(false);
             setDropdown3(false);
-            setDropdown4(false);
         }
     };
 
     const handleDropdown3 = () => {
         setDropdown3(!dropdown3);
-        if (dropdown == true || dropdown2 == true || dropdown4 == true) {
+        if (dropdown == true || dropdown2 == true) {
             setDropdown(false);
             setDropdown2(false);
-            setDropdown4(false);
         }
     };
 
-    const handleDropdown4 = () => {
-        setDropdown4(!dropdown4);
-        if (dropdown == true || dropdown2 == true || dropdown3 == true) {
-            setDropdown(false);
-            setDropdown2(false);
-            setDropdown3(false);
-        }
-    };
 
     const handleClickOutside = (event: MouseEvent) => {
         if (navbarRef.current && !navbarRef.current.contains(event.target as Node)) {
             setDropdown(false);
             setDropdown2(false);
             setDropdown3(false);
-            setDropdown4(false);
         }
     };
 
     useEffect(() => {
-        if (dropdown || dropdown2 || dropdown3 || dropdown4) {
+        if (dropdown || dropdown2 || dropdown3) {
             document.addEventListener('click', handleClickOutside);
         } else {
             document.removeEventListener('click', handleClickOutside);
@@ -72,7 +59,7 @@ export default function Navbar() {
         return () => {
             document.removeEventListener('click', handleClickOutside);
         };
-    }, [dropdown, dropdown2, dropdown3, dropdown4]);
+    }, [dropdown, dropdown2, dropdown3]);
 
     return (
         <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-4 font-arsenal'>
@@ -99,15 +86,15 @@ export default function Navbar() {
                             </ul>
                         </div>
                     </div>
-                    <div ref={navbarRef} className='relative' onClick={() => handleDropdown3()}>
+                    <div ref={navbarRef} className='relative' onClick={() => handleDropdown2()}>
                         <li className='flex gap-x-2'>
                             Đối tác
                             {
-                                dropdown3 ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                dropdown2 ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
                                     <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown3 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                        <div className={dropdown2 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
                             <ul className='flex flex-col'>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/customers')}>Khách hàng</li>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/employees')}>Nhân viên</li>
@@ -115,15 +102,15 @@ export default function Navbar() {
                             </ul>
                         </div>
                     </div>
-                    <div ref={navbarRef} className='relative' onClick={() => handleDropdown4()}>
+                    <div ref={navbarRef} className='relative' onClick={() => handleDropdown3()}>
                         <li className='flex gap-x-2'>
                             Giao dịch
                             {
-                                dropdown4 ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                dropdown3 ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
                                     <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown4 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                        <div className={dropdown3 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
                             <ul className='flex flex-col'>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/income')}>Thu</li>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/expenditures')}>Chi</li>
@@ -143,18 +130,10 @@ export default function Navbar() {
                         height={24}
                     />
                 </div>
-                <div className='flex items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
-                    <Image src={userIcon} alt='user icon' width={24} height={24} />
-                </div>
-                <div className={dropdown2 ? 'absolute w-fit bg-[#FFFFFF] shadow-lg top-[75px] right-4' : 'hidden'}>
-                    <ul className='flex flex-col font-bold'>
-                        <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/profile')}>Thông tin cá nhân</li>
-                        <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/settings')}>Cài đặt</li>
-                        <li className='hover:bg-gray-200 p-2' onClick={() => {
-                            localStorage.clear();
-                            router.push('/');
-                        }}>Đăng xuất</li>
-                    </ul>
+                <div>
+                    <AvatarDropdownMenu
+                        setUserProfileDialog={setIsUserProfileDialogOpen}
+                    />
                 </div>
             </div>
 
