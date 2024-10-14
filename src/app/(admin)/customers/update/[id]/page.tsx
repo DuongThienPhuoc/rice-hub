@@ -1,24 +1,25 @@
-/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Navbar from '@/components/navbar/navbar';
 import Sidebar from '@/components/navbar/sidebar';
-import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
+import api from "../../../../../api/axiosConfig";
+import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import api from "../../../../api/axiosConfig";
 
-const Page = () => {
-    const router = useRouter();
+const Page = ({ params }: { params: { id: number } }) => {
     const [navbarVisible, setNavbarVisible] = useState(false);
+    const [employee, setEmployee] = useState<any>(null);
+    const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({
-        name: '',
+        id: 0,
+        fullName: '',
         email: '',
         username: '',
-        password: '',
         phone: '',
         address: '',
-        dob: '',
+        dateOfBirth: '',
         userType: 'ROLE_EMPLOYEE',
         employeeRoleId: '',
         description: '',
@@ -29,13 +30,6 @@ const Page = () => {
         bankName: '',
         bankNumber: '',
     });
-
-    const handleFieldChange = (field: string, value: string | number | boolean) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            [field]: value,
-        }));
-    };
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -52,20 +46,44 @@ const Page = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const getEmployee = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const url = `/employees/${params.id}`;
+                console.log(url);
+                const response = await api.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                const data = response.data;
+                setEmployee(data);
+            } catch (error) {
+                console.error("Error fetching employee:", error);
+            }
+        };
+
+        if (params.id) {
+            getEmployee();
+        }
+    }, [params.id]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
             const token = localStorage.getItem("token");
-            const response = await api.post(`/user/create`, formData, {
+            console.log(formData);
+            const response = await api.post(`/employees/updateEmployee`, formData, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log(formData);
+            console.log(response);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Nhân viên đã được thêm thành công`);
+                alert(`Nhân viên đã được cập nhật thành công`);
                 router.push("/employees");
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
@@ -76,6 +94,35 @@ const Page = () => {
         }
     };
 
+    const handleFieldChange = (field: string, value: string | number | boolean) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [field]: value,
+        }));
+    };
+
+    useEffect(() => {
+        if (employee) {
+            setFormData({
+                id: params.id || 0,
+                fullName: employee.fullName || '',
+                email: employee.email || '',
+                username: employee.username || '',
+                phone: employee.phone || '',
+                address: employee.address || '',
+                dateOfBirth: employee.dateOfBirth || '',
+                userType: 'ROLE_EMPLOYEE',
+                employeeRoleId: employee.role.employeeRole.id || '',
+                description: employee.description || '',
+                active: true,
+                gender: employee.gender || '',
+                salaryType: 'DAILY',
+                dailyWage: employee.dailyWage || '0',
+                bankName: employee.bankName || '',
+                bankNumber: employee.bankNumber || '',
+            });
+        }
+    }, [employee]);
 
     return (
         <div>
@@ -88,7 +135,7 @@ const Page = () => {
                                 <button
                                     type='button'
                                     onClick={() => setChoice(index === 0)}
-                                    className={`w-[100%] lg:w-[92%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
+                                    className={`w-[100%] lg:w-[90%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
                                         ? 'text-white bg-black hover:bg-[#1d1d1fca]'
                                         : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                         }`}
@@ -107,10 +154,10 @@ const Page = () => {
                                     <input
                                         className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
                                         type='text'
-                                        name='name'
+                                        name='fullName'
                                         placeholder='Nhập đầy đủ họ và tên'
-                                        value={formData.name.toString()}
-                                        onChange={(e) => handleFieldChange('name', e.target.value)}
+                                        value={formData.fullName.toString()}
+                                        onChange={(e) => handleFieldChange('fullName', e.target.value)}
                                     />
                                 </div>
 
@@ -120,11 +167,12 @@ const Page = () => {
                                         className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
                                         name='gender'
                                         value={formData.gender.toString()}
-                                        onChange={(e) => handleFieldChange('gender', e.target.value === 'true')}
+                                        onChange={(e) => handleFieldChange('gender', e.target.value)}
                                     >
                                         <option defaultValue={''}>Chọn giới tính</option>
-                                        <option value={'true'}>Nam</option>
-                                        <option value={'false'}>Nữ</option>
+                                        <option value={'Male'}>Nam</option>
+                                        <option value={'Female'}>Nữ</option>
+                                        <option value={'Other'}>Khác</option>
                                     </select>
                                 </div>
 
@@ -133,10 +181,10 @@ const Page = () => {
                                     <input
                                         className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
                                         type='date'
-                                        name='dob'
+                                        name='dateOfBirth'
                                         placeholder='Nhập ngày sinh'
-                                        value={formData.dob.toString()}
-                                        onChange={(e) => handleFieldChange('dob', e.target.value)}
+                                        value={formData.dateOfBirth.toString()}
+                                        onChange={(e) => handleFieldChange('dateOfBirth', e.target.value)}
                                     />
                                 </div>
 
@@ -151,7 +199,6 @@ const Page = () => {
                                         onChange={(e) => handleFieldChange('phone', e.target.value)}
                                     />
                                 </div>
-
                             </div>
                             <div className='flex-1'>
                                 <div className='mx-10 mb-10 mt-0 lg:m-10 flex'>
@@ -206,20 +253,9 @@ const Page = () => {
                                         <option value={2}>Nhân viên bán hàng</option>
                                     </select>
                                 </div>
-                                <div className='m-10 flex'>
-                                    <span className='font-bold flex-1'>Mật khẩu: </span>
-                                    <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
-                                        type='password'
-                                        name='password'
-                                        placeholder='Nhập mật khẩu'
-                                        value={formData.password.toString()}
-                                        onChange={(e) => handleFieldChange('password', e.target.value)}
-                                    />
-                                </div>
                             </div>
                             <div className='flex-1'>
-                                <div className='mx-10 flex lg:my-10'>
+                                <div className='m-10 flex'>
                                     <span className='font-bold flex-1'>Tên ngân hàng: </span>
                                     <input
                                         className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
@@ -244,12 +280,12 @@ const Page = () => {
                             </div>
                         </div>
                     )}
-                    <div className='w-full flex justify-center align-bottom items-center my-10'>
+                    <div className='w-full flex justify-center items-center my-10'>
                         <Button type='submit' className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                            <strong>Thêm</strong>
+                            <strong>Cập nhật</strong>
                         </Button>
                         <Button type='button' onClick={() => router.push("/employees")} className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                            <strong>Hủy</strong>
+                            <strong>Trở về</strong>
                         </Button>
                     </div>
                 </div>

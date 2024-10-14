@@ -2,7 +2,7 @@
 'use client';
 import TextField from '@/components/field/textfield';
 import Navbar from '@/components/navbar/navbar';
-import ResponsiveNavbar from '@/components/navbar/responsiveNavbar';
+import Sidebar from '@/components/navbar/sidebar';
 import React, { useEffect, useState } from 'react';
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -39,7 +39,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             {navbarVisible ? (
                 <Navbar />
             ) : (
-                <ResponsiveNavbar />
+                <Sidebar />
             )}
             <div className='flex my-5 mt-16 justify-center px-5 w-full'>
                 <div className='w-[95%] md:w-[70%] flex bg-white rounded-lg flex-col lg:flex-row' style={{ boxShadow: '5px 5px 5px lightgray' }}>

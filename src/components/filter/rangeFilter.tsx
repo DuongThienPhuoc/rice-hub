@@ -35,7 +35,7 @@ const RangeFilter: React.FC<RangeFilterProps> = ({ title, min, max, step, onChan
 
             {isDropdownOpen && (
                 <div className="my-4 mx-2">
-                    <span className='text-red-500'>
+                    <span className='text-blue-500'>
                         {rangeValue[0].toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
                         <span> - </span>
                         {rangeValue[1].toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
