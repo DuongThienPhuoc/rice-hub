@@ -57,13 +57,8 @@ const Page = () => {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
-            const token = localStorage.getItem("token");
             const url = `/categories/?${params.toString()}`;
-            const response = await api.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.get(url);
             const data = response.data;
             setCategories(data._embedded.categoryList);
             setTotalPages(data.page.totalPages);

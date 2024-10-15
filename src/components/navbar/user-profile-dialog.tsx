@@ -43,7 +43,7 @@ export default function UserProfileDialog({
         setIsEdit(!isEdit);
     }
 
-    function handleSave(values: z.infer<typeof userProfileFormSchema>){
+    function handleSave(values: z.infer<typeof userProfileFormSchema>) {
         console.log(values);
     }
 

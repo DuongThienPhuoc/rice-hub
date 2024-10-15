@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Navbar from '@/components/navbar/navbar';
@@ -33,14 +34,8 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const url = `/employees/${params.id}`;
-                console.log(url);
-                const response = await api.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get(url);
                 const data = response.data;
                 setEmployee(data);
             } catch (error) {
@@ -90,6 +85,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                     <div className='flex flex-col lg:flex-row px-10'>
                         {choice ? (
                             <div className='flex-[3]'>
+                                <div className='m-10 flex justify-center'>
+                                    <img
+                                        src={employee?.image || "https://via.placeholder.com/150"}
+                                        alt="Avatar"
+                                        className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                                    />
+                                </div>
+
                                 <div className='m-10 flex'>
                                     <span className='font-bold flex-1'>Mã nhân viên: </span>
                                     <strong className='flex-[2] ml-5 '>{employee?.employeeCode}</strong>
@@ -127,6 +130,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                         ) : (
                             <div className='flex-[3]'>
+                                <div className='m-10 flex justify-center'>
+                                    <img
+                                        src="https://github.com/shadcn.png"
+                                        alt="Avatar"
+                                        className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                                    />
+                                </div>
+
                                 <div className='m-10 flex'>
                                     <span className='font-bold flex-1'>Tên đăng nhập: </span>
                                     <strong className='flex-[2] ml-5 '>{employee?.username}</strong>
@@ -147,13 +158,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                         )}
 
-                        <div className='flex-1 flex justify-center'>
-                            <div className='w-[100px] h-[100px] border-[3px] border-blue-400 mt-10'>
-
-                            </div>
-                        </div>
-
-                        <div className='flex-[3] flex justify-center py-10'>
+                        <div className='flex-[3] flex justify-center lg:py-10 py-0'>
                             <div className='w-[350px] h-[200px] bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl p-6 shadow-lg'>
                                 <div className='flex justify-between items-center'>
                                     <div className='text-lg font-bold'>{employee?.bankName}</div>
@@ -176,10 +181,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                         </div>
                     </div>
                     <div className='w-full flex justify-center items-center my-10'>
-                        <Button type='button' onClick={() => router.push(`/employees/${params.id}`)} className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='button' onClick={() => router.push(`/employees/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Sửa</strong>
                         </Button>
-                        <Button type='button' onClick={() => router.push("/employees")} className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='button' onClick={() => router.push("/employees")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Trở về</strong>
                         </Button>
                     </div>

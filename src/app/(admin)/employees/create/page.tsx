@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import Navbar from '@/components/navbar/navbar';
@@ -11,6 +12,21 @@ const Page = () => {
     const router = useRouter();
     const [navbarVisible, setNavbarVisible] = useState(false);
     const [choice, setChoice] = useState(true);
+    const [image, setImage] = useState<string>("");
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === "string") {
+                    setImage(reader.result);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({
         name: '',
         email: '',
@@ -56,14 +72,7 @@ const Page = () => {
         e.preventDefault();
 
         try {
-            const token = localStorage.getItem("token");
-            const response = await api.post(`/user/create`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            console.log(formData);
+            const response = await api.post(`/user/create`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Nhân viên đã được thêm thành công`);
                 router.push("/employees");
@@ -98,6 +107,23 @@ const Page = () => {
                                 </button>
                             </div>
                         ))}
+                    </div>
+                    <div className='mt-10 flex flex-col items-center'>
+                        <img
+                            src={image || "https://via.placeholder.com/150"}
+                            alt='Avatar'
+                            className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                        />
+                        <label htmlFor="image-upload" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                            {image ? 'Thay ảnh' : 'Thêm ảnh'}
+                        </label>
+                        <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                        />
                     </div>
                     {choice ? (
                         <div className='flex flex-col lg:flex-row px-10'>
@@ -245,10 +271,10 @@ const Page = () => {
                         </div>
                     )}
                     <div className='w-full flex justify-center align-bottom items-center my-10'>
-                        <Button type='submit' className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Thêm</strong>
                         </Button>
-                        <Button type='button' onClick={() => router.push("/employees")} className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Hủy</strong>
                         </Button>
                     </div>
