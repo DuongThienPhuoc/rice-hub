@@ -49,13 +49,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
         }
 
         try {
-            const token = localStorage.getItem("token");
-            const response = await api.post(`${url}`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.post(`${url}`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`${tableName} đã được thêm thành công`);
                 handleClose(true);

@@ -5,17 +5,18 @@ import MenuIcon from '@/components/icon/menu.svg';
 import ChevronRightIcon from '@/components/icon/chevron_right_white.svg';
 import ChevronDownIcon from '@/components/icon/upArrowWhite.svg';
 import bellIcon from '@/components/icon/bell.svg';
-import userIcon from '@/components/icon/user.svg';
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
+import AvatarDropdownMenu from "./avatar-dropdown-menu";
+import UserProfileDialog from "./user-profile-dialog";
 
 export default function Sidebar() {
     const [navbarExpanded, setNavbarExpanded] = useState(false);
     const [dropdown, setDropdown] = useState(false);
     const [dropdown2, setDropdown2] = useState(false);
     const [dropdown3, setDropdown3] = useState(false);
-    const [dropdown4, setDropdown4] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const [isUserProfileDialogOpen, setIsUserProfileDialogOpen] = useState<boolean>(false);
     const router = useRouter();
 
     const handleToggleNavbar = () => {
@@ -32,10 +33,6 @@ export default function Sidebar() {
 
     const handleDropdown3 = () => {
         setDropdown3(!dropdown3);
-    };
-
-    const handleDropdown4 = () => {
-        setDropdown4(!dropdown4);
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -71,23 +68,24 @@ export default function Sidebar() {
                 </div>
                 <h1 className='flex-1 font-extrabold text-[32px]'>Ricehub</h1>
                 <div className='flex flex-1 justify-end items-center'>
-                    <div className='flex items-center justify-center w-12 h-12'>
-                        <Image src={bellIcon} alt='bell icon' width={24} height={24} />
+                    <div className="flex items-center justify-center w-12 h-12">
+                        <Image
+                            src={bellIcon}
+                            alt="bell icon"
+                            width={24}
+                            height={24}
+                        />
                     </div>
-                    <div onClick={() => handleDropdown2()} className='flex relative items-center justify-center w-12 h-12 bg-[#F2F4F8] rounded-full'>
-                        <Image src={userIcon} alt='user icon' width={24} height={24} />
-                    </div>
-                    <div className={dropdown2 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-[75px] right-4' : 'hidden'}>
-                        <ul className='flex flex-col font-bold'>
-                            <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/profile')}>Thông tin cá nhân</li>
-                            <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/settings')}>Cài đặt</li>
-                            <li className='hover:bg-gray-200 p-2' onClick={() => {
-                                localStorage.clear();
-                                router.push('/');
-                            }}>Đăng xuất</li>
-                        </ul>
+                    <div>
+                        <AvatarDropdownMenu
+                            setUserProfileDialog={setIsUserProfileDialogOpen}
+                        />
                     </div>
                 </div>
+                <UserProfileDialog
+                    open={isUserProfileDialogOpen}
+                    setOpen={setIsUserProfileDialogOpen}
+                />
             </div>
 
             <div
@@ -112,26 +110,26 @@ export default function Sidebar() {
                         <button onClick={() => router.push('/prices')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Bảng giá</button>
                     </div>
 
-                    <button onClick={handleDropdown3} className="flex px-5 py-3 border-b border-gray-700 hover:bg-gray-500 justify-between w-full pr-5 items-center">
+                    <button onClick={handleDropdown2} className="flex px-5 py-3 border-b border-gray-700 hover:bg-gray-500 justify-between w-full pr-5 items-center">
                         <span>Đối tác</span>
-                        <Image src={dropdown3 ? ChevronDownIcon : ChevronRightIcon} alt='toggle arrow' width={10} height={10} />
+                        <Image src={dropdown2 ? ChevronDownIcon : ChevronRightIcon} alt='toggle arrow' width={10} height={10} />
                     </button>
 
                     <div
-                        className={`pl-3 overflow-hidden transition-[max-height] duration-500 ease-in-out ${dropdown3 ? 'max-h-96' : 'max-h-0'}`}
+                        className={`pl-3 overflow-hidden transition-[max-height] duration-500 ease-in-out ${dropdown2 ? 'max-h-96' : 'max-h-0'}`}
                     >
                         <button onClick={() => router.push('/customers')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Khách hàng</button>
                         <button onClick={() => router.push('/employees')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Nhân viên</button>
                         <button onClick={() => router.push('/suppliers')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Nhà cung cấp</button>
                     </div>
 
-                    <button onClick={handleDropdown4} className="flex px-5 py-3 border-b border-gray-700 hover:bg-gray-500 justify-between w-full pr-5 items-center">
+                    <button onClick={handleDropdown3} className="flex px-5 py-3 border-b border-gray-700 hover:bg-gray-500 justify-between w-full pr-5 items-center">
                         <span>Giao dịch</span>
-                        <Image src={dropdown4 ? ChevronDownIcon : ChevronRightIcon} alt='toggle arrow' width={10} height={10} />
+                        <Image src={dropdown3 ? ChevronDownIcon : ChevronRightIcon} alt='toggle arrow' width={10} height={10} />
                     </button>
 
                     <div
-                        className={`pl-3 overflow-hidden transition-[max-height] duration-500 ease-in-out ${dropdown4 ? 'max-h-96' : 'max-h-0'}`}
+                        className={`pl-3 overflow-hidden transition-[max-height] duration-500 ease-in-out ${dropdown3 ? 'max-h-96' : 'max-h-0'}`}
                     >
                         <button onClick={() => router.push('/income')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Thu</button>
                         <button onClick={() => router.push('/expenditures')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Chi</button>

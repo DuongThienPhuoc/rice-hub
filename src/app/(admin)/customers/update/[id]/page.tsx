@@ -49,14 +49,9 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const url = `/employees/${params.id}`;
                 console.log(url);
-                const response = await api.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get(url);
                 const data = response.data;
                 setEmployee(data);
             } catch (error) {
@@ -73,15 +68,7 @@ const Page = ({ params }: { params: { id: number } }) => {
         e.preventDefault();
 
         try {
-            const token = localStorage.getItem("token");
-            console.log(formData);
-            const response = await api.post(`/employees/updateEmployee`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            console.log(response);
+            const response = await api.post(`/employees/updateEmployee`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Nhân viên đã được cập nhật thành công`);
                 router.push("/employees");
@@ -122,7 +109,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 bankNumber: employee.bankNumber || '',
             });
         }
-    }, [employee]);
+    }, [employee, params.id]);
 
     return (
         <div>

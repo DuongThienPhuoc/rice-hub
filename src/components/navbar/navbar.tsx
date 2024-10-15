@@ -77,7 +77,7 @@ export default function Navbar() {
                                     <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                        <div className={dropdown ? 'absolute w-32 bg-[#FFFFFF] shadow-lg z-50 top-12 left-0' : 'hidden'}>
                             <ul className='flex flex-col'>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/categories')}>Danh mục</li>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/products')}>Sản phẩm</li>
@@ -94,7 +94,7 @@ export default function Navbar() {
                                     <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown2 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                        <div className={dropdown2 ? 'absolute w-32 z-50 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
                             <ul className='flex flex-col'>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/customers')}>Khách hàng</li>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/employees')}>Nhân viên</li>
@@ -110,7 +110,7 @@ export default function Navbar() {
                                     <Image src={upArrow} alt='down arrow' width={10} height={10} />
                             }
                         </li>
-                        <div className={dropdown3 ? 'absolute w-32 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
+                        <div className={dropdown3 ? 'absolute w-32 z-50 bg-[#FFFFFF] shadow-lg top-12 left-0' : 'hidden'}>
                             <ul className='flex flex-col'>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/income')}>Thu</li>
                                 <li className='hover:bg-gray-200 p-2' onClick={() => router.push('/expenditures')}>Chi</li>

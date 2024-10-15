@@ -44,15 +44,10 @@ const Page = () => {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
-            const token = localStorage.getItem("token");
-            const url = `/employees/?${params.toString()}`;
-            const response = await api.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const url = `/customer/?${params.toString()}`;
+            const response = await api.get(url);
             const data = response.data;
-            setCustomers(data._embedded.employeeList);
+            setCustomers(data._embedded.customerList);
             setTotalPages(data.page.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách khách hàng:", error);

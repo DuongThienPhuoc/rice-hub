@@ -53,13 +53,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
         }
 
         try {
-            const token = localStorage.getItem("token");
-            const response = await api.post(`${url}`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.post(`${url}`, formData);
 
             if (response.status >= 200 && response.status < 300) {
                 alert(`Cập nhật ${tableName.toLocaleLowerCase()} thành công`);

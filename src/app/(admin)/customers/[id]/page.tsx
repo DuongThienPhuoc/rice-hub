@@ -33,14 +33,8 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const url = `/employees/${params.id}`;
-                console.log(url);
-                const response = await api.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get(url);
                 const data = response.data;
                 setEmployee(data);
             } catch (error) {

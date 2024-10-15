@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import Navbar from '@/components/navbar/navbar';
@@ -13,7 +14,20 @@ const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({});
+    const [image, setImage] = useState<string>("");
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                if (typeof reader.result === "string") {
+                    setImage(reader.result);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
     useEffect(() => {
         const updateNavbarVisibility = () => {
             const shouldShowNavbar = window.innerWidth >= 1100;
@@ -32,13 +46,8 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         const getEmployee = async () => {
             try {
-                const token = localStorage.getItem("token");
                 const url = `/employees/${params.id}`;
-                const response = await api.get(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await api.get(url);
                 const data = response.data;
                 setEmployee(data);
             } catch (error) {
@@ -55,15 +64,7 @@ const Page = ({ params }: { params: { id: number } }) => {
         e.preventDefault();
 
         try {
-            const token = localStorage.getItem("token");
-            console.log("formData: " + formData);
-            const response = await api.post(`/employees/updateEmployee`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            console.log(response);
+            const response = await api.post(`/employees/updateEmployee`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Nhân viên đã được cập nhật thành công`);
                 router.push("/employees");
@@ -81,28 +82,30 @@ const Page = ({ params }: { params: { id: number } }) => {
             ...prevData,
             [field]: value,
         }));
+        console.log(employee.dob);
     };
 
     useEffect(() => {
         if (employee) {
             setFormData({
                 id: params.id,
-                fullName: employee.fullName || '',
-                email: employee.email || '',
-                username: employee.username || '',
-                phone: employee.phone || '',
-                address: employee.address || '',
-                dateOfBirth: employee.dateOfBirth || '',
+                fullName: employee.fullName,
+                email: employee.email,
+                username: employee.username,
+                phone: employee.phone,
+                address: employee.address,
+                dob: employee.dob,
                 userType: 'ROLE_EMPLOYEE',
-                employeeRoleId: employee.role.employeeRole.id || '',
-                description: employee.description || '',
+                employeeRoleId: employee.role.employeeRole.id,
+                description: employee.description,
                 active: true,
-                gender: employee.gender || '',
+                gender: employee.gender,
                 salaryType: 'DAILY',
-                dailyWage: employee.dailyWage || '0',
-                bankName: employee.bankName || '',
-                bankNumber: employee.bankNumber || '',
+                dailyWage: employee.dailyWage || 0,
+                bankName: employee.bankName,
+                bankNumber: employee.bankNumber,
             });
+            setImage(employee.image);
         }
     }, [employee, params.id]);
 
@@ -128,6 +131,23 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                         ))}
                     </div>
+                    <div className='mt-10 flex flex-col items-center'>
+                        <img
+                            src={image || "https://via.placeholder.com/150"}
+                            alt='Avatar'
+                            className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                        />
+                        <label htmlFor="image-upload" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                            {image ? 'Thay ảnh' : 'Thêm ảnh'}
+                        </label>
+                        <input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                        />
+                    </div>
                     {choice ? (
                         <div className='flex flex-col lg:flex-row px-10'>
                             <div className='flex-1'>
@@ -148,8 +168,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <select
                                         className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
                                         name='gender'
-                                        value={formData.gender?.toString() || ''}
-                                        onChange={(e) => handleFieldChange('gender', e.target.value === "true")}
+                                        value={formData?.gender === '' ? '' : (formData?.gender === true ? "true" : "false")}
+                                        onChange={(e) => handleFieldChange('gender', e.target.value === "true" ? true : false)}
                                     >
                                         <option defaultValue="">Chọn giới tính</option>
                                         <option value="true">Nam</option>
@@ -262,10 +282,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                         </div>
                     )}
                     <div className='w-full flex justify-center items-center my-10'>
-                        <Button type='submit' className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Cập nhật</strong>
                         </Button>
-                        <Button type='button' onClick={() => router.push("/employees")} className='ml-2 mt-4 lg:mt-0 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Trở về</strong>
                         </Button>
                     </div>

@@ -28,23 +28,18 @@ const Page = () => {
                     "Content-Type": "application/json",
                 },
             });
-            console.log('Login success:', response.data.message);
-            localStorage.setItem("token", response.data.token);
+            console.log('Login success');
             localStorage.setItem("role", response.data.userType);
+            setLoading(false);
+            if (response.data.userType && response.data.userType == 'ROLE_ADMIN') {
+                router.push('/dashboard');
+            } else if (response.data.userType && response.data.userType == 'ROLE_EMPLOYEE') {
+                router.push('/');
+            } else if (response.data.userType && response.data.userType == 'ROLE_CUSTOMER') {
+                router.push('/');
+            }
         } catch (error) {
             console.error('Login error:', error);
-        } finally {
-            setLoading(false);
-            const role = localStorage.getItem("role");
-            if (role && role == 'ROLE_ADMIN') {
-                router.push('/dashboard');
-            } else if (role && role == 'ROLE_EMPLOYEE') {
-                router.push('/');
-            } else if (role && role == 'ROLE_CUSTOMER') {
-                router.push('/');
-            } else {
-                console.log('Login failed!');
-            }
         }
     };
 

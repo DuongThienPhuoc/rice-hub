@@ -56,13 +56,7 @@ const Page = () => {
         e.preventDefault();
 
         try {
-            const token = localStorage.getItem("token");
-            const response = await api.post(`/user/create`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.post(`/user/create`, formData);
             console.log(formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Nhân viên đã được thêm thành công`);
