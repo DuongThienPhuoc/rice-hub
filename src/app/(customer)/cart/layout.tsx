@@ -1,13 +1,17 @@
-import {ReactNode} from "react";
-import Navbar from "@/components/navbar/navbar";
+import { ReactNode } from 'react';
+import Navbar from '@/components/navbar/navbar';
+import { Metadata } from 'next';
 
-export default function CartLayout({children}: { children: ReactNode }) {
+export const metadata: Metadata = {
+    title: 'Giỏ hàng',
+    description: 'Giỏ hàng',
+};
+
+export default function CartLayout({ children }: { children: ReactNode }) {
     return (
         <main>
-            <Navbar/>
-            <section className='container mx-auto'>
-                {children}
-            </section>
+            <Navbar />
+            <section className="container mx-auto">{children}</section>
         </main>
-    )
+    );
 }
