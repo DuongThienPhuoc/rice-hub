@@ -1,11 +1,10 @@
 import CartTable from "@/app/(customer)/cart/table";
+import CartPageBreadcrumb from '@/app/(customer)/cart/breadcrumb';
 
 export default function CartPage(){
     return (
         <section>
-            <div>
-                <h1 className='font-bold text-[18px] py-5'>Giỏ hàng</h1>
-            </div>
+            <CartPageBreadcrumb/>
             <div>
                 <CartTable/>
             </div>
