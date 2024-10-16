@@ -29,7 +29,7 @@ export default function AvatarDropdownMenu({
                     <AvatarFallback>U</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent className="w-56" align='end'>
                 <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
