@@ -17,7 +17,7 @@ export default function CartLayout({ children }: { children: ReactNode }) {
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <CartPageBreadcrumb />
             </header>
-            <main className="w-full">{children}</main>
+           {children}
         </>
     );
 }

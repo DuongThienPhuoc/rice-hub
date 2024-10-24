@@ -12,7 +12,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import OrderPageDialog from '@/app/(customer)/order/dialog';
-import { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { orderStore } from '@/stores/orderStore';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -24,7 +24,6 @@ import {
 } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { getProductList } from '@/data/customer-product';
-import { Product as ProductType } from '@/data/customer-product';
 import { useProductStore } from '@/stores/productStore';
 import PaginationComponent from '@/components/pagination/pagination';
 import { SidebarTrigger } from '@/components/ui/sidebar';
@@ -67,19 +66,23 @@ export default function OrderPage() {
     }
 
     async function getProduct() {
-        const response = await getProductList({
-            pageSize: 5,
-            pageNumber: currentPage + 1,
-        });
-        return response.data as ProductType;
+        try {
+            const response = await getProductList({
+                pageSize: 5,
+                pageNumber: currentPage + 1,
+            });
+            setProducts(response.data._embedded.productDtoList);
+            setTotalPages(response.data.page.totalPages);
+        }catch (e) {
+            if(e instanceof Error){
+                throw new Error(`An error occurred while fetching products: ${e.message}`)
+            }
+            throw new Error('An error occurred while fetching products')
+        }
     }
 
     useEffect(() => {
         getProduct()
-            .then((data) => {
-                setProducts(data._embedded.productDtoList);
-                setTotalPages(data.page.totalPages);
-            })
             .catch((e) => console.error(e));
     }, [currentPage]);
 
@@ -213,15 +216,15 @@ export default function OrderPage() {
                                                     {product.categoryId === '1'
                                                         ? 'Gạo'
                                                         : product.categoryId ===
-                                                            '2'
-                                                          ? 'Cám'
-                                                          : product.categoryId ===
-                                                              '3'
-                                                            ? 'Thóc'
+                                                        '2'
+                                                            ? 'Cám'
                                                             : product.categoryId ===
+                                                            '3'
+                                                                ? 'Thóc'
+                                                                : product.categoryId ===
                                                                 '4'
-                                                              ? 'Trấu'
-                                                              : 'Thức ăn chăn nuôi'}
+                                                                    ? 'Trấu'
+                                                                    : 'Thức ăn chăn nuôi'}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
@@ -230,9 +233,9 @@ export default function OrderPage() {
                                                     1
                                                         ? 'Tấn'
                                                         : product.unitOfMeasureId ===
-                                                            2
-                                                          ? 'Kg'
-                                                          : 'Yến'}
+                                                        2
+                                                            ? 'Kg'
+                                                            : 'Yến'}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
