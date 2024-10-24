@@ -1,7 +1,7 @@
 'use client'
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {Checkbox} from "@/components/ui/checkbox";
-import {useState} from "react";
+import { useEffect, useState } from 'react';
 import {Button} from "@/components/ui/button";
 import CartDialog from "@/app/(customer)/cart/dialog";
 import {useProductSelectedStore} from '@/stores/cartTableStore'
@@ -18,9 +18,15 @@ export default function CartTable() {
         price: number;
     }
 
-    const localStorageProducts: Product[] = JSON.parse(localStorage.getItem('cart') || '[]');
-
-    const [products, setProducts] = useState<Product[]>(localStorageProducts)
+    const [products, setProducts] = useState<Product[]>([]);
+    useEffect(() => {
+        const localStorageProducts =
+            typeof window !== 'undefined' ? localStorage.getItem('cart') : null;
+        const parsedProducts: Product[] = localStorageProducts
+            ? JSON.parse(localStorageProducts)
+            : [];
+        setProducts(parsedProducts);
+    }, []);
 
     const selectedProduct = useProductSelectedStore(state => state.selected)
     const updateSelectedProduct = useProductSelectedStore(state => state.handleSelected)

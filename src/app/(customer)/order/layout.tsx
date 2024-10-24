@@ -1,5 +1,4 @@
 import React from 'react';
-import Navbar from '@/components/navbar/navbar';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -13,9 +12,8 @@ export default function OrderPageLayout({
     children: React.ReactNode;
 }) {
     return (
-        <main>
-            <Navbar />
+        <>
             {children}
-        </main>
+        </>
     );
 }
