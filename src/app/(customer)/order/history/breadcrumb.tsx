@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -9,10 +9,10 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/navigation';
 
-export default function CartPageBreadcrumb() {
+export default function OrderHistoryPageBreadcrumb() {
     const router = useRouter();
     return (
-        <Breadcrumb>
+        <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink onClick={() => router.push('/')}>
@@ -27,7 +27,13 @@ export default function CartPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Giỏ hàng</BreadcrumbPage>
+                    <BreadcrumbLink onClick={() => router.push('/cart')}>
+                        Giỏ hàng
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Lịch sử đơn hàng</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

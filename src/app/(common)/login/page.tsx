@@ -87,7 +87,7 @@ const Page = () => {
                         />
                     </div>
                     <div className='flex justify-between text-[12px] font-semibold font-arsenal text-gray-400 mt-2'>
-                        <p className='hover:text-gray-600 hover:cursor-pointer'>Quên mật khẩu ?</p>
+                        <p onClick={() => router.push('/forgot-password')} className='hover:text-gray-600 hover:cursor-pointer'>Quên mật khẩu ?</p>
                         <p onClick={() => router.push("/register")} className='hover:text-gray-600 hover:cursor-pointer'>Chưa có tài khoản ?</p>
                     </div>
                 </div>
