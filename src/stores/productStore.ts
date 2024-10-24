@@ -1,14 +1,15 @@
-import {create} from 'zustand'
+import { create } from 'zustand';
+import { ProductDtoList } from '@/data/customer-product';
 
 type State = {
-    price: number
-}
+    products: ProductDtoList[];
+};
 
 type Actions = {
-    setPrice: (price: State['price']) => void
-}
+    setProducts: (products: ProductDtoList[]) => void;
+};
 
-export const productPriceStore = create<State & Actions>((set) => ({
-    price: 0,
-    setPrice: (price) => set(() => ({price: price}))
-}))
+export const useProductStore = create<State & Actions>((set) => ({
+    products: [],
+    setProducts: (products) => set({ products }),
+}));
