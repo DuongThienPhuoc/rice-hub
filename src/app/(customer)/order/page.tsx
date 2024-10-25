@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Search, ShoppingCart, CirclePlus } from 'lucide-react';
+import { Search, ShoppingCart, CirclePlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -12,7 +12,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import OrderPageDialog from '@/app/(customer)/order/dialog';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { orderStore } from '@/stores/orderStore';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
@@ -32,39 +32,12 @@ import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
 
 export default function OrderPage() {
     const router = useRouter();
-
-    interface ProductCategory {
-        id: number;
-        name: string;
-    }
-
-    const productCategories: Array<ProductCategory> = [
-        { id: 1, name: 'Cám' },
-        { id: 2, name: 'Cám cp' },
-        { id: 3, name: 'Đỗ' },
-        { id: 4, name: 'Gạo rượu' },
-        { id: 5, name: 'Men rượu' },
-    ];
-
     const [open, setOpen] = useState(false);
-    const [category, setCategory] = useState(productCategories);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const product = orderStore((state) => state.product);
-    // const updateProducts = orderStore((state) => state.updateProducts);
     const products = useProductStore((state) => state.products);
     const setProducts = useProductStore((state) => state.setProducts);
-
-    function handleSearchCategory(e: ChangeEvent<HTMLInputElement>) {
-        setCategory(
-            productCategories.filter((category) =>
-                category.name
-                    .toLowerCase()
-                    .includes(e.target.value.toLowerCase()),
-            ),
-        );
-    }
-
     async function getProduct() {
         try {
             const response = await getProductList({
@@ -86,6 +59,20 @@ export default function OrderPage() {
             .catch((e) => console.error(e));
     }, [currentPage]);
 
+    //TODO: This is a mock data for product categories
+    interface ProductCategory {
+        id: number;
+        name: string;
+    }
+
+    const productCategories: Array<ProductCategory> = [
+        { id: 1, name: 'Cám' },
+        { id: 2, name: 'Cám cp' },
+        { id: 3, name: 'Đỗ' },
+        { id: 4, name: 'Gạo rượu' },
+        { id: 5, name: 'Men rượu' },
+    ];
+
     return (
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 mb-5">
@@ -94,38 +81,7 @@ export default function OrderPage() {
                 <OrderPageBreadcrumb />
             </header>
             <section className="container mx-auto">
-                <div className="grid grid-cols-5 gap-x-2">
-                    <section>
-                        <section className="bg-white p-3 rounded-lg flex flex-col gap-y-2">
-                            <div className="flex justify-between text-[16px] font-bold">
-                                <h1>Nhóm hàng</h1>
-                                <span>
-                                    <ChevronDown />
-                                </span>
-                            </div>
-                            <div className="relative">
-                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2  h-4 w-4 text-gray-500" />
-                                <Input
-                                    type="text"
-                                    placeholder="Tìm kiếm nhóm hàng"
-                                    className="pl-9"
-                                    onChange={handleSearchCategory}
-                                />
-                            </div>
-                            <div>
-                                <ul>
-                                    {category.map((category) => (
-                                        <li
-                                            key={category.id}
-                                            className="p-2 font-normal hover:bg-gray-100 cursor-pointer"
-                                        >
-                                            {category.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </section>
-                    </section>
+                <div>
                     <section className="col-span-4">
                         <section className="mb-2 flex justify-between">
                             <div className="flex gap-x-1">
