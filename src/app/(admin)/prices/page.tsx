@@ -13,18 +13,18 @@ import DropdownSearchBar from "@/components/searchbar/dropdownSearchBar";
 
 const Page = () => {
     // const router = useRouter();
-    const columns = ['Mã sản phẩm', 'Tên sản phẩm', 'Giá chung (kg)', ''];
+    const columns = ['Mã sản phẩm', 'Tên sản phẩm', 'Giá nhập', 'Đơn giá (kg)'];
     const data = [
-        { ma: 'SP0000001', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000002', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000003', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000004', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000005', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000006', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000007', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000008', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000009', ten: 'ST21', giaTien: '12000' },
-        { ma: 'SP0000010', ten: 'ST21', giaTien: '12000' },
+        { ma: 'SP0000001', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000002', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000003', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000004', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000005', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000006', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000007', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000008', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000009', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
+        { ma: 'SP0000010', ten: 'ST21', importPrice: '10000', giaTien: '12000' },
     ];
 
     const handleSearch = (query: string) => {
@@ -118,7 +118,7 @@ const Page = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className='overflow-x-auto lg:ml-7'>
+                    <div className='overflow-hidden lg:ml-7'>
                         <PriceList columns={columns} data={data} />
                     </div>
                     <Paging

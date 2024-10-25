@@ -40,6 +40,7 @@ const Page = () => {
             }
         } catch (error) {
             console.error('Login error:', error);
+            setLoading(false);
         }
     };
 

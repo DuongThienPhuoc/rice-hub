@@ -71,7 +71,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <button
                                     type='button'
                                     onClick={() => setChoice(index === 0)}
-                                    className={`w-[100%] lg:w-[92%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
+                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
                                         ? 'text-white bg-black hover:bg-[#1d1d1fca]'
                                         : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                         }`}
@@ -93,67 +93,67 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     />
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Mã nhân viên: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.employeeCode}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.employeeCode}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Tên nhân viên: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.fullName}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.fullName}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Giới tính: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.gender === true ? 'Nam' : 'Nữ'}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.gender === true ? 'Nam' : 'Nữ'}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Ngày sinh: </span>
-                                    <strong className='flex-[2] ml-5 '>{renderDate(employee?.dob)}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(employee?.dob)}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Số điện thoại: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.phone}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.phone}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Địa chỉ: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.address}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.address}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Email: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.email}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.email}</span>
                                 </div>
                             </div>
                         ) : (
                             <div className='flex-[3]'>
                                 <div className='m-10 flex justify-center'>
                                     <img
-                                        src="https://github.com/shadcn.png"
+                                        src={employee?.image || "https://via.placeholder.com/150"}
                                         alt="Avatar"
                                         className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                     />
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Tên đăng nhập: </span>
-                                    <strong className='flex-[2] ml-5 '>{employee?.username}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.username}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Ngày vào làm: </span>
-                                    <strong className='flex-[2] ml-5 '>{renderDate(employee?.joinDate)}</strong>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(employee?.joinDate)}</span>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Vị trí: </span>
-                                    <strong className='flex-[2] ml-5 '>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
                                         {employee?.role.employeeRole.roleName === 'ROLE_STOCK' && 'Nhân viên quản kho'}
                                         {employee?.role.employeeRole.roleName === 'ROLE_SALE' && 'Nhân viên bán hàng'}
-                                    </strong>
+                                    </span>
                                 </div>
                             </div>
                         )}

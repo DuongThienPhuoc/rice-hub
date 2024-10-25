@@ -7,6 +7,8 @@ import React, { useEffect, useState } from 'react';
 import api from "../../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import firebase from '../../../../../api/firebaseConfig';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [navbarVisible, setNavbarVisible] = useState(false);
@@ -64,7 +66,25 @@ const Page = ({ params }: { params: { id: number } }) => {
         e.preventDefault();
 
         try {
-            const response = await api.post(`/employees/updateEmployee`, formData);
+            const storage = getStorage(firebase);
+            const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+            const file = fileInput?.files?.[0];
+            let updatedFormData = { ...formData };
+
+            if (file) {
+                const storageRef = ref(storage, `images/${file.name}`);
+                const snapshot = await uploadBytes(storageRef, file);
+                console.log('Uploaded a file!');
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                console.log('File available at', downloadURL);
+
+                updatedFormData = {
+                    ...updatedFormData,
+                    image: downloadURL,
+                };
+            }
+
+            const response = await api.post(`/employees/updateEmployee`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Nhân viên đã được cập nhật thành công`);
                 router.push("/employees");
@@ -91,10 +111,11 @@ const Page = ({ params }: { params: { id: number } }) => {
                 id: params.id,
                 fullName: employee.fullName,
                 email: employee.email,
-                username: employee.username,
+                userName: employee.username,
                 phone: employee.phone,
                 address: employee.address,
                 dob: employee.dob,
+                image: employee.image,
                 userType: 'ROLE_EMPLOYEE',
                 employeeRoleId: employee.role.employeeRole.id,
                 description: employee.description,
@@ -120,7 +141,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <button
                                     type='button'
                                     onClick={() => setChoice(index === 0)}
-                                    className={`w-[100%] lg:w-[92%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
+                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
                                         ? 'text-white bg-black hover:bg-[#1d1d1fca]'
                                         : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                         }`}
@@ -137,11 +158,11 @@ const Page = ({ params }: { params: { id: number } }) => {
                             alt='Avatar'
                             className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                         />
-                        <label htmlFor="image-upload" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                        <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
                             {image ? 'Thay ảnh' : 'Thêm ảnh'}
                         </label>
                         <input
-                            id="image-upload"
+                            id="fileInput"
                             type="file"
                             accept="image/*"
                             onChange={handleImageChange}
@@ -149,12 +170,12 @@ const Page = ({ params }: { params: { id: number } }) => {
                         />
                     </div>
                     {choice ? (
-                        <div className='flex flex-col lg:flex-row px-10'>
+                        <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
                             <div className='flex-1'>
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Tên nhân viên: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='text'
                                         name='fullName'
                                         placeholder='Nhập đầy đủ họ và tên'
@@ -163,10 +184,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     />
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Giới tính: </span>
                                     <select
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         name='gender'
                                         value={formData?.gender === '' ? '' : (formData?.gender === true ? "true" : "false")}
                                         onChange={(e) => handleFieldChange('gender', e.target.value === "true" ? true : false)}
@@ -177,10 +198,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </select>
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Ngày sinh: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='date'
                                         name='dob'
                                         placeholder='Nhập ngày sinh'
@@ -189,10 +210,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     />
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Số điện thoại: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='text'
                                         name='phone'
                                         placeholder='Nhập số điện thoại'
@@ -202,10 +223,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
                             </div>
                             <div className='flex-1'>
-                                <div className='mx-10 mb-10 mt-0 lg:m-10 flex'>
+                                <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Địa chỉ: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='text'
                                         name='address'
                                         placeholder='Nhập địa chỉ'
@@ -214,10 +235,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     />
                                 </div>
 
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Email: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='text'
                                         name='email'
                                         placeholder='Nhập địa chỉ email'
@@ -228,23 +249,23 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                         </div>
                     ) : (
-                        <div className='flex flex-col lg:flex-row px-10'>
+                        <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
                             <div className='flex-1'>
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Tên đăng nhập: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='cursor-not-allowed flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 border-b-2'
                                         type='text'
-                                        name='username'
+                                        name='userName'
+                                        readOnly
                                         placeholder='Nhập tên đăng nhập'
-                                        value={formData.username?.toString() || ''}
-                                        onChange={(e) => handleFieldChange('username', e.target.value)}
+                                        value={formData.userName?.toString() || ''}
                                     />
                                 </div>
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Vị trí: </span>
                                     <select
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         name='employeeRoleId'
                                         value={formData.employeeRoleId?.toString() || ''}
                                         onChange={(e) => handleFieldChange('employeeRoleId', e.target.value)}
@@ -256,10 +277,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
                             </div>
                             <div className='flex-1'>
-                                <div className='mx-10 flex lg:my-10'>
+                                <div className='mx-10 flex flex-col lg:flex-row lg:my-10'>
                                     <span className='font-bold flex-1'>Tên ngân hàng: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='text'
                                         name='bankName'
                                         placeholder='Nhập tên ngân hàng'
@@ -267,10 +288,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         onChange={(e) => handleFieldChange('bankName', e.target.value)}
                                     />
                                 </div>
-                                <div className='m-10 flex'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Số tài khoản ngân hàng: </span>
                                     <input
-                                        className='flex-[2] ml-5 focus:outline-none border-transparent focus:border-black border-b-2'
+                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                         type='text'
                                         name='bankNumber'
                                         placeholder='Nhập số tài khoản ngân hàng'

@@ -18,6 +18,12 @@ export default function AvatarDropdownMenu({
     setUserProfileDialog: Dispatch<SetStateAction<boolean>>;
 }) {
     const router = useRouter();
+
+    const handleLogout = () => {
+        localStorage.clear();
+        window.location.href = "/";
+    };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild={true}>
@@ -29,28 +35,34 @@ export default function AvatarDropdownMenu({
                     <AvatarFallback>U</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
+            <DropdownMenuContent className="w-56 mr-4">
                 <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem
-                        onClick={() => setUserProfileDialog(true)}
-                    >
+                        className='cursor-pointer'
+                        onClick={() => setUserProfileDialog(true)}>
                         <User className="mr-2 w-4 h-4" />
                         <span>Hồ sơ</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push('/order')}>
+                    <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={() => router.push('/order')}>
                         <Logs className="mr-2 w-4 h-4" />
                         <span>Đặt hàng</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push('/cart')}>
+                    <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={() => router.push('/cart')}>
                         <ShoppingCart className="mr-2 w-4 h-4" />
                         <span>Giỏ hàng</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem
+                        className='cursor-pointer'
+                        onClick={handleLogout}>
                         <LogOut className="mr-2 w-4 h-4" />
                         <span>Đăng xuất</span>
                     </DropdownMenuItem>

@@ -21,24 +21,24 @@ const InputField: React.FC<InputFieldProps> = ({ titles, data, onFieldChange }) 
                     {type !== 'hidden' && (
                         <div className='flex-[3] mr-3 font-bold pt-1'> {displayName}:</div>
                     )}
-                    <div className='flex-[4]'>
+                    <div className='flex-[4] text-center'>
                         {type === 'checkbox' ? (
                             <input
                                 type='checkbox'
-                                className='px-3 py-1 border min-w-[260px] border-gray-400'
+                                className='py-1 border border-gray-400'
                                 checked={!!displayData[name]}
                                 onChange={(e) => handleChange(name, e.target.checked)}
                             />
                         ) : type !== 'textArea' ? (
                             <input
                                 type={type}
-                                className='px-3 py-1 border min-w-[260px] border-gray-400'
+                                className='px-3 py-1 border w-full border-gray-400'
                                 value={typeof displayData[name] === 'string' || typeof displayData[name] === 'number' ? displayData[name] : ''}
                                 onChange={(e) => handleChange(name, e.target.value)}
                             />
                         ) : (
                             <textarea
-                                className='px-3 py-1 border min-w-[260px] min-h-[100px] border-gray-400'
+                                className='px-3 py-1 border w-full min-h-[100px] border-gray-400'
                                 value={typeof displayData[name] === 'string' ? displayData[name] : ''}
                                 onChange={(e) => handleChange(name, e.target.value)}
                             />

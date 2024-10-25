@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import editIcon from '@/components/icon/edit.svg'
 import deleteIcon from '@/components/icon/delete.svg'
-import sortIcon from '@/components/icon/sort.svg'
+// import sortIcon from '@/components/icon/sort.svg'
 import eyeIcon from '@/components/icon/eye_icon.svg'
 import Image from "next/image";
 import Swal from 'sweetalert2';
@@ -83,13 +83,38 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         });
     };
 
-    const handleSort = (column: string) => {
-        console.log(`Sorting ${column}`);
+    // const handleSort = (column: string) => {
+    //     console.log(`Sorting ${column}`);
+    // };
+
+    type RowData = {
+        [key: string]: any;
     };
 
-    const renderCell = (key: any, cell: any) => {
-        if (key === 'joinDate' || key === 'createDate' && Date.parse(cell)) {
-            const date = new Date(cell);
+    const renderCell = (key: string, row: RowData) => {
+        const keys = key.split('.');
+        let cell = row;
+
+        keys.forEach(k => {
+            cell = cell?.[k];
+        });
+
+        if (cell === undefined || cell === null) return '';
+
+        if (key.includes('batchCode')) {
+            return (
+                <a
+                    className="text-blue-500 hover:text-blue-300"
+                    href="#"
+                    onClick={() => router.push(`/batches/${cell.toString()}`)}
+                >
+                    {cell.toString()}
+                </a>
+            );
+        }
+
+        if ((key.includes('Date') || key.includes('date')) && Date.parse(cell.toString())) {
+            const date = new Date(cell.toString());
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
@@ -109,48 +134,51 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 return cell ? 'Hoạt động' : 'Không hoạt động';
             }
         }
-
         return cell;
     };
 
     return (
-        <div className='w-full'>
-            <table className="min-w-[1242.99px] w-full bg-white border-collapse">
+        <div className='w-full rounded-2xl overflow-x-auto'>
+            <table className="min-w-[1250px] w-full bg-white border-collapse">
                 <thead>
-                    <tr className="bg-[#e6f1fe]">
+                    <tr className="bg-white border border-gray-200">
                         {columns.map((column, index) => (
-                            <th key={index} className="border border-transparent bg-[#e6f1fe] text-black px-2 py-2">
+                            <th key={index} className={`pt-3 bg-white text-black px-2 py-2 ${index === 0 ? 'rounded-tl-2xl' : ''} ${index === columns.length - 1 ? 'rounded-tr-2xl' : ''}`}>
                                 <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
                                     {column.displayName}
-                                    {column.displayName && (
+                                    {/* {column.displayName && (
                                         <button onClick={() => handleSort(column.displayName)} className="ml-2">
                                             <Image src={sortIcon} className='min-w-[15px] min-h-[15px]' alt="Sort" width={15} height={15} />
                                         </button>
-                                    )}
+                                    )} */}
                                 </div>
                             </th>
                         ))}
-                        <th className="border border-transparent bg-[#e6f1fe] text-black px-2 py-2"></th>
+                        <th className="bg-white text-black px-2 py-2 rounded-tr-lg">#</th>
                     </tr>
                 </thead>
                 <tbody>
                     {data && data.length !== 0 ? (
                         data.map((row, rowIndex) => (
-                            <tr key={rowIndex} className={`font-semibold border border-gray-200 ${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-200'}`}>
+                            <tr key={rowIndex} className={`font-semibold border border-gray-200 bg-white`}>
                                 {columns.map((column, cellIndex) => (
-                                    <td key={cellIndex} className='text-center px-4 py-3'>
-                                        {renderCell(column.name, row[column.name])}
+                                    <td key={cellIndex} className={`text-center max-w-[200px] px-4 py-3 ${rowIndex === data.length - 1 && cellIndex === 0 ? 'rounded-bl-lg' : ''} ${rowIndex === data.length - 1 && cellIndex === columns.length - 1 ? 'rounded-br-lg' : ''}`}>
+                                        {renderCell(column.name, row)}
                                     </td>
                                 ))}
                                 <td className="text-center px-4 py-3">
                                     {tableName !== 'categories' && tableName !== 'suppliers' ? (
                                         <div className="flex justify-center space-x-3">
-                                            <button onClick={() => router.push(`/${tableName.toString()}/${row.id}`)} className="group w-6 h-6 md:w-auto md:h-auto">
-                                                <Image src={eyeIcon} alt="view icon" width={16} height={16} className="min-w-[16px] min-h-[16px]" />
-                                            </button>
-                                            <button onClick={() => router.push(`/${tableName.toString()}/update/${row.id}`)} className="group w-6 h-6 md:w-auto md:h-auto">
-                                                <Image src={editIcon} alt="edit icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
-                                            </button>
+                                            {tableName != "import" && (
+                                                <button onClick={() => router.push(`/${tableName.toString()}/${row.id}`)} className="group w-6 h-6 md:w-auto md:h-auto">
+                                                    <Image src={eyeIcon} alt="view icon" width={16} height={16} className="min-w-[16px] min-h-[16px]" />
+                                                </button>
+                                            )}
+                                            {tableName != "products" && tableName != "import" && (
+                                                <button onClick={() => router.push(`/${tableName.toString()}/update/${row.id}`)} className="group w-6 h-6 md:w-auto md:h-auto">
+                                                    <Image src={editIcon} alt="edit icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
+                                                </button>
+                                            )}
                                             <button onClick={showAlert} className="group w-6 h-6 md:w-auto md:h-auto">
                                                 <Image src={deleteIcon} alt="delete icon" width={14} height={14} className="min-w-[14px] min-h-[14px]" />
                                             </button>

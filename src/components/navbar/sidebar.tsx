@@ -15,6 +15,7 @@ export default function Sidebar() {
     const [dropdown, setDropdown] = useState(false);
     const [dropdown2, setDropdown2] = useState(false);
     const [dropdown3, setDropdown3] = useState(false);
+    const [dropdown4, setDropdown4] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
     const [isUserProfileDialogOpen, setIsUserProfileDialogOpen] = useState<boolean>(false);
     const router = useRouter();
@@ -33,6 +34,10 @@ export default function Sidebar() {
 
     const handleDropdown3 = () => {
         setDropdown3(!dropdown3);
+    };
+
+    const handleDropdown4 = () => {
+        setDropdown4(!dropdown4);
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -66,7 +71,7 @@ export default function Sidebar() {
                         />
                     </button>
                 </div>
-                <h1 className='flex-1 font-extrabold text-[32px]'>Ricehub</h1>
+                <h1 className='flex-1 font-extrabold text-center text-[32px]'>Ricehub</h1>
                 <div className='flex flex-1 justify-end items-center'>
                     <div className="flex items-center justify-center w-12 h-12">
                         <Image
@@ -134,6 +139,19 @@ export default function Sidebar() {
                         <button onClick={() => router.push('/income')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Thu</button>
                         <button onClick={() => router.push('/expenditures')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Chi</button>
                         <button onClick={() => router.push('/orders')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Đơn hàng</button>
+                    </div>
+
+                    <button onClick={handleDropdown4} className="flex px-5 py-3 border-b border-gray-700 hover:bg-gray-500 justify-between w-full pr-5 items-center">
+                        <span>Nhập xuất</span>
+                        <Image src={dropdown4 ? ChevronDownIcon : ChevronRightIcon} alt='toggle arrow' width={10} height={10} />
+                    </button>
+
+                    <div
+                        className={`pl-3 overflow-hidden transition-[max-height] duration-500 ease-in-out ${dropdown4 ? 'max-h-96' : 'max-h-0'}`}
+                    >
+                        <button onClick={() => router.push('/import')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Nhập hàng</button>
+                        <button onClick={() => router.push('/export')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Xuất hàng</button>
+                        <button onClick={() => router.push('/inventory')} className="w-full text-start px-5 py-3 hover:bg-gray-500 border-b border-gray-700">Kiểm hàng</button>
                     </div>
                 </div>
             </div>

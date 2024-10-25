@@ -62,6 +62,7 @@ const ListPrice: React.FC<DataTableProps> = ({ columns, data }) => {
                                 </div>
                             </th>
                         ))}
+                        <th className="border border-transparent bg-[#e6f1fe] text-black px-2 py-2">#</th>
                     </tr>
                 </thead>
                 <tbody>
