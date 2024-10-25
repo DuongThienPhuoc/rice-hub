@@ -8,7 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, ShoppingCart, Logs, LogOut } from 'lucide-react';
+import { User, ShoppingCart, Logs, LogOut, ScrollText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -35,7 +35,7 @@ export default function AvatarDropdownMenu({
                     <AvatarFallback>U</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 mr-4">
+            <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -56,6 +56,12 @@ export default function AvatarDropdownMenu({
                         onClick={() => router.push('/cart')}>
                         <ShoppingCart className="mr-2 w-4 h-4" />
                         <span>Giỏ hàng</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={() => router.push('/order/history')}
+                    >
+                        <ScrollText className="mr-2 w-4 h-4" />
+                        <span>Lịch sử đơn hàng</span>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

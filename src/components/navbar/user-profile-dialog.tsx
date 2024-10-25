@@ -7,7 +7,7 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { userProfileFormSchema } from '@/schema/user-profile-schema';
+import { userProfileFormSchema } from '@/schema/user-profile';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
     Form,
@@ -44,7 +44,7 @@ export default function UserProfileDialog({
     }
 
     function handleSave(values: z.infer<typeof userProfileFormSchema>) {
-        console.log(values);
+        console.log(values); // TODO: Save to server
     }
 
 

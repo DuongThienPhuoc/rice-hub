@@ -1,11 +1,19 @@
-import React from "react";
-import Navbar from "@/components/navbar/navbar";
+import React from 'react';
+import { Metadata } from 'next';
 
-export default function OrderPageLayout({children}: { children: React.ReactNode }) {
+export const metadata: Metadata = {
+    title: 'Đặt hàng',
+    description: 'Hệ thống đặt hàng',
+};
+
+export default function OrderPageLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     return (
-        <main>
-            <Navbar/>
+        <>
             {children}
-        </main>
-    )
+        </>
+    );
 }
