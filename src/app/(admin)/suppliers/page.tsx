@@ -18,8 +18,6 @@ const Page = () => {
         { name: 'email', displayName: 'Email' },
         { name: 'phoneNumber', displayName: 'Số điện thoại' },
         { name: 'address', displayName: 'Địa chỉ' },
-        { name: 'active', displayName: 'Trạng thái' },
-        { name: '', displayName: '' },
     ];
     const [suppliers, setSuppliers] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -35,9 +33,8 @@ const Page = () => {
         { name: 'name', displayName: 'Tên nhà cung cấp', type: 'text' },
         { name: 'contactPerson', displayName: 'Người liên hệ', type: 'text' },
         { name: 'email', displayName: 'Email', type: 'text' },
-        { name: 'phoneNumber', displayName: 'Số điện thoại', type: 'number' },
+        { name: 'phoneNumber', displayName: 'Số điện thoại', type: 'text' },
         { name: 'address', displayName: 'Địa chỉ', type: 'text' },
-        { name: 'active', displayName: 'Trạng thái', type: 'checkbox' },
     ];
 
     const openPopup = () => setPopupVisible(true);
@@ -140,7 +137,7 @@ const Page = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className='overflow-x-auto'>
+                    <div className='overflow-hidden'>
                         <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
                     </div>
                     {totalPages > 1 && (

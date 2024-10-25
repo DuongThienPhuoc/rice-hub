@@ -3,42 +3,60 @@
 import Navbar from "@/components/navbar/navbar";
 import Sidebar from "@/components/navbar/sidebar";
 import { Button } from '@/components/ui/button';
-import ProductList from "@/components/list/list";
-import SearchBar from '@/components/searchbar/searchbar';
+import ImportList from "@/components/list/list";
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
+// import RadioFilter from "@/components/filter/radioFilter";
+// import CheckboxFilter from "@/components/filter/checkboxFilter";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
-import RadioFilter from "@/components/filter/radioFilter";
-import CheckBoxFilter from "@/components/filter/checkboxFilter";
-import ExcelJS from 'exceljs';
+import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import ExcelJS from 'exceljs';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../api/firebaseConfig';
 
 const Page = () => {
+    const router = useRouter();
+    const storage = getStorage(firebase);
     const columns = [
-        { name: 'productCode', displayName: 'Mã sản phẩm' },
-        { name: 'productName', displayName: 'Tên sản phẩm' },
-        { name: '', displayName: 'Giá nhập (kg)' },
-        { name: 'price', displayName: 'Đơn giá (kg)' },
-        { name: 'productQuantity', displayName: 'Tồn kho (kg)' },
-        { name: 'batchCode', displayName: 'Lô hàng' },
-        { name: 'importDate', displayName: 'Ngày nhập' },
-        { name: '', displayName: 'Nhà cung cấp' },
+        { name: 'id', displayName: 'Mã phiếu' },
+        { name: 'receiptDate', displayName: 'Ngày nhập' },
+        { name: 'batch.batchCode', displayName: 'Lô hàng' },
+        { name: 'batch.batchCreator.fullName', displayName: 'Người tạo' },
     ];
-    const [products, setProducts] = useState([]);
+    const [employees, setEmployees] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [navbarVisible, setNavbarVisible] = useState(false);
-    const storage = getStorage(firebase);
-    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
-        field: '',
-        query: ''
-    });
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+
+    const getData = async (page?: number) => {
+        try {
+            const params = new URLSearchParams();
+            params.append("pageSize", "10");
+            if (page) {
+                params.append("pageNumber", page.toString());
+            }
+            const url = `/WarehouseReceipt/?${params.toString()}`;
+            const response = await api.get(url);
+            const data = response.data;
+            setEmployees(data._embedded.warehouseReceiptList);
+            setTotalPages(data.page.totalPages);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
+        }
+    };
+
+    useEffect(() => {
+        getData(currentPage);
+    }, [currentPage]);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     const showAlert = (data: any, fileInput: HTMLInputElement) => {
         Swal.fire({
@@ -163,7 +181,7 @@ const Page = () => {
         try {
             const response = await api.post(`/products/import`, data);
             if (response.status >= 200 && response.status < 300) {
-                getProducts(currentPage, currentSearch);
+                getData(currentPage);
                 Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
@@ -173,48 +191,6 @@ const Page = () => {
             alert('Đã xảy ra lỗi, vui lòng thử lại.');
         }
     }
-
-    const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
-        try {
-            const params = new URLSearchParams();
-            params.append("pageSize", "10");
-            if (page) {
-                params.append("pageNumber", page.toString());
-            }
-            if (search?.field && search?.query) {
-                params.append(search.field, search.query);
-            }
-            const url = `/products/admin/products?${params.toString()}`;
-            const response = await api.get(url);
-            const data = response.data;
-            console.log(data);
-            if (data._embedded) {
-                setProducts(data._embedded.adminProductDtoList);
-                setTotalPages(data.page.totalPages);
-            } else {
-                alert("Danh sách rỗng");
-            }
-        } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
-        }
-    };
-
-    useEffect(() => {
-        getProducts(currentPage, currentSearch);
-    }, [currentPage, currentSearch]);
-
-    const handleSearch = (field: string, query: string) => {
-        setCurrentPage(1);
-        setCurrentSearch({ field, query });
-    };
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
-    const handleFilterChange = () => {
-
-    };
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -240,48 +216,18 @@ const Page = () => {
             )}
             <div className="flex">
                 <div style={{ flex: '1' }}></div>
-                {navbarVisible && (
-                    <div style={{ flex: '2' }} className="my-16">
-                        <h1 className='font-bold text-[20px] pb-5'><strong>Danh sách sản phẩm</strong></h1>
-                        <div className="pt-2">
-                            <CheckBoxFilter
-                                title="Loại hàng"
-                                options={[
-                                    { label: 'Gạo', value: 1 },
-                                    { label: 'Cám', value: 2 },
-                                    { label: 'Thóc', value: 3 },
-                                    { label: 'Trấu', value: 4 },
-                                    { label: 'Thức ăn chăn nuôi', value: 5 }
-                                ]}
-                                onChange={handleFilterChange}
-                            />
-                            <RadioFilter
-                                title="Tồn kho"
-                                options={[
-                                    { label: 'Tất cả', value: 1 },
-                                    { label: 'Dưới định mức tồn', value: 2 },
-                                    { label: 'Trên định định tồn', value: 3 },
-                                    { label: 'Còn hàng', value: 4 },
-                                    { label: 'Hết', value: 5 }
-                                ]}
-                                onChange={handleFilterChange}
-                            />
-                        </div>
-                    </div>
-                )}
-                <div style={{ flex: '7' }} className='my-16 overflow-x-auto'>
-                    <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle mb-10'>
+                <div style={{ flex: '9' }} className='my-16 overflow-x-auto'>
+                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle mb-10'>
+                        {navbarVisible && (
+                            <h1 className='font-bold text-[20px] pb-5'><strong>Danh sách phiếu nhập</strong></h1>
+                        )}
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
                             {!navbarVisible && (
-                                <h1 className='font-bold text-[20px] pb-5 px-5'><strong>Danh sách sản phẩm</strong></h1>
+                                <h1 className='font-bold text-[20px] pb-5 px-5'><strong>Danh sách phiếu nhập</strong></h1>
                             )}
-                            <SearchBar
-                                onSearch={handleSearch}
-                                selectOptions={[
-                                    { value: 'productCode', label: 'Mã sản phẩm' },
-                                    { value: 'productName', label: 'Tên sản phẩm' }
-                                ]}
-                            />
+                            <Button onClick={() => router.push("/import/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                Tạo phiếu nhập kho
+                            </Button>
                             <input
                                 type="file"
                                 id="fileInput"
@@ -300,8 +246,8 @@ const Page = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className='overflow-hidden lg:ml-7'>
-                        <ProductList name="Sản phẩm" editUrl="/products/update/1" titles={titles} columns={columns} data={products} tableName="products" />
+                    <div className='overflow-x-auto'>
+                        <ImportList name="Phiếu nhập kho" editUrl="/import/updateImport" titles={titles} columns={columns} data={employees} tableName="import" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

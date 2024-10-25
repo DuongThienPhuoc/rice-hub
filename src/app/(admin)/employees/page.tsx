@@ -21,8 +21,6 @@ const Page = () => {
         { name: 'phone', displayName: 'Số điện thoại' },
         { name: 'address', displayName: 'Địa chỉ' },
         { name: 'joinDate', displayName: 'Ngày vào làm' },
-        { name: 'active', displayName: 'Trạng thái' },
-        { name: '', displayName: '' },
     ];
     const [employees, setEmployees] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -145,7 +143,7 @@ const Page = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className='overflow-x-auto lg:ml-7'>
+                    <div className='overflow-hidden lg:ml-7'>
                         <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" titles={titles} columns={columns} data={employees} tableName="employees" />
                     </div>
                     {totalPages > 1 && (
