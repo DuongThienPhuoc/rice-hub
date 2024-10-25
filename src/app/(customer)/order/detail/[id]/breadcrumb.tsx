@@ -25,18 +25,6 @@ export default function OrderDetailPageBreadcrumb({
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/order')}>
-                        Đặt hàng
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/cart')}>
-                        Giỏ hàng
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
                     <BreadcrumbLink
                         onClick={() => router.push('/order/history')}
                     >

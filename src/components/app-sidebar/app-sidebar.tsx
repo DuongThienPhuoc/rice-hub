@@ -39,17 +39,19 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import UserProfileDialog from '@/components/navbar/user-profile-dialog';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
+import { cn } from '@/lib/utils';
 
 const categories = [
     {
         category: 'Quản lý tài chính',
+        role: ['ROLE_ADMIN'],
         items: [
             {
                 title: 'Tài Chính',
@@ -60,6 +62,7 @@ const categories = [
     },
     {
         category: 'Đơn hàng',
+        role: ['ROLE_CUSTOMER', 'ROLE_ADMIN'],
         items: [
             {
                 title: 'Đặt hàng',
@@ -80,6 +83,7 @@ const categories = [
     },
     {
         category: 'Hàng hoá',
+        role: ['ROLE_ADMIN'],
         items: [
             {
                 title: 'Danh mục',
@@ -105,6 +109,7 @@ const categories = [
     },
     {
         category: 'Giao dịch',
+        role: ['ROLE_ADMIN'],
         items: [
             {
                 title: 'Thu',
@@ -123,6 +128,18 @@ const categories = [
 export default function AppSidebar() {
     const [userProfileDialog, setUserProfileDialog] = useState(false);
     const pathName = usePathname();
+    const [role, setRole] = React.useState<string>('')
+    useEffect(() => {
+        const role = typeof window != 'undefined' ? localStorage.getItem('role') : '';
+        if(role !== null){
+            setRole(role)
+        }
+    },[role])
+
+    function isHidden(category:any) {
+        return !category.role.includes(role);
+    }
+
     return (
         <Sidebar collapsible="icon">
             <UserProfileDialog
@@ -190,7 +207,7 @@ export default function AppSidebar() {
                         className="group/collapsible"
                         key={category.category}
                     >
-                        <SidebarGroup>
+                        <SidebarGroup className={cn(isHidden(category) ? 'hidden' : '')}>
                             <SidebarGroupLabel asChild>
                                 <CollapsibleTrigger>
                                     {category.category}
