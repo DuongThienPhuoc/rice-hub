@@ -29,11 +29,10 @@ const Page = () => {
                 },
             });
             console.log('Register success:', response.data);
-        } catch (error) {
-            console.error('Register error:', error);
-        } finally {
             setLoading(false);
             router.push('/login');
+        } catch (error) {
+            console.error('Register error:', error);
         }
     };
 

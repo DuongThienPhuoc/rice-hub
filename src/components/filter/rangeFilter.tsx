@@ -30,7 +30,7 @@ const RangeFilter: React.FC<RangeFilterProps> = ({ title, min, max, step, onChan
         <div className="bg-white rounded-md mt-5 px-2 py-2" style={{ boxShadow: '5px 5px 5px lightgray' }}>
             <button onClick={toggleDropdown} className="flex justify-between w-full px-2 items-center">
                 <span className="font-bold">{title}</span>
-                <Image src={isDropdownOpen ? ChevronUpIcon : ChevronDownIcon} alt="toggle arrow" width={10} height={10} />
+                <Image src={isDropdownOpen ? ChevronDownIcon : ChevronUpIcon} alt="toggle arrow" width={10} height={10} />
             </button>
 
             {isDropdownOpen && (
