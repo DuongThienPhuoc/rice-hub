@@ -1,85 +1,136 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart, LinearScale, CategoryScale, BarElement } from 'chart.js';
-import dayjs from 'dayjs';
 
-Chart.register(LinearScale, CategoryScale, BarElement);
+import React, { useEffect, useRef, useState } from 'react';
+import { BarChart, Bar, XAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import dayjs from 'dayjs';
+import Image from 'next/image';
+import upArrow from '@/components/icon/upArrow.svg';
+import downArrow from '@/components/icon/downArrow.svg';
 
 const generateRandomRevenue = () => {
     return Math.floor(Math.random() * (1000000000 - 100000000) + 100000000);
 };
 
-const BarChart: React.FC<{ period: string }> = ({ period }) => {
-    const [labels, setLabels] = useState<string[]>([]);
-    const [revenueData, setRevenueData] = useState<number[]>([]);
+const BarChartComponent: React.FC<{ chartName: string, color: string }> = ({ chartName, color }) => {
+    const [chartData, setChartData] = useState<{ label: string; revenue: number }[]>([]);
+    const [period, setPeriod] = useState("tháng");
+    const [dropdown, setDropdown] = useState(false);
+    const navbarRef = useRef<HTMLDivElement>(null);
+
+    const handleDropdown = () => {
+        setDropdown(!dropdown);
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (navbarRef.current && !navbarRef.current.contains(event.target as Node)) {
+            setDropdown(false);
+        }
+    };
 
     useEffect(() => {
-        let periodLabels: string[] = [];
-        let periodData: number[] = [];
+        if (dropdown) {
+            document.addEventListener('click', handleClickOutside);
+        } else {
+            document.removeEventListener('click', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [dropdown]);
+
+    useEffect(() => {
+        let periodData: { label: string; revenue: number }[] = [];
 
         switch (period) {
-            case 'week':
-                periodLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
-                periodData = Array.from({ length: 7 }, () => generateRandomRevenue());
+            case 'tuần':
+                const weekLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+                periodData = weekLabels.map(label => ({ label, revenue: generateRandomRevenue() }));
                 break;
-
-            case 'month':
+            case 'tháng':
                 const currentMonthDays = dayjs().daysInMonth();
-                periodLabels = Array.from({ length: currentMonthDays }, (_, index) => (index + 1).toString());
-                periodData = periodLabels.map(() => generateRandomRevenue());
+                periodData = Array.from({ length: currentMonthDays }, (_, index) => ({
+                    label: (index + 1).toString(),
+                    revenue: generateRandomRevenue(),
+                }));
                 break;
-
-            case 'year':
-                periodLabels = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
-                periodData = Array.from({ length: 12 }, () => generateRandomRevenue());
+            case 'năm':
+                const yearLabels = [
+                    'Tháng 1',
+                    'Tháng 2',
+                    'Tháng 3',
+                    'Tháng 4',
+                    'Tháng 5',
+                    'Tháng 6',
+                    'Tháng 7',
+                    'Tháng 8',
+                    'Tháng 9',
+                    'Tháng 10',
+                    'Tháng 11',
+                    'Tháng 12',
+                ];
+                periodData = yearLabels.map(label => ({ label, revenue: generateRandomRevenue() }));
                 break;
         }
 
-        setLabels(periodLabels);
-        setRevenueData(periodData);
+        setChartData(periodData);
     }, [period]);
 
-    const data = {
-        labels,
-        datasets: [
-            {
-                label: 'Doanh thu (VND)',
-                data: revenueData,
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1,
-            },
-        ],
-    };
-
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: (tickValue: string | number) => {
-                        const value = typeof tickValue === 'string' ? parseInt(tickValue) : tickValue;
-                        return new Intl.NumberFormat('vi-VN', {
-                            style: 'currency',
-                            currency: 'VND',
-                            maximumSignificantDigits: 2,
-                        }).format(value);
-                    },
-                },
-                min: 0,
-                max: 1000000000,
-            },
-        },
-    };
-
     return (
-        <div className="w-full h-[200px] md:h-[300px] lg:h-[400px] xl:h-[400px] px-3">
-            <Bar data={data} options={options} />
-        </div>
+        <Card className='mt-10'>
+            <CardHeader className='flex flex-row justify-between items-center'>
+                <div>
+                    <CardTitle>{chartName}</CardTitle>
+                    <CardDescription>{`${chartName} cho ${period} hiện tại:`}</CardDescription>
+                </div>
+                <div ref={navbarRef} className='relative' onClick={() => handleDropdown()}>
+                    <li className='flex items-center gap-x-2 font-semibold text-black'>
+                        {period === 'tháng' && (
+                            <>Tháng này</>
+                        )}
+                        {period === 'tuần' && (
+                            <>Tuần này</>
+                        )}
+                        {period === 'năm' && (
+                            <>Năm nay</>
+                        )}
+                        {
+                            dropdown ? <Image src={downArrow} alt='up arrow' width={10} height={10} /> :
+                                <Image src={upArrow} alt='down arrow' width={10} height={10} />
+                        }
+                    </li>
+                    <div className={dropdown ? 'absolute w-32 z-[1000] bg-[#FFFFFF] shadow-lg top-8 left-0' : 'hidden'}>
+                        <ul className='flex flex-col'>
+                            <li className='hover:bg-gray-200 p-2 font-semibold border-b-[1px]' onClick={() => setPeriod('tháng')}>Tháng này</li>
+                            <li className='hover:bg-gray-200 p-2 font-semibold border-b-[1px]' onClick={() => setPeriod('tuần')}>Tuần này</li>
+                            <li className='hover:bg-gray-200 p-2 font-semibold border-b-[1px]' onClick={() => setPeriod('năm')}>Năm nay</li>
+                        </ul>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="label" />
+                        <Tooltip
+                            formatter={(value: number) =>
+                                chartName === 'Doanh thu'
+                                    ? `${new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                        maximumSignificantDigits: 2,
+                                    }).format(value)}`
+                                    : `${value} kg`
+                            }
+                        />
+                        <Bar dataKey="revenue" name={`${chartName}`} fill={`${color}`} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
     );
 };
 
-export default BarChart;
+export default BarChartComponent;
