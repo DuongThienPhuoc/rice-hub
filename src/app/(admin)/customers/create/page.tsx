@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import Navbar from '@/components/navbar/navbar';
-import Sidebar from '@/components/navbar/sidebar';
+
 import { Button } from '@/components/ui/button';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from "../../../../api/axiosConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -12,7 +11,6 @@ import firebase from '../../../../api/firebaseConfig';
 
 const Page = () => {
     const router = useRouter();
-    const [navbarVisible, setNavbarVisible] = useState(false);
     const [choice, setChoice] = useState(true);
     const [image, setImage] = useState<string>("");
 
@@ -49,21 +47,6 @@ const Page = () => {
             [field]: value,
         }));
     };
-
-    useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
-
-        updateNavbarVisibility();
-
-        window.addEventListener('resize', updateNavbarVisibility);
-
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -104,8 +87,7 @@ const Page = () => {
 
     return (
         <div>
-            {navbarVisible ? <Navbar /> : <Sidebar />}
-            <form onSubmit={handleSubmit} className='flex my-16 justify-center px-5 w-full font-arsenal'>
+            <form onSubmit={handleSubmit} className='flex my-16 justify-center w-full font-arsenal'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {['Thông tin khách hàng', 'Thông tin đăng nhập'].map((label, index) => (

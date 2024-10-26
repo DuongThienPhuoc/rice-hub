@@ -1,33 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import Navbar from '@/components/navbar/navbar';
-import Sidebar from '@/components/navbar/sidebar';
+
 import React, { useEffect, useState } from 'react';
 import api from "../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 const Page = ({ params }: { params: { id: number } }) => {
-    const [navbarVisible, setNavbarVisible] = useState(false);
     const [product, setProduct] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
-
-    useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
-
-        updateNavbarVisibility();
-
-        window.addEventListener('resize', updateNavbarVisibility);
-
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
 
     useEffect(() => {
         const getProduct = async () => {
@@ -61,8 +44,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            {navbarVisible ? <Navbar /> : <Sidebar />}
-            <div className='flex my-16 justify-center px-5 w-full font-arsenal'>
+            <div className='flex my-16 justify-center w-full font-arsenal'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {['Thông tin sản phẩm', 'Thông tin lô hàng'].map((label, index) => (

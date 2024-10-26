@@ -46,8 +46,8 @@ export default function OrderPage() {
             });
             setProducts(response.data._embedded.productDtoList);
             setTotalPages(response.data.page.totalPages);
-        }catch (e) {
-            if(e instanceof Error){
+        } catch (e) {
+            if (e instanceof Error) {
                 throw new Error(`An error occurred while fetching products: ${e.message}`)
             }
             throw new Error('An error occurred while fetching products')
@@ -172,13 +172,13 @@ export default function OrderPage() {
                                                     {product.categoryId === '1'
                                                         ? 'Gạo'
                                                         : product.categoryId ===
-                                                        '2'
+                                                            '2'
                                                             ? 'Cám'
                                                             : product.categoryId ===
-                                                            '3'
+                                                                '3'
                                                                 ? 'Thóc'
                                                                 : product.categoryId ===
-                                                                '4'
+                                                                    '4'
                                                                     ? 'Trấu'
                                                                     : 'Thức ăn chăn nuôi'}
                                                 </Badge>
@@ -186,10 +186,10 @@ export default function OrderPage() {
                                             <TableCell>
                                                 <Badge variant="outline">
                                                     {product.unitOfMeasureId ===
-                                                    1
+                                                        1
                                                         ? 'Tấn'
                                                         : product.unitOfMeasureId ===
-                                                        2
+                                                            2
                                                             ? 'Kg'
                                                             : 'Yến'}
                                                 </Badge>

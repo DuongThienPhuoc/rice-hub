@@ -138,8 +138,8 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     };
 
     return (
-        <div className='w-full rounded-2xl overflow-x-auto'>
-            <table className="min-w-[1250px] w-full bg-white border-collapse">
+        <div className='w-full mb-20 rounded-2xl overflow-x-auto'>
+            <table className="w-full bg-white border-collapse">
                 <thead>
                     <tr className="bg-white border border-gray-200">
                         {columns.map((column, index) => (

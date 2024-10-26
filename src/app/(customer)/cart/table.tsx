@@ -1,11 +1,11 @@
 'use client'
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
-import {Checkbox} from "@/components/ui/checkbox";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from 'react';
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import CartDialog from "@/app/(customer)/cart/dialog";
-import {useProductSelectedStore} from '@/stores/cartTableStore'
-import {Trash2} from 'lucide-react';
+import { useProductSelectedStore } from '@/stores/cartTableStore'
+import { Trash2 } from 'lucide-react';
 
 export default function CartTable() {
 
@@ -34,7 +34,7 @@ export default function CartTable() {
     const totalMoney = useProductSelectedStore(state => state.total)
     const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
-    function handleDeleteProduct(id: number){
+    function handleDeleteProduct(id: number) {
         const newProducts = products.filter(product => product.id != id)
         localStorage.setItem('cart', JSON.stringify(newProducts))
         setProducts(newProducts)

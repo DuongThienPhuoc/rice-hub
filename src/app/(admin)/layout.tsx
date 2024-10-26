@@ -2,7 +2,7 @@ import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar/app-sidebar';
 
-export default function CustomerLayout({
+export default function AdminLayout({
     children,
 }: {
     children: React.ReactNode;
