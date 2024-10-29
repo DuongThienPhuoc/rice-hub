@@ -30,7 +30,7 @@ export default function CustomerTable() {
         { name: '', displayName: '', type: '' },
     ];
 
-    const getEmployees = async (page?: number, search?: { field?: string, query?: string }) => {
+    const getCustomers = async (page?: number, search?: { field?: string, query?: string }) => {
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -51,7 +51,7 @@ export default function CustomerTable() {
     };
 
     useEffect(() => {
-        getEmployees(currentPage, currentSearch);
+        getCustomers(currentPage, currentSearch);
     }, [currentPage, currentSearch]);
 
     const handleSearch = (field: string, query: string) => {

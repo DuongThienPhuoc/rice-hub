@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/navigation';
 
-export default function ImportPageBreadcrumb() {
+export default function CreatePricePageBreadcrumb() {
     const router = useRouter();
     return (
         <Breadcrumb className="my-5">
@@ -21,7 +21,13 @@ export default function ImportPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Phiếu nhập kho</BreadcrumbPage>
+                    <BreadcrumbLink onClick={() => router.push('/prices')}>
+                        Bảng giá
+                    </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                    <BreadcrumbPage>Thêm mới</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/navigation';
 
-export default function CreateImportPageBreadcrumb() {
+export default function CreateExportPageBreadcrumb() {
     const router = useRouter();
     return (
         <Breadcrumb className="my-5">
@@ -21,13 +21,13 @@ export default function CreateImportPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/import')}>
-                        Phiếu nhập kho
+                    <BreadcrumbLink onClick={() => router.push('/receipts')}>
+                        Phiếu nhập/xuất
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Thêm mới</BreadcrumbPage>
+                    <BreadcrumbPage>Thêm phiếu xuất</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

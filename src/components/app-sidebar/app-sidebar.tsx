@@ -30,10 +30,9 @@ import {
     UserPen,
     Users,
     UserCog,
-    PackagePlus,
-    PackageMinus,
     PackageCheck,
     PenBox,
+    PackageOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -110,7 +109,7 @@ const categories = [
             },
             {
                 title: 'Bảng giá',
-                url: '#',
+                url: '/prices',
                 icon: <DollarSign />,
             },
         ],
@@ -162,14 +161,9 @@ const categories = [
         role: ['ROLE_ADMIN'],
         items: [
             {
-                title: 'Nhập hàng',
-                url: '/import',
-                icon: <PackagePlus />,
-            },
-            {
-                title: 'Xuất hàng',
-                url: '/export',
-                icon: <PackageMinus />,
+                title: 'Nhập/xuất',
+                url: '/receipts',
+                icon: <PackageOpen />,
             },
             {
                 title: 'Kiểm hàng',

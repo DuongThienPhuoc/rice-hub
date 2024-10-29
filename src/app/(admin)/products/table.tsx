@@ -16,12 +16,10 @@ export default function ProductTable() {
     const columns = [
         { name: 'productCode', displayName: 'Mã sản phẩm' },
         { name: 'productName', displayName: 'Tên sản phẩm' },
-        { name: '', displayName: 'Giá nhập (kg)' },
-        { name: 'price', displayName: 'Đơn giá (kg)' },
+        { name: 'price', displayName: 'Giá nhập (kg)' },
         { name: 'productQuantity', displayName: 'Tồn kho (kg)' },
-        { name: 'batchCode', displayName: 'Lô hàng' },
         { name: 'importDate', displayName: 'Ngày nhập' },
-        { name: '', displayName: 'Nhà cung cấp' },
+        { name: 'supplierName', displayName: 'Nhà cung cấp' },
     ];
     const [products, setProducts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);

@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import ImportList from "@/components/list/list";
+import ReceiptList from "@/components/list/list";
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
@@ -12,43 +12,80 @@ import Swal from 'sweetalert2';
 import ExcelJS from 'exceljs';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../api/firebaseConfig';
+import { Menu, MenuItem } from '@mui/material';
+import { ExpandMore, ExpandLess } from '@mui/icons-material';
+import Flatpickr from 'react-flatpickr';
+import 'flatpickr/dist/themes/material_blue.css';
 
-export default function ImportTable() {
+export default function ReceiptTable() {
     const router = useRouter();
     const storage = getStorage(firebase);
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
-        { name: 'receiptDate', displayName: 'Ngày nhập' },
-        { name: 'batch.batchCode', displayName: 'Lô hàng' },
-        { name: 'batch.batchCreator.fullName', displayName: 'Người tạo' },
+        { name: 'receiptType', displayName: 'Loại phiếu' },
+        { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
+        { name: 'batchCode', displayName: 'Lô hàng' },
+        { name: 'username', displayName: 'Người tạo' },
+        { name: 'type', displayName: 'Lý do xuất hàng' },
     ];
-    const [employees, setEmployees] = useState([]);
+    const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const [dateRange, setDateRange] = useState<[Date, Date]>([new Date(), new Date()]);
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [anchorEl, setAnchorEl] = useState(null);
 
-    const getData = async (page?: number) => {
+    const handleClick = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMenuItemClick = (path: string) => {
+        handleClose();
+        router.push(path);
+    };
+
+    const getData = async (page?: number, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
             if (page) {
                 params.append("pageNumber", page.toString());
             }
+            if (startDate && endDate) {
+                params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
+                params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
+            }
             const url = `/WarehouseReceipt/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setEmployees(data._embedded.warehouseReceiptList);
-            setTotalPages(data.page.totalPages);
+            console.log(data);
+            if (data?._embedded?.warehouseReceiptDtoList) {
+                setReceipts(data._embedded.warehouseReceiptDtoList);
+                setTotalPages(data.page.totalPages);
+            } else {
+                setReceipts([]);
+            }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
         }
     };
 
     useEffect(() => {
-        getData(currentPage);
-    }, [currentPage]);
+        getData(currentPage, startDate, endDate);
+    }, [currentPage, startDate, endDate]);
+
+    useEffect(() => {
+        setStartDate(dateRange[0]);
+        setEndDate(dateRange[1]);
+    }, [dateRange])
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -194,9 +231,41 @@ export default function ImportTable() {
                 <div className='w-full overflow-x-auto'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button onClick={() => router.push("/import/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Tạo phiếu nhập kho
+                            <div className="border border-[#ccc] rounded-[4px] p-[5px]" style={{ boxShadow: '0px 4px 8px lightgray' }}>
+                                <Flatpickr
+                                    className='border-none outline-none p-[5px]'
+                                    value={dateRange}
+                                    onChange={([startDate, endDate]) => {
+                                        setDateRange([startDate, endDate])
+                                    }}
+                                    options={{
+                                        mode: "range",
+                                        dateFormat: "d/m/Y",
+                                        locale: {
+                                            rangeSeparator: " ~ ",
+                                        },
+                                    }}
+                                    placeholder="_/__/___ ~ _/__/___"
+                                />
+                                <span className="icon">&#x1F4C5;</span>
+                            </div>
+                        </div>
+                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                            <Button
+                                onClick={handleClick}
+                                className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                            >
+                                Tạo phiếu
+                                {anchorEl ? <ExpandLess /> : <ExpandMore />}
                             </Button>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleClose}
+                            >
+                                <MenuItem onClick={() => handleMenuItemClick("/receipts/import/create")}>Tạo phiếu nhập</MenuItem>
+                                <MenuItem onClick={() => handleMenuItemClick("/receipts/export/create")}>Tạo phiếu xuất</MenuItem>
+                            </Menu>
                             <input
                                 type="file"
                                 id="fileInput"
@@ -213,7 +282,7 @@ export default function ImportTable() {
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <ImportList name="Phiếu nhập kho" editUrl="/import/updateImport" titles={titles} columns={columns} data={employees} tableName="import" />
+                        <ReceiptList name="Phiếu nhập/xuất" editUrl="/import/updateImport" titles={titles} columns={columns} data={receipts} tableName="import" />
                     </div>
                     {totalPages > 1 && (
                         <Paging
