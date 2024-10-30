@@ -1,62 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import Navbar from "@/components/navbar/navbar";
-import Sidebar from "@/components/navbar/sidebar";
 import { Button } from '@/components/ui/button';
-import ImportList from "@/components/list/list";
+import ProductList from "@/components/list/list";
+import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
-// import RadioFilter from "@/components/filter/radioFilter";
-// import CheckboxFilter from "@/components/filter/checkboxFilter";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
-import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
 import ExcelJS from 'exceljs';
+import Swal from 'sweetalert2';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../api/firebaseConfig';
 
-const Page = () => {
-    const router = useRouter();
-    const storage = getStorage(firebase);
+export default function ProductTable() {
     const columns = [
-        { name: 'id', displayName: 'Mã phiếu' },
-        { name: 'receiptDate', displayName: 'Ngày nhập' },
-        { name: 'batch.batchCode', displayName: 'Lô hàng' },
-        { name: 'batch.batchCreator.fullName', displayName: 'Người tạo' },
+        { name: 'productCode', displayName: 'Mã sản phẩm' },
+        { name: 'productName', displayName: 'Tên sản phẩm' },
+        { name: 'price', displayName: 'Giá nhập (kg)' },
+        { name: 'productQuantity', displayName: 'Tồn kho (kg)' },
+        { name: 'importDate', displayName: 'Ngày nhập' },
+        { name: 'supplierName', displayName: 'Nhà cung cấp' },
     ];
-    const [employees, setEmployees] = useState([]);
+    const [products, setProducts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [navbarVisible, setNavbarVisible] = useState(false);
+    const storage = getStorage(firebase);
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
-
-    const getData = async (page?: number) => {
-        try {
-            const params = new URLSearchParams();
-            params.append("pageSize", "10");
-            if (page) {
-                params.append("pageNumber", page.toString());
-            }
-            const url = `/WarehouseReceipt/?${params.toString()}`;
-            const response = await api.get(url);
-            const data = response.data;
-            setEmployees(data._embedded.warehouseReceiptList);
-            setTotalPages(data.page.totalPages);
-        } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
-        }
-    };
-
-    useEffect(() => {
-        getData(currentPage);
-    }, [currentPage]);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
 
     const showAlert = (data: any, fileInput: HTMLInputElement) => {
         Swal.fire({
@@ -181,7 +156,7 @@ const Page = () => {
         try {
             const response = await api.post(`/products/import`, data);
             if (response.status >= 200 && response.status < 300) {
-                getData(currentPage);
+                getProducts(currentPage, currentSearch);
                 Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
@@ -192,42 +167,57 @@ const Page = () => {
         }
     }
 
+    const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
+        try {
+            const params = new URLSearchParams();
+            params.append("pageSize", "10");
+            if (page) {
+                params.append("pageNumber", page.toString());
+            }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
+            }
+            const url = `/products/admin/products?${params.toString()}`;
+            const response = await api.get(url);
+            const data = response.data;
+            console.log(data);
+            if (data._embedded) {
+                setProducts(data._embedded.adminProductDtoList);
+                setTotalPages(data.page.totalPages);
+            } else {
+                alert("Danh sách rỗng");
+            }
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+        }
+    };
+
     useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
+        getProducts(currentPage, currentSearch);
+    }, [currentPage, currentSearch]);
 
-        updateNavbarVisibility();
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
+    };
 
-        window.addEventListener('resize', updateNavbarVisibility);
-
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
 
     return (
         <div>
-            {navbarVisible ? (
-                <Navbar />
-            ) : (
-                <Sidebar />
-            )}
-            <div className="flex">
-                <div style={{ flex: '1' }}></div>
-                <div style={{ flex: '9' }} className='my-16 overflow-x-auto'>
-                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle mb-10'>
-                        {navbarVisible && (
-                            <h1 className='font-bold text-[20px] pb-5'><strong>Danh sách phiếu nhập</strong></h1>
-                        )}
+            <section className='col-span-4'>
+                <div className='w-full overflow-x-auto'>
+                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
+                        <SearchBar
+                            onSearch={handleSearch}
+                            selectOptions={[
+                                { value: 'productCode', label: 'Mã sản phẩm' },
+                                { value: 'productName', label: 'Tên sản phẩm' }
+                            ]}
+                        />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            {!navbarVisible && (
-                                <h1 className='font-bold text-[20px] pb-5 px-5'><strong>Danh sách phiếu nhập</strong></h1>
-                            )}
-                            <Button onClick={() => router.push("/import/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Tạo phiếu nhập kho
-                            </Button>
                             <input
                                 type="file"
                                 id="fileInput"
@@ -246,8 +236,8 @@ const Page = () => {
                             </Button>
                         </div>
                     </div>
-                    <div className='overflow-x-auto'>
-                        <ImportList name="Phiếu nhập kho" editUrl="/import/updateImport" titles={titles} columns={columns} data={employees} tableName="import" />
+                    <div className='overflow-hidden'>
+                        <ProductList name="Sản phẩm" editUrl="/products/update/1" titles={titles} columns={columns} data={products} tableName="products" />
                     </div>
                     {totalPages > 1 && (
                         <Paging
@@ -258,10 +248,9 @@ const Page = () => {
                     )}
                 </div>
                 <div style={{ flex: '1' }}></div>
-            </div>
+            </section>
             <FloatingButton />
         </div>
     );
 };
 
-export default Page;

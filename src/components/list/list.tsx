@@ -8,7 +8,6 @@ import eyeIcon from '@/components/icon/eye_icon.svg'
 import Image from "next/image";
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
-import { LinearProgress } from '@mui/material';
 import PopupDetail from '../popup/popupDetail';
 import PopupEdit from '../popup/popupEdit';
 
@@ -104,8 +103,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         if (key.includes('batchCode')) {
             return (
                 <a
-                    className="text-blue-500 hover:text-blue-300"
-                    href="#"
+                    className="text-blue-500 hover:text-blue-300 cursor-pointer"
                     onClick={() => router.push(`/batches/${cell.toString()}`)}
                 >
                     {cell.toString()}
@@ -133,13 +131,18 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             if (key === 'active') {
                 return cell ? 'Hoạt động' : 'Không hoạt động';
             }
+            if (key === 'receiptType') {
+                return (
+                    <p className={`${cell === 'EXPORT' ? 'text-red-500' : 'text-green-500'}`}>{cell === 'EXPORT' ? 'Phiếu xuất' : 'Phiếu nhập'}</p>
+                );
+            }
         }
         return cell;
     };
 
     return (
-        <div className='w-full rounded-2xl overflow-x-auto'>
-            <table className="min-w-[1250px] w-full bg-white border-collapse">
+        <div className='w-full mb-20 rounded-2xl overflow-x-auto'>
+            <table className="w-full bg-white border-collapse">
                 <thead>
                     <tr className="bg-white border border-gray-200">
                         {columns.map((column, index) => (
@@ -162,7 +165,10 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         data.map((row, rowIndex) => (
                             <tr key={rowIndex} className={`font-semibold border border-gray-200 bg-white`}>
                                 {columns.map((column, cellIndex) => (
-                                    <td key={cellIndex} className={`text-center max-w-[200px] px-4 py-3 ${rowIndex === data.length - 1 && cellIndex === 0 ? 'rounded-bl-lg' : ''} ${rowIndex === data.length - 1 && cellIndex === columns.length - 1 ? 'rounded-br-lg' : ''}`}>
+                                    <td
+                                        key={cellIndex}
+                                        className={`text-center max-w-[200px] px-4 py-3 ${rowIndex === data.length - 1 && cellIndex === 0 ? 'rounded-bl-lg' : ''} ${rowIndex === data.length - 1 && cellIndex === columns.length - 1 ? 'rounded-br-lg' : ''}`}
+                                    >
                                         {renderCell(column.name, row)}
                                     </td>
                                 ))}
@@ -202,8 +208,8 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                     ) : (
                         <tr>
                             <td colSpan={columns.length}>
-                                <div className="my-4 mx-4">
-                                    <LinearProgress color="inherit" />
+                                <div className="my-10 mx-4 text-center text-gray-500">
+                                    Không có dữ liệu
                                 </div>
                             </td>
                         </tr>

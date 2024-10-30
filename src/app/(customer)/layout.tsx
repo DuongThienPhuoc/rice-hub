@@ -3,13 +3,13 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/app-sidebar/app-sidebar';
 
 export default function CustomerLayout({
-                                            children,
-                                        }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
     return (
         <SidebarProvider>
-            <AppSidebar/>
+            <AppSidebar />
             <main className='w-full'>
                 {children}
             </main>

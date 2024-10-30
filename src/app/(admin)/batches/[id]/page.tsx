@@ -9,24 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 
 const Page = ({ params }: { params: { id: string } }) => {
-    const [navbarVisible, setNavbarVisible] = useState(false);
     const [batch, setBatch] = useState<any>(null);
     const router = useRouter();
-
-    useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
-
-        updateNavbarVisibility();
-
-        window.addEventListener('resize', updateNavbarVisibility);
-
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
 
     useEffect(() => {
         const getBatch = async () => {
@@ -60,11 +44,10 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     return (
         <div>
-            {navbarVisible ? <Navbar /> : <Sidebar />}
             <div className='flex my-16 justify-center px-5 w-full font-arsenal'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
-                        {['Thông tin lô hàng', 'Danh sách sản phẩm'].map((label, index) => (
+                        {['Thông tin lô hàng'].map((label, index) => (
                             <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
                                 <div
                                     className={`w-[100%] text-center mt-5 lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
@@ -75,9 +58,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                             </div>
                         ))}
                     </div>
-                    <div className='flex flex-col mt-10 lg:flex-row px-10'>
+                    <div className='flex flex-col mt-10 lg:flex-row lg:px-10'>
                         <div className='flex-1'>
-                            <div className='m-10 flex flex-col lg:flex-row'>
+                            <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
                                 <span className='font-bold flex-1'>Mã lô: </span>
                                 <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{batch?.batchCode}</span>
                             </div>
@@ -93,28 +76,22 @@ const Page = ({ params }: { params: { id: string } }) => {
                             </div>
                         </div>
                         <div className='flex-1'>
-                            <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
-                                    {/* {products.map((product) => (
-                                        <div key={product.id} className="bg-white rounded-lg shadow-md p-5 flex flex-col items-center">
-                                            <img src={product.image} alt={product.name} className="w-full h-40 object-cover mb-4 rounded-lg" />
-                                            <h2 className="text-lg font-bold text-gray-800 mb-2">{product.name}</h2>
-                                            <p className="text-blue-500 font-semibold text-lg mb-4">{formatCurrency(product.price)}</p>
-                                            <button
-                                                onClick={() => handleProductClick(product.id)}
-                                                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-                                            >
-                                                View Details
-                                            </button>
-                                        </div>
-                                    ))} */}
+                            <div className='m-0 flex flex-col lg:flex-row'>
+                                <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                    <span className='font-bold flex-1'>Danh sách sản phẩm: </span>
+                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
+                                        {batch?.batchProducts?.map((bp: any) => (
+                                            <div key={bp?.id}>
+                                                <a onClick={() => router.push(`/products/${bp?.product?.id}`)} className='hover:text-blue-400 cursor-pointer'>{bp?.product?.productCode} - {bp?.product?.name}</a>
+                                            </div>
+                                        ))}
+                                    </span>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <div className='w-full flex justify-center items-center my-10'>
-                        <Button type='button' onClick={() => router.push("/import")} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='button' onClick={() => router.push("/batches")} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Trở về</strong>
                         </Button>
                     </div>

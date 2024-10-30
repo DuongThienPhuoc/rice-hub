@@ -1,7 +1,5 @@
 'use client';
-import Navbar from '@/components/navbar/navbar';
-import Sidebar from '@/components/navbar/sidebar';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import BarChart from '@/components/chart/BarChart';
 import MultipleBarChart from '@/components/chart/MultipleBarChart';
 import StackBarChart from '@/components/chart/StackBarChart';
@@ -10,30 +8,8 @@ import DonutChart from '@/components/chart/PieChart';
 import HorizontalChart from '@/components/chart/HorizontalChart';
 
 const Page = () => {
-    const [navbarVisible, setNavbarVisible] = useState(false);
-
-    useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
-
-        updateNavbarVisibility();
-
-        window.addEventListener('resize', updateNavbarVisibility);
-
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
-
     return (
         <div>
-            {navbarVisible ? (
-                <Navbar />
-            ) : (
-                <Sidebar />
-            )}
             <div className='flex my-5 justify-center px-5 w-full' >
                 <div className='w-[95%] md:w-[70%]'>
                     <div className='bg-white w-full rounded-md px-5 py-3' style={{ boxShadow: '5px 5px 5px lightgray' }}>

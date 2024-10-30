@@ -8,9 +8,8 @@ export default function CustomerLayout({
     children: React.ReactNode;
 }) {
     return (
-        <SidebarProvider>
-            <AppSidebar />
-            <main className="w-full bg-white">{children}</main>
-        </SidebarProvider>
+        <>
+            {children}
+        </>
     );
 }

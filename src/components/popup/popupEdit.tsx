@@ -69,7 +69,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
 
     return (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className='w-fit flex bg-white rounded-lg flex-col lg:flex-row'>
+            <div className='w-fit flex min-w-[300px] lg:min-w-[500px] bg-white rounded-lg flex-col lg:flex-row'>
                 <div className='w-full py-3 h-full flex flex-col justify-between items-center lg:items-start'>
                     <div className='w-full flex justify-between items-center pb-5 px-5'>
                         <h1 className='font-bold'>Sửa {tableName.toLocaleLowerCase()}</h1>
@@ -77,7 +77,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
                             <span className="text-black text-xl hover:text-gray-500">✖</span>
                         </button>
                     </div>
-                    <form className='px-6' onSubmit={handleSubmit}>
+                    <form className='px-6 w-full' onSubmit={handleSubmit}>
                         <InputField titles={titles} data={formData} onFieldChange={handleFieldChange} />
                         <div className='w-full flex justify-center items-center pt-5 px-5'>
                             <Button className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]' type="submit">

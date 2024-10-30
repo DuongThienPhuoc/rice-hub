@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import {
@@ -25,7 +26,13 @@ import {
     SquareArrowRight,
     Import,
     ArrowRightFromLine,
-    Logs
+    Logs,
+    UserPen,
+    Users,
+    UserCog,
+    PackageCheck,
+    PenBox,
+    PackageOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -67,7 +74,7 @@ const categories = [
     },
     {
         category: 'Đơn hàng',
-        role: ['ROLE_CUSTOMER', 'ROLE_ADMIN'],
+        role: ['ROLE_CUSTOMER'],
         items: [
             {
                 title: 'Đặt hàng',
@@ -107,8 +114,29 @@ const categories = [
             },
             {
                 title: 'Bảng giá',
-                url: '#',
+                url: '/prices',
                 icon: <DollarSign />,
+            },
+        ],
+    },
+    {
+        category: 'Đối tác',
+        role: ['ROLE_ADMIN'],
+        items: [
+            {
+                title: 'Khách hàng',
+                url: '/customers',
+                icon: <Users />,
+            },
+            {
+                title: 'Nhân viên',
+                url: '/employees',
+                icon: <UserCog />,
+            },
+            {
+                title: 'Nhà cung cấp',
+                url: '/suppliers',
+                icon: <UserPen />,
             },
         ],
     },
@@ -118,13 +146,34 @@ const categories = [
         items: [
             {
                 title: 'Thu',
-                url: '#',
+                url: '/income',
                 icon: <Import />,
             },
             {
                 title: 'Chi',
-                url: '#',
+                url: '/expenditures',
                 icon: <ArrowRightFromLine />,
+            },
+            {
+                title: 'Đơn hàng',
+                url: 'order',
+                icon: <PackageCheck />,
+            },
+        ],
+    },
+    {
+        category: 'Nhập xuất',
+        role: ['ROLE_ADMIN'],
+        items: [
+            {
+                title: 'Nhập/xuất',
+                url: '/receipts',
+                icon: <PackageOpen />,
+            },
+            {
+                title: 'Kiểm hàng',
+                url: '/inventory',
+                icon: <PenBox />,
             },
         ],
     },
@@ -136,12 +185,12 @@ export default function AppSidebar() {
     const [role, setRole] = React.useState<string>('')
     useEffect(() => {
         const role = typeof window != 'undefined' ? localStorage.getItem('role') : '';
-        if(role !== null){
+        if (role !== null) {
             setRole(role)
         }
-    },[role])
+    }, [role])
 
-    function isHidden(category:any) {
+    function isHidden(category: any) {
         return !category.role.includes(role);
     }
 

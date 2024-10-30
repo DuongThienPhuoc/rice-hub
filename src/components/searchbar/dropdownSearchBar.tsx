@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
@@ -6,8 +7,8 @@ import ChevronDownIcon from '@/components/icon/downArrowWhite.svg';
 import ChevronUpIcon from '@/components/icon/upArrowWhite.svg';
 
 interface Option {
-    value: string;
-    label: string;
+    value: any;
+    label: any;
 }
 
 interface DropdownSearchBarProps {
@@ -56,7 +57,7 @@ const DropdownSearchBar: React.FC<DropdownSearchBarProps> = ({ onChange, selectO
                 className="px-3 py-2 text-white bg-[#1d1d1f] hover:bg-[#1d1d1fcd] outline-none rounded-l-lg text-[14px]"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {selectedOption || 'Bảng giá chung'}
+                {selectedOption || selectOptions[0].label}
                 <Image className='ml-2' src={isOpen ? ChevronDownIcon : ChevronUpIcon} alt='toggle arrow' width={8} />
             </Button>
 
