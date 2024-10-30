@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import {ProductDtoList} from '@/data/customer-product';
 
 export interface OrderProduct {
     id: string;
@@ -9,13 +10,13 @@ export interface OrderProduct {
 }
 
 type State = {
-    product: OrderProduct;
+    product: ProductDtoList;
 };
 type Actions = {
-    updateProducts: (products: OrderProduct) => void;
+    updateProducts: (products: ProductDtoList) => void;
 };
 
 export const orderStore = create<State & Actions>((set) => ({
-    product: { id: '', name: '', price: 0, category: '', type: [] },
+    product: {productCode: '', name: '', description: '', price: 0, image: '', categoryId: '', supplierId: 0, unitOfMeasureId: 0, unitWeightPairsList: [], warehouseId: null},
     updateProducts: (product) => set(() => ({ product: product })),
 }));

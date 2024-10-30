@@ -36,6 +36,7 @@ export default function OrderPage() {
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(0);
     const product = orderStore((state) => state.product);
+    const updateProducts = orderStore((state) => state.updateProducts);
     const products = useProductStore((state) => state.products);
     const setProducts = useProductStore((state) => state.setProducts);
     async function getProduct() {
@@ -202,14 +203,25 @@ export default function OrderPage() {
                                                     <ShoppingCart
                                                         onClick={() => {
                                                             setOpen(true);
-                                                            // updateProducts({
-                                                            //     id: product.id,
-                                                            //     name: product.name,
-                                                            //     category:
-                                                            //         product.category,
-                                                            //     price: product.price,
-                                                            //     type: product.type,
-                                                            // });
+                                                            updateProducts({
+                                                                productCode:
+                                                                    product.productCode,
+                                                                name: product.name,
+                                                                description:
+                                                                    product.description,
+                                                                price: product.price,
+                                                                image: product.image,
+                                                                categoryId:
+                                                                    product.categoryId,
+                                                                supplierId:
+                                                                    product.supplierId,
+                                                                unitOfMeasureId:
+                                                                    product.unitOfMeasureId,
+                                                                unitWeightPairsList:
+                                                                    product.unitWeightPairsList,
+                                                                warehouseId:
+                                                                    product.warehouseId,
+                                                            });
                                                         }}
                                                         className="h-4 w-4 hover:cursor-pointer"
                                                     />

@@ -65,6 +65,11 @@ const categories = [
                 url: '/dashboard',
                 icon: <Home />,
             },
+            {
+                title: 'Nhân viên',
+                url: '/salary',
+                icon: <User />,
+            }
         ],
     },
     {

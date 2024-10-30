@@ -30,6 +30,7 @@ const Page = () => {
             });
             console.log('Login success');
             localStorage.setItem("role", response.data.userType);
+            document.cookie = `userID=${response.data.userId}; path=/; expires=${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toUTCString()}`;
             setLoading(false);
             if (response.data.userType && response.data.userType == 'ROLE_ADMIN') {
                 router.push('/dashboard');
