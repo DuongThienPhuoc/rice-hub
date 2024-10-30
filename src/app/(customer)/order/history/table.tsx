@@ -1,18 +1,41 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { Calendar, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import {
     Pagination,
-    PaginationContent, PaginationEllipsis,
+    PaginationContent,
+    PaginationEllipsis,
     PaginationItem,
-    PaginationLink, PaginationNext,
-    PaginationPrevious
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
 } from '@/components/ui/pagination';
+import { getOrderHistory } from '@/data/order';
+import { useEffect } from 'react';
 
-export default function OrderTable() {
+export default function OrderTable({ value }: { value?: string }) {
+    useEffect(() => {
+        if (value !== undefined) {
+            getOrderHistory({ customerID: parseInt(value) })
+                .then((order) => {
+                    console.log(order);
+                })
+                .catch((e) => console.error(e));
+        }
+    }, []);
     const orders = [
         {
             id: 'ORD-12345',
@@ -52,9 +75,7 @@ export default function OrderTable() {
                             <TableHead className="w-[80px]">ID</TableHead>
                             <TableHead>Ngày</TableHead>
                             <TableHead>Tình trạng</TableHead>
-                            <TableHead className="text-right">
-                                Tổng
-                            </TableHead>
+                            <TableHead className="text-right">Tổng</TableHead>
                             <TableHead className="text-right">
                                 Chi tiết
                             </TableHead>
@@ -75,13 +96,12 @@ export default function OrderTable() {
                                 <TableCell>
                                     <Badge
                                         variant={
-                                            order.status ===
-                                            'Đang vận chuyển'
+                                            order.status === 'Đang vận chuyển'
                                                 ? 'default'
                                                 : order.status ===
-                                                'Đã thanh toán'
-                                                    ? 'outline'
-                                                    : 'destructive'
+                                                    'Đã thanh toán'
+                                                  ? 'outline'
+                                                  : 'destructive'
                                         }
                                     >
                                         {order.status}
@@ -112,10 +132,7 @@ export default function OrderTable() {
                                             <PaginationPrevious href="#" />
                                         </PaginationItem>
                                         <PaginationItem>
-                                            <PaginationLink
-                                                href="#"
-                                                isActive
-                                            >
+                                            <PaginationLink href="#" isActive>
                                                 1
                                             </PaginationLink>
                                         </PaginationItem>

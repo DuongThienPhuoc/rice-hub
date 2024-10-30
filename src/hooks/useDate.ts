@@ -2,20 +2,19 @@ export function getDaysAndWeekdaysInMonth(year: number, month: number) {
     const days = [];
     const date = new Date(year, month, 1);
     const weekdays = [
+        'Chủ nhật',
         'Thứ hai',
         'Thứ ba',
         'Thứ tư',
         'Thứ năm',
         'Thứ sáu',
         'Thứ bảy',
-        'Chủ nhật',
     ];
-
     while (date.getMonth() === month) {
         days.push({
             day: date.getDate(),
             weekday: weekdays[date.getDay()],
-            localDate: date.toLocaleDateString()
+            localDate: date.toLocaleDateString(),
         });
         date.setDate(date.getDate() + 1);
     }
