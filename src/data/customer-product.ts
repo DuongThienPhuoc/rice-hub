@@ -12,6 +12,7 @@ export interface Embedded {
 
 export interface ProductDtoList {
     name: string;
+    productCode: string;
     description: string;
     price: number;
     image: string;
@@ -19,18 +20,19 @@ export interface ProductDtoList {
     supplierId: number;
     unitOfMeasureId: number;
     warehouseId: null;
-    productUnit: null;
+    unitWeightPairsList: UnitWeightPairsList[];
+}
+
+export interface UnitWeightPairsList {
+    productUnit: string;
+    weightPerUnit: number;
 }
 
 export interface Links {
-    first: First;
-    prev: First;
-    self: First;
-    next: First;
-    last: First;
+    self: Self;
 }
 
-export interface First {
+export interface Self {
     href: string;
 }
 
