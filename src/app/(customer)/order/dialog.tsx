@@ -17,9 +17,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { OrderProduct } from '@/stores/orderStore';
 import { ToastAction } from '@/components/ui/toast';
 import { useCartDialogStore } from '@/stores/cartDialogStore';
+import { ProductDtoList } from '@/data/customer-product';
 
 export default function OrderPageDialog({
     open,
@@ -28,7 +28,7 @@ export default function OrderPageDialog({
 }: {
     open: boolean;
     onOpenChange: Dispatch<SetStateAction<boolean>>;
-    product: OrderProduct;
+    product: ProductDtoList;
 }) {
     const { toast } = useToast();
 
@@ -41,7 +41,7 @@ export default function OrderPageDialog({
         const getOrderId = JSON.parse(localStorage.getItem('cart') || '[]').length;
         const order = {
             id: getOrderId + 1,
-            productId: product.id,
+            productId: product.productCode,
             name: product.name,
             quantity: quantity,
             price: product.price,
@@ -84,9 +84,9 @@ export default function OrderPageDialog({
                                 <SelectValue placeholder="Chọn loại hàng" />
                             </SelectTrigger>
                             <SelectContent>
-                                {product.type.map((t, index) => (
-                                    <SelectItem key={index} value={`${t}KG`}>
-                                        {t} Kg
+                                {product.unitWeightPairsList.map((weight, index) => (
+                                    <SelectItem key={index} value={weight.weightPerUnit.toString()}>
+                                        {weight.weightPerUnit} Kg
                                     </SelectItem>
                                 ))}
                             </SelectContent>
