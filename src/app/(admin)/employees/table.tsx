@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
+import { PlusIcon } from 'lucide-react';
 
 export default function EmployeeTable() {
     const router = useRouter();
@@ -18,6 +19,7 @@ export default function EmployeeTable() {
         { name: 'address', displayName: 'Địa chỉ' },
         { name: 'joinDate', displayName: 'Ngày vào làm' },
     ];
+    const [loadingData, setLoadingData] = useState(true);
     const [employees, setEmployees] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +32,7 @@ export default function EmployeeTable() {
     ];
 
     const getEmployees = async (page?: number, search?: { field?: string, query?: string }) => {
+        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -46,6 +49,8 @@ export default function EmployeeTable() {
             setTotalPages(data.page.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách nhân viên:", error);
+        } finally {
+            setLoadingData(false);
         }
     };
 
@@ -78,17 +83,12 @@ export default function EmployeeTable() {
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
                             <Button onClick={() => router.push("/employees/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Thêm nhân viên
-                            </Button>
-                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Import
-                            </Button>
-                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Xuất file
+                                <PlusIcon />
                             </Button>
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" titles={titles} columns={columns} data={employees} tableName="employees" />
+                        <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" loadingData={loadingData} titles={titles} columns={columns} data={employees} tableName="employees" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

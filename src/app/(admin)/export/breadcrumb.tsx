@@ -9,11 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/navigation';
 
-export default function BatchDetailPageBreadcrumb({
-    batchId,
-}: {
-    batchId: string;
-}) {
+export default function ExportPageBreadcrumb() {
     const router = useRouter();
     return (
         <Breadcrumb className="my-5">
@@ -25,13 +21,7 @@ export default function BatchDetailPageBreadcrumb({
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbLink>
-                        Lô hàng
-                    </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbPage>{batchId}</BreadcrumbPage>
+                    <BreadcrumbPage>Phiếu xuất</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

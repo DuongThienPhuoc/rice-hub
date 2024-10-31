@@ -154,7 +154,7 @@ const Page = () => {
                                 </Button>
                             </div>
 
-                            <div className="m-10 max-h-[300px] overflow-y-auto border border-gray-300 p-4">
+                            <div className="m-10 max-h-[300px] overflow-y-auto">
                                 {prices.length > 0 ? (
                                     prices.map((price, index) => (
                                         <div key={price.id} className="flex items-center my-2">
@@ -185,7 +185,7 @@ const Page = () => {
                         </div>
 
                         <div className="flex-1 lg:pl-5">
-                            <div className="flex flex-col lg:flex-row items-center">
+                            <div className="m-5 flex flex-col lg:flex-row items-center">
                                 <span className="font-bold lg:w-1/4 w-full">Khách hàng:</span>
                                 <Autocomplete
                                     className="lg:w-2/4 w-full lg:mx-5 my-4"
@@ -206,7 +206,7 @@ const Page = () => {
                                 </Button>
                             </div>
 
-                            <div className="mt-7 max-h-[300px] overflow-y-auto border border-gray-300 p-4">
+                            <div className="mt-6 max-h-[300px] overflow-y-auto p-4">
                                 {priceCustomer?.length > 0 ? (
                                     priceCustomer?.map((customer: any) => (
                                         <div key={customer.id} className="flex items-center my-2">
@@ -222,7 +222,7 @@ const Page = () => {
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="w-full flex justify-center items-center py-5 text-gray-500">
+                                    <div className="w-full flex border border-gray-300 justify-center mt-2 items-center py-10 text-gray-500">
                                         Danh sách rỗng
                                     </div>
                                 )}

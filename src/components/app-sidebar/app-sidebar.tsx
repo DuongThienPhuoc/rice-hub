@@ -32,7 +32,10 @@ import {
     UserCog,
     PackageCheck,
     PenBox,
-    PackageOpen,
+    PackagePlus,
+    PackageMinus,
+    MonitorCheck,
+    BadgeDollarSign,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -65,11 +68,6 @@ const categories = [
                 url: '/dashboard',
                 icon: <Home />,
             },
-            {
-                title: 'Nhân viên',
-                url: '/salary',
-                icon: <User />,
-            }
         ],
     },
     {
@@ -129,14 +127,30 @@ const categories = [
                 icon: <Users />,
             },
             {
+                title: 'Nhà cung cấp',
+                url: '/suppliers',
+                icon: <UserPen />,
+            },
+        ],
+    },
+    {
+        category: 'Nhân sự',
+        role: ['ROLE_ADMIN'],
+        items: [
+            {
                 title: 'Nhân viên',
                 url: '/employees',
                 icon: <UserCog />,
             },
             {
-                title: 'Nhà cung cấp',
-                url: '/suppliers',
-                icon: <UserPen />,
+                title: 'Chấm công',
+                url: '/salary',
+                icon: <MonitorCheck />,
+            },
+            {
+                title: 'Bảng lương',
+                url: '/',
+                icon: <BadgeDollarSign />,
             },
         ],
     },
@@ -166,9 +180,14 @@ const categories = [
         role: ['ROLE_ADMIN'],
         items: [
             {
-                title: 'Nhập/xuất',
-                url: '/receipts',
-                icon: <PackageOpen />,
+                title: 'Nhập hàng',
+                url: '/import',
+                icon: <PackagePlus />,
+            },
+            {
+                title: 'Xuất hàng',
+                url: '/export',
+                icon: <PackageMinus />,
             },
             {
                 title: 'Kiểm hàng',

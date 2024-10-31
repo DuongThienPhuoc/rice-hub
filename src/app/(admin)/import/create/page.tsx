@@ -5,7 +5,7 @@
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from "../../../../../api/axiosConfig";
+import api from "../../../../api/axiosConfig";
 import { Autocomplete, TextField } from '@mui/material';
 import { PlusCircle, Trash2 } from 'lucide-react';
 
@@ -217,10 +217,11 @@ const Page = () => {
         }
 
         try {
+            console.log(formData);
             const response = await api.post(`/products/import`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Lô hàng đã được thêm thành công`);
-                router.push("/receipts");
+                router.push("/import");
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
@@ -260,45 +261,45 @@ const Page = () => {
                         </div>
                     </div>
                     <div className='lg:px-10 mt-5 px-2 overflow-x-auto'>
-                        <table className="w-full bg-white border-collapse mb-10 overflow-hidden rounded-2xl">
+                        <table className="w-full border-collapse mb-10 overflow-hidden rounded-2xl">
                             <thead className='rounded-2xl'>
-                                <tr className="bg-white border-2 border-gray-200">
-                                    <th className={`min-w-[50px] pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
+                                <tr className="border-2 border-gray-200">
+                                    <th className={`min-w-[50px] pt-3 text-black px-2 py-2 rounded-tl-2xl`}>
                                         STT
                                     </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
                                         Tên sản phẩm
                                     </th>
-                                    <th className={`min-w-[100px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
                                         Giá nhập
                                     </th>
-                                    <th className={`min-w-[100px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
                                         Đơn vị
                                     </th>
-                                    <th className={`min-w-[100px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
                                         Trọng lượng
                                     </th>
-                                    <th className={`min-w-[100px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
                                         Số lượng
                                     </th>
-                                    <th className={`min-w-[120px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[120px] pt-3 text-black px-2 py-2`}>
                                         Quy cách
                                     </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
                                         Danh mục
                                     </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
                                         Nhà cung cấp
                                     </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
                                         Kho
                                     </th>
-                                    <th className="min-w-[50px] bg-white text-black px-2 py-2 rounded-tr-2xl">#</th>
+                                    <th className="min-w-[50px] text-black px-2 py-2 rounded-tr-2xl">#</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr className={`font-semibold border-2 border-gray-200 bg-white`}>
-                                    <td colSpan={2} className='p-2'>
+                                    <td colSpan={2} className='px-2 py-4'>
                                         <TextField
                                             type={'text'}
                                             InputProps={{

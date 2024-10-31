@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import Modal from 'react-modal';
 import PopupCreate from '@/components/popup/popupCreate';
+import { PlusIcon } from 'lucide-react';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [navbarVisible, setNavbarVisible] = useState(false);
@@ -266,8 +267,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>Chưa có thông tin</span>
                                     </div>
                                     <div className='m-10 flex justify-center lg:justify-end'>
-                                        <Button onClick={openPopup} type='button' className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                            <strong>Tạo hợp đồng mới</strong>
+                                        <Button onClick={openPopup} type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                            Tạo hợp đồng <PlusIcon />
                                         </Button>
                                     </div>
                                 </div>

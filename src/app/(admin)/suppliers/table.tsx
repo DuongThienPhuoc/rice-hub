@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import PopupCreate from "@/components/popup/popupCreate";
+import { PlusIcon } from 'lucide-react';
 
 export default function SupplierTable() {
     const columns = [
@@ -17,6 +18,7 @@ export default function SupplierTable() {
         { name: 'phoneNumber', displayName: 'Số điện thoại' },
         { name: 'address', displayName: 'Địa chỉ' },
     ];
+    const [loadingData, setLoadingData] = useState(true);
     const [suppliers, setSuppliers] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,6 +52,7 @@ export default function SupplierTable() {
     }
 
     const getSuppliers = async (page?: number, search?: { field?: string, query?: string }) => {
+        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -66,6 +69,8 @@ export default function SupplierTable() {
             setTotalPages(data.page.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
+        } finally {
+            setLoadingData(false);
         }
     };
 
@@ -98,19 +103,12 @@ export default function SupplierTable() {
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
                             <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                 Thêm nhà cung cấp
+                                <PlusIcon />
                             </Button>
-                            <div className='flex space-x-1'>
-                                <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                    Import
-                                </Button>
-                                <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                    Xuất file
-                                </Button>
-                            </div>
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
+                        <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} loadingData={loadingData} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
                     </div>
                     {totalPages > 1 && (
                         <Paging
