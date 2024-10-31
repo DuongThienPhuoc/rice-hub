@@ -1,19 +1,29 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import Navbar from '@/components/navbar/navbar';
-import Sidebar from '@/components/navbar/sidebar';
 import React, { useEffect, useState } from 'react';
 import api from "../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import ProductList from "@/components/list/list";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const [batch, setBatch] = useState<any>(null);
     const router = useRouter();
-
+    const columns = [
+        { name: 'product.productCode', displayName: 'Mã sản phẩm' },
+        { name: 'product.name', displayName: 'Tên sản phẩm' },
+        { name: 'product.description', displayName: 'Mô tả' },
+        { name: 'product.category.name', displayName: 'Danh mục' },
+        { name: 'product.supplier.name', displayName: 'Nhà cung cấp' },
+    ];
+    const [loadingData, setLoadingData] = useState(true);
+    const titles = [
+        { name: '', displayName: '', type: '' },
+    ];
     useEffect(() => {
         const getBatch = async () => {
+            setLoadingData(true);
             try {
                 const url = `/batches/batchCode/${params.id}`;
                 const response = await api.get(url);
@@ -22,6 +32,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 setBatch(data);
             } catch (error) {
                 console.error("Error fetching batch:", error);
+            } finally {
+                setLoadingData(false)
             }
         };
 
@@ -66,32 +78,27 @@ const Page = ({ params }: { params: { id: string } }) => {
                             </div>
 
                             <div className='m-10 flex flex-col lg:flex-row'>
-                                <span className='font-bold flex-1'>Ngày nhập: </span>
-                                <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(batch?.importDate)}</span>
-                            </div>
-
-                            <div className='m-10 flex flex-col lg:flex-row'>
                                 <span className='font-bold flex-1'>Người nhập: </span>
                                 <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{batch?.batchCreator.fullName}</span>
                             </div>
                         </div>
                         <div className='flex-1'>
-                            <div className='m-0 flex flex-col lg:flex-row'>
-                                <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Danh sách sản phẩm: </span>
-                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
-                                        {batch?.batchProducts?.map((bp: any) => (
-                                            <div key={bp?.id}>
-                                                <a onClick={() => router.push(`/products/${bp?.product?.id}`)} className='hover:text-blue-400 cursor-pointer'>{bp?.product?.productCode} - {bp?.product?.name}</a>
-                                            </div>
-                                        ))}
-                                    </span>
-                                </div>
+                            <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                <span className='font-bold flex-1'>Ngày nhập: </span>
+                                <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(batch?.importDate)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='lg:px-10 w-full lg:mt-0 mt-10'>
+                        <div className='mx-10'>
+                            <p className='font-bold mb-5'>Danh sách sản phẩm: </p>
+                            <div className='overflow-x-auto'>
+                                <ProductList name="Sản phẩm" editUrl="" titles={titles} loadingData={loadingData} columns={columns} data={batch?.batchProducts} tableName="batch" />
                             </div>
                         </div>
                     </div>
                     <div className='w-full flex justify-center items-center my-10'>
-                        <Button type='button' onClick={() => router.push("/batches")} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                        <Button type='button' onClick={() => router.push(`${batch?.receiptType === "IMPORT" ? '/import' : '/export'}`)} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Trở về</strong>
                         </Button>
                     </div>

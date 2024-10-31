@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/navigation';
 
-export default function ReceiptPageBreadcrumb() {
+export default function ImportPageBreadcrumb() {
     const router = useRouter();
     return (
         <Breadcrumb className="my-5">
@@ -21,7 +21,7 @@ export default function ReceiptPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Phiếu nhập/xuất</BreadcrumbPage>
+                    <BreadcrumbPage>Phiếu nhập</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

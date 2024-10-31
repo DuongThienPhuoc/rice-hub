@@ -10,6 +10,7 @@ import DropdownSearchBar from "@/components/searchbar/dropdownSearchBar";
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { LinearProgress } from '@mui/material';
+import { PlusIcon } from 'lucide-react';
 
 interface RowData {
     [key: string]: any;
@@ -108,7 +109,7 @@ export default function PriceTable() {
 
     const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
 
-    const handleEditClick = (rowIndex: number, value: string | number) => {
+    const handleEditClick = (rowIndex: number) => {
         setEditingRowIndex(rowIndex);
     };
 
@@ -152,7 +153,8 @@ export default function PriceTable() {
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
                             <Button onClick={() => router.push("/prices/create")} className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Tạo bảng giá
+                                Thêm bảng giá
+                                <PlusIcon />
                             </Button>
                             <DropdownSearchBar
                                 onChange={handlePriceChange}
@@ -167,9 +169,6 @@ export default function PriceTable() {
                                     ]
                                 }
                             />
-                            <Button className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Xuất file
-                            </Button>
                         </div>
                     </div>
                     <div className='overflow-hidden'>
@@ -251,7 +250,7 @@ export default function PriceTable() {
                                                                 </>
                                                             ) : (
                                                                 <button
-                                                                    onClick={() => handleEditClick(rowIndex, matchingProductPrice?.unit_price || product.price)}
+                                                                    onClick={() => handleEditClick(rowIndex)}
                                                                     className="group w-12 h-6 md:w-auto md:h-auto hover:text-blue-500"
                                                                 >
                                                                     Sửa

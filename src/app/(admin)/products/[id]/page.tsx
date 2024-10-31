@@ -6,11 +6,24 @@ import React, { useEffect, useState } from 'react';
 import api from "../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import BatchList from "@/components/list/list";
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [product, setProduct] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
+
+    const columns = [
+        { name: 'batch.batchCode', displayName: 'Mã lô hàng' },
+        { name: 'description', displayName: 'Mô tả' },
+        { name: 'price', displayName: 'Giá nhập (kg)' },
+        { name: 'unit', displayName: 'Quy cách' },
+        { name: 'quantity', displayName: 'Số lượng' },
+    ];
+
+    const titles = [
+        { name: '', displayName: '', type: '' },
+    ];
 
     useEffect(() => {
         const getProduct = async () => {
@@ -63,17 +76,17 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                         ))}
                     </div>
-                    <div className='flex flex-col lg:flex-row lg:px-10'>
-                        <div className='flex-1'>
-                            <div className='mt-10 px-10 flex flex-col items-center'>
-                                <img
-                                    src={product?.image || "https://via.placeholder.com/400"}
-                                    alt='Avatar'
-                                    className="w-[90%] h-[400px] border-[5px] border-black object-cover"
-                                />
+                    {choice ? (
+                        <div className='flex flex-col lg:flex-row lg:px-10'>
+                            <div className='flex-1'>
+                                <div className='mt-10 xl:px-10 flex flex-col items-center'>
+                                    <img
+                                        src={product?.image || "https://via.placeholder.com/400"}
+                                        alt='Avatar'
+                                        className="w-[90%] h-[400px] border-[5px] border-black object-cover"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        {choice ? (
                             <div className='flex-1'>
                                 <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Mã sản phẩm: </span>
@@ -105,36 +118,32 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.description}</span>
                                 </div>
                             </div>
-                        ) : (
-                            <div className='flex-1'>
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Người nhập: </span>
-                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.batchProducts[0]?.batch?.batchCreator?.fullName}</span>
-                                </div>
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Ngày nhập: </span>
-                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(product?.createAt)}</span>
-                                </div>
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Giá nhập: </span>
-                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.importPrice}</span>
-                                </div>
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Danh sách lô hàng: </span>
-                                    <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
-                                        {product.batchProducts?.map((p: any) => (
-                                            <div key={p.id}>
-                                                {p.batch?.receiptType === 'IMPORT' && (
-                                                    <a onClick={() => router.push(`/batches/${p.batch?.batchCode}`)} className='hover:text-blue-400 cursor-pointer'>{p?.batch?.batchCode}</a>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </span>
-                                </div>
+                        </div>
+                    ) : (
+                        <div className='w-full lg:px-10'>
+                            <div className='flex flex-col lg:flex-row'>
+                                <div className='flex-1'>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Người nhập: </span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.batchProducts[0]?.batch?.batchCreator?.fullName}</span>
+                                    </div>
 
+                                </div>
+                                <div className='flex-1'>
+                                    <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Ngày nhập: </span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(product?.createAt)}</span>
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                    </div>
+                            <div className='m-10'>
+                                <p className='font-bold mb-5'>Danh sách lô hàng: </p>
+                                <div className='overflow-x-auto'>
+                                    <BatchList name="Lô hàng" editUrl="" titles={titles} columns={columns} data={product.batchProducts} tableName="batch" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className='w-full flex justify-center items-center my-10'>
                         <Button type='button' onClick={() => router.push(`/products/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                             <strong>Sửa</strong>
@@ -145,7 +154,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
