@@ -10,49 +10,42 @@ import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import ExcelJS from 'exceljs';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import firebase from '../../../api/firebaseConfig';
-import { Menu, MenuItem } from '@mui/material';
-import { ExpandMore, ExpandLess } from '@mui/icons-material';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/material_blue.css';
+import { PlusIcon } from 'lucide-react';
+import * as XLSX from 'xlsx';
+import crypto from 'crypto';
 
-export default function ReceiptTable() {
+export default function ImportTable() {
     const router = useRouter();
-    const storage = getStorage(firebase);
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
-        { name: 'receiptType', displayName: 'Loại phiếu' },
-        { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
         { name: 'batchCode', displayName: 'Lô hàng' },
+        { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
         { name: 'username', displayName: 'Người tạo' },
-        { name: 'type', displayName: 'Lý do xuất hàng' },
     ];
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
+    const [loadingData, setLoadingData] = useState(true);
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
-    const [dateRange, setDateRange] = useState<[Date, Date]>([new Date(), new Date()]);
+    const [dateRange, setDateRange] = useState<[any, any]>(['', '']);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
+    const processedFileHashes = new Set<string>();
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleMenuItemClick = (path: string) => {
-        handleClose();
-        router.push(path);
+    const calculateFileHash = async (file: File): Promise<string> => {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+        return hash;
     };
 
     const getData = async (page?: number, startDate?: any, endDate?: any) => {
+        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -75,6 +68,8 @@ export default function ReceiptTable() {
             }
         } catch (error) {
             console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
+        } finally {
+            setLoadingData(false);
         }
     };
 
@@ -100,25 +95,13 @@ export default function ReceiptTable() {
             confirmButtonText: 'Có, thêm!',
             cancelButtonText: 'Không, hủy!',
         }).then(async (result) => {
+            fileInput.value = '';
             if (result.isConfirmed) {
                 handleSubmit(data);
             } else {
-                fileInput.value = '';
                 Swal.fire('Đã hủy', 'Danh sách không được thêm.', 'info');
             }
         });
-    };
-
-    const uploadImageToFirebase = async (imageBuffer: Buffer, fileName: string): Promise<string> => {
-        try {
-            const fileRef = ref(storage, `images/${fileName}`);
-            await uploadBytes(fileRef, imageBuffer);
-            const downloadURL = await getDownloadURL(fileRef);
-            return downloadURL;
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            return "";
-        }
     };
 
     const fileToBuffer = (file: File): Promise<Buffer> => {
@@ -135,16 +118,83 @@ export default function ReceiptTable() {
         });
     };
 
+    const handleShowDownloadMaterial = () => {
+        Swal.fire({
+            title: 'Bạn đã có mẫu file import chưa?',
+            text: "Nếu chưa, bạn có thể tải xuống ở bên dưới.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Tải xuống mẫu',
+            cancelButtonText: 'Tôi có rồi',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                downloadTemplateExcel();
+            } else {
+                document.getElementById("fileInput")?.click();
+            }
+        });
+    };
+
+    const downloadTemplateExcel = () => {
+        const data = [
+            { name: "Sản phẩm mới", importPrice: 100, quantity: 10, weightPerUnit: 10, unit: "bao", categoryId: 1, supplierId: 1, unitOfMeasureId: 2, warehouseId: 1 },
+            { name: "Sản phẩm mới 2", importPrice: 200, quantity: 20, weightPerUnit: 25, unit: "bao", categoryId: 2, supplierId: 2, unitOfMeasureId: 1, warehouseId: 1 },
+            { name: "Sản phẩm mới 3", importPrice: 300, quantity: 30, weightPerUnit: 70, unit: "bao", categoryId: 3, supplierId: 3, unitOfMeasureId: 3, warehouseId: 2 }
+        ];
+
+        const categories = [
+            { id: 1, categoryName: "Category 1" },
+            { id: 2, categoryName: "Category 2" },
+            { id: 3, categoryName: "Category 3" }
+        ];
+        const suppliers = [
+            { id: 1, supplierName: "Supplier 1" },
+            { id: 2, supplierName: "Supplier 2" },
+            { id: 3, supplierName: "Supplier 3" }
+        ];
+        const unitsOfMeasure = [
+            { id: 1, measureName: "Measure 1" },
+            { id: 2, measureName: "Measure 2" },
+            { id: 3, measureName: "Measure 3" }
+        ];
+        const warehouses = [
+            { id: 1, warehouseName: "Warehouse 1" },
+            { id: 2, warehouseName: "Warehouse 2" }
+        ];
+
+        const dataSheet = XLSX.utils.json_to_sheet(data);
+        const categorySheet = XLSX.utils.json_to_sheet(categories);
+        const supplierSheet = XLSX.utils.json_to_sheet(suppliers);
+        const measureSheet = XLSX.utils.json_to_sheet(unitsOfMeasure);
+        const warehouseSheet = XLSX.utils.json_to_sheet(warehouses);
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, dataSheet, "Products");
+        XLSX.utils.book_append_sheet(workbook, categorySheet, "Categories");
+        XLSX.utils.book_append_sheet(workbook, supplierSheet, "Suppliers");
+        XLSX.utils.book_append_sheet(workbook, measureSheet, "UnitsOfMeasure");
+        XLSX.utils.book_append_sheet(workbook, warehouseSheet, "Warehouses");
+
+        XLSX.writeFile(workbook, 'template.xlsx');
+    };
+
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
             const file = event.target.files?.[0];
             if (!file) {
-                throw new Error("No file selected");
+                throw new Error("Chưa có file nào được chọn");
+            }
+
+            const fileHash = await calculateFileHash(file);
+
+            if (processedFileHashes.has(fileHash)) {
+                Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
+                return;
             }
 
             Swal.fire({
-                title: 'Processing...',
-                text: 'Please wait while we process your file.',
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ, dữ liệu đang được xử lí.',
                 allowOutsideClick: false,
                 willOpen: () => {
                     Swal.showLoading();
@@ -156,56 +206,31 @@ export default function ReceiptTable() {
             await workbook.xlsx.load(fileBuffer);
             const worksheet = workbook.getWorksheet(1);
 
-            const imageMap: { [rowNumber: number]: string } = {};
-            const images = workbook.model.media;
-
             const rows = worksheet?.rowCount;
             if (rows === 0) {
-                throw new Error("The worksheet contains no rows");
-            }
-
-            const imageRowNumbers = Array.from({ length: images.length }, (_, i) => i + 2);
-
-            for (let i = 0; i < images.length; i++) {
-                const image = images[i];
-                const { buffer, name, extension } = image;
-
-                if (buffer) {
-                    const fileName = `${name}.${extension}`;
-                    const firebaseUrl = await uploadImageToFirebase(Buffer.from(buffer), fileName);
-
-                    const rowNumber = imageRowNumbers[i];
-                    if (rows && rowNumber <= rows) {
-                        imageMap[rowNumber] = firebaseUrl;
-                    }
-                }
+                throw new Error("File rỗng");
             }
 
             const processedData: Array<any> = [];
 
             const headers = worksheet?.getRow(1).values as string[];
+            console.log(headers);
 
             worksheet?.eachRow({ includeEmpty: true }, (row, rowNumber) => {
                 if (rowNumber === 1) return;
 
                 const rowData: { [key: string]: any } = {};
                 row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    if (colNumber === 4 && imageMap[rowNumber]) {
-                        rowData[headers[colNumber]] = imageMap[rowNumber];
-                    } else {
-                        rowData[headers[colNumber]] = cell.value;
-                    }
+                    rowData[headers[colNumber]] = cell.value;
                 });
                 processedData.push(rowData);
             });
-
             Swal.close();
-
+            processedFileHashes.add(fileHash);
             const fileInput = event.target;
             showAlert(processedData, fileInput);
         } catch (error) {
-            console.error("Error processing file:", error);
-            Swal.fire('Error processing file', 'error');
+            Swal.fire('Lỗi khi xử lý file', 'error');
         }
     };
 
@@ -252,20 +277,12 @@ export default function ReceiptTable() {
                         </div>
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
                             <Button
-                                onClick={handleClick}
+                                onClick={() => router.push("/import/create")}
                                 className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
                             >
-                                Tạo phiếu
-                                {anchorEl ? <ExpandLess /> : <ExpandMore />}
+                                Tạo phiếu nhập
+                                <PlusIcon />
                             </Button>
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={Boolean(anchorEl)}
-                                onClose={handleClose}
-                            >
-                                <MenuItem onClick={() => handleMenuItemClick("/receipts/import/create")}>Tạo phiếu nhập</MenuItem>
-                                <MenuItem onClick={() => handleMenuItemClick("/receipts/export/create")}>Tạo phiếu xuất</MenuItem>
-                            </Menu>
                             <input
                                 type="file"
                                 id="fileInput"
@@ -275,14 +292,15 @@ export default function ReceiptTable() {
                             />
                             <Button
                                 className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                                onClick={() => document.getElementById('fileInput')?.click()}
+                                onClick={handleShowDownloadMaterial}
+                            // onClick={() => document.getElementById('fileInput')?.click()}
                             >
                                 Import
                             </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <ReceiptList name="Phiếu nhập/xuất" editUrl="/import/updateImport" titles={titles} columns={columns} data={receipts} tableName="import" />
+                        <ReceiptList name="Phiếu nhập/xuất" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
                     </div>
                     {totalPages > 1 && (
                         <Paging
