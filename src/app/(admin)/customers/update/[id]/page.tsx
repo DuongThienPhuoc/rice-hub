@@ -1,17 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import Navbar from '@/components/navbar/navbar';
-import Sidebar from '@/components/navbar/sidebar';
+
 import React, { useEffect, useState } from 'react';
 import api from "../../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../../../api/firebaseConfig';
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const Page = ({ params }: { params: { id: number } }) => {
-    const [navbarVisible, setNavbarVisible] = useState(false);
     const [customer, setCustomer] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
@@ -30,20 +29,6 @@ const Page = ({ params }: { params: { id: number } }) => {
             reader.readAsDataURL(file);
         }
     };
-    useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
-
-        updateNavbarVisibility();
-
-        window.addEventListener('resize', updateNavbarVisibility);
-
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
 
     useEffect(() => {
         const getCustomer = async () => {
@@ -129,7 +114,6 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            {navbarVisible ? <Navbar /> : <Sidebar />}
             <form onSubmit={handleSubmit} className='flex my-16 justify-center px-5 w-full font-arsenal'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
@@ -170,78 +154,78 @@ const Page = ({ params }: { params: { id: number } }) => {
                         <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
                             <div className='flex-1'>
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Tên khách hàng: </span>
-                                    <input
-                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
-                                        type='text'
-                                        name='fullName'
-                                        placeholder='Nhập đầy đủ họ và tên'
-                                        value={formData.fullName?.toString() || ''}
+                                    <span className='font-bold flex-1 pt-4'>Tên khách hàng: </span>
+                                    <TextField
+                                        type={'text'}
+                                        className='flex-[2]'
                                         onChange={(e) => handleFieldChange('fullName', e.target.value)}
-                                    />
+                                        value={formData.fullName?.toString() || ''}
+                                        label={'Nhập đầy đủ họ và tên'}
+                                        variant="standard" />
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Giới tính: </span>
-                                    <select
-                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
-                                        name='gender'
-                                        value={formData?.gender === '' ? '' : (formData?.gender === true ? "true" : "false")}
-                                        onChange={(e) => handleFieldChange('gender', e.target.value === "true" ? true : false)}
-                                    >
-                                        <option defaultValue="">Chọn giới tính</option>
-                                        <option value="true">Nam</option>
-                                        <option value="false">Nữ</option>
-                                    </select>
+                                    <span className='font-bold flex-1 pt-4'>Giới tính: </span>
+                                    <FormControl className='flex-[2]' variant="standard" sx={{ minWidth: 120 }}>
+                                        <InputLabel id="demo-simple-select-standard-label">Giới tính</InputLabel>
+                                        <Select
+                                            labelId="demo-simple-select-standard-label"
+                                            id="demo-simple-select-standard"
+                                            value={formData?.gender === '' ? '' : (formData?.gender === true ? "true" : "false")}
+                                            onChange={(e) => handleFieldChange('gender', e.target.value === "true" ? true : false)}
+                                            label="Chọn giới tính"
+                                        >
+                                            <MenuItem value="">
+                                                <em>Chọn giới tính</em>
+                                            </MenuItem>
+                                            <MenuItem value={'true'}>Nam</MenuItem>
+                                            <MenuItem value={'false'}>Nữ</MenuItem>
+                                        </Select>
+                                    </FormControl>
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Ngày sinh: </span>
-                                    <input
-                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
+                                    <span className='font-bold flex-1 pt-4'>Ngày sinh: </span>
+                                    <TextField
                                         type='date'
-                                        name='dob'
-                                        placeholder='Nhập ngày sinh'
-                                        value={formData.dob ? formData.dob.toString().split('T')[0] : ''}
+                                        className='flex-[2]'
                                         onChange={(e) => handleFieldChange('dob', e.target.value)}
-                                    />
+                                        value={formData.dob ? formData.dob.toString().split('T')[0] : ''}
+                                        variant="standard" />
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Số điện thoại: </span>
-                                    <input
-                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
+                                    <span className='font-bold flex-1 pt-4'>Số điện thoại: </span>
+                                    <TextField
                                         type='text'
-                                        name='phone'
-                                        placeholder='Nhập số điện thoại'
-                                        value={formData.phone?.toString() || ''}
+                                        className='flex-[2]'
                                         onChange={(e) => handleFieldChange('phone', e.target.value)}
-                                    />
+                                        value={formData.phone?.toString() || ''}
+                                        label='Nhập số điện thoại'
+                                        variant="standard" />
                                 </div>
                             </div>
                             <div className='flex-1'>
                                 <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Địa chỉ: </span>
-                                    <input
-                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
+                                    <span className='font-bold flex-1 pt-4'>Địa chỉ: </span>
+                                    <TextField
                                         type='text'
-                                        name='address'
-                                        placeholder='Nhập địa chỉ'
-                                        value={formData.address?.toString() || ''}
+                                        className='flex-[2]'
                                         onChange={(e) => handleFieldChange('address', e.target.value)}
-                                    />
+                                        value={formData.address?.toString() || ''}
+                                        label='Nhập địa chỉ'
+                                        variant="standard" />
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Email: </span>
-                                    <input
-                                        className='flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
+                                    <span className='font-bold flex-1 pt-4'>Email: </span>
+                                    <TextField
                                         type='text'
-                                        name='email'
-                                        placeholder='Nhập địa chỉ email'
-                                        value={formData.email?.toString() || ''}
+                                        className='flex-[2]'
                                         onChange={(e) => handleFieldChange('email', e.target.value)}
-                                    />
+                                        value={formData.email?.toString() || ''}
+                                        label='Nhập địa chỉ email'
+                                        variant="standard" />
                                 </div>
                             </div>
                         </div>
@@ -249,15 +233,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                         <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
                             <div className='flex-1'>
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Tên đăng nhập: </span>
-                                    <input
-                                        className='cursor-not-allowed flex-[2] lg:ml-5 mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 border-b-2'
+                                    <span className='font-bold flex-1 pt-4'>Tên đăng nhập: </span>
+                                    <TextField
                                         type='text'
-                                        name='username'
-                                        readOnly
-                                        placeholder='Nhập tên đăng nhập'
+                                        className='flex-[2]'
+                                        disabled
                                         value={formData.username?.toString() || ''}
-                                    />
+                                        label='Nhập tên đăng nhập'
+                                        variant="standard" />
                                 </div>
                             </div>
                             <div className='flex-1'>

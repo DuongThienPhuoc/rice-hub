@@ -15,8 +15,8 @@ export default function SalaryPageBreadcrumb() {
         <Breadcrumb>
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/')}>
-                        Trang chủ
+                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
+                        Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />

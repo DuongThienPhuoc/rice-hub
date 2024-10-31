@@ -1,151 +1,505 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// /* eslint-disable @next/next/no-img-element */
-// 'use client';
-// import Navbar from '@/components/navbar/navbar';
-// import Sidebar from '@/components/navbar/sidebar';
-// import { Button } from '@/components/ui/button';
-// import React, { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation';
-// import api from "../../../../api/axiosConfig";
-// import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-// import firebase from '../../../../api/firebaseConfig';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
+'use client';
 
-// const Page = () => {
-//     const router = useRouter();
-//     const [navbarVisible, setNavbarVisible] = useState(false);
-//     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({
-//         name: '',
-//         email: '',
-//         username: '',
-//         password: '',
-//         phone: '',
-//         address: '',
-//         dateOfBirth: '',
-//         userType: 'ROLE_EMPLOYEE',
-//         employeeRoleId: '',
-//         description: '',
-//         active: true,
-//         gender: '',
-//         salaryType: 'DAILY',
-//         dailyWage: '0',
-//         bankName: '',
-//         bankNumber: '',
-//     });
+import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import api from "../../../../api/axiosConfig";
+import { Autocomplete, TextField } from '@mui/material';
+import { PlusCircle, Trash2 } from 'lucide-react';
 
-//     const handleFieldChange = (field: string, value: string | number | boolean) => {
-//         setFormData((prevData) => ({
-//             ...prevData,
-//             [field]: value,
-//         }));
-//     };
+interface RowData {
+    [key: string]: any;
+}
 
-//     useEffect(() => {
-//         const updateNavbarVisibility = () => {
-//             const shouldShowNavbar = window.innerWidth >= 1100;
-//             setNavbarVisible(shouldShowNavbar);
-//         };
+interface FormDataItem {
+    name: string;
+    description: string;
+    importPrice: number;
+    image: string;
+    quantity: number;
+    weightPerUnit: number;
+    unit: string;
+    categoryName: string;
+    categoryId: string;
+    supplierId: number;
+    supplierName: string;
+    unitOfMeasureName: string;
+    unitOfMeasureId: number;
+    warehouseId: number;
+    warehouseName: string;
+}
 
-//         updateNavbarVisibility();
+const Page = () => {
+    const router = useRouter();
+    const [suppliers, setSuppliers] = useState<RowData[]>([]);
+    const [categories, setCategories] = useState<RowData[]>([]);
+    const [warehouses, setWarehouses] = useState<RowData[]>([]);
+    const [units, setUnits] = useState<RowData[]>([]);
+    const [products, setProducts] = useState<RowData[]>([]);
+    const [selectedProduct, setSelectedProduct] = useState<RowData | null>(null);
+    const [isFocused, setIsFocused] = useState(false);
+    const [productName, setProductName] = useState('');
+    const [importPrice, setImportPrice] = useState(0);
+    const [quantity, setQuantity] = useState(0);
+    const [selectedUnit, setSelectedUnit] = useState<RowData | null>(null);
+    const [weight, setWeight] = useState(0);
+    const [type, setType] = useState<string | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
+    const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
+    const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
+    const [formData, setFormData] = useState<FormDataItem[]>([]);
 
-//         window.addEventListener('resize', updateNavbarVisibility);
+    useEffect(() => {
+        getSuppliers();
+        getProducts();
+        getCategories();
+        getWarehouses();
+        getUnits();
+    }, []);
 
-//         return () => {
-//             window.removeEventListener('resize', updateNavbarVisibility);
-//         };
-//     }, []);
+    useEffect(() => {
+        if (selectedProduct) {
+            setImportPrice(selectedProduct?.importPrice);
+            setProductName(selectedProduct?.name || '');
+            const foundCategory = categories.find((category) => category.id === selectedProduct?.category?.id);
+            setSelectedCategory(foundCategory || null);
+            const foundSupplier = suppliers.find((supplier) => supplier.id === selectedProduct?.supplier?.id);
+            setSelectedSupplier(foundSupplier || null);
+            const foundWarehouse = warehouses.find((warehouse) => warehouse.id === selectedProduct?.productWarehouses[0]?.warehouse.id);
+            setSelectedWarehouse(foundWarehouse || null);
+        } else {
+            setImportPrice(0);
+            setProductName('');
+            setSelectedSupplier(null);
+            setSelectedProduct(null);
+            setSelectedCategory(null);
+            setSelectedWarehouse(null);
+        }
+    }, [selectedProduct])
 
-//     const handleSubmit = async (e: React.FormEvent) => {
-//         e.preventDefault();
+    const getSuppliers = async () => {
+        try {
+            const url = `/suppliers/all`;
+            const response = await api.get(url);
+            const data = response.data;
+            setSuppliers(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
+        }
+    };
 
-//         try {
-//             const storage = getStorage(firebase);
-//             const fileInput = document.getElementById("fileInput") as HTMLInputElement;
-//             const file = fileInput?.files?.[0];
-//             let updatedFormData = { ...formData };
+    const getWarehouses = async () => {
+        try {
+            const url = `/warehouses/all`;
+            const response = await api.get(url);
+            const data = response.data;
+            setWarehouses(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhà nhà kho:", error);
+        }
+    };
 
-//             if (file) {
-//                 const storageRef = ref(storage, `images/${file.name}`);
-//                 const snapshot = await uploadBytes(storageRef, file);
-//                 console.log('Uploaded a file!');
-//                 const downloadURL = await getDownloadURL(snapshot.ref);
-//                 console.log('File available at', downloadURL);
+    const getProducts = async () => {
+        try {
+            const url = `/products/`;
+            const response = await api.get(url);
+            const data = response.data;
+            setProducts(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+        }
+    };
 
-//                 updatedFormData = {
-//                     ...updatedFormData,
-//                     image: downloadURL,
-//                 };
-//             }
+    const getCategories = async () => {
+        try {
+            const url = `/categories/all`;
+            const response = await api.get(url);
+            const data = response.data;
+            setCategories(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách danh mục:", error);
+        }
+    };
 
-//             const response = await api.post(`/user/create`, updatedFormData);
-//             if (response.status >= 200 && response.status < 300) {
-//                 alert(`Nhân viên đã được thêm thành công`);
-//                 router.push("/employees");
-//             } else {
-//                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
-//             }
-//         } catch (error) {
-//             console.error('Error submitting form:', error);
-//             alert('Đã xảy ra lỗi, vui lòng thử lại.');
-//         }
-//     };
+    const getUnits = async () => {
+        try {
+            const url = `/unitOfMeasures/all`;
+            const response = await api.get(url);
+            const data = response.data;
+            setUnits(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách đơn vị:", error);
+        }
+    };
 
+    const handleAddItemToForm = () => {
+        if (productName === '') {
+            alert('Vui lòng nhập tên sản phẩm!');
+            return;
+        }
 
-//     return (
-//         <div>
-//             {navbarVisible ? <Navbar /> : <Sidebar />}
-//             <form onSubmit={handleSubmit} className='flex my-16 justify-center px-5 w-full font-arsenal'>
-//                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
-//                     <div
-//                         className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
-//                         style={{ boxShadow: '3px 3px 5px lightgray' }}
-//                     >
-//                         <strong>Thông tin phiếu nhập</strong>
-//                     </div>
-//                     <div className='flex mt-10 flex-col lg:flex-row lg:px-10 px-2'>
-//                         <div className='m-5 flex-3 flex flex-col lg:flex-row'>
-//                             <span className='font-bold flex-1'>Tên nhân viên: </span>
-//                             <input
-//                                 className='flex-[2] mt-2 lg:mt-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
-//                                 type='text'
-//                                 name='name'
-//                                 placeholder='Chọn hoặc thêm sản phẩm mới'
-//                             />
-//                         </div>
-//                         <div className='m-10 flex-1 flex flex-col lg:flex-row'>
-//                         </div>
-//                         <div className='m-10 flex-1 flex flex-col lg:flex-row'>
-//                         </div>
-//                         <div className='m-10 flex-1 flex flex-col lg:flex-row'>
-//                         </div>
-//                         <div className='m-10 flex-1 flex flex-col lg:flex-row'>
-//                         </div>
-//                     </div>
-//                     <div className='flex flex-col lg:flex-row lg:px-10 mt-10 px-2'>
-//                         <div className='flex-1'>
-//                             <div className='m-10 flex flex-col lg:flex-row'>
+        if (importPrice === 0) {
+            alert('Giá nhập không hợp lệ');
+            return;
+        }
 
-//                             </div>
+        if (!selectedUnit) {
+            alert('Vui lòng chọn đơn vị');
+            return;
+        }
 
-//                         </div>
-//                         <div className='flex-1'>
-//                             <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
+        if (weight === 0) {
+            alert('Trọng lượng không hợp lệ');
+            return;
+        }
 
-//                             </div>
-//                         </div>
-//                     </div>
+        if (quantity === 0) {
+            alert('Số lượng không hợp lệ');
+            return;
+        }
 
-//                     <div className='w-full flex justify-center align-bottom items-center my-10'>
-//                         <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-//                             <strong>Thêm</strong>
-//                         </Button>
-//                         <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-//                             <strong>Hủy</strong>
-//                         </Button>
-//                     </div>
-//                 </div>
-//             </form>
-//         </div>
-//     );
-// };
+        if (!type) {
+            alert('Vui lòng chọn quy cách');
+            return;
+        }
 
-// export default Page;
+        if (!selectedCategory) {
+            alert('Vui lòng chọn danh mục');
+            return;
+        }
+
+        if (!selectedCategory) {
+            alert('Vui lòng chọn nhà cung cấp');
+            return;
+        }
+
+        if (!selectedCategory) {
+            alert('Vui lòng chọn kho');
+            return;
+        }
+        const newItem: FormDataItem = {
+            name: productName,
+            description: '',
+            importPrice: importPrice,
+            image: "",
+            quantity: quantity,
+            weightPerUnit: weight,
+            unit: type || '',
+            categoryName: selectedCategory?.name,
+            categoryId: selectedCategory?.id,
+            supplierName: selectedSupplier?.name,
+            supplierId: selectedSupplier?.id,
+            unitOfMeasureName: selectedUnit?.unitName,
+            unitOfMeasureId: selectedUnit?.id,
+            warehouseName: selectedWarehouse?.name,
+            warehouseId: selectedWarehouse?.id
+        };
+        setFormData(prevFormData => [...prevFormData, newItem]);
+        setSelectedProduct(null);
+        setSelectedUnit(null);
+        setSelectedCategory(null);
+        setSelectedSupplier(null);
+        setSelectedWarehouse(null);
+        setProductName('');
+        setImportPrice(0);
+        setQuantity(0);
+        setWeight(0);
+        setType(null);
+    }
+
+    const handleSubmit = async () => {
+
+        if (formData.length < 1) {
+            alert("Danh sách rỗng! Vui lòng thêm sản phẩm.");
+            return;
+        }
+
+        try {
+            console.log(formData);
+            const response = await api.post(`/products/import`, formData);
+            if (response.status >= 200 && response.status < 300) {
+                alert(`Lô hàng đã được thêm thành công`);
+                router.push("/import");
+            } else {
+                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        }
+    };
+
+    const handleDeleteItem = (index: number) => {
+        setFormData(prevFormData => prevFormData.filter((_, i) => i !== index));
+    };
+
+    return (
+        <div>
+            <div className='flex my-16 justify-center w-full font-arsenal'>
+                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+                    <div
+                        className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
+                        style={{ boxShadow: '3px 3px 5px lightgray' }}
+                    >
+                        <strong>Thông tin phiếu nhập</strong>
+                    </div>
+                    <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
+                        <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
+                            <span className='font-bold flex-[2] pt-4'>Chọn sản phẩm: </span>
+                            <Autocomplete
+                                className='flex-[4] lg:mx-5 my-4 lg:my-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
+                                disablePortal
+                                options={products}
+                                value={selectedProduct}
+                                getOptionLabel={(option) => option.name}
+                                sx={{ width: 300 }}
+                                onChange={(event, newValue) => { setSelectedProduct(newValue) }}
+                                renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm sản phẩm" />}
+                            />
+                        </div>
+                    </div>
+                    <div className='lg:px-10 mt-5 px-2 overflow-x-auto'>
+                        <table className="w-full border-collapse mb-10 overflow-hidden rounded-2xl">
+                            <thead className='rounded-2xl'>
+                                <tr className="border-2 border-gray-200">
+                                    <th className={`min-w-[50px] pt-3 text-black px-2 py-2 rounded-tl-2xl`}>
+                                        STT
+                                    </th>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
+                                        Tên sản phẩm
+                                    </th>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
+                                        Giá nhập
+                                    </th>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
+                                        Đơn vị
+                                    </th>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
+                                        Trọng lượng
+                                    </th>
+                                    <th className={`min-w-[100px] pt-3 text-black px-2 py-2`}>
+                                        Số lượng
+                                    </th>
+                                    <th className={`min-w-[120px] pt-3 text-black px-2 py-2`}>
+                                        Quy cách
+                                    </th>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
+                                        Danh mục
+                                    </th>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
+                                        Nhà cung cấp
+                                    </th>
+                                    <th className={`min-w-[150px] pt-3 text-black px-2 py-2`}>
+                                        Kho
+                                    </th>
+                                    <th className="min-w-[50px] text-black px-2 py-2 rounded-tr-2xl">#</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className={`font-semibold border-2 border-gray-200 bg-white`}>
+                                    <td colSpan={2} className='px-2 py-4'>
+                                        <TextField
+                                            type={'text'}
+                                            InputProps={{
+                                                readOnly: selectedProduct !== null,
+                                            }}
+                                            InputLabelProps={{
+                                                shrink: selectedProduct !== null || productName !== '' || isFocused,
+                                            }}
+                                            onFocus={() => setIsFocused(true)}
+                                            onBlur={() => setIsFocused(false)}
+                                            onChange={(e) => setProductName(e.target.value)}
+                                            value={productName}
+                                            label={'Tên sản phẩm'}
+                                            variant="standard" />
+                                    </td>
+                                    <td className='p-2'>
+                                        <TextField
+                                            type={'number'}
+                                            inputProps={{ min: 0 }}
+                                            onChange={(e) => setImportPrice(Number(e.target.value))}
+                                            value={importPrice}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            label={'Giá nhập'}
+                                            variant="standard" />
+                                    </td>
+                                    <td className='p-2'>
+                                        <Autocomplete
+                                            disablePortal
+                                            options={units}
+                                            getOptionLabel={(option) => option.unitName}
+                                            onChange={(event, newValue) => setSelectedUnit(newValue)}
+                                            renderInput={(params) => <TextField {...params} variant='standard' label="Đơn vị" />}
+                                        />
+                                    </td>
+                                    <td className='p-2'>
+                                        <TextField
+                                            type={'number'}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            inputProps={{ min: 0 }}
+                                            onChange={(e) => setWeight(Number(e.target.value))}
+                                            value={weight}
+                                            label={'Trọng lượng'}
+                                            variant="standard" />
+                                    </td>
+                                    <td className='p-2'>
+                                        <TextField
+                                            inputProps={{ min: 0 }}
+                                            type={'number'}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            onChange={(e) => setQuantity(Number(e.target.value))}
+                                            value={quantity}
+                                            label={'Số lượng'}
+                                            variant="standard" />
+                                    </td>
+                                    <td className='p-2'>
+                                        <Autocomplete
+                                            disablePortal
+                                            options={['Bao 10kg', 'Bao 20kg', '...']}
+                                            onChange={(event, newValue) => setType(newValue)}
+                                            renderInput={(params) => <TextField {...params} variant='standard' label="Quy cách" />}
+                                        />
+                                    </td>
+                                    <td className='p-2'>
+                                        {selectedProduct ? (
+                                            <TextField
+                                                type={'text'}
+                                                InputProps={{
+                                                    readOnly: selectedProduct !== null,
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                value={selectedCategory?.name}
+                                                label={'Danh mục'}
+                                                variant="standard" />
+                                        ) : (
+                                            <Autocomplete
+                                                disablePortal
+                                                options={categories}
+                                                getOptionLabel={(option) => option.name}
+                                                onChange={(event, newValue) => setSelectedCategory(newValue)}
+                                                renderInput={(params) => <TextField {...params} variant='standard' label="Danh mục" />}
+                                            />
+                                        )}
+                                    </td>
+                                    <td className='p-2'>
+                                        {selectedProduct ? (
+                                            <TextField
+                                                type={'text'}
+                                                InputProps={{
+                                                    readOnly: selectedProduct !== null,
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                value={selectedSupplier?.name}
+                                                label={'Nhà cung cấp'}
+                                                variant="standard" />
+                                        ) : (
+                                            <Autocomplete
+                                                disablePortal
+                                                options={suppliers}
+                                                getOptionLabel={(option) => option.name}
+                                                onChange={(event, newValue) => setSelectedSupplier(newValue)}
+                                                renderInput={(params) => <TextField {...params} variant='standard' label="Nhà cung cấp" />}
+                                            />
+                                        )}
+                                    </td>
+                                    <td className='p-2'>
+                                        {selectedProduct ? (
+                                            <TextField
+                                                type={'text'}
+                                                InputProps={{
+                                                    readOnly: selectedProduct !== null,
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                value={selectedWarehouse?.name}
+                                                label={'Kho'}
+                                                variant="standard" />
+                                        ) : (
+                                            <Autocomplete
+                                                disablePortal
+                                                options={warehouses}
+                                                getOptionLabel={(option) => option.name}
+                                                onChange={(event, newValue) => setSelectedWarehouse(newValue)}
+                                                renderInput={(params) => <TextField {...params} variant='standard' label="Kho" />}
+                                            />
+                                        )}
+                                    </td>
+                                    <td className='p-2'>
+                                        <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
+                                    </td>
+                                </tr>
+                                {formData && formData.map((item, index) => (
+                                    <tr key={index} className={`text-center border-2 border-gray-200 bg-white`}>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {index + 1}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.name}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.importPrice}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.unitOfMeasureName}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.weightPerUnit}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.quantity}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.unit}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.categoryName}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.supplierName}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            {item.warehouseName}
+                                        </td>
+                                        <td className='p-2 border-2 border-gray-200'>
+                                            <Trash2 color='red' className='cursor-pointer' onClick={() => handleDeleteItem(index)} />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className='lg:px-10 px-2 flex'>
+                        <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
+
+                        </div>
+                        <div className='flex-1'></div>
+                    </div>
+
+                    <div className='w-full flex justify-center align-bottom items-center mt-5 mb-10'>
+                        <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <strong>Thêm</strong>
+                        </Button>
+                        <Button type='button' onClick={() => router.push("/receipts")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <strong>Hủy</strong>
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Page;
