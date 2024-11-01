@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import Modal from 'react-modal';
 import PopupCreate from '@/components/popup/popupCreate';
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [navbarVisible, setNavbarVisible] = useState(false);
@@ -18,6 +19,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [isPopupVisible, setPopupVisible] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
     const titles = [
         { name: 'id', displayName: 'Mã danh mục', type: 'hidden' },
         { name: 'signDate', displayName: 'Ngày ký', type: 'text' },
@@ -44,6 +46,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     useEffect(() => {
         const getCustomer = async () => {
+            setLoadingData(true);
             try {
                 const url = `/customer/${params.id}`;
                 console.log(url);
@@ -52,6 +55,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                 setCustomer(data);
             } catch (error) {
                 console.error("Error fetching customer:", error);
+            } finally {
+                setLoadingData(false);
             }
         };
 
@@ -107,83 +112,148 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            <div className='flex my-16 justify-center w-full font-arsenal'>
+            <div className='flex my-10 justify-center w-full font-arsenal'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
-                        {['Thông tin khách hàng', 'Thông tin hợp đồng'].map((label, index) => (
-                            <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
-                                <button
-                                    type='button'
-                                    onClick={() => setChoice(index === 0)}
-                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                        ? 'text-white bg-black hover:bg-[#1d1d1fca]'
-                                        : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
-                                        }`}
-                                    style={{ boxShadow: '3px 3px 5px lightgray' }}
-                                >
-                                    <strong>{label}</strong>
-                                </button>
-                            </div>
-                        ))}
+                        {loadingData ? (
+                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
+                        ) : (
+                            ['Thông tin khách hàng', 'Thông tin hợp đồng'].map((label, index) => (
+                                <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
+                                    <button
+                                        type='button'
+                                        onClick={() => setChoice(index === 0)}
+                                        className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
+                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
+                                            }`}
+                                        style={{ boxShadow: '3px 3px 5px lightgray' }}
+                                    >
+                                        <strong>{label}</strong>
+                                    </button>
+                                </div>
+                            ))
+                        )}
                     </div>
                     {choice && (
                         <div className='mt-10 flex flex-col items-center'>
-                            <img
-                                src={customer?.image || "https://via.placeholder.com/150"}
-                                alt='Avatar'
-                                className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
-                            />
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="circular" height={'8rem'} width={'8rem'} />
+                            ) : (
+                                <img
+                                    src={customer?.image || "https://via.placeholder.com/150"}
+                                    alt='Avatar'
+                                    className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                                />
+                            )}
                         </div>
                     )}
                     <div className='flex flex-col lg:flex-row px-10'>
                         {choice ? (
-                            <>
-                                <div className='flex-1'>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tên khách hàng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.fullName || 'Chưa có thông tin'}</span>
+                            loadingData ? (
+                                <>
+                                    <div className='flex-1'>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
                                     </div>
+                                    <div className='flex-1'>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className='flex-1'>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Tên khách hàng: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.fullName || 'Chưa có thông tin'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Giới tính: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.gender === true ? 'Nam' : 'Nữ'}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Giới tính: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.gender === true ? 'Nam' : 'Nữ'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Ngày sinh: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.dob)}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Ngày sinh: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.dob)}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Số điện thoại: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.phone || 'Chưa có thông tin'}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Số điện thoại: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.phone || 'Chưa có thông tin'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Địa chỉ: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.address || 'Chưa có thông tin'}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Địa chỉ: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.address || 'Chưa có thông tin'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Email: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.email || 'Chưa có thông tin'}</span>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Email: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.email || 'Chưa có thông tin'}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className='flex-1'>
-                                    <div className='lg:m-10 mb-10 mx-10 mt-0 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tổng đơn hàng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalOrders || '0'}</span>
+                                    <div className='flex-1'>
+                                        <div className='lg:m-10 mb-10 mx-10 mt-0 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Tổng đơn hàng: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalOrders || '0'}</span>
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Tổng nợ: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalDebt || '0'}</span>
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Lần cuối mua hàng: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.lastPurchase)}</span>
+                                        </div>
                                     </div>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tổng nợ: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalDebt || '0'}</span>
-                                    </div>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Lần cuối mua hàng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.lastPurchase)}</span>
-                                    </div>
-                                </div>
-                            </>
+                                </>
+                            )
                         ) : (
                             <>
                                 <div className="flex-1 flex flex-col items-center my-10 mx-auto">
@@ -277,12 +347,21 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                     {choice && (
                         <div className='w-full flex justify-center items-center my-10'>
-                            <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                <strong>Sửa</strong>
-                            </Button>
-                            <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                <strong>Trở về</strong>
-                            </Button>
+                            {loadingData ? (
+                                <>
+                                    <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 mr-2 py-3' />
+                                    <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 ml-2 py-3' />
+                                </>
+                            ) : (
+                                <>
+                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        <strong>Sửa</strong>
+                                    </Button>
+                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        <strong>Trở về</strong>
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
@@ -317,7 +396,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </Modal>
-        </div>
+        </div >
     )
 };
 

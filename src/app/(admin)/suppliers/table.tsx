@@ -8,6 +8,7 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 export default function SupplierTable() {
     const columns = [
@@ -94,6 +95,7 @@ export default function SupplierTable() {
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <SearchBar
                             onSearch={handleSearch}
+                            loadingData={loadingData}
                             selectOptions={[
                                 { value: 'name', label: 'Nhà cung cấp' },
                                 { value: 'email', label: 'Email' },
@@ -101,10 +103,14 @@ export default function SupplierTable() {
                             ]}
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm nhà cung cấp
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                            ) : (
+                                <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    Thêm nhà cung cấp
+                                    <PlusIcon />
+                                </Button>
+                            )}
                         </div>
                     </div>
                     <div className='overflow-hidden'>

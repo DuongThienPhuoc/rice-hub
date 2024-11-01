@@ -97,7 +97,7 @@ const Page = () => {
             <div className="flex">
                 <div style={{ flex: '1' }}></div>
                 {navbarVisible && (
-                    <div style={{ flex: '2' }} className="my-16">
+                    <div style={{ flex: '2' }} className="my-10">
                         <h1 className='font-bold text-[20px] pb-5'><strong>Danh sách phiếu chi</strong></h1>
                         <div className="pt-2">
                             {/* <CheckboxFilter
@@ -120,7 +120,7 @@ const Page = () => {
                         </div>
                     </div>
                 )}
-                <div style={{ flex: '7' }} className='my-16 overflow-x-auto'>
+                <div style={{ flex: '7' }} className='my-10 overflow-x-auto'>
                     <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle mb-10'>
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
                             {!navbarVisible && (

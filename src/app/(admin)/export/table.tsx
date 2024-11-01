@@ -15,6 +15,7 @@ import firebase from '../../../api/firebaseConfig';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/material_blue.css';
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 export default function ExportTable() {
     const router = useRouter();
@@ -240,13 +241,28 @@ export default function ExportTable() {
                             </div>
                         </div>
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button
-                                onClick={() => router.push("/export/create")}
-                                className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                            >
-                                Tạo phiếu xuất
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <>
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={80} className='rounded-lg ml-0 mt-4 lg:ml-2 lg:mt-0' />
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        onClick={() => router.push("/export/create")}
+                                        className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                    >
+                                        Tạo phiếu xuất
+                                        <PlusIcon />
+                                    </Button>
+                                    <Button
+                                        className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                        onClick={() => document.getElementById('fileInput')?.click()}
+                                    >
+                                        Import
+                                    </Button>
+                                </>
+                            )}
                             <input
                                 type="file"
                                 id="fileInput"
@@ -254,12 +270,6 @@ export default function ExportTable() {
                                 style={{ display: 'none' }}
                                 onChange={handleFileUpload}
                             />
-                            <Button
-                                className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                                onClick={() => document.getElementById('fileInput')?.click()}
-                            >
-                                Import
-                            </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto'>

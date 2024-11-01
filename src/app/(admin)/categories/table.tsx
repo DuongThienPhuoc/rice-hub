@@ -8,6 +8,7 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 export default function CategoryTable() {
     const [loadingData, setLoadingData] = useState(true);
@@ -60,6 +61,7 @@ export default function CategoryTable() {
             const url = `/categories/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
+            console.log(data);
             setCategories(data._embedded.categoryList);
             setTotalPages(data.page.totalPages);
         } catch (error) {
@@ -89,15 +91,20 @@ export default function CategoryTable() {
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <SearchBar
                             onSearch={handleSearch}
+                            loadingData={loadingData}
                             selectOptions={[
                                 { value: 'name', label: 'Tên danh mục' },
                             ]}
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm danh mục
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                            ) : (
+                                <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    Thêm danh mục
+                                    <PlusIcon />
+                                </Button>
+                            )}
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
@@ -111,9 +118,10 @@ export default function CategoryTable() {
                         />
                     )}
                 </div>
-            </section>
-            {isPopupVisible && <PopupCreate tableName="Danh mục" url="/categories/createCategory" titles={titles} handleClose={closeCreate} />}
+            </section >
+            {isPopupVisible && <PopupCreate tableName="Danh mục" url="/categories/createCategory" titles={titles} handleClose={closeCreate} />
+            }
             <FloatingButton />
-        </div>
+        </div >
     );
 };

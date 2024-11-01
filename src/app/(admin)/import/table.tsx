@@ -15,6 +15,7 @@ import 'flatpickr/dist/themes/material_blue.css';
 import { PlusIcon } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import crypto from 'crypto';
+import { Skeleton } from '@mui/material';
 
 export default function ImportTable() {
     const router = useRouter();
@@ -276,13 +277,28 @@ export default function ImportTable() {
                             </div>
                         </div>
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button
-                                onClick={() => router.push("/import/create")}
-                                className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                            >
-                                Tạo phiếu nhập
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <>
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={80} className='rounded-lg ml-0 mt-4 lg:ml-2 lg:mt-0' />
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        onClick={() => router.push("/import/create")}
+                                        className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                    >
+                                        Tạo phiếu nhập
+                                        <PlusIcon />
+                                    </Button>
+                                    <Button
+                                        className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                        onClick={handleShowDownloadMaterial}
+                                    >
+                                        Import
+                                    </Button>
+                                </>
+                            )}
                             <input
                                 type="file"
                                 id="fileInput"
@@ -290,13 +306,6 @@ export default function ImportTable() {
                                 style={{ display: 'none' }}
                                 onChange={handleFileUpload}
                             />
-                            <Button
-                                className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                                onClick={handleShowDownloadMaterial}
-                            // onClick={() => document.getElementById('fileInput')?.click()}
-                            >
-                                Import
-                            </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto'>

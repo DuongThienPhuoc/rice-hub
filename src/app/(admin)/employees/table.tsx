@@ -8,6 +8,7 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 export default function EmployeeTable() {
     const router = useRouter();
@@ -74,6 +75,7 @@ export default function EmployeeTable() {
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <SearchBar
                             onSearch={handleSearch}
+                            loadingData={loadingData}
                             selectOptions={[
                                 { value: 'employeeCode', label: 'Mã nhân viên' },
                                 { value: 'fullName', label: 'Tên nhân viên' },
@@ -81,10 +83,14 @@ export default function EmployeeTable() {
                             ]}
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button onClick={() => router.push("/employees/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm nhân viên
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                            ) : (
+                                <Button onClick={() => router.push("/employees/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    Thêm nhân viên
+                                    <PlusIcon />
+                                </Button>
+                            )}
                         </div>
                     </div>
                     <div className='overflow-hidden'>

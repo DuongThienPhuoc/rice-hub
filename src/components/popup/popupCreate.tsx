@@ -4,6 +4,8 @@ import InputField from '@/components/field/inputfield';
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import api from "../../api/axiosConfig";
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 interface PopupCreateProps {
     tableName: string;
@@ -19,7 +21,7 @@ interface PopupCreateProps {
 const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handleClose }) => {
 
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({});
-
+    const { toast } = useToast();
     useEffect(() => {
         const initialFormData = titles.reduce((acc, title) => {
             acc[title.name] = '';
@@ -39,26 +41,35 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        for (let index = 0; index < titles.length; index++) {
-            const element = titles[index];
-            if (!element.name) {
-                alert('Vui lòng điền đầy đủ thông tin.');
-                return;
-            }
-        }
+        // for (let index = 0; index < titles.length; index++) {
+        //     const element = titles[index];
+        //     console.log(element);
+        //     if (!element.name) {
+        // toast({
+        //     variant: 'destructive',
+        //     title: 'Xin hãy nhập đầy đủ thông tin',
+        //     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+        // })
+        //         return;
+        //     }
+        // }
 
         try {
-            const response = await api.post(`${url}`, formData);
-            if (response.status >= 200 && response.status < 300) {
-                alert(`${tableName} đã được thêm thành công`);
-                handleClose(true);
-            } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
-            }
+            await api.post(`${url}`, formData);
+            toast({
+                variant: 'default',
+                title: 'Tạo thành công',
+                description: `${tableName} đã được thêm thành công`,
+            })
+            handleClose(true);
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+            console.log(error)
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
         }
     };
 

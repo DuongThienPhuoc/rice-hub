@@ -151,20 +151,25 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     return (
         <div className='w-full mb-20 rounded-2xl overflow-x-auto'>
             {loadingData ? (
-                <div className="w-full">
-                    <div className="flex">
-                        {Array.from({ length: 4 }).map((_, index) => (
-                            <Skeleton key={index} variant="rectangular" height={40} width={`${100 / 4}%`} />
+                tableName === 'batch' ? (
+                    <div className="w-full">
+                        <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                        {Array.from({ length: 4 }).map((_, rowIndex) => (
+                            <div key={rowIndex} className="flex mt-2">
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                            </div>
                         ))}
                     </div>
-                    {Array.from({ length: 10 }).map((_, rowIndex) => (
-                        <div key={rowIndex} className="flex mt-2">
-                            {Array.from({ length: 4 }).map((_, colIndex) => (
-                                <Skeleton key={colIndex} variant="rectangular" height={40} width={`${100 / 4}%`} />
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                ) : (
+                    <div className="w-full">
+                        <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                        {Array.from({ length: 10 }).map((_, rowIndex) => (
+                            <div key={rowIndex} className="flex mt-2">
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                            </div>
+                        ))}
+                    </div>
+                )
             ) : (
                 <table className="w-full bg-white border-collapse">
                     <thead>
@@ -237,7 +242,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                             <tr>
                                 <td colSpan={columns.length}>
                                     <div className="my-10 mx-4 text-center text-gray-500">
-                                        Không có dữ liệu
+                                        không tìm thấy dữ liệu
                                     </div>
                                 </td>
                             </tr>

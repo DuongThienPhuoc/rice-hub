@@ -9,8 +9,8 @@ import FloatingButton from "@/components/floating/floatingButton";
 import DropdownSearchBar from "@/components/searchbar/dropdownSearchBar";
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
-import { LinearProgress } from '@mui/material';
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 interface RowData {
     [key: string]: any;
@@ -27,8 +27,10 @@ export default function PriceTable() {
     const [prices, setPrices] = useState<RowData[]>([]);
     const [currentPrice, setCurrentPrice] = useState<RowData>();
     const [currentInput, setCurrentInput] = useState(0);
+    const [loadingData, setLoadingData] = useState(true);
 
     const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
+        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -46,6 +48,8 @@ export default function PriceTable() {
             setTotalPages(data.page.totalPages);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+        } finally {
+            setLoadingData(false);
         }
     };
 
@@ -144,6 +148,7 @@ export default function PriceTable() {
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <SearchBar
                             onSearch={handleSearch}
+                            loadingData={loadingData}
                             selectOptions={[
                                 { value: 'productCode', label: 'Mã sản phẩm' },
                                 { value: 'productName', label: 'Tên sản phẩm' },
@@ -152,126 +157,146 @@ export default function PriceTable() {
                             ]}
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button onClick={() => router.push("/prices/create")} className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm bảng giá
-                                <PlusIcon />
-                            </Button>
-                            <DropdownSearchBar
-                                onChange={handlePriceChange}
-                                selectOptions={
-                                    prices.length !== 0 ? (
-                                        prices.map((price) => ({
-                                            value: price,
-                                            label: price?.name
-                                        }))
-                                    ) : [
-                                        { value: 'default', label: 'No prices available' }
-                                    ]
-                                }
-                            />
+                            {loadingData ? (
+                                <>
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg ml-2 mt-4 lg:mt-0 px-3 py-3' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg ml-2 mt-4 lg:mt-0 px-3 py-3' />
+                                </>
+                            ) : (
+                                <>
+                                    <Button onClick={() => router.push("/prices/create")} className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        Thêm bảng giá
+                                        <PlusIcon />
+                                    </Button>
+                                    <DropdownSearchBar
+                                        onChange={handlePriceChange}
+                                        selectOptions={
+                                            prices.length !== 0 ? (
+                                                prices.map((price) => ({
+                                                    value: price,
+                                                    label: price?.name
+                                                }))
+                                            ) : [
+                                                { value: 'default', label: 'No prices available' }
+                                            ]
+                                        }
+                                    />
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className='overflow-hidden'>
                         <div className='w-full mb-20 rounded-2xl overflow-x-auto'>
-                            <table className="w-full bg-white border-collapse">
-                                <thead>
-                                    <tr className="bg-white border border-gray-200">
-                                        <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                            <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                Mã sản phẩm
-                                            </div>
-                                        </th>
-                                        <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                            <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                Tên sản phẩm
-                                            </div>
-                                        </th>
-                                        <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                            <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                Giá nhập
-                                            </div>
-                                        </th>
-                                        <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                            <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                Đơn giá (kg)
-                                            </div>
-                                        </th>
-                                        <th className="bg-white text-black px-2 py-2 rounded-tr-lg">#</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {products.length !== 0 ? (
-                                        products.map((product, rowIndex) => {
-                                            const matchingProductPrice = currentPrice?.productPrices?.find(
-                                                (pPrice: any) => pPrice?.product?.id === product?.id || pPrice?.product === product?.id
-                                            );
-
-                                            return (
-                                                <tr key={rowIndex} className="font-semibold border border-gray-200 bg-white">
-                                                    <td className="text-center max-w-[200px] px-4 py-3 rounded-bl-lg">
-                                                        {product?.productCode}
-                                                    </td>
-                                                    <td className="text-center max-w-[200px] px-4 py-3">
-                                                        {product?.productName}
-                                                    </td>
-                                                    <td className="text-center max-w-[200px] px-4 py-3">
-                                                        {formatCurrency(product?.importPrice || 0)}
-                                                    </td>
-                                                    <td className="text-center max-w-[200px] px-4 py-3">
-                                                        {editingRowIndex === rowIndex ? (
-                                                            <input
-                                                                min={0}
-                                                                type="number"
-                                                                value={currentInput || matchingProductPrice?.unit_price || product.price}
-                                                                onChange={handleInputChange}
-                                                                className="border-b-2 border-gray-300 text-center w-[100px] focus:border-gray-500 focus:outline-none"
-                                                            />
-                                                        ) : (
-                                                            formatCurrency(matchingProductPrice?.unit_price || product?.price)
-                                                        )}
-                                                    </td>
-                                                    <td className="text-center px-4 py-3">
-                                                        <div className="flex min-w-[100px] justify-center space-x-3">
-                                                            {editingRowIndex === rowIndex ? (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => handleSave(rowIndex)}
-                                                                        className="group w-6 h-6 md:w-auto md:h-auto hover:text-green-500"
-                                                                    >
-                                                                        Lưu
-                                                                    </button>
-                                                                    <span className="px-1">|</span>
-                                                                    <button
-                                                                        onClick={() => handleCancel()}
-                                                                        className="group w-6 h-6 md:w-auto md:h-auto hover:text-red-500"
-                                                                    >
-                                                                        Hủy
-                                                                    </button>
-                                                                </>
-                                                            ) : (
-                                                                <button
-                                                                    onClick={() => handleEditClick(rowIndex)}
-                                                                    className="group w-12 h-6 md:w-auto md:h-auto hover:text-blue-500"
-                                                                >
-                                                                    Sửa
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={5}>
-                                                <div className="my-4 mx-4">
-                                                    <LinearProgress color="inherit" />
+                            {loadingData ? (
+                                <div className="w-full">
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                    {Array.from({ length: 10 }).map((_, rowIndex) => (
+                                        <div key={rowIndex} className="flex mt-2">
+                                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <table className="w-full bg-white border-collapse">
+                                    <thead>
+                                        <tr className="bg-white border border-gray-200">
+                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
+                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                    Mã sản phẩm
                                                 </div>
-                                            </td>
+                                            </th>
+                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
+                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                    Tên sản phẩm
+                                                </div>
+                                            </th>
+                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
+                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                    Giá nhập
+                                                </div>
+                                            </th>
+                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
+                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                    Đơn giá (kg)
+                                                </div>
+                                            </th>
+                                            <th className="bg-white text-black px-2 py-2 rounded-tr-lg">#</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {products.length !== 0 ? (
+                                            products.map((product, rowIndex) => {
+                                                const matchingProductPrice = currentPrice?.productPrices?.find(
+                                                    (pPrice: any) => pPrice?.product?.id === product?.id || pPrice?.product === product?.id
+                                                );
+
+                                                return (
+                                                    <tr key={rowIndex} className="font-semibold border border-gray-200 bg-white">
+                                                        <td className="text-center max-w-[200px] px-4 py-3 rounded-bl-lg">
+                                                            {product?.productCode}
+                                                        </td>
+                                                        <td className="text-center max-w-[200px] px-4 py-3">
+                                                            {product?.productName}
+                                                        </td>
+                                                        <td className="text-center max-w-[200px] px-4 py-3">
+                                                            {formatCurrency(product?.importPrice || 0)}
+                                                        </td>
+                                                        <td className="text-center max-w-[200px] px-4 py-3">
+                                                            {editingRowIndex === rowIndex ? (
+                                                                <input
+                                                                    min={0}
+                                                                    type="number"
+                                                                    value={currentInput || matchingProductPrice?.unit_price || product.price}
+                                                                    onChange={handleInputChange}
+                                                                    className="border-b-2 border-gray-300 text-center w-[100px] focus:border-gray-500 focus:outline-none"
+                                                                />
+                                                            ) : (
+                                                                formatCurrency(matchingProductPrice?.unit_price || product?.price)
+                                                            )}
+                                                        </td>
+                                                        <td className="text-center px-4 py-3">
+                                                            <div className="flex min-w-[100px] justify-center space-x-3">
+                                                                {editingRowIndex === rowIndex ? (
+                                                                    <>
+                                                                        <button
+                                                                            onClick={() => handleSave(rowIndex)}
+                                                                            className="group w-6 h-6 md:w-auto md:h-auto hover:text-green-500"
+                                                                        >
+                                                                            Lưu
+                                                                        </button>
+                                                                        <span className="px-1">|</span>
+                                                                        <button
+                                                                            onClick={() => handleCancel()}
+                                                                            className="group w-6 h-6 md:w-auto md:h-auto hover:text-red-500"
+                                                                        >
+                                                                            Hủy
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <button
+                                                                        onClick={() => handleEditClick(rowIndex)}
+                                                                        className="group w-12 h-6 md:w-auto md:h-auto hover:text-blue-500"
+                                                                    >
+                                                                        Sửa
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5}>
+                                                    <div className="my-10 mx-4 text-center text-gray-500">
+                                                        Không tìm thấy dữ liệu
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </div>
                     {totalPages > 1 && (
