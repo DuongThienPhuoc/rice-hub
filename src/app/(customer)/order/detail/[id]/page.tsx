@@ -1,3 +1,5 @@
+'use client';
+
 import {
     Card,
     CardContent,
@@ -8,6 +10,10 @@ import {
 import { Package2, Calendar, DollarSign, User, Truck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getOrderDetail } from '@/data/order';
+import { OrderDetail } from '@/type/order'
 
 export default function OrderDetailPage({
     params,
@@ -16,44 +22,27 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
-    type OrderDetail = {
-        productID: string;
-        productName: string;
-        productType: string;
-        quantity: number;
-        price: number;
-    };
+    const searchParams = useSearchParams();
+    const orderCode = searchParams.get('orderCode');
+    const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
+    async function fetchOrderDetail() {
+        try {
+            const response = await getOrderDetail(params.id);
+            if (response.status === 200) {
+                setOrderDetails(response.data);
+            } else {
+                console.error({ data: response.data, status: response.status });
+            }
+        } catch (e) {
+            if (e instanceof Error) {
+                throw new Error(e.message || 'Unexpected error occurred');
+            }
+        }
+    }
 
-    const orderDetail: OrderDetail[] = [
-        {
-            productID: '1',
-            productName: 'Gạo ST25',
-            productType: '25kg',
-            quantity: 20,
-            price: 20000,
-        },
-        {
-            productID: '2',
-            productName: 'Gạo ST25',
-            productType: '50kg',
-            quantity: 30,
-            price: 60000,
-        },
-        {
-            productID: '3',
-            productName: 'Cám HT35',
-            productType: '25kg',
-            quantity: 50,
-            price: 60000,
-        },
-        {
-            productID: '4',
-            productName: 'Cám HT25',
-            productType: '50kg',
-            quantity: 30,
-            price: 60000,
-        },
-    ];
+    useEffect(() => {
+        fetchOrderDetail().catch((e) => console.error(e));
+    }, []);
 
     return (
         <section className="container mx-auto">
@@ -68,7 +57,7 @@ export default function OrderDetailPage({
                     <CardContent className="space-y-4">
                         <div className="flex justify-between">
                             <span className="font-semibold">Mã đơn hàng:</span>
-                            <span>{params.id}</span>
+                            <span>{orderCode}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Ngày tạo đơn:</span>
@@ -133,7 +122,7 @@ export default function OrderDetailPage({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <OrderDetailTable orderDetail={orderDetail} />
+                        <OrderDetailTable orderDetail={orderDetails} />
                     </CardContent>
                     <CardFooter className="flex justify-end">
                         <div className="text-right">
@@ -146,9 +135,7 @@ export default function OrderDetailPage({
                             <p className="text-sm text-muted-foreground">
                                 Tax: $0.00
                             </p>
-                            <p className="mt-2 font-bold">
-                                Total: $100.00
-                            </p>
+                            <p className="mt-2 font-bold">Total: $100.00</p>
                         </div>
                     </CardFooter>
                 </Card>

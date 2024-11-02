@@ -6,27 +6,23 @@ import {
     TableBody,
     TableHeader,
 } from '@/components/ui/table';
-import { DollarSign } from 'lucide-react';
-
-type OrderDetail = {
-    productID: string;
-    productName: string;
-    productType: string;
-    quantity: number;
-    price: number;
-};
+import { OrderDetail } from '@/type/order'
 
 export default function OrderDetailTable({
     orderDetail,
 }: {
     orderDetail: OrderDetail[];
 }) {
+    const formater = new Intl.NumberFormat('vi-VN',{
+        style: 'currency',
+        currency: 'VND'
+    })
     return (
         <Table>
             <TableHeader>
                 <TableRow>
                     <TableHead>Sản Phẩm</TableHead>
-                    <TableHead>Loại</TableHead>
+                    <TableHead>Quy cách</TableHead>
                     <TableHead>Số lượng</TableHead>
                     <TableHead>Giá</TableHead>
                     <TableHead className="text-right">Thành tiền</TableHead>
@@ -35,13 +31,12 @@ export default function OrderDetailTable({
             <TableBody>
                 {orderDetail.map((item, index) => (
                     <TableRow key={index}>
-                        <TableCell>{item.productName}</TableCell>
-                        <TableCell>{item.productType}</TableCell>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{`${item.weightPerUnit} KG`}</TableCell>
                         <TableCell>{item.quantity}</TableCell>
-                        <TableCell>{item.price}</TableCell>
+                        <TableCell>{item.unitPrice}</TableCell>
                         <TableCell className="flex items-center justify-end">
-                            <DollarSign className="w-4 h-4 text-muted-foreground" />
-                            {item.quantity * item.price}
+                            {formater.format(item.totalPrice)}
                         </TableCell>
                     </TableRow>
                 ))}
