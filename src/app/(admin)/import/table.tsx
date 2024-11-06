@@ -57,6 +57,7 @@ export default function ImportTable() {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
+            params.append("receiptType", 'IMPORT');
             const url = `/WarehouseReceipt/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
@@ -187,7 +188,9 @@ export default function ImportTable() {
             }
 
             const fileHash = await calculateFileHash(file);
-
+            console.log(processedFileHashes);
+            console.log(fileHash);
+            console.log(processedFileHashes.has(fileHash));
             if (processedFileHashes.has(fileHash)) {
                 Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
                 return;
@@ -238,7 +241,7 @@ export default function ImportTable() {
     const handleSubmit = async (data: any) => {
         console.log(data);
         try {
-            const response = await api.post(`/products/import`, data);
+            const response = await api.post(`/products/import/preview`, data);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
                 Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');

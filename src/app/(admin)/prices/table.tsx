@@ -10,7 +10,13 @@ import DropdownSearchBar from "@/components/searchbar/dropdownSearchBar";
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
-import { Skeleton } from '@mui/material';
+import { Skeleton, Paper } from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 interface RowData {
     [key: string]: any;
@@ -197,105 +203,107 @@ export default function PriceTable() {
                                     ))}
                                 </div>
                             ) : (
-                                <table className="w-full bg-white border-collapse">
-                                    <thead>
-                                        <tr className="bg-white border border-gray-200">
-                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                    Mã sản phẩm
-                                                </div>
-                                            </th>
-                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                    Tên sản phẩm
-                                                </div>
-                                            </th>
-                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                    Giá nhập
-                                                </div>
-                                            </th>
-                                            <th className={`pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                                <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
-                                                    Đơn giá (kg)
-                                                </div>
-                                            </th>
-                                            <th className="bg-white text-black px-2 py-2 rounded-tr-lg">#</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {products.length !== 0 ? (
-                                            products.map((product, rowIndex) => {
-                                                const matchingProductPrice = currentPrice?.productPrices?.find(
-                                                    (pPrice: any) => pPrice?.product?.id === product?.id || pPrice?.product === product?.id
-                                                );
-
-                                                return (
-                                                    <tr key={rowIndex} className="font-semibold border border-gray-200 bg-white">
-                                                        <td className="text-center max-w-[200px] px-4 py-3 rounded-bl-lg">
-                                                            {product?.productCode}
-                                                        </td>
-                                                        <td className="text-center max-w-[200px] px-4 py-3">
-                                                            {product?.productName}
-                                                        </td>
-                                                        <td className="text-center max-w-[200px] px-4 py-3">
-                                                            {formatCurrency(product?.importPrice || 0)}
-                                                        </td>
-                                                        <td className="text-center max-w-[200px] px-4 py-3">
-                                                            {editingRowIndex === rowIndex ? (
-                                                                <input
-                                                                    min={0}
-                                                                    type="number"
-                                                                    value={currentInput || matchingProductPrice?.unit_price || product.price}
-                                                                    onChange={handleInputChange}
-                                                                    className="border-b-2 border-gray-300 text-center w-[100px] focus:border-gray-500 focus:outline-none"
-                                                                />
-                                                            ) : (
-                                                                formatCurrency(matchingProductPrice?.unit_price || product?.price)
-                                                            )}
-                                                        </td>
-                                                        <td className="text-center px-4 py-3">
-                                                            <div className="flex min-w-[100px] justify-center space-x-3">
-                                                                {editingRowIndex === rowIndex ? (
-                                                                    <>
-                                                                        <button
-                                                                            onClick={() => handleSave(rowIndex)}
-                                                                            className="group w-6 h-6 md:w-auto md:h-auto hover:text-green-500"
-                                                                        >
-                                                                            Lưu
-                                                                        </button>
-                                                                        <span className="px-1">|</span>
-                                                                        <button
-                                                                            onClick={() => handleCancel()}
-                                                                            className="group w-6 h-6 md:w-auto md:h-auto hover:text-red-500"
-                                                                        >
-                                                                            Hủy
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <button
-                                                                        onClick={() => handleEditClick(rowIndex)}
-                                                                        className="group w-12 h-6 md:w-auto md:h-auto hover:text-blue-500"
-                                                                    >
-                                                                        Sửa
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={5}>
-                                                    <div className="my-10 mx-4 text-center text-gray-500">
-                                                        Không tìm thấy dữ liệu
+                                <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 5 }}>
+                                    <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell align='center' className={`pt-3 bg-white font-semibold text-black px-2 py-2 rounded-tl-2xl`}>
+                                                    <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                        Mã sản phẩm
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                                </TableCell>
+                                                <TableCell align='center' className={`pt-3 bg-white font-semibold text-black px-2 py-2 rounded-tl-2xl`}>
+                                                    <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                        Tên sản phẩm
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell align='center' className={`pt-3 bg-white font-semibold text-black px-2 py-2 rounded-tl-2xl`}>
+                                                    <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                        Giá nhập
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell align='center' className={`pt-3 bg-white font-semibold text-black px-2 py-2 rounded-tl-2xl`}>
+                                                    <div className='flex items-center justify-center' style={{ fontSize: '15px' }}>
+                                                        Đơn giá (kg)
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell align='center' className="bg-white font-semibold text-black px-2 py-2 rounded-tr-lg">#</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {products.length !== 0 ? (
+                                                products.map((product, rowIndex) => {
+                                                    const matchingProductPrice = currentPrice?.productPrices?.find(
+                                                        (pPrice: any) => pPrice?.product?.id === product?.id || pPrice?.product === product?.id
+                                                    );
+
+                                                    return (
+                                                        <TableRow key={rowIndex}>
+                                                            <TableCell className="text-center max-w-[200px] px-4 py-3 rounded-bl-lg">
+                                                                {product?.productCode}
+                                                            </TableCell>
+                                                            <TableCell className="text-center max-w-[200px] px-4 py-3">
+                                                                {product?.productName}
+                                                            </TableCell>
+                                                            <TableCell className="text-center max-w-[200px] px-4 py-3">
+                                                                {formatCurrency(product?.importPrice || 0)}
+                                                            </TableCell>
+                                                            <TableCell className="text-center max-w-[200px] px-4 py-3">
+                                                                {editingRowIndex === rowIndex ? (
+                                                                    <input
+                                                                        min={0}
+                                                                        type="number"
+                                                                        value={currentInput || matchingProductPrice?.unit_price || product.price}
+                                                                        onChange={handleInputChange}
+                                                                        className="border-b-2 border-gray-300 text-center w-[100px] focus:border-gray-500 focus:outline-none"
+                                                                    />
+                                                                ) : (
+                                                                    formatCurrency(matchingProductPrice?.unit_price || product?.price)
+                                                                )}
+                                                            </TableCell>
+                                                            <TableCell className="text-center px-4 py-3">
+                                                                <div className="flex min-w-[100px] justify-center space-x-3">
+                                                                    {editingRowIndex === rowIndex ? (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={() => handleSave(rowIndex)}
+                                                                                className="group w-6 h-6 md:w-auto md:h-auto hover:text-green-500"
+                                                                            >
+                                                                                Lưu
+                                                                            </button>
+                                                                            <span className="px-1">|</span>
+                                                                            <button
+                                                                                onClick={() => handleCancel()}
+                                                                                className="group w-6 h-6 md:w-auto md:h-auto hover:text-red-500"
+                                                                            >
+                                                                                Hủy
+                                                                            </button>
+                                                                        </>
+                                                                    ) : (
+                                                                        <button
+                                                                            onClick={() => handleEditClick(rowIndex)}
+                                                                            className="group w-12 h-6 md:w-auto md:h-auto hover:text-blue-500"
+                                                                        >
+                                                                            Sửa
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={5}>
+                                                        <div className="my-10 mx-4 text-center text-gray-500">
+                                                            Không tìm thấy dữ liệu
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
                             )}
                         </div>
                     </div>

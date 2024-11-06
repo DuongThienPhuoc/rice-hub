@@ -5,23 +5,33 @@ import React, { useEffect, useState } from 'react';
 import api from "../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import ProductList from "@/components/list/list";
-import { Skeleton } from '@mui/material';
+import { Checkbox, Paper, Skeleton } from '@mui/material';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+
+interface RowData {
+    [key: string]: any;
+}
 
 const Page = ({ params }: { params: { id: string } }) => {
     const [batch, setBatch] = useState<any>(null);
     const router = useRouter();
-    const columns = [
-        { name: 'product.productCode', displayName: 'Mã sản phẩm' },
-        { name: 'product.name', displayName: 'Tên sản phẩm' },
-        { name: 'product.description', displayName: 'Mô tả' },
-        { name: 'product.category.name', displayName: 'Danh mục' },
-        { name: 'product.supplier.name', displayName: 'Nhà cung cấp' },
-    ];
+    const [products, setProducts] = useState<RowData[]>([]);
     const [loadingData, setLoadingData] = useState(true);
-    const titles = [
-        { name: '', displayName: '', type: '' },
-    ];
+    const [selectedProducts, setSelectedProducts] = useState<any>([]);
+
+    const handleSelectProduct = (productCode: any) => {
+        setSelectedProducts((prevSelected: any) =>
+            prevSelected.includes(productCode)
+                ? prevSelected.filter((code: any) => code !== productCode)
+                : [...prevSelected, productCode]
+        );
+    };
+
     useEffect(() => {
         const getBatch = async () => {
             setLoadingData(true);
@@ -39,9 +49,22 @@ const Page = ({ params }: { params: { id: string } }) => {
         };
 
         if (params.id) {
+            getProducts();
             getBatch();
         }
     }, [params.id]);
+
+    const getProducts = async () => {
+        try {
+            const url = `/batchproducts/batchCode/${params.id}`;
+            const response = await api.get(url);
+            const data = response.data;
+            setProducts(data);
+            console.log(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+        }
+    };
 
     const renderDate = (value: any) => {
         if (value) {
@@ -121,13 +144,72 @@ const Page = ({ params }: { params: { id: string } }) => {
                     <div className='lg:px-10 w-full lg:mt-0 mt-10'>
                         <div className='mx-10'>
                             {loadingData ? (
-                                <Skeleton animation="wave" variant="text" height={'30px'} width={200} className='mb-5' />
+                                <div className="w-full">
+                                    <Skeleton animation="wave" variant="text" height={'30px'} width={200} className='mb-5' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                    {Array.from({ length: 4 }).map((_, rowIndex) => (
+                                        <div key={rowIndex} className="flex mt-2">
+                                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                        </div>
+                                    ))}
+                                </div>
                             ) : (
-                                <p className='font-bold mb-5'>Danh sách sản phẩm: </p>
+                                <>
+                                    <p className='font-bold mb-5'>Danh sách sản phẩm: </p>
+                                    <div className='overflow-x-auto'>
+                                        <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+                                            <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <TableCell padding="checkbox">
+                                                            <Checkbox
+                                                                indeterminate={selectedProducts.length > 0 && selectedProducts.length < products.length}
+                                                                checked={selectedProducts.length === products.length}
+                                                                onChange={(e) => {
+                                                                    if (e.target.checked) {
+                                                                        setSelectedProducts(products.map((product) => product.product.productCode));
+                                                                    } else {
+                                                                        setSelectedProducts([]);
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell align="center" className='font-semibold'>Mã sản phẩm</TableCell>
+                                                        <TableCell align="center" className='font-semibold'>Tên sản phẩm</TableCell>
+                                                        <TableCell align="center" className='font-semibold'>Mô tả</TableCell>
+                                                        <TableCell align="center" className='font-semibold'>Giá nhập</TableCell>
+                                                        <TableCell align="center" className='font-semibold'>Quy cách</TableCell>
+                                                        <TableCell align="center" className='font-semibold'>Số lượng</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {products && products.map((product, index) => (
+                                                        <TableRow
+                                                            key={index}
+                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                        >
+                                                            <TableCell padding="checkbox">
+                                                                <Checkbox
+                                                                    checked={selectedProducts.includes(product.product.productCode)}
+                                                                    onChange={() => handleSelectProduct(product.product.productCode)}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell align="center" onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                {product.product.productCode}
+                                                            </TableCell>
+                                                            <TableCell align="center">{product.product.name}</TableCell>
+                                                            <TableCell align="center">{product.product.description}</TableCell>
+                                                            <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
+                                                            <TableCell align="center">{product.unit + ' ' + product.weightPerUnit} kg</TableCell>
+                                                            <TableCell align="center">{product.quantity}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </div>
+                                </>
                             )}
-                            <div className='overflow-x-auto'>
-                                <ProductList name="Sản phẩm" editUrl="" titles={titles} loadingData={loadingData} columns={columns} data={batch?.batchProducts} tableName="batch" />
-                            </div>
                         </div>
                     </div>
                     <div className='w-full flex justify-center items-center my-10'>

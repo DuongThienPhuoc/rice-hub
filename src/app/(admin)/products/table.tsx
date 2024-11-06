@@ -9,8 +9,10 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
+import { useRouter } from 'next/navigation';
 
 export default function ProductTable() {
+    const router = useRouter();
     const columns = [
         { name: 'productCode', displayName: 'Mã sản phẩm' },
         { name: 'productName', displayName: 'Tên sản phẩm' },
@@ -42,6 +44,7 @@ export default function ProductTable() {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
+            params.append("warehouseId", '2');
             const url = `/products/admin/products?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
@@ -89,7 +92,7 @@ export default function ProductTable() {
                             {loadingData ? (
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                             ) : (
-                                <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button onClick={() => router.push("/products/create")} className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                     Thêm sản phẩm
                                     <PlusIcon />
                                 </Button>
@@ -97,7 +100,7 @@ export default function ProductTable() {
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <ProductList name="Sản phẩm" editUrl="/products/update/1" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="products" />
+                        <ProductList name="Sản phẩm" editUrl="/products/updateProduct" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="products" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

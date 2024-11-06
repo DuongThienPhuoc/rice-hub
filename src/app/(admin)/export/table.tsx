@@ -50,6 +50,7 @@ export default function ExportTable() {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
+            params.append("receiptType", 'EXPORT');
             const url = `/WarehouseReceipt/?${params.toString()}`;
             console.log(url);
             const response = await api.get(url);

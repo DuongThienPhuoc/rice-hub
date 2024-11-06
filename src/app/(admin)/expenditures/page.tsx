@@ -17,8 +17,7 @@ const Page = () => {
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
         { name: 'type', displayName: 'Loại chi' },
-        { name: 'object', displayName: 'Đối tượng nhận' },
-        { name: 'time', displayName: 'Thời gian' },
+        { name: 'object', displayName: 'Đối tượng chi' },
         { name: 'totalValue', displayName: 'Tổng giá trị' },
         { name: 'payedValue', displayName: 'Đã thanh toán' },
         { name: 'residualValue', displayName: 'Còn lại' },

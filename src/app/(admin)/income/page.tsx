@@ -16,9 +16,8 @@ const Page = () => {
     const router = useRouter();
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
-        { name: 'type', displayName: 'Loại thu' },
-        { name: 'object', displayName: 'Đối tượng nộp' },
-        { name: 'time', displayName: 'Hạn nộp' },
+        { name: 'object', displayName: 'Đối tượng thu' },
+        { name: 'time', displayName: 'Hạn thu' },
         { name: 'totalValue', displayName: 'Tổng giá trị' },
         { name: 'payedValue', displayName: 'Đã thanh toán' },
         { name: 'residualValue', displayName: 'Còn lại' },

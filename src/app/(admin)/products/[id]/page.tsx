@@ -11,6 +11,7 @@ import { Skeleton } from '@mui/material';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [product, setProduct] = useState<any>(null);
+    const [batchProducts, setBatchProducts] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [loadingData, setLoadingData] = useState(true);
@@ -28,7 +29,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     ];
 
     useEffect(() => {
-        setLoadingData(true);
         const getProduct = async () => {
             try {
                 const url = `/products/${params.id}`;
@@ -42,11 +42,25 @@ const Page = ({ params }: { params: { id: number } }) => {
                 setLoadingData(false);
             }
         };
+        setLoadingData(true);
 
         if (params.id) {
+            getBatch();
             getProduct();
         }
     }, [params.id]);
+
+    const getBatch = async () => {
+        try {
+            const url = `/batchproducts/productId/${params.id}`;
+            const response = await api.get(url);
+            const data = response.data;
+            console.log(data);
+            setBatchProducts(data);
+        } catch (error) {
+            console.error("Error fetching product:", error);
+        }
+    };
 
     const renderDate = (value: any) => {
         if (value) {
@@ -126,8 +140,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <div className='mt-10 xl:px-10 flex flex-col items-center'>
                                         <img
                                             src={product?.image || "https://via.placeholder.com/400"}
-                                            alt='Avatar'
-                                            className="w-[90%] h-[400px] border-[5px] border-black object-cover"
+                                            alt='Image'
+                                            className="w-[80%] h-[auto] border-[5px] border-black object-cover"
                                         />
                                     </div>
                                 </div>
@@ -161,30 +175,22 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         <span className='font-bold flex-1'>Mô tả: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.description}</span>
                                     </div>
+
+                                    <div className='flex-1'>
+                                        <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Ngày tạo: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(product?.createAt)}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )
                     ) : (
                         <div className='w-full lg:px-10'>
-                            <div className='flex flex-col lg:flex-row'>
-                                <div className='flex-1'>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Người nhập: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.batchProducts[0]?.batch?.batchCreator?.fullName}</span>
-                                    </div>
-
-                                </div>
-                                <div className='flex-1'>
-                                    <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Ngày nhập: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(product?.createAt)}</span>
-                                    </div>
-                                </div>
-                            </div>
                             <div className='m-10'>
                                 <p className='font-bold mb-5'>Danh sách lô hàng: </p>
                                 <div className='overflow-x-auto'>
-                                    <BatchList name="Lô hàng" editUrl="" titles={titles} columns={columns} loadingData={loadingData} data={product.batchProducts} tableName="batch" />
+                                    <BatchList name="Lô hàng" editUrl="" titles={titles} columns={columns} loadingData={loadingData} data={batchProducts} tableName="batch" />
                                 </div>
                             </div>
                         </div>
