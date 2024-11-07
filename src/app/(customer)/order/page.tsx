@@ -159,7 +159,7 @@ export default function OrderPage() {
                                         <TableHead>Loại</TableHead>
                                         <TableHead>Đơn vị</TableHead>
                                         <TableHead>Đơn giá</TableHead>
-                                        <TableHead></TableHead>
+                                        <TableHead className='text-center w-36'>Thêm vào giỏ hàng</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -198,12 +198,13 @@ export default function OrderPage() {
                                             <TableCell>
                                                 {product.price}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell className='flex justify-center'>
                                                 <span>
                                                     <ShoppingCart
                                                         onClick={() => {
                                                             setOpen(true);
                                                             updateProducts({
+                                                                id:product.id,
                                                                 productCode:
                                                                     product.productCode,
                                                                 name: product.name,
@@ -223,7 +224,7 @@ export default function OrderPage() {
                                                                     product.warehouseId,
                                                             });
                                                         }}
-                                                        className="h-4 w-4 hover:cursor-pointer"
+                                                        className="h-5 w-5 hover:cursor-pointer"
                                                     />
                                                 </span>
                                             </TableCell>

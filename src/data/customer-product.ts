@@ -11,6 +11,7 @@ export interface Embedded {
 }
 
 export interface ProductDtoList {
+    id: number;
     name: string;
     productCode: string;
     description: string;

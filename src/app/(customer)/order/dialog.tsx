@@ -40,8 +40,9 @@ export default function OrderPageDialog({
     function handleSubmitOrder() {
         const getOrderId = JSON.parse(localStorage.getItem('cart') || '[]').length;
         const order = {
-            id: getOrderId + 1,
-            productId: product.productCode,
+            cartId: getOrderId + 1,
+            productID: product.id,
+            productCode: product.productCode,
             name: product.name,
             quantity: quantity,
             price: product.price,
@@ -55,7 +56,7 @@ export default function OrderPageDialog({
             })
         } else {
             setType(0);
-            setQuantity(0);
+            setQuantity(1);
             const preOrder = JSON.parse(localStorage.getItem('cart') || '[]');
             localStorage.setItem('cart', JSON.stringify([...preOrder, order]));
             toast({
@@ -81,7 +82,7 @@ export default function OrderPageDialog({
                         <Label>Loại</Label>
                         <Select onValueChange={(e) => setType(parseInt(e))}>
                             <SelectTrigger className="col-span-3">
-                                <SelectValue placeholder="Chọn loại hàng" />
+                                <SelectValue placeholder="Chọn quy cách đóng gói" />
                             </SelectTrigger>
                             <SelectContent>
                                 {product.unitWeightPairsList.map((weight, index) => (
@@ -122,7 +123,7 @@ export default function OrderPageDialog({
                             onClick={handleSubmitOrder}
                             className="w-full"
                         >
-                            Đặt hàng
+                            Thêm vào giỏ hàng
                         </Button>
                     </div>
                 </section>
