@@ -8,16 +8,13 @@ export default function CategoryFilter() {
         name: string;
     }
 
-    const productCategories: Array<ProductCategory> = [
+    const category: Array<ProductCategory> = [
         { id: 1, name: 'Cám' },
         { id: 2, name: 'Cám cp' },
         { id: 3, name: 'Đỗ' },
         { id: 4, name: 'Gạo rượu' },
         { id: 5, name: 'Men rượu' },
     ];
-
-    const [category, setCategory] =
-        React.useState<Array<ProductCategory>>(productCategories);
 
     function handleSearchCategory() {
         // Search category

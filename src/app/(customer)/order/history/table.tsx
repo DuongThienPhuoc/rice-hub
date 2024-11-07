@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -23,46 +23,44 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
-import { getOrderHistory } from '@/data/order';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { getOrderHistory, OrderList } from '@/data/order';
 
-export default function OrderTable({ value }: { value?: string }) {
+export default function OrderTable({ userID }: { userID: string }) {
+    const [orderList, setOrderList] = useState<OrderList>([]);
     useEffect(() => {
-        if (value !== undefined) {
-            getOrderHistory({ customerID: parseInt(value) })
-                .then((order) => {
-                    console.log(order);
-                })
-                .catch((e) => console.error(e));
+        getOrderHistory({ customerID: userID }).then((response) => {
+            setOrderList(response.data);
+        });
+    }, [userID]);
+    type OrderStatus = {
+        variant:
+            | 'default'
+            | 'outline'
+            | 'destructive'
+            | 'secondary'
+            | null
+            | undefined;
+        text: string;
+    };
+
+    function getOrderStatus(status: string): OrderStatus {
+        switch (status) {
+            case 'IN_PROCESS':
+                return { variant: 'default', text: 'Đang xử lý' };
+            case 'COMPLETED':
+                return { variant: 'outline', text: 'Hoàn thành' };
+            case 'FAILED':
+                return { variant: 'destructive', text: 'Thất bại' };
+            case 'CANCELED':
+                return { variant: 'destructive', text: 'Đã hủy' };
+            case 'PENDING':
+                return { variant: 'default', text: 'Chờ xử lý' };
+            default:
+                return { variant: 'secondary', text: 'Không xác định' };
         }
-    }, []);
-    const orders = [
-        {
-            id: 'ORD-12345',
-            date: '2023-04-15',
-            status: 'Đang vận chuyển',
-            total: 239.97,
-        },
-        {
-            id: 'ORD-12346',
-            date: '2023-04-20',
-            status: 'Đã thanh toán',
-            total: 129.99,
-        },
-        {
-            id: 'ORD-12347',
-            date: '2023-04-25',
-            status: 'Đang vận chuyển',
-            total: 59.98,
-        },
-        { id: 'ORD-12348', date: '2023-04-30', status: 'Đã huỷ', total: 89.97 },
-        {
-            id: 'ORD-12349',
-            date: '2023-05-05',
-            status: 'Đang vận chuyển',
-            total: 199.99,
-        },
-    ];
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -72,7 +70,7 @@ export default function OrderTable({ value }: { value?: string }) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[80px]">ID</TableHead>
+                            <TableHead>Mã đơn hàng</TableHead>
                             <TableHead>Ngày</TableHead>
                             <TableHead>Tình trạng</TableHead>
                             <TableHead className="text-right">Tổng</TableHead>
@@ -82,38 +80,36 @@ export default function OrderTable({ value }: { value?: string }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders.map((order) => (
+                        {orderList.map((order) => (
                             <TableRow key={order.id}>
                                 <TableCell className="font-medium">
-                                    {order.id}
+                                    {order.orderCode}
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center">
                                         <Calendar className="mr-2 w-4 h-4 text-muted-foreground" />
-                                        {order.date}
+                                        {new Date(
+                                            order.orderDate,
+                                        ).toLocaleDateString()}
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     <Badge
                                         variant={
-                                            order.status === 'Đang vận chuyển'
-                                                ? 'default'
-                                                : order.status ===
-                                                    'Đã thanh toán'
-                                                  ? 'outline'
-                                                  : 'destructive'
+                                            getOrderStatus(order.status)
+                                                ?.variant || 'default'
                                         }
                                     >
-                                        {order.status}
+                                        {getOrderStatus(order.status)?.text}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    {order.total}
+                                    {order.totalAmount}
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <Button variant="ghost" asChild>
                                         <Link
-                                            href={`/order/detail/${order.id}`}
+                                            href={`/order/detail/${order.id}/?orderCode=${order.orderCode}`}
                                         >
                                             <Search className="w-4 h-4" />
                                             Chi tiết
