@@ -170,7 +170,7 @@ const categories = [
             },
             {
                 title: 'Đơn hàng',
-                url: 'order',
+                url: '/admin/orders',
                 icon: <PackageCheck />,
             },
         ],

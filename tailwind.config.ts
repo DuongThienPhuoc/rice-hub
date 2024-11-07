@@ -90,7 +90,8 @@ const config: Config = {
   		}
   	},
   	fontFamily: {
-  		arsenal: ['Arsenal', 'sans-serif']
+  		arsenal: ['Arsenal', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif']
   	}
   },
   plugins: [require("tailwindcss-animate")],
