@@ -1,11 +1,6 @@
 'use client';
 
 import {
-    Employee,
-    PorterEmployees,
-    DriverEmployees,
-} from '@/sample-data/salary';
-import {
     getDaysAndWeekdaysInMonth,
     getYears,
     monthNames,
@@ -20,32 +15,65 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { DayCard } from '@/app/(admin)/salary/day-card';
+import { getEmployee } from '@/data/employee';
+import { Employee } from '@/type/employee';
+import { isAxiosError } from 'axios';
 
 export default function SalaryPage() {
     const [tab, setTab] = React.useState(0);
-    const employees = tab === 0 ? PorterEmployees : DriverEmployees;
-    const [selectedEmployee, setSelectedEmployee] = React.useState<Employee>(
-        employees[0],
-    );
+    const [employees, setEmployees] = React.useState<Employee[]>([]);
+    const [selectedEmployee, setSelectedEmployee] = React.useState<Employee>();
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     const currentDate = new Date().toLocaleDateString();
     const calendar = getDaysAndWeekdaysInMonth(currentYear, currentMonth);
+
+    async function fetchEmployee(role: 'driver' | 'porter') {
+        try {
+            const response = await getEmployee(
+                currentMonth + 1,
+                currentYear,
+                role
+            );
+            setEmployees(response.data);
+        } catch (e) {
+            if (isAxiosError(e)) {
+                throw e;
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    useEffect(() => {
+        fetchEmployee(tab === 0 ? 'porter': 'driver').catch((e) => {
+            if (e.status === 400) {
+                console.error('Employees not found');
+            } else {
+                console.error(`An error occurred: ${e}`);
+            }
+        });
+    }, [tab]);
+
     useEffect(() => {
         setSelectedEmployee(employees[0]);
     }, [employees]);
+
+    if(!selectedEmployee){
+        return <></>
+    }
 
     return (
         <section className="container mx-auto">
             <div className="grid grid-cols-5 gap-1">
                 <div className="col-span-1">
-                    <UserCardContainer
-                        employees={employees}
-                        selectedEmployee={selectedEmployee}
-                        setSelectedEmployee={setSelectedEmployee}
-                        tab={tab}
-                        setTab={setTab}
-                    />
+                        <UserCardContainer
+                            employees={employees}
+                            selectedEmployee={selectedEmployee}
+                            setSelectedEmployee={setSelectedEmployee}
+                            tab={tab}
+                            setTab={setTab}
+                        />
                 </div>
                 <div className="col-span-4 space-y-2">
                     {tab === 0 ? (
@@ -55,11 +83,11 @@ export default function SalaryPage() {
                             calendar={calendar}
                         />
                     ) : (
-                        <DriverCalendar
-                            employee={selectedEmployee}
-                            currentDate={currentDate}
-                            calendar={calendar}
-                        />
+                    <DriverCalendar
+                        employee={selectedEmployee}
+                        currentDate={currentDate}
+                        calendar={calendar}
+                    />
                     )}
                 </div>
             </div>
@@ -77,9 +105,9 @@ function PorterCalendar({
     calendar: { day: number; weekday: string; localDate: string }[];
 }) {
     function isActiveDate(date: string) {
-        return employee.activeDates?.some(
+        return employee.dayActive?.some(
             (activeDate) =>
-                new Date(activeDate.date).toLocaleDateString() === date,
+                new Date(activeDate.dayActive).toLocaleDateString() === date,
         );
     }
 
@@ -113,9 +141,9 @@ function DriverCalendar({
     calendar: { day: number; weekday: string; localDate: string }[];
 }) {
     function isActiveDate(date: string) {
-        return employee.activeDates?.some(
+        return employee?.dayActive?.some(
             (activeDate) =>
-                new Date(activeDate.date).toLocaleDateString() === date,
+                new Date(activeDate.dayActive).toLocaleDateString() === date,
         );
     }
 
@@ -208,7 +236,7 @@ function UserCardContainer({
 }: {
     employees: Employee[];
     selectedEmployee: Employee;
-    setSelectedEmployee: React.Dispatch<React.SetStateAction<Employee>>;
+    setSelectedEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
     tab: number;
     setTab: React.Dispatch<React.SetStateAction<number>>;
 }) {
@@ -241,7 +269,7 @@ function UserCardContainer({
             <div className="overflow-y-auto space-y-3">
                 {employees.map((empl) => (
                     <UserCard
-                        key={empl.name}
+                        key={empl.fullName}
                         employee={empl}
                         selectedEmpl={selectedEmployee}
                         setEmployee={setSelectedEmployee}
@@ -258,7 +286,7 @@ function UserCard({
     selectedEmpl,
 }: {
     employee: Employee;
-    setEmployee: React.Dispatch<React.SetStateAction<Employee>>;
+    setEmployee: React.Dispatch<React.SetStateAction<Employee | undefined>>;
     selectedEmpl: Employee;
 }) {
     return (
@@ -270,8 +298,12 @@ function UserCard({
             onClick={() => setEmployee(employee)}
         >
             <div>
-                <h1 className="text-[16px] font-bold">{employee.name}</h1>
-                <p className="text-sm text-gray-400">{employee.role}</p>
+                <h1 className="text-[16px] font-bold">{employee.fullName}</h1>
+                <p className="text-sm text-gray-400">
+                    {employee.employeeRole === 'PORTER'
+                        ? 'Nhân viên bốc/dỡ hàng'
+                        : 'Lái xe'}
+                </p>
             </div>
         </div>
     );

@@ -5,7 +5,7 @@ import {
 } from '@/components/ui/popover';
 import React, { useEffect } from 'react';
 import { Day } from '@/app/(admin)/salary/day-card';
-import { Employee } from '@/sample-data/salary';
+import { Employee } from '@/type/employee';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -24,19 +24,20 @@ export default function SalaryPopoverProvider({
     variant?: 'active' | 'inactive' | 'default';
 }) {
     function getEmployeeActiveDate(date: string) {
-        return employee.activeDates?.find(
+        return employee.dayActive?.find(
             (activeDate) =>
-                new Date(activeDate.date).toLocaleDateString() === date,
+                new Date(activeDate.dayActive).toLocaleDateString() === date,
         );
     }
 
     const [active, setActive] = React.useState<boolean>(variant === 'active');
-    const [inputDetail, setInputDetail] = React.useState<string>(getEmployeeActiveDate(day.localDate)?.detail || '');
+    const [inputDetail, setInputDetail] = React.useState<string>(getEmployeeActiveDate(day.localDate)?.mass || '');
 
     useEffect(() => {
         setActive(variant === 'active');
-        setInputDetail(getEmployeeActiveDate(day.localDate)?.detail || '');
+        setInputDetail(getEmployeeActiveDate(day.localDate)?.mass || '');
     }, [variant]);
+
     return (
         <Popover>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -51,7 +52,7 @@ export default function SalaryPopoverProvider({
                     setDetail={setInputDetail}
                     active={active}
                     setActive={setActive}
-                    role={employee.role}
+                    role={employee.employeeRole}
                 />
             </PopoverContent>
         </Popover>
@@ -89,9 +90,9 @@ function EmployeePopoverContent({
                     </label>
                 </div>
             </div>
-            {role === 'porter' && (
+            {role === 'PORTER' && (
                 <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="mass">Số lượng</Label>
+                    <Label htmlFor="mass">Số lượng (Tấn)</Label>
                     <Input
                         id="mass"
                         className="col-span-2"

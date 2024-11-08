@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { CircleCheck, CircleX } from 'lucide-react';
-import { Employee } from '@/sample-data/salary';
+import { Employee } from '@/type/employee';
 import SalaryPopoverProvider from '@/app/(admin)/salary/salary-popover-provider';
 
 export type Day = {
