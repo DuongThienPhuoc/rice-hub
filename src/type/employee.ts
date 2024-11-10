@@ -10,12 +10,32 @@ export interface Employee {
     gender: boolean;
     image: string;
     employeeRole: string;
-    dayActive: DayActive[];
 }
 
 export interface DayActive {
     id: number;
     dayActive: Date;
-    mass: string | null;
+    mass: number | null;
     note: string | null;
+}
+
+export interface EmployeeDayActiveBodyRequest {
+    employeeId: number;
+    dayActive: string;
+    mass: number | null;
+    note: string | null;
+}
+
+export interface UpdateEmployeeDayActiveBodyRequest {
+    employeeId: number;
+    dayActive: string;
+    mass: number | null;
+    note: string | null;
+}
+
+
+
+export interface DeleteActiveDayBodyRequest {
+    employeeId : number;
+    date: string;
 }
