@@ -9,6 +9,8 @@ import api from "../../../../api/axiosConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../../api/firebaseConfig';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 type UnitWeightPair = {
     productUnit: string;
@@ -20,16 +22,15 @@ interface RowData {
 }
 
 const Page = () => {
+    const { toast } = useToast();
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
     const [suppliers, setSuppliers] = useState<RowData[]>([]);
     const [categories, setCategories] = useState<RowData[]>([]);
-    const [warehouses, setWarehouses] = useState<RowData[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
-    const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -51,7 +52,12 @@ const Page = () => {
             const data = response.data;
             setCategories(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách danh mục:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách danh mục!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         }
     };
 
@@ -62,25 +68,18 @@ const Page = () => {
             const data = response.data;
             setSuppliers(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
-        }
-    };
-
-    const getWarehouses = async () => {
-        try {
-            const url = `/warehouses/All`;
-            const response = await api.get(url);
-            const data = response.data;
-            setWarehouses(data);
-        } catch (error) {
-            console.error("Lỗi khi lấy danh sách nhà nhà kho:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         }
     };
 
     useEffect(() => {
         getSuppliers();
         getCategories();
-        getWarehouses();
 
         const timer = setTimeout(() => {
             setLoadingData(false);
@@ -146,9 +145,7 @@ const Page = () => {
             if (file) {
                 const storageRef = ref(storage, `images/${file.name}`);
                 const snapshot = await uploadBytes(storageRef, file);
-                console.log('Uploaded a file!');
                 const downloadURL = await getDownloadURL(snapshot.ref);
-                console.log('File available at', downloadURL);
 
                 updatedFormData = {
                     ...updatedFormData,
@@ -160,29 +157,48 @@ const Page = () => {
                 ...updatedFormData,
                 categoryId: selectedCategory?.id,
                 supplierId: selectedSupplier?.id,
-                warehouseId: selectedWarehouse?.id,
+                warehouseId: 2,
             };
 
-            console.log(updatedFormData);
             const response = await api.post(`/products/createProduct`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Sản phẩm đã được tạo thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    description: `Sản phẩm đã được tạo thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/products");
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full font-arsenal'>
+            <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
-                    <div className='flex flex-col lg:flex-row'>
+                    <div className='flex flex-col lg:flex-row mb-5'>
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
                         ) : (
@@ -284,28 +300,6 @@ const Page = () => {
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Quy cách: </span>
-                                    <TextField
-                                        type={'text'}
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('productUnit', e.target.value)}
-                                        value={formData.unitWeightPairsList[0].productUnit.toString()}
-                                        label={'Nhập quy cách (vd: bao, túi, ...)'}
-                                        variant="standard" />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Khối lượng (kg): </span>
-                                    <TextField
-                                        type={'number'}
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('weightPerUnit', e.target.value)}
-                                        value={formData.unitWeightPairsList[0].weightPerUnit.toString()}
-                                        label={'Nhập khối lượng'}
-                                        variant="standard" />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1 pt-4'>Nhà cung cấp: </span>
                                     <Autocomplete
                                         className='flex-[2]'
@@ -314,18 +308,6 @@ const Page = () => {
                                         getOptionLabel={(option) => option.name}
                                         onChange={(event, newValue) => setSelectedSupplier(newValue)}
                                         renderInput={(params) => <TextField {...params} variant='standard' label="Chọn nhà cung cấp" />}
-                                    />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Nhà kho: </span>
-                                    <Autocomplete
-                                        className='flex-[2]'
-                                        disablePortal
-                                        options={warehouses}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, newValue) => setSelectedWarehouse(newValue)}
-                                        renderInput={(params) => <TextField {...params} variant='standard' label="Chọn nhà kho" />}
                                     />
                                 </div>
 

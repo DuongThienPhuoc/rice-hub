@@ -50,7 +50,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            <div className='flex my-10 justify-center w-full font-arsenal'>
+            <div className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (

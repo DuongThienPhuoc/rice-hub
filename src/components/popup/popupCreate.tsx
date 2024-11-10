@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import InputField from '@/components/field/inputfield';
@@ -41,34 +42,26 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // for (let index = 0; index < titles.length; index++) {
-        //     const element = titles[index];
-        //     console.log(element);
-        //     if (!element.name) {
-        // toast({
-        //     variant: 'destructive',
-        //     title: 'Xin hãy nhập đầy đủ thông tin',
-        //     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-        // })
-        //         return;
-        //     }
-        // }
-
         try {
             await api.post(`${url}`, formData);
             toast({
                 variant: 'default',
                 title: 'Tạo thành công',
                 description: `${tableName} đã được thêm thành công`,
+                style: {
+                    backgroundColor: '#4caf50',
+                    color: '#fff',
+                },
+                duration: 3000
             })
             handleClose(true);
-        } catch (error) {
-            console.log(error)
+        } catch (error: any) {
             toast({
                 variant: 'destructive',
                 title: 'Tạo thất bại',
-                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
             })
         }
     };

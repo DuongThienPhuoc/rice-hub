@@ -10,8 +10,10 @@ import api from "../../../api/axiosConfig";
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProductTable() {
+    const { toast } = useToast();
     const router = useRouter();
     const columns = [
         { name: 'productCode', displayName: 'Mã sản phẩm' },
@@ -48,15 +50,25 @@ export default function ProductTable() {
             const url = `/products/admin/products?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
-            if (data._embedded) {
-                setProducts(data._embedded.adminProductDtoList);
-                setTotalPages(data.page.totalPages);
+            if (data.page.totalElements === 0) {
+                setProducts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy sản phẩm!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             } else {
-                alert("Danh sách rỗng");
+                setProducts(data._embedded.adminProductDtoList);
             }
+            setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách sản phẩm!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -76,7 +88,7 @@ export default function ProductTable() {
     };
 
     return (
-        <div>
+        <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='w-full overflow-x-auto'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>

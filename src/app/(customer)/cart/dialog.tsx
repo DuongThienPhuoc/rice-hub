@@ -1,8 +1,8 @@
-import {Dispatch, SetStateAction} from "react";
-import {Dialog, DialogContent, DialogDescription, DialogTitle} from "@/components/ui/dialog";
+import { Dispatch, SetStateAction } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 
-export default function CartDialog({open,setOpen}:{open: boolean, setOpen: Dispatch<SetStateAction<boolean>>}){
-    return(
+export default function CartDialog({ open, setOpen }: { open: boolean, setOpen: Dispatch<SetStateAction<boolean>> }) {
+    return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className='bg-white'>
                 <DialogTitle>Thông báo</DialogTitle>

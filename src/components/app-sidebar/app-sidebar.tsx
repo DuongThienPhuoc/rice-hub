@@ -109,7 +109,7 @@ const categories = [
             },
             {
                 title: 'Nguyên Liệu',
-                url: '#',
+                url: '/ingredients',
                 icon: <SquareArrowRight />,
             },
             {

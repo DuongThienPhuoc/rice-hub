@@ -178,7 +178,7 @@ const Page = () => {
 
     return (
         <div>
-            <div className='flex my-1 justify-center w-full font-arsenal'>
+            <div className='flex my-1 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     {loadingData ? (
                         <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
@@ -233,13 +233,13 @@ const Page = () => {
                                                 Tên sản phẩm
                                             </TableCell>
                                             <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Trọng lượng
-                                            </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Số lượng
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Quy cách
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Trọng lượng
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Danh mục
@@ -269,20 +269,7 @@ const Page = () => {
                                                     label={'Tên sản phẩm'}
                                                     variant="standard" />
                                             </TableCell>
-                                            <TableCell className='p-2'>
-                                                <TextField
-                                                    type={'number'}
-                                                    InputProps={{
-                                                        readOnly: true,
-                                                    }}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                    inputProps={{ min: 0 }}
-                                                    value={weight}
-                                                    label={'Trọng lượng'}
-                                                    variant="standard" />
-                                            </TableCell>
+
                                             <TableCell className='p-2'>
                                                 <TextField
                                                     inputProps={{ min: 0 }}
@@ -303,6 +290,20 @@ const Page = () => {
                                                     onChange={(event, newValue) => setSelectedType(newValue)}
                                                     renderInput={(params) => <TextField {...params} variant='standard' label="Quy cách" />}
                                                 />
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                <TextField
+                                                    type={'number'}
+                                                    InputProps={{
+                                                        readOnly: true,
+                                                    }}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                    inputProps={{ min: 0 }}
+                                                    value={weight}
+                                                    label={'Trọng lượng'}
+                                                    variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 {!selectedProduct ? (
@@ -383,13 +384,13 @@ const Page = () => {
                                                     {item.productName}
                                                 </TableCell>
                                                 <TableCell align='center'>
-                                                    {item.weightPerUnit}
-                                                </TableCell>
-                                                <TableCell align='center'>
                                                     {item.quantity}
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     {item.unit}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.weightPerUnit}
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     {item.categoryName}

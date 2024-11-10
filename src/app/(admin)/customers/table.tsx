@@ -10,8 +10,10 @@ import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CustomerTable() {
+    const { toast } = useToast();
     const router = useRouter();
     const columns = [
         { name: 'fullName', displayName: 'Tên khách hàng' },
@@ -47,10 +49,25 @@ export default function CustomerTable() {
             const url = `/customer/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setCustomers(data._embedded.customerList);
+            if (data.page.totalElements === 0) {
+                setCustomers([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy khách hàng!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            } else {
+                setCustomers(data._embedded.customerList);
+            }
             setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách khách hàng:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách khách hàng!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -70,7 +87,7 @@ export default function CustomerTable() {
     };
 
     return (
-        <div>
+        <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='overflow-x-auto w-full'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>

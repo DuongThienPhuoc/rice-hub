@@ -9,14 +9,15 @@ import api from "../../../api/axiosConfig";
 import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CategoryTable() {
+    const { toast } = useToast();
     const [loadingData, setLoadingData] = useState(true);
     const columns = [
         { name: 'id', displayName: 'Mã danh mục' },
         { name: 'name', displayName: 'Tên danh mục' },
         { name: 'description', displayName: 'Mô tả chi tiết' },
-        { name: '', displayName: '' },
     ];
     const [categories, setCategories] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -58,14 +59,28 @@ export default function CategoryTable() {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
-            const url = `/categories/?${params.toString()}`;
+            const url = `/categories/getByFilter?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
-            setCategories(data._embedded.categoryList);
+            if (data.page.totalElements === 0) {
+                setCategories([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy danh mục!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            } else {
+                setCategories(data._embedded.categoryList);
+            }
             setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách danh mục:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách danh mục!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -85,7 +100,7 @@ export default function CategoryTable() {
     };
 
     return (
-        <div>
+        <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='overflow-x-auto w-full'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
@@ -119,8 +134,7 @@ export default function CategoryTable() {
                     )}
                 </div>
             </section >
-            {isPopupVisible && <PopupCreate tableName="Danh mục" url="/categories/createCategory" titles={titles} handleClose={closeCreate} />
-            }
+            {isPopupVisible && <PopupCreate tableName="Danh mục" url="/categories/createCategory" titles={titles} handleClose={closeCreate} />}
             <FloatingButton />
         </div >
     );

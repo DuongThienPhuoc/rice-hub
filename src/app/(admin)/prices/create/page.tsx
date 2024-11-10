@@ -8,12 +8,15 @@ import { useRouter } from 'next/navigation';
 import api from "../../../../api/axiosConfig";
 import { Trash2 } from 'lucide-react';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 interface RowData {
     [key: string]: any;
 }
 
 const Page = () => {
+    const { toast } = useToast();
     const router = useRouter();
     const [prices, setPrices] = useState<RowData[]>([]);
     const [customers, setCustomers] = useState<RowData[]>([]);
@@ -32,7 +35,12 @@ const Page = () => {
             console.log(data);
             setPrices(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách bảng giá:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi danh sách bảng giá!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -54,7 +62,12 @@ const Page = () => {
             const data = response.data;
             setCustomers(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách khách hàng:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi danh sách khách hàng!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         }
     };
 
@@ -68,7 +81,13 @@ const Page = () => {
 
     const handleCreatePrice = async () => {
         if (priceName === '' || priceName.trim().length < 1) {
-            alert('Vui lòng nhập tên bảng giá');
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại!',
+                description: 'Xin vui lòng nhập tên bảng giá',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
             return;
         }
 
@@ -82,25 +101,58 @@ const Page = () => {
         try {
             const response = await api.post(`/price/admin/AddPrice`, formData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Tạo bảng giá thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    description: `Bảng giá đã được tạo thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 getPrices();
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     }
 
     const handleApplyPrice = async () => {
         if (!selectedPrice) {
-            alert('Vui lòng chọn bảng giá');
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại!',
+                description: 'Vui lòng chọn bảng giá',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
             return;
         }
 
+
         if (!selectedCustomer) {
-            alert('Vui lòng chọn khách hàng');
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại!',
+                description: 'Vui lòng chọn khách hàng',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
             return;
         }
 
@@ -112,20 +164,40 @@ const Page = () => {
         try {
             const response = await api.post(`/price/admin/UpdateCustomerPrice`, formData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Áp dụng bảng giá cho khách hàng thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Áp dụng thành công',
+                    description: `Bảng giá đã được áp dụng thành công cho ${selectedCustomer.fullName}`,
+                    duration: 3000,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                })
                 getPrices();
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Áp dụng thất bại!',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    duration: 3000,
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Áp dụng thất bại',
+                duration: 3000,
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
         }
     }
 
     return (
         <div>
-            <div className='flex my-10 justify-center w-full font-arsenal'>
+            <div className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         <div className={`flex-1`}>

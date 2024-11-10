@@ -466,7 +466,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 </div>
 
                 <div className='flex justify-end'>
-                    <button className={cn("rounded-lg px-4 py-2 bg-black hover:bg-[#1d1d1fca] text-white font-arsenal font-semibold", hiddenButton && 'hidden')}
+                    <button className={cn("rounded-lg px-4 py-2 bg-black hover:bg-[#1d1d1fca] text-white font-semibold", hiddenButton && 'hidden')}
                         onClick={() => {
                             handleSubmit();
                         }}>Tạo hợp đồng

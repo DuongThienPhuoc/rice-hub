@@ -225,7 +225,7 @@ const Page = () => {
 
     return (
         <div>
-            <div className='w-full flex my-10 justify-center font-arsenal'>
+            <div className='w-full flex my-10 justify-center'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     {loadingData ? (
                         <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
@@ -435,7 +435,7 @@ const Page = () => {
                                                     />
                                                 )}
                                             </TableCell>
-                                            <TableCell className='p-2'>
+                                            <TableCell align='center' className='p-2'>
                                                 <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
                                             </TableCell>
                                         </TableRow>
@@ -451,13 +451,13 @@ const Page = () => {
                                                     {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.importPrice))}
                                                 </TableCell>
                                                 <TableCell align='center'>
-                                                    {item.weightPerUnit}
-                                                </TableCell>
-                                                <TableCell align='center'>
                                                     {item.quantity}
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     {item.unit}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.weightPerUnit}
                                                 </TableCell>
                                                 <TableCell align='center'>
                                                     {item.categoryName}

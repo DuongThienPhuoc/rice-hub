@@ -17,15 +17,20 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 interface RowData {
     [key: string]: any;
 }
 
 export default function PriceTable() {
+    const { toast } = useToast();
     const router = useRouter();
-    const handleSearch = (query: string) => {
-        console.log('Searching for:', query);
+
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
     };
     const [products, setProducts] = useState<RowData[]>([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -34,6 +39,10 @@ export default function PriceTable() {
     const [currentPrice, setCurrentPrice] = useState<RowData>();
     const [currentInput, setCurrentInput] = useState(0);
     const [loadingData, setLoadingData] = useState(true);
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
 
     const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
         setLoadingData(true);
@@ -46,14 +55,29 @@ export default function PriceTable() {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
+            params.append('warehouseId', '2');
             const url = `/products/admin/products?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
-            setProducts(data._embedded.adminProductDtoList);
+            if (data.page.totalElements === 0) {
+                setProducts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy sản phẩm!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            } else {
+                setProducts(data._embedded.adminProductDtoList);
+            }
             setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách sản phẩm!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -72,7 +96,12 @@ export default function PriceTable() {
                     : data[0]
             );
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách bảng giá:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy giá sản phẩm!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         }
     };
 
@@ -81,8 +110,8 @@ export default function PriceTable() {
     }, []);
 
     useEffect(() => {
-        getProducts(currentPage);
-    }, [currentPage]);
+        getProducts(currentPage, currentSearch);
+    }, [currentPage, currentSearch]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -104,16 +133,35 @@ export default function PriceTable() {
                 ]
             })
             const response = await api.post(`/price/admin/UpdateProductPrice`, formData);
-            console.log(formData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Cập nhật giá thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Cập nhật thành công',
+                    description: `Giá sản phẩm đã được cập nhật thành công`,
+                    duration: 3000,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                })
                 getPrices();
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    duration: 3000,
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                duration: 3000,
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
         }
     };
 
@@ -148,7 +196,7 @@ export default function PriceTable() {
     };
 
     return (
-        <div>
+        <div className='mx-5'>
             <div className="flex">
                 <div className='w-full overflow-x-auto'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
@@ -192,7 +240,7 @@ export default function PriceTable() {
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <div className='w-full mb-20 rounded-2xl overflow-x-auto'>
+                        <div className='w-full mb-20 overflow-x-auto'>
                             {loadingData ? (
                                 <div className="w-full">
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
@@ -203,7 +251,7 @@ export default function PriceTable() {
                                     ))}
                                 </div>
                             ) : (
-                                <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 5 }}>
+                                <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
                                     <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow>
@@ -296,7 +344,7 @@ export default function PriceTable() {
                                                 <TableRow>
                                                     <TableCell colSpan={5}>
                                                         <div className="my-10 mx-4 text-center text-gray-500">
-                                                            Không tìm thấy dữ liệu
+                                                            Không có dữ liệu
                                                         </div>
                                                     </TableCell>
                                                 </TableRow>

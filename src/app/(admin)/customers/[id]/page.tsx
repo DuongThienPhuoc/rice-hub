@@ -9,8 +9,10 @@ import { useRouter } from 'next/navigation';
 import Modal from 'react-modal';
 import { PlusIcon, Printer, Upload } from 'lucide-react';
 import { Skeleton } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
+    const { toast } = useToast();
     const [navbarVisible, setNavbarVisible] = useState(false);
     const [customer, setCustomer] = useState<any>(null);
     const router = useRouter();
@@ -39,14 +41,34 @@ const Page = ({ params }: { params: { id: number } }) => {
             setLoadingData(true);
             try {
                 const url = `/customer/${params.id}`;
-                console.log(url);
                 const response = await api.get(url);
                 const data = response.data;
                 setCustomer(data);
                 setSelectedImageIndex(0);
-                console.log(data);
-            } catch (error) {
-                console.error("Error fetching customer:", error);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                if (error.response.status === 404) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Khách hàng không tồn tại!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại sau',
+                        duration: 3000
+                    })
+                }
             } finally {
                 setLoadingData(false);
             }
@@ -93,7 +115,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            <div className='flex my-10 justify-center w-full font-arsenal'>
+            <div className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (

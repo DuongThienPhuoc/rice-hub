@@ -9,8 +9,11 @@ import { useRouter } from 'next/navigation';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../../../api/firebaseConfig';
 import { FormControl, InputLabel, MenuItem, Select, Skeleton, TextField } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
+    const { toast } = useToast();
     const [customer, setCustomer] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
@@ -39,8 +42,30 @@ const Page = ({ params }: { params: { id: number } }) => {
                 const response = await api.get(url);
                 const data = response.data;
                 setCustomer(data);
-            } catch (error) {
-                console.error("Error fetching customer:", error);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                if (error.response.status === 404) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Khách hàng không tồn tại!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại sau',
+                        duration: 3000
+                    })
+                }
             } finally {
                 setLoadingData(false);
             }
@@ -58,17 +83,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const storage = getStorage(firebase);
             const fileInput = document.getElementById("fileInput") as HTMLInputElement;
             const file = fileInput?.files?.[0];
-            console.log("Image");
-            console.log(formData);
             let updatedFormData = { ...formData };
 
             if (file) {
-                console.log(file);
                 const storageRef = ref(storage, `images/${file.name}`);
                 const snapshot = await uploadBytes(storageRef, file);
-                console.log('Uploaded a file!');
                 const downloadURL = await getDownloadURL(snapshot.ref);
-                console.log('File available at', downloadURL);
 
                 updatedFormData = {
                     ...updatedFormData,
@@ -78,14 +98,34 @@ const Page = ({ params }: { params: { id: number } }) => {
 
             const response = await api.post(`/customer/updateCustomer`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Khách hàng đã được cập nhật thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Cập nhật thành công',
+                    description: `Khách hàng đã được cập nhật thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/customers");
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
@@ -118,7 +158,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className='flex my-10 justify-center px-5 w-full font-arsenal'>
+            <form onSubmit={handleSubmit} className='flex my-10 justify-center px-5 w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (

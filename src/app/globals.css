@@ -18,7 +18,7 @@
 body {
   color      : var(--foreground);
   background : var(--background);
-  font-family: "Inter", system-ui;
+  font-family: "Arsenal", sans-serif;
 }
 
 @layer components {

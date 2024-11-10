@@ -26,7 +26,7 @@ export default function UpdateProductPageBreadcrumb({
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                     <BreadcrumbLink onClick={() => router.push('/products')}>
-                        Khách hàng
+                        Sản phẩm
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />

@@ -32,6 +32,35 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
     };
 
+    const handleSubmit = async () => {
+        if (selectedProducts.length < 1) {
+            alert("Danh sách rỗng! Vui lòng chọn sản phẩm.");
+            return;
+        }
+
+        console.log(selectedProducts);
+        const productData = selectedProducts.map((product: any) => ({
+            productId: product?.product?.id,
+            unit: product?.unit,
+            weighPerUnit: product?.weightPerUnit,
+            supplierId: product?.product?.supplier?.id
+        }));
+
+        console.log(productData);
+        try {
+            const response = await api.post(`/products/confirm-add-to-warehouse/${batch?.id}`, productData);
+            if (response.status >= 200 && response.status < 300) {
+                alert(`Lô hàng đã được nhập thành công`);
+                router.push("/products");
+            } else {
+                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        }
+    }
+
     useEffect(() => {
         const getBatch = async () => {
             setLoadingData(true);
@@ -78,9 +107,11 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
     }
 
+    const hasUnaddedProducts = products.some((product) => !product.added);
+
     return (
         <div>
-            <div className='flex my-10 justify-center px-5 w-full font-arsenal'>
+            <div className='flex my-10 justify-center px-5 w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (
@@ -155,24 +186,35 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 </div>
                             ) : (
                                 <>
-                                    <p className='font-bold mb-5'>Danh sách sản phẩm: </p>
+                                    <div className='flex justify-between items-center mb-5'>
+                                        <p className='font-bold'>Danh sách sản phẩm: </p>
+                                        <Button type='button' onClick={handleSubmit} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                            {batch?.receiptType === 'IMPORT' ? (
+                                                <strong>Xác nhận nhập kho</strong>
+                                            ) : (
+                                                <strong>Xác nhận xuất kho</strong>
+                                            )}
+                                        </Button>
+                                    </div>
                                     <div className='overflow-x-auto'>
                                         <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead>
                                                     <TableRow>
                                                         <TableCell padding="checkbox">
-                                                            <Checkbox
-                                                                indeterminate={selectedProducts.length > 0 && selectedProducts.length < products.length}
-                                                                checked={selectedProducts.length === products.length}
-                                                                onChange={(e) => {
-                                                                    if (e.target.checked) {
-                                                                        setSelectedProducts(products.map((product) => product.product.productCode));
-                                                                    } else {
-                                                                        setSelectedProducts([]);
-                                                                    }
-                                                                }}
-                                                            />
+                                                            {hasUnaddedProducts && (
+                                                                <Checkbox
+                                                                    indeterminate={selectedProducts.length > 0 && selectedProducts.length < products.filter((product) => !product.added).length}
+                                                                    checked={selectedProducts.length === products.filter((product) => !product.added).length}
+                                                                    onChange={(e) => {
+                                                                        if (e.target.checked) {
+                                                                            setSelectedProducts(products.filter((product) => product.added === false));
+                                                                        } else {
+                                                                            setSelectedProducts([]);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            )}
                                                         </TableCell>
                                                         <TableCell align="center" className='font-semibold'>Mã sản phẩm</TableCell>
                                                         <TableCell align="center" className='font-semibold'>Tên sản phẩm</TableCell>
@@ -188,17 +230,22 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                             key={index}
                                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                         >
-                                                            <TableCell padding="checkbox">
-                                                                <Checkbox
-                                                                    checked={selectedProducts.includes(product.product.productCode)}
-                                                                    onChange={() => handleSelectProduct(product.product.productCode)}
-                                                                />
-                                                            </TableCell>
+                                                            {product.added === true ? (
+                                                                <TableCell></TableCell>
+                                                            ) : (
+
+                                                                <TableCell padding="checkbox">
+                                                                    <Checkbox
+                                                                        checked={selectedProducts.includes(product)}
+                                                                        onChange={() => handleSelectProduct(product)}
+                                                                    />
+                                                                </TableCell>
+                                                            )}
                                                             <TableCell align="center" onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                 {product.product.productCode}
                                                             </TableCell>
                                                             <TableCell align="center">{product.product.name}</TableCell>
-                                                            <TableCell align="center">{product.product.description}</TableCell>
+                                                            <TableCell align="center">{product.description}</TableCell>
                                                             <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
                                                             <TableCell align="center">{product.unit + ' ' + product.weightPerUnit} kg</TableCell>
                                                             <TableCell align="center">{product.quantity}</TableCell>
@@ -227,7 +274,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

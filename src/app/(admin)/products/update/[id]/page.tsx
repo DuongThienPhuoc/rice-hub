@@ -9,6 +9,8 @@ import api from "../../../../../api/axiosConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../../../api/firebaseConfig';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 type UnitWeightPair = {
     productUnit: string;
@@ -20,16 +22,15 @@ interface RowData {
 }
 
 const Page = ({ params }: { params: { id: number } }) => {
+    const { toast } = useToast();
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
     const [suppliers, setSuppliers] = useState<RowData[]>([]);
     const [categories, setCategories] = useState<RowData[]>([]);
-    const [warehouses, setWarehouses] = useState<RowData[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
-    const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
     const [product, setProduct] = useState<any>(null);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +53,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             setCategories(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách danh mục:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách danh mục!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         }
     };
 
@@ -63,18 +69,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             setSuppliers(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
-        }
-    };
-
-    const getWarehouses = async () => {
-        try {
-            const url = `/warehouses/All`;
-            const response = await api.get(url);
-            const data = response.data;
-            setWarehouses(data);
-        } catch (error) {
-            console.error("Lỗi khi lấy danh sách nhà nhà kho:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         }
     };
 
@@ -84,10 +84,31 @@ const Page = ({ params }: { params: { id: number } }) => {
                 const url = `/products/${params.id}`;
                 const response = await api.get(url);
                 const data = response.data;
-                console.log(data);
                 setProduct(data);
-            } catch (error) {
-                console.error("Error fetching product:", error);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin sản phẩm!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                if (error.response.status === 404) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Sản phẩm không tồn tại!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Hệ thống gặp sự cố khi lấy thông tin sản phẩm!',
+                        description: 'Xin vui lòng thử lại sau',
+                        duration: 3000
+                    })
+                }
             } finally {
                 setLoadingData(false);
             }
@@ -102,7 +123,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         getSuppliers();
         getCategories();
-        getWarehouses();
     }, []);
 
     const [formData, setFormData] = useState<{
@@ -155,10 +175,8 @@ const Page = ({ params }: { params: { id: number } }) => {
             });
             const defaultCategory = categories.find(category => category.id === product.category.id);
             const defaultSupplier = suppliers.find(supplier => supplier.id === product.supplier.id);
-            const defaultWarehouse = warehouses.find(warehouse => warehouse.id === product.productWarehouses[0].warehouse.id);
             setSelectedCategory(defaultCategory || null);
             setSelectedSupplier(defaultSupplier || null);
-            setSelectedWarehouse(defaultWarehouse || null);
             setImage(product.image);
         }
     }, [product, params.id]);
@@ -194,9 +212,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             if (file) {
                 const storageRef = ref(storage, `images/${file.name}`);
                 const snapshot = await uploadBytes(storageRef, file);
-                console.log('Uploaded a file!');
                 const downloadURL = await getDownloadURL(snapshot.ref);
-                console.log('File available at', downloadURL);
 
                 updatedFormData = {
                     ...updatedFormData,
@@ -208,30 +224,48 @@ const Page = ({ params }: { params: { id: number } }) => {
                 ...updatedFormData,
                 categoryId: selectedCategory?.id,
                 supplierId: selectedSupplier?.id,
-                warehouseId: selectedWarehouse?.id,
+                warehouseId: 2,
             };
 
-            console.log(updatedFormData);
             const response = await api.post(`/products/admin/updateProduct`, updatedFormData);
-            console.log(response);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Sản phẩm đã được cập nhật thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Cập nhật thành công',
+                    description: `Sản phẩm đã được cập nhật thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push(`/products/${params.id}`);
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full font-arsenal'>
+            <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
-                    <div className='flex flex-col lg:flex-row'>
+                    <div className='flex flex-col lg:flex-row mb-5'>
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
                         ) : (
@@ -334,28 +368,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Quy cách: </span>
-                                    <TextField
-                                        type={'text'}
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('productUnit', e.target.value)}
-                                        value={formData.unitWeightPairsList[0].productUnit || ''}
-                                        label={'Nhập quy cách (vd: bao, túi, ...)'}
-                                        variant="standard" />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Khối lượng (kg): </span>
-                                    <TextField
-                                        type={'number'}
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('weightPerUnit', e.target.value)}
-                                        value={formData.unitWeightPairsList[0].weightPerUnit || 0}
-                                        label={'Nhập khối lượng'}
-                                        variant="standard" />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1 pt-4'>Nhà cung cấp: </span>
                                     <Autocomplete
                                         className='flex-[2]'
@@ -365,19 +377,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         getOptionLabel={(option) => option.name}
                                         onChange={(event, newValue) => setSelectedSupplier(newValue)}
                                         renderInput={(params) => <TextField {...params} variant='standard' label="Chọn nhà cung cấp" />}
-                                    />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Nhà kho: </span>
-                                    <Autocomplete
-                                        className='flex-[2]'
-                                        disablePortal
-                                        options={warehouses}
-                                        value={selectedWarehouse}
-                                        getOptionLabel={(option) => option.name}
-                                        onChange={(event, newValue) => setSelectedWarehouse(newValue)}
-                                        renderInput={(params) => <TextField {...params} variant='standard' label="Chọn nhà kho" />}
                                     />
                                 </div>
 

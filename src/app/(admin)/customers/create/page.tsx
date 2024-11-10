@@ -9,8 +9,11 @@ import api from "../../../../api/axiosConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../../api/firebaseConfig';
 import { FormControl, InputLabel, MenuItem, Select, Skeleton, TextField } from '@mui/material';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 const Page = () => {
+    const { toast } = useToast();
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [image, setImage] = useState<string>("");
@@ -69,9 +72,7 @@ const Page = () => {
             if (file) {
                 const storageRef = ref(storage, `images/${file.name}`);
                 const snapshot = await uploadBytes(storageRef, file);
-                console.log('Uploaded a file!');
                 const downloadURL = await getDownloadURL(snapshot.ref);
-                console.log('File available at', downloadURL);
 
                 updatedFormData = {
                     ...updatedFormData,
@@ -79,24 +80,43 @@ const Page = () => {
                 };
             }
 
-            console.log(updatedFormData);
             const response = await api.post(`/user/create`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Khách hàng đã được tạo thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    description: `Khách hàng đã được tạo thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/customers");
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full font-arsenal'>
+            <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (
