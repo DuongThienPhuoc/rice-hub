@@ -50,6 +50,7 @@ export default function ProductTable() {
             const url = `/products/admin/products?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
+            console.log(data);
             if (data.page.totalElements === 0) {
                 setProducts([]);
                 toast({

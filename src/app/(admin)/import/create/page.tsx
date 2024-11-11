@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from "../../../../api/axiosConfig";
 import { Autocomplete, Skeleton, TextField, Paper } from '@mui/material';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PenSquare, PlusCircle, Trash2, X } from 'lucide-react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -54,6 +54,7 @@ const Page = () => {
     const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
     const [formData, setFormData] = useState<FormDataItem[]>([]);
     const [loadingData, setLoadingData] = useState(true);
+    const [selectedRow, setSelectedRow] = useState<any>(null);
 
     useEffect(() => {
         getSuppliers();
@@ -198,6 +199,16 @@ const Page = () => {
         setType('');
     }
 
+    const handleFieldChange = (fieldName: any, fieldValue: any, index: any) => {
+        setFormData(prevFormData =>
+            prevFormData.map((item, i) =>
+                i === index
+                    ? { ...item, [fieldName]: fieldValue }
+                    : item
+            )
+        );
+    };
+
     const handleSubmit = async () => {
         if (formData.length < 1) {
             alert("Danh sách rỗng! Vui lòng thêm sản phẩm.");
@@ -273,35 +284,39 @@ const Page = () => {
                                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                     <TableHead>
                                         <TableRow>
-                                            <TableCell align='center' className={`w-[5%] font-semibold text-black p-2 rounded-tl-2xl`}>
+                                            <TableCell rowSpan={2} align='center' className={`w-[5%] font-semibold text-black p-2 rounded-tl-2xl`}>
                                                 STT
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
                                                 Tên sản phẩm
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
                                                 Giá nhập
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
                                                 Số lượng
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell colSpan={2} align='center' className={`w-[20%] font-semibold text-black p-2`}>
                                                 Quy cách
+                                            </TableCell>
+                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                                Danh mục
+                                            </TableCell>
+                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                                Nhà cung cấp
+                                            </TableCell>
+                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                                Kho
+                                            </TableCell>
+                                            <TableCell rowSpan={2} align='center' className="w-[5%] font-semibold text-black p-2 rounded-tr-2xl">#</TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                                Loại
                                             </TableCell>
                                             <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
                                                 Trọng lượng
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold text-black p-2`}>
-                                                Danh mục
-                                            </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold text-black p-2`}>
-                                                Nhà cung cấp
-                                            </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold text-black p-2`}>
-                                                Kho
-                                            </TableCell>
-
-                                            <TableCell align='center' className="w-[5%] font-semibold text-black p-2 rounded-tr-2xl">#</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -347,12 +362,12 @@ const Page = () => {
                                                     variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>
-                                                <Autocomplete
-                                                    disablePortal
-                                                    options={['Bao', 'Túi']}
-                                                    onChange={(event, newValue) => setType(newValue)}
-                                                    renderInput={(params) => <TextField {...params} variant='standard' label="Quy cách" />}
-                                                />
+                                                <TextField
+                                                    type={'text'}
+                                                    onChange={(e) => setType(e.target.value)}
+                                                    value={type}
+                                                    label={'Loại'}
+                                                    variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 <TextField
@@ -440,38 +455,158 @@ const Page = () => {
                                             </TableCell>
                                         </TableRow>
                                         {formData && formData.map((item, index) => (
-                                            <TableRow key={index} className={`text-center `}>
-                                                <TableCell align='center'>
-                                                    {index + 1}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.name}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.importPrice))}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.quantity}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.unit}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.weightPerUnit}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.categoryName}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.supplierName}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.warehouseName}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    <Trash2 color='red' className='cursor-pointer' onClick={() => handleDeleteItem(index)} />
-                                                </TableCell>
-                                            </TableRow>
+                                            index === selectedRow ? (
+                                                <TableRow key={index} className={`text-center `}>
+                                                    <TableCell align='center'>
+                                                        {index + 1}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {item.name}
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'number'}
+                                                            inputProps={{ min: 0 }}
+                                                            onChange={(e) => handleFieldChange('importPrice', Number(e.target.value), index)}
+                                                            value={item.importPrice}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            label={'Giá nhập'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            inputProps={{ min: 0 }}
+                                                            type={'number'}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            value={item.quantity}
+                                                            label={'Số lượng'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'text'}
+                                                            onChange={(e) => handleFieldChange('unit', e.target.value, index)}
+                                                            value={item.unit}
+                                                            label={'Loại'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'number'}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            inputProps={{ min: 0 }}
+                                                            onChange={(e) => handleFieldChange('weightPerUnit', e.target.value, index)}
+                                                            value={item.weightPerUnit}
+                                                            label={'Trọng lượng'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <Autocomplete
+                                                            disablePortal
+                                                            options={categories}
+                                                            getOptionLabel={(option) => option.name}
+                                                            value={categories.find((category) => category.name === item.categoryName)}
+                                                            onChange={(event, newValue) => {
+                                                                handleFieldChange('categoryId', newValue.name, index)
+                                                                handleFieldChange('categoryName', newValue.name, index)
+                                                            }}
+                                                            renderInput={(params) => <TextField {...params} variant='standard' label="Danh mục" />}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <Autocomplete
+                                                            disablePortal
+                                                            options={suppliers}
+                                                            getOptionLabel={(option) => option.name}
+                                                            value={suppliers.find((supplier) => supplier.name === item.supplierName)}
+                                                            onChange={(event, newValue) => {
+                                                                handleFieldChange('supplierId', newValue.name, index)
+                                                                handleFieldChange('supplierName', newValue.name, index)
+                                                            }}
+                                                            renderInput={(params) => <TextField {...params} variant='standard' label="Nhà cung cấp" />}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className='p-2'>
+                                                        <Autocomplete
+                                                            disablePortal
+                                                            options={warehouses}
+                                                            getOptionLabel={(option) => option.name}
+                                                            value={warehouses.find((warehouse) => warehouse.name === item.warehouseName)}
+                                                            onChange={(event, newValue) => {
+                                                                handleFieldChange('warehouseId', newValue.name, index)
+                                                                handleFieldChange('warehouseName', newValue.name, index)
+                                                            }}
+                                                            renderInput={(params) => <TextField {...params} variant='standard' label="Kho" />}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        <div className='flex justify-center items-center space-x-2'>
+                                                            <div className='relative group'>
+                                                                <X size={20} className='cursor-pointer hover:text-red-500' onClick={() => setSelectedRow(null)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Hủy
+                                                                </span>
+                                                            </div>
+                                                            <div className='relative group'>
+                                                                <Trash2 size={20} className='cursor-pointer hover:text-red-500' onClick={() => handleDeleteItem(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Xóa
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ) : (
+                                                <TableRow key={index} className={`text-center `}>
+                                                    <TableCell align='center'>
+                                                        {index + 1}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {item.name}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.importPrice))}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {item.quantity}
+                                                    </TableCell>
+                                                    <TableCell colSpan={2} align='center'>
+                                                        {item.unit} {item.weightPerUnit}kg
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {item.categoryName}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {item.supplierName}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        {item.warehouseName}
+                                                    </TableCell>
+                                                    <TableCell align='center'>
+                                                        <div className='flex justify-center items-center space-x-2'>
+                                                            <div className='relative group'>
+                                                                <PenSquare size={20} className='cursor-pointer hover:text-blue-500' onClick={() => setSelectedRow(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Sửa
+                                                                </span>
+                                                            </div>
+                                                            <div className='relative group'>
+                                                                <Trash2 size={20} className='cursor-pointer hover:text-red-500' onClick={() => handleDeleteItem(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Xóa
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
                                         ))}
                                     </TableBody>
                                 </Table>
@@ -490,7 +625,7 @@ const Page = () => {
                                 <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/receipts")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/import")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                     <strong>Hủy</strong>
                                 </Button>
 

@@ -312,7 +312,7 @@ export default function ImportTable() {
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <ReceiptList name="Phiếu nhập/xuất" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
+                        <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

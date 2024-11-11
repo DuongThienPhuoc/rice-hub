@@ -325,11 +325,11 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Ngày tạo: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.contractTime)) || 'Chưa có thông tin'}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractTime ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.contractTime)) : 'Chưa có thông tin'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Ngày ký: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.confirmationDate)) || 'Chưa có thông tin'}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.confirmationDate ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.confirmationDate)) : 'Chưa có thông tin'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Thời hạn: </span>

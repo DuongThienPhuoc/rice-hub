@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from "../../../../api/axiosConfig";
 import { Autocomplete, Skeleton, TextField, Paper } from '@mui/material';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PenSquare, PlusCircle, Trash2, X } from 'lucide-react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -21,8 +21,6 @@ interface RowData {
 
 interface FormDataItem {
     productName: string;
-    unit: string;
-    weightPerUnit: number;
     quantity: number;
     categoryName: string;
     categoryId: string;
@@ -38,31 +36,21 @@ const Page = () => {
     const [selectedProduct, setSelectedProduct] = useState<RowData | null>(null);
     const [productName, setProductName] = useState('');
     const [quantity, setQuantity] = useState(0);
-    const [weight, setWeight] = useState(0);
-    const [selectedType, setSelectedType] = useState<RowData | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
     const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
     const [formData, setFormData] = useState<FormDataItem[]>([]);
     const [loadingData, setLoadingData] = useState(true);
+    const [selectedRow, setSelectedRow] = useState<any>(null);
 
     useEffect(() => {
         getProducts();
     }, []);
 
     useEffect(() => {
-        if (selectedType) {
-            setWeight(selectedType?.weightPerUnit);
-        } else {
-            setWeight(0);
-        }
-    }, [selectedType])
-
-    useEffect(() => {
         console.log(selectedProduct);
         if (selectedProduct) {
             setProductName(selectedProduct?.name || '');
-            // setWeight(selectedProduct?.batchProducts[0]?.weightPerUnit)
             setSelectedCategory(selectedProduct?.category || null);
             setSelectedSupplier(selectedProduct?.supplier || null);
             setSelectedWarehouse(selectedProduct?.productWarehouses[0]?.warehouse || null);
@@ -81,7 +69,7 @@ const Page = () => {
             const url = `/products/`;
             const response = await api.get(url);
             const data = response.data;
-            setProducts(data);
+            setProducts(data.filter((p: any) => p.productWarehouses[0].warehouse.id === 1));
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sản phẩm:", error);
         } finally {
@@ -95,18 +83,8 @@ const Page = () => {
             return;
         }
 
-        if (weight === 0) {
-            alert('Trọng lượng không hợp lệ');
-            return;
-        }
-
         if (quantity === 0) {
             alert('Số lượng không hợp lệ');
-            return;
-        }
-
-        if (!selectedType) {
-            alert('Vui lòng chọn quy cách');
             return;
         }
 
@@ -127,8 +105,6 @@ const Page = () => {
         const newItem: FormDataItem = {
             productName: productName,
             quantity: quantity,
-            weightPerUnit: weight,
-            unit: selectedType?.unit,
             categoryName: selectedCategory?.name,
             categoryId: selectedCategory?.id,
             supplierName: selectedSupplier?.name,
@@ -143,8 +119,6 @@ const Page = () => {
         setSelectedWarehouse(null);
         setProductName('');
         setQuantity(0);
-        setWeight(0);
-        setSelectedType(null);
     }
 
     const handleSubmit = async () => {
@@ -155,10 +129,10 @@ const Page = () => {
         }
 
         try {
-            const response = await api.post(`/products/export`, formData);
+            const response = await api.post(`/products/export/preview`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Lô hàng đã được xuất thành công`);
-                router.push("/receipts");
+                router.push("/export");
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
@@ -175,6 +149,16 @@ const Page = () => {
     useEffect(() => {
         console.log(formData)
     }, [formData])
+
+    const handleFieldChange = (fieldName: any, fieldValue: any, index: any) => {
+        setFormData(prevFormData =>
+            prevFormData.map((item, i) =>
+                i === index
+                    ? { ...item, [fieldName]: fieldValue }
+                    : item
+            )
+        );
+    };
 
     return (
         <div>
@@ -236,12 +220,6 @@ const Page = () => {
                                                 Số lượng
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Quy cách
-                                            </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Trọng lượng
-                                            </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Danh mục
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
@@ -258,6 +236,7 @@ const Page = () => {
                                             <TableCell colSpan={2} className='p-2'>
                                                 <TextField
                                                     type={'text'}
+                                                    className='w-full'
                                                     InputProps={{
                                                         readOnly: true,
                                                     }}
@@ -269,7 +248,6 @@ const Page = () => {
                                                     label={'Tên sản phẩm'}
                                                     variant="standard" />
                                             </TableCell>
-
                                             <TableCell className='p-2'>
                                                 <TextField
                                                     inputProps={{ min: 0 }}
@@ -277,41 +255,21 @@ const Page = () => {
                                                     InputLabelProps={{
                                                         shrink: true,
                                                     }}
+                                                    className='w-full'
                                                     onChange={(e) => setQuantity(Number(e.target.value))}
                                                     value={quantity}
                                                     label={'Số lượng'}
                                                     variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>
-                                                <Autocomplete
-                                                    disablePortal
-                                                    options={selectedProduct?.batchProducts || []}
-                                                    getOptionLabel={(option: any) => option?.unit}
-                                                    onChange={(event, newValue) => setSelectedType(newValue)}
-                                                    renderInput={(params) => <TextField {...params} variant='standard' label="Quy cách" />}
-                                                />
-                                            </TableCell>
-                                            <TableCell className='p-2'>
-                                                <TextField
-                                                    type={'number'}
-                                                    InputProps={{
-                                                        readOnly: true,
-                                                    }}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                    inputProps={{ min: 0 }}
-                                                    value={weight}
-                                                    label={'Trọng lượng'}
-                                                    variant="standard" />
-                                            </TableCell>
-                                            <TableCell className='p-2'>
                                                 {!selectedProduct ? (
                                                     <Autocomplete
+                                                        className='w-full'
                                                         options={[]}
                                                         disablePortal
                                                         readOnly
-                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' label="Danh mục" />}
+                                                        renderInput={(params) => <TextField {...params}
+                                                            disabled variant='standard' label="Danh mục" />}
                                                     />
                                                 ) : (
                                                     <TextField
@@ -319,6 +277,7 @@ const Page = () => {
                                                         InputProps={{
                                                             readOnly: true,
                                                         }}
+                                                        className='w-full'
                                                         InputLabelProps={{
                                                             shrink: selectedProduct !== null,
                                                         }}
@@ -330,6 +289,7 @@ const Page = () => {
                                             <TableCell className='p-2'>
                                                 {!selectedProduct ? (
                                                     <Autocomplete
+                                                        className='w-full'
                                                         options={[]}
                                                         disablePortal
                                                         readOnly
@@ -338,6 +298,7 @@ const Page = () => {
                                                 ) : (
                                                     <TextField
                                                         type={'text'}
+                                                        className='w-full'
                                                         InputProps={{
                                                             readOnly: true,
                                                         }}
@@ -352,6 +313,7 @@ const Page = () => {
                                             <TableCell className='p-2'>
                                                 {!selectedProduct ? (
                                                     <Autocomplete
+                                                        className='w-full'
                                                         disablePortal
                                                         options={[]}
                                                         readOnly
@@ -359,6 +321,7 @@ const Page = () => {
                                                     />
                                                 ) : (
                                                     <TextField
+                                                        className='w-full'
                                                         type={'text'}
                                                         InputProps={{
                                                             readOnly: true,
@@ -372,7 +335,9 @@ const Page = () => {
                                                 )}
                                             </TableCell>
                                             <TableCell className='p-2'>
-                                                <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
+                                                <div className='flex justify-center'>
+                                                    <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                         {formData && formData.map((item, index) => (
@@ -383,15 +348,24 @@ const Page = () => {
                                                 <TableCell align='center'>
                                                     {item.productName}
                                                 </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.quantity}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.unit}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.weightPerUnit}
-                                                </TableCell>
+                                                {index === selectedRow ? (
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'number'}
+                                                            inputProps={{ min: 0 }}
+                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            value={item.quantity}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            label={'Số lượng'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell align='center'>
+                                                        {item.quantity}
+                                                    </TableCell>
+                                                )}
                                                 <TableCell align='center'>
                                                     {item.categoryName}
                                                 </TableCell>
@@ -402,7 +376,37 @@ const Page = () => {
                                                     {item.warehouseName}
                                                 </TableCell>
                                                 <TableCell align='center'>
-                                                    <Trash2 color='red' className='cursor-pointer' onClick={() => handleDeleteItem(index)} />
+                                                    {index === selectedRow ? (
+                                                        <div className='flex justify-center items-center space-x-2'>
+                                                            <div className='relative group'>
+                                                                <X size={20} className='cursor-pointer hover:text-red-500' onClick={() => setSelectedRow(null)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Hủy
+                                                                </span>
+                                                            </div>
+                                                            <div className='relative group'>
+                                                                <Trash2 size={20} className='cursor-pointer hover:text-red-500' onClick={() => handleDeleteItem(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Xóa
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className='flex justify-center items-center space-x-2'>
+                                                            <div className='relative group'>
+                                                                <PenSquare size={20} className='cursor-pointer hover:text-blue-500' onClick={() => setSelectedRow(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Sửa
+                                                                </span>
+                                                            </div>
+                                                            <div className='relative group'>
+                                                                <Trash2 size={20} className='cursor-pointer hover:text-red-500' onClick={() => handleDeleteItem(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Xóa
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -410,12 +414,6 @@ const Page = () => {
                                 </Table>
                             </TableContainer>
                         )}
-                    </div>
-                    <div className='lg:px-10 px-2 flex'>
-                        <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
-
-                        </div>
-                        <div className='flex-1'></div>
                     </div>
 
                     <div className='w-full flex justify-center align-bottom items-center mt-5 mb-10'>
@@ -429,7 +427,7 @@ const Page = () => {
                                 <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/receipts")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/export")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>

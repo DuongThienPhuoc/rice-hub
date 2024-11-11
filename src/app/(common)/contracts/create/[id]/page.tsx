@@ -7,6 +7,9 @@ import React, { useEffect, useState } from 'react';
 import api from "../../../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import firebase from '../../../../../api/firebaseConfig';
+import html2canvas from 'html2canvas';
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
@@ -98,29 +101,37 @@ const Page = ({ params }: { params: { id: number } }) => {
     }, [params.id]);
 
     const handleSubmit = async () => {
-        const isBuyerValid = Object.values(buyer).every(value => value.trim() !== '');
-        const isSellerValid = Object.values(seller).every(value => value.trim() !== '');
+        setHiddenButton(true);
+        const isBuyerValid = Object.values(buyer).every(value => value?.trim() !== '');
+        const isSellerValid = Object.values(seller).every(value => value?.trim() !== '');
         const isDurationValid = duration > 0;
         const allCheck = fromDate && toDate && location;
 
-        if (!isBuyerValid || !isSellerValid || !isDurationValid || !allCheck) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: 'Vui lòng điền đầy đủ thông tin vào tất cả các trường.',
-            });
-            return;
-        }
+        // if (!isBuyerValid || !isSellerValid || !isDurationValid || !allCheck) {
+        //     Swal.fire({
+        //         icon: 'error',
+        //         title: 'Lỗi',
+        //         text: 'Vui lòng điền đầy đủ thông tin vào tất cả các trường.',
+        //     });
+        //     return;
+        // }
+
+        const storage = getStorage(firebase);
+        const canvas = await html2canvas(document.body);
+        const imageData = canvas.toDataURL('image/png');
+        const imageRef = ref(storage, `screenshots/${Date.now()}.png`);
+        const snapshot = await uploadString(imageRef, imageData, 'data_url');
+        const downloadURL = await getDownloadURL(snapshot.ref);
 
         const formData = {
             duration: duration,
             customerId: params.id,
+            image: downloadURL,
         }
 
         if (duration > 0) {
             try {
                 const response = await api.post(`/contracts/createContract`, formData);
-                console.log(response);
 
                 if (response.status >= 200 && response.status < 300) {
                     Swal.fire({
@@ -141,13 +152,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                         }
                     });
                 } else {
+                    setHiddenButton(false);
                     throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
                 }
             } catch (error) {
+                setHiddenButton(false);
                 console.error('Error submitting form:', error);
                 alert('Đã xảy ra lỗi, vui lòng thử lại.');
             }
         } else {
+            setHiddenButton(false);
             alert('Thời hạn hợp đồng phải lớn hơn 3 tháng!');
         }
     };

@@ -10,22 +10,20 @@ import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import ExcelJS from 'exceljs';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import firebase from '../../../api/firebaseConfig';
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/material_blue.css';
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
+import crypto from 'crypto';
 
 export default function ExportTable() {
     const router = useRouter();
-    const storage = getStorage(firebase);
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
         { name: 'batchCode', displayName: 'Lô hàng' },
         { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
         { name: 'username', displayName: 'Người tạo' },
-        { name: 'type', displayName: 'Lý do xuất hàng' },
+        { name: 'type', displayName: 'Loại phiếu' },
     ];
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -37,6 +35,7 @@ export default function ExportTable() {
     const [dateRange, setDateRange] = useState<[any, any]>(['', '']);
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+    const processedFileHashes = new Set<string>();
 
     const getData = async (page?: number, startDate?: any, endDate?: any) => {
         try {
@@ -63,7 +62,7 @@ export default function ExportTable() {
                 setReceipts([]);
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
+            console.error("Lỗi khi lấy danh sách phiếu xuất kho:", error);
         } finally {
             setLoadingData(false);
         }
@@ -100,18 +99,6 @@ export default function ExportTable() {
         });
     };
 
-    const uploadImageToFirebase = async (imageBuffer: Buffer, fileName: string): Promise<string> => {
-        try {
-            const fileRef = ref(storage, `images/${fileName}`);
-            await uploadBytes(fileRef, imageBuffer);
-            const downloadURL = await getDownloadURL(fileRef);
-            return downloadURL;
-        } catch (error) {
-            console.error("Error uploading image:", error);
-            return "";
-        }
-    };
-
     const fileToBuffer = (file: File): Promise<Buffer> => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -126,16 +113,32 @@ export default function ExportTable() {
         });
     };
 
+    const calculateFileHash = async (file: File): Promise<string> => {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+        return hash;
+    };
+
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
             const file = event.target.files?.[0];
             if (!file) {
-                throw new Error("No file selected");
+                throw new Error("Chưa có file nào được chọn");
+            }
+
+            const fileHash = await calculateFileHash(file);
+            console.log(processedFileHashes);
+            console.log(fileHash);
+            console.log(processedFileHashes.has(fileHash));
+            if (processedFileHashes.has(fileHash)) {
+                Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
+                return;
             }
 
             Swal.fire({
-                title: 'Processing...',
-                text: 'Please wait while we process your file.',
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ, dữ liệu đang được xử lí.',
                 allowOutsideClick: false,
                 willOpen: () => {
                     Swal.showLoading();
@@ -147,63 +150,38 @@ export default function ExportTable() {
             await workbook.xlsx.load(fileBuffer);
             const worksheet = workbook.getWorksheet(1);
 
-            const imageMap: { [rowNumber: number]: string } = {};
-            const images = workbook.model.media;
-
             const rows = worksheet?.rowCount;
             if (rows === 0) {
-                throw new Error("The worksheet contains no rows");
-            }
-
-            const imageRowNumbers = Array.from({ length: images.length }, (_, i) => i + 2);
-
-            for (let i = 0; i < images.length; i++) {
-                const image = images[i];
-                const { buffer, name, extension } = image;
-
-                if (buffer) {
-                    const fileName = `${name}.${extension}`;
-                    const firebaseUrl = await uploadImageToFirebase(Buffer.from(buffer), fileName);
-
-                    const rowNumber = imageRowNumbers[i];
-                    if (rows && rowNumber <= rows) {
-                        imageMap[rowNumber] = firebaseUrl;
-                    }
-                }
+                throw new Error("File rỗng");
             }
 
             const processedData: Array<any> = [];
 
             const headers = worksheet?.getRow(1).values as string[];
+            console.log(headers);
 
             worksheet?.eachRow({ includeEmpty: true }, (row, rowNumber) => {
                 if (rowNumber === 1) return;
 
                 const rowData: { [key: string]: any } = {};
                 row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    if (colNumber === 4 && imageMap[rowNumber]) {
-                        rowData[headers[colNumber]] = imageMap[rowNumber];
-                    } else {
-                        rowData[headers[colNumber]] = cell.value;
-                    }
+                    rowData[headers[colNumber]] = cell.value;
                 });
                 processedData.push(rowData);
             });
-
             Swal.close();
-
+            processedFileHashes.add(fileHash);
             const fileInput = event.target;
             showAlert(processedData, fileInput);
         } catch (error) {
-            console.error("Error processing file:", error);
-            Swal.fire('Error processing file', 'error');
+            Swal.fire('Lỗi khi xử lý file', 'error');
         }
     };
 
     const handleSubmit = async (data: any) => {
         console.log(data);
         try {
-            const response = await api.post(`/products/import`, data);
+            const response = await api.post(`/products/export/preview`, data);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
                 Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
@@ -253,7 +231,7 @@ export default function ExportTable() {
                                         onClick={() => router.push("/export/create")}
                                         className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
                                     >
-                                        Tạo phiếu xuất
+                                        Tạo phiếu sản xuất
                                         <PlusIcon />
                                     </Button>
                                     <Button
@@ -274,7 +252,7 @@ export default function ExportTable() {
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <ReceiptList name="Phiếu nhập/xuất" editUrl="/import/updateImport" loadingData={loadingData} titles={titles} columns={columns} data={receipts} tableName="import" />
+                        <ReceiptList name="Phiếu xuất" editUrl="/export/updateExport" loadingData={loadingData} titles={titles} columns={columns} data={receipts} tableName="import" />
                     </div>
                     {totalPages > 1 && (
                         <Paging
