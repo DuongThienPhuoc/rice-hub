@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import InputField from '@/components/field/inputfield';
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import api from "../../api/axiosConfig";
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 interface PopupEditProps {
     tableName: string;
@@ -18,7 +21,7 @@ interface PopupEditProps {
 }
 
 const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, handleClose }) => {
-
+    const { toast } = useToast();
     const [formData, setFormData] = useState<Record<string, string | number | boolean>>({});
 
     useEffect(() => {
@@ -39,31 +42,39 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        for (let index = 0; index < titles.length; index++) {
-            const element = titles[index];
-            if (!element.name) {
-                alert('Vui lòng điền đầy đủ thông tin.');
-                return;
-            }
-        }
 
         if (!formData.id || formData.id == 0) {
-            alert(`Không tìm thấy mã ${tableName.toLocaleLowerCase()}.`);
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: `Không tìm thấy mã ${tableName.toLocaleLowerCase()}.`,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
             return;
         }
 
         try {
             const response = await api.post(`${url}`, formData);
-
-            if (response.status >= 200 && response.status < 300) {
-                alert(`Cập nhật ${tableName.toLocaleLowerCase()} thành công`);
-                handleClose(true);
-            } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+            toast({
+                variant: 'default',
+                title: 'Cập nhật thành công',
+                description: `${tableName} đã được cập nhật thành công`,
+                style: {
+                    backgroundColor: '#4caf50',
+                    color: '#fff',
+                },
+                duration: 3000
+            })
+            handleClose(true);
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 

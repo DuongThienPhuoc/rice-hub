@@ -8,14 +8,18 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '../../../../../api/firebaseConfig';
-import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { FormControl, InputLabel, MenuItem, Select, Skeleton, TextField } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
+    const { toast } = useToast();
     const [customer, setCustomer] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({});
     const [image, setImage] = useState<string>("");
+    const [loadingData, setLoadingData] = useState(true);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -31,14 +35,39 @@ const Page = ({ params }: { params: { id: number } }) => {
     };
 
     useEffect(() => {
+        setLoadingData(true);
         const getCustomer = async () => {
             try {
                 const url = `/customer/${params.id}`;
                 const response = await api.get(url);
                 const data = response.data;
                 setCustomer(data);
-            } catch (error) {
-                console.error("Error fetching customer:", error);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                if (error.response.status === 404) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Khách hàng không tồn tại!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại sau',
+                        duration: 3000
+                    })
+                }
+            } finally {
+                setLoadingData(false);
             }
         };
 
@@ -54,17 +83,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const storage = getStorage(firebase);
             const fileInput = document.getElementById("fileInput") as HTMLInputElement;
             const file = fileInput?.files?.[0];
-            console.log("Image");
-            console.log(formData);
             let updatedFormData = { ...formData };
 
             if (file) {
-                console.log(file);
                 const storageRef = ref(storage, `images/${file.name}`);
                 const snapshot = await uploadBytes(storageRef, file);
-                console.log('Uploaded a file!');
                 const downloadURL = await getDownloadURL(snapshot.ref);
-                console.log('File available at', downloadURL);
 
                 updatedFormData = {
                     ...updatedFormData,
@@ -74,14 +98,34 @@ const Page = ({ params }: { params: { id: number } }) => {
 
             const response = await api.post(`/customer/updateCustomer`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Khách hàng đã được cập nhật thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Cập nhật thành công',
+                    description: `Khách hàng đã được cập nhật thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/customers");
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
@@ -114,34 +158,47 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className='flex my-16 justify-center px-5 w-full font-arsenal'>
+            <form onSubmit={handleSubmit} className='flex my-10 justify-center px-5 w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
-                        {['Thông tin khách hàng', 'Thông tin đăng nhập'].map((label, index) => (
-                            <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
-                                <button
-                                    type='button'
-                                    onClick={() => setChoice(index === 0)}
-                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                        ? 'text-white bg-black hover:bg-[#1d1d1fca]'
-                                        : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
-                                        }`}
-                                    style={{ boxShadow: '3px 3px 5px lightgray' }}
-                                >
-                                    <strong>{label}</strong>
-                                </button>
-                            </div>
-                        ))}
+                        {loadingData ? (
+                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
+                        ) : (
+                            ['Thông tin khách hàng', 'Thông tin đăng nhập'].map((label, index) => (
+                                <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
+                                    <button
+                                        type='button'
+                                        onClick={() => setChoice(index === 0)}
+                                        className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
+                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
+                                            }`}
+                                        style={{ boxShadow: '3px 3px 5px lightgray' }}
+                                    >
+                                        <strong>{label}</strong>
+                                    </button>
+                                </div>
+                            ))
+                        )}
                     </div>
                     <div className='mt-10 flex flex-col items-center'>
-                        <img
-                            src={image || "https://via.placeholder.com/150"}
-                            alt='Avatar'
-                            className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
-                        />
-                        <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
-                            {image ? 'Thay ảnh' : 'Thêm ảnh'}
-                        </label>
+                        {loadingData ? (
+                            <>
+                                <Skeleton animation="wave" variant="circular" height={'8rem'} width={'8rem'} />
+                                <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg mt-4 px-4 py-2' />
+                            </>
+                        ) : (
+                            <>
+                                <img
+                                    src={image || "https://via.placeholder.com/150"}
+                                    alt='Avatar'
+                                    className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                                />
+                                <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                                    {image ? 'Thay ảnh' : 'Thêm ảnh'}
+                                </label>
+                            </>
+                        )}
                         <input
                             id="fileInput"
                             type="file"
@@ -151,84 +208,141 @@ const Page = ({ params }: { params: { id: number } }) => {
                         />
                     </div>
                     {choice ? (
-                        <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
-                            <div className='flex-1'>
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Tên khách hàng: </span>
-                                    <TextField
-                                        type={'text'}
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('fullName', e.target.value)}
-                                        value={formData.fullName?.toString() || ''}
-                                        label={'Nhập đầy đủ họ và tên'}
-                                        variant="standard" />
+                        loadingData ? (
+                            <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
+                                <div className='flex-1'>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
                                 </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Giới tính: </span>
-                                    <FormControl className='flex-[2]' variant="standard" sx={{ minWidth: 120 }}>
-                                        <InputLabel id="demo-simple-select-standard-label">Giới tính</InputLabel>
-                                        <Select
-                                            labelId="demo-simple-select-standard-label"
-                                            id="demo-simple-select-standard"
-                                            value={formData?.gender === '' ? '' : (formData?.gender === true ? "true" : "false")}
-                                            onChange={(e) => handleFieldChange('gender', e.target.value === "true" ? true : false)}
-                                            label="Chọn giới tính"
-                                        >
-                                            <MenuItem value="">
-                                                <em>Chọn giới tính</em>
-                                            </MenuItem>
-                                            <MenuItem value={'true'}>Nam</MenuItem>
-                                            <MenuItem value={'false'}>Nữ</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Ngày sinh: </span>
-                                    <TextField
-                                        type='date'
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('dob', e.target.value)}
-                                        value={formData.dob ? formData.dob.toString().split('T')[0] : ''}
-                                        variant="standard" />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Số điện thoại: </span>
-                                    <TextField
-                                        type='text'
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('phone', e.target.value)}
-                                        value={formData.phone?.toString() || ''}
-                                        label='Nhập số điện thoại'
-                                        variant="standard" />
-                                </div>
-                            </div>
-                            <div className='flex-1'>
-                                <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Địa chỉ: </span>
-                                    <TextField
-                                        type='text'
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('address', e.target.value)}
-                                        value={formData.address?.toString() || ''}
-                                        label='Nhập địa chỉ'
-                                        variant="standard" />
-                                </div>
-
-                                <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Email: </span>
-                                    <TextField
-                                        type='text'
-                                        className='flex-[2]'
-                                        onChange={(e) => handleFieldChange('email', e.target.value)}
-                                        value={formData.email?.toString() || ''}
-                                        label='Nhập địa chỉ email'
-                                        variant="standard" />
+                                <div className='flex-1'>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                        <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        ) : (
+                            <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
+                                <div className='flex-1'>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Tên khách hàng: </span>
+                                        <TextField
+                                            type={'text'}
+                                            className='flex-[2]'
+                                            onChange={(e) => handleFieldChange('fullName', e.target.value)}
+                                            value={formData.fullName?.toString() || ''}
+                                            label={'Nhập đầy đủ họ và tên'}
+                                            variant="standard" />
+                                    </div>
+
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Giới tính: </span>
+                                        <FormControl className='flex-[2]' variant="standard" sx={{ minWidth: 120 }}>
+                                            <InputLabel id="demo-simple-select-standard-label">Giới tính</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-standard-label"
+                                                id="demo-simple-select-standard"
+                                                value={formData?.gender === '' ? '' : (formData?.gender === true ? "true" : "false")}
+                                                onChange={(e) => handleFieldChange('gender', e.target.value === "true" ? true : false)}
+                                                label="Chọn giới tính"
+                                            >
+                                                <MenuItem value="">
+                                                    <em>Chọn giới tính</em>
+                                                </MenuItem>
+                                                <MenuItem value={'true'}>Nam</MenuItem>
+                                                <MenuItem value={'false'}>Nữ</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </div>
+
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Ngày sinh: </span>
+                                        <TextField
+                                            type='date'
+                                            className='flex-[2]'
+                                            onChange={(e) => handleFieldChange('dob', e.target.value)}
+                                            value={formData.dob ? formData.dob.toString().split('T')[0] : ''}
+                                            variant="standard" />
+                                    </div>
+
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Số điện thoại: </span>
+                                        <TextField
+                                            type='text'
+                                            className='flex-[2]'
+                                            onChange={(e) => handleFieldChange('phone', e.target.value)}
+                                            value={formData.phone?.toString() || ''}
+                                            label='Nhập số điện thoại'
+                                            variant="standard" />
+                                    </div>
+                                </div >
+                                <div className='flex-1'>
+                                    <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Địa chỉ: </span>
+                                        <TextField
+                                            type='text'
+                                            className='flex-[2]'
+                                            onChange={(e) => handleFieldChange('address', e.target.value)}
+                                            value={formData.address?.toString() || ''}
+                                            label='Nhập địa chỉ'
+                                            variant="standard" />
+                                    </div>
+
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Email: </span>
+                                        <TextField
+                                            type='text'
+                                            className='flex-[2]'
+                                            onChange={(e) => handleFieldChange('email', e.target.value)}
+                                            value={formData.email?.toString() || ''}
+                                            label='Nhập địa chỉ email'
+                                            variant="standard" />
+                                    </div>
+                                </div>
+                            </div >
+                        )
                     ) : (
                         <div className='flex flex-col lg:flex-row lg:px-10 px-2'>
                             <div className='flex-1'>
@@ -248,16 +362,25 @@ const Page = ({ params }: { params: { id: number } }) => {
                         </div>
                     )}
                     <div className='w-full flex justify-center items-center my-10'>
-                        <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                            <strong>Cập nhật</strong>
-                        </Button>
-                        <Button type='button' onClick={() => router.push("/customers")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                            <strong>Trở về</strong>
-                        </Button>
+                        {loadingData ? (
+                            <>
+                                <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 mr-2 py-3' />
+                                <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 ml-2 py-3' />
+                            </>
+                        ) : (
+                            <>
+                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <strong>Cập nhật</strong>
+                                </Button>
+                                <Button type='button' onClick={() => router.push("/customers")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <strong>Trở về</strong>
+                                </Button>
+                            </>
+                        )}
                     </div>
-                </div>
-            </form>
-        </div>
+                </div >
+            </form >
+        </div >
     );
 };
 

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import api from "../../api/axiosConfig";
+import { useRouter } from 'next/navigation';
 import {
     Sidebar,
     SidebarContent,
@@ -107,7 +109,7 @@ const categories = [
             },
             {
                 title: 'Nguyên Liệu',
-                url: '#',
+                url: '/ingredients',
                 icon: <SquareArrowRight />,
             },
             {
@@ -201,7 +203,8 @@ const categories = [
 export default function AppSidebar() {
     const [userProfileDialog, setUserProfileDialog] = useState(false);
     const pathName = usePathname();
-    const [role, setRole] = React.useState<string>('')
+    const [role, setRole] = React.useState<string>('');
+    const router = useRouter();
     useEffect(() => {
         const role = typeof window != 'undefined' ? localStorage.getItem('role') : '';
         if (role !== null) {
@@ -211,6 +214,16 @@ export default function AppSidebar() {
 
     function isHidden(category: any) {
         return !category.role.includes(role);
+    }
+
+    const handleLogout = async () => {
+        try {
+            const url = `/logout/logoutRequest`;
+            await api.post(url);
+            router.push('/');
+        } catch (error) {
+            console.error("Đăng xuất thất bại:", error);
+        }
     }
 
     return (
@@ -263,7 +276,7 @@ export default function AppSidebar() {
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem onClick={handleLogout}>
                                         <LogOut className="mr-2 w-4 h-4" />
                                         <span>Đăng xuất</span>
                                     </DropdownMenuItem>

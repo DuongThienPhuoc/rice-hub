@@ -6,8 +6,14 @@ import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from "../../../../api/axiosConfig";
-import { Autocomplete, TextField } from '@mui/material';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { Autocomplete, Skeleton, TextField, Paper } from '@mui/material';
+import { PenSquare, PlusCircle, Trash2, X } from 'lucide-react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 interface RowData {
     [key: string]: any;
@@ -15,8 +21,6 @@ interface RowData {
 
 interface FormDataItem {
     productName: string;
-    unit: string;
-    weightPerUnit: number;
     quantity: number;
     categoryName: string;
     categoryId: string;
@@ -32,30 +36,21 @@ const Page = () => {
     const [selectedProduct, setSelectedProduct] = useState<RowData | null>(null);
     const [productName, setProductName] = useState('');
     const [quantity, setQuantity] = useState(0);
-    const [weight, setWeight] = useState(0);
-    const [selectedType, setSelectedType] = useState<RowData | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
     const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
     const [formData, setFormData] = useState<FormDataItem[]>([]);
+    const [loadingData, setLoadingData] = useState(true);
+    const [selectedRow, setSelectedRow] = useState<any>(null);
 
     useEffect(() => {
         getProducts();
     }, []);
 
     useEffect(() => {
-        if (selectedType) {
-            setWeight(selectedType?.weightPerUnit);
-        } else {
-            setWeight(0);
-        }
-    }, [selectedType])
-
-    useEffect(() => {
         console.log(selectedProduct);
         if (selectedProduct) {
             setProductName(selectedProduct?.name || '');
-            // setWeight(selectedProduct?.batchProducts[0]?.weightPerUnit)
             setSelectedCategory(selectedProduct?.category || null);
             setSelectedSupplier(selectedProduct?.supplier || null);
             setSelectedWarehouse(selectedProduct?.productWarehouses[0]?.warehouse || null);
@@ -69,13 +64,16 @@ const Page = () => {
     }, [selectedProduct])
 
     const getProducts = async () => {
+        setLoadingData(true);
         try {
             const url = `/products/`;
             const response = await api.get(url);
             const data = response.data;
-            setProducts(data);
+            setProducts(data.filter((p: any) => p.productWarehouses[0].warehouse.id === 1));
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+        } finally {
+            setLoadingData(false);
         }
     };
 
@@ -85,18 +83,8 @@ const Page = () => {
             return;
         }
 
-        if (weight === 0) {
-            alert('Trọng lượng không hợp lệ');
-            return;
-        }
-
         if (quantity === 0) {
             alert('Số lượng không hợp lệ');
-            return;
-        }
-
-        if (!selectedType) {
-            alert('Vui lòng chọn quy cách');
             return;
         }
 
@@ -105,20 +93,18 @@ const Page = () => {
             return;
         }
 
-        if (!selectedCategory) {
+        if (!selectedSupplier) {
             alert('Vui lòng chọn nhà cung cấp');
             return;
         }
 
-        if (!selectedCategory) {
+        if (!selectedWarehouse) {
             alert('Vui lòng chọn kho');
             return;
         }
         const newItem: FormDataItem = {
             productName: productName,
             quantity: quantity,
-            weightPerUnit: weight,
-            unit: selectedType?.unit,
             categoryName: selectedCategory?.name,
             categoryId: selectedCategory?.id,
             supplierName: selectedSupplier?.name,
@@ -133,8 +119,6 @@ const Page = () => {
         setSelectedWarehouse(null);
         setProductName('');
         setQuantity(0);
-        setWeight(0);
-        setSelectedType(null);
     }
 
     const handleSubmit = async () => {
@@ -145,10 +129,10 @@ const Page = () => {
         }
 
         try {
-            const response = await api.post(`/products/export`, formData);
+            const response = await api.post(`/products/export/preview`, formData);
             if (response.status >= 200 && response.status < 300) {
                 alert(`Lô hàng đã được xuất thành công`);
-                router.push("/receipts");
+                router.push("/export");
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
@@ -166,231 +150,288 @@ const Page = () => {
         console.log(formData)
     }, [formData])
 
+    const handleFieldChange = (fieldName: any, fieldValue: any, index: any) => {
+        setFormData(prevFormData =>
+            prevFormData.map((item, i) =>
+                i === index
+                    ? { ...item, [fieldName]: fieldValue }
+                    : item
+            )
+        );
+    };
+
     return (
         <div>
-            <div className='flex my-16 justify-center w-full font-arsenal'>
+            <div className='flex my-1 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
-                    <div
-                        className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
-                        style={{ boxShadow: '3px 3px 5px lightgray' }}
-                    >
-                        <strong>Thông tin phiếu xuất</strong>
-                    </div>
-                    <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
-                        <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
-                            <span className='font-bold flex-[2] pt-4'>Chọn sản phẩm: </span>
-                            <Autocomplete
-                                className='flex-[4] lg:mx-5 my-4 lg:my-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
-                                disablePortal
-                                options={products}
-                                value={selectedProduct}
-                                getOptionLabel={(option) => option.name}
-                                sx={{ width: 300 }}
-                                onChange={(event, newValue) => { setSelectedProduct(newValue) }}
-                                renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm sản phẩm" />}
-                            />
+                    {loadingData ? (
+                        <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
+                    ) : (
+                        <div
+                            className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
+                            style={{ boxShadow: '3px 3px 5px lightgray' }}
+                        >
+                            <strong>Thông tin phiếu xuất</strong>
                         </div>
-                    </div>
+                    )}
+                    {loadingData ? (
+                        <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
+                            <div className="m-5 flex flex-col lg:flex-row items-center w-full">
+                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[200px] w-[100%] rounded-lg' />
+                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[300px] w-[100%] lg:mx-5 my-4 rounded-lg' />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
+                            <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
+                                <span className='font-bold flex-[2] pt-4'>Chọn sản phẩm: </span>
+                                <Autocomplete
+                                    className='flex-[4] lg:mx-5 my-4 lg:my-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
+                                    disablePortal
+                                    options={products}
+                                    value={selectedProduct}
+                                    getOptionLabel={(option) => option.name}
+                                    sx={{ width: 300 }}
+                                    onChange={(event, newValue) => { setSelectedProduct(newValue) }}
+                                    renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm sản phẩm" />}
+                                />
+                            </div>
+                        </div>
+                    )}
                     <div className='lg:px-10 mt-5 px-2 overflow-x-auto'>
-                        <table className="w-full bg-white border-collapse mb-10 overflow-hidden rounded-2xl">
-                            <thead className='rounded-2xl'>
-                                <tr className="bg-white border-2 border-gray-200">
-                                    <th className={`min-w-[50px] pt-3 bg-white text-black px-2 py-2 rounded-tl-2xl`}>
-                                        STT
-                                    </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Tên sản phẩm
-                                    </th>
-                                    <th className={`min-w-[100px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Trọng lượng
-                                    </th>
-                                    <th className={`min-w-[100px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Số lượng
-                                    </th>
-                                    <th className={`min-w-[120px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Quy cách
-                                    </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Danh mục
-                                    </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Nhà cung cấp
-                                    </th>
-                                    <th className={`min-w-[150px] pt-3 bg-white text-black px-2 py-2`}>
-                                        Kho
-                                    </th>
-                                    <th className="min-w-[50px] bg-white text-black px-2 py-2 rounded-tr-2xl">#</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr className={`font-semibold border-2 border-gray-200 bg-white`}>
-                                    <td colSpan={2} className='p-2'>
-                                        <TextField
-                                            type={'text'}
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                            InputLabelProps={{
-                                                shrink: selectedProduct !== null,
-                                            }}
-                                            onChange={(e) => setProductName(e.target.value)}
-                                            value={productName}
-                                            label={'Tên sản phẩm'}
-                                            variant="standard" />
-                                    </td>
-                                    <td className='p-2'>
-                                        <TextField
-                                            type={'number'}
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            inputProps={{ min: 0 }}
-                                            value={weight}
-                                            label={'Trọng lượng'}
-                                            variant="standard" />
-                                    </td>
-                                    <td className='p-2'>
-                                        <TextField
-                                            inputProps={{ min: 0 }}
-                                            type={'number'}
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            onChange={(e) => setQuantity(Number(e.target.value))}
-                                            value={quantity}
-                                            label={'Số lượng'}
-                                            variant="standard" />
-                                    </td>
-                                    <td className='p-2'>
-                                        <Autocomplete
-                                            disablePortal
-                                            options={selectedProduct?.batchProducts || []}
-                                            getOptionLabel={(option: any) => option?.unit}
-                                            onChange={(event, newValue) => setSelectedType(newValue)}
-                                            renderInput={(params) => <TextField {...params} variant='standard' label="Quy cách" />}
-                                        />
-                                    </td>
-                                    <td className='p-2'>
-                                        {!selectedProduct ? (
-                                            <Autocomplete
-                                                options={[]}
-                                                disablePortal
-                                                readOnly
-                                                renderInput={(params) => <TextField {...params} disabled variant='standard' label="Danh mục" />}
-                                            />
-                                        ) : (
-                                            <TextField
-                                                type={'text'}
-                                                InputProps={{
-                                                    readOnly: true,
-                                                }}
-                                                InputLabelProps={{
-                                                    shrink: selectedProduct !== null,
-                                                }}
-                                                value={selectedCategory?.name}
-                                                label={'Danh mục'}
-                                                variant="standard" />
-                                        )}
-                                    </td>
-                                    <td className='p-2'>
-                                        {!selectedProduct ? (
-                                            <Autocomplete
-                                                options={[]}
-                                                disablePortal
-                                                readOnly
-                                                renderInput={(params) => <TextField {...params} disabled variant='standard' label="Nhà cung cấp" />}
-                                            />
-                                        ) : (
-                                            <TextField
-                                                type={'text'}
-                                                InputProps={{
-                                                    readOnly: true,
-                                                }}
-                                                InputLabelProps={{
-                                                    shrink: selectedProduct !== null,
-                                                }}
-                                                value={selectedSupplier?.name}
-                                                label={'Nhà cung cấp'}
-                                                variant="standard" />
-                                        )}
-                                    </td>
-                                    <td className='p-2'>
-                                        {!selectedProduct ? (
-                                            <Autocomplete
-                                                disablePortal
-                                                options={[]}
-                                                readOnly
-                                                renderInput={(params) => <TextField {...params} disabled variant='standard' label="Kho" />}
-                                            />
-                                        ) : (
-                                            <TextField
-                                                type={'text'}
-                                                InputProps={{
-                                                    readOnly: true,
-                                                }}
-                                                InputLabelProps={{
-                                                    shrink: selectedProduct !== null,
-                                                }}
-                                                value={selectedWarehouse?.name}
-                                                label={'Kho'}
-                                                variant="standard" />
-                                        )}
-                                    </td>
-                                    <td className='p-2'>
-                                        <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
-                                    </td>
-                                </tr>
-                                {formData && formData.map((item, index) => (
-                                    <tr key={index} className={`text-center border-2 border-gray-200 bg-white`}>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {index + 1}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.productName}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.weightPerUnit}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.quantity}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.unit}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.categoryName}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.supplierName}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            {item.warehouseName}
-                                        </td>
-                                        <td className='p-2 border-2 border-gray-200'>
-                                            <Trash2 color='red' className='cursor-pointer' onClick={() => handleDeleteItem(index)} />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className='lg:px-10 px-2 flex'>
-                        <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
-
-                        </div>
-                        <div className='flex-1'></div>
+                        {loadingData ? (
+                            <div className="w-full">
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='rounded-t-lg' />
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-2' />
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='rounded-b-lg mt-2' />
+                            </div>
+                        ) : (
+                            <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+                                <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell align='center' className={`w-[5%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                STT
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Tên sản phẩm
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Số lượng
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Danh mục
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Nhà cung cấp
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Kho
+                                            </TableCell>
+                                            <TableCell align='center' className="w-[5%] font-semibold bg-white text-black p-2 rounded-tr-2xl">#</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={2} className='p-2'>
+                                                <TextField
+                                                    type={'text'}
+                                                    className='w-full'
+                                                    InputProps={{
+                                                        readOnly: true,
+                                                    }}
+                                                    InputLabelProps={{
+                                                        shrink: selectedProduct !== null,
+                                                    }}
+                                                    onChange={(e) => setProductName(e.target.value)}
+                                                    value={productName}
+                                                    label={'Tên sản phẩm'}
+                                                    variant="standard" />
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                <TextField
+                                                    inputProps={{ min: 0 }}
+                                                    type={'number'}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                    className='w-full'
+                                                    onChange={(e) => setQuantity(Number(e.target.value))}
+                                                    value={quantity}
+                                                    label={'Số lượng'}
+                                                    variant="standard" />
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                {!selectedProduct ? (
+                                                    <Autocomplete
+                                                        className='w-full'
+                                                        options={[]}
+                                                        disablePortal
+                                                        readOnly
+                                                        renderInput={(params) => <TextField {...params}
+                                                            disabled variant='standard' label="Danh mục" />}
+                                                    />
+                                                ) : (
+                                                    <TextField
+                                                        type={'text'}
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                        }}
+                                                        className='w-full'
+                                                        InputLabelProps={{
+                                                            shrink: selectedProduct !== null,
+                                                        }}
+                                                        value={selectedCategory?.name}
+                                                        label={'Danh mục'}
+                                                        variant="standard" />
+                                                )}
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                {!selectedProduct ? (
+                                                    <Autocomplete
+                                                        className='w-full'
+                                                        options={[]}
+                                                        disablePortal
+                                                        readOnly
+                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' label="Nhà cung cấp" />}
+                                                    />
+                                                ) : (
+                                                    <TextField
+                                                        type={'text'}
+                                                        className='w-full'
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: selectedProduct !== null,
+                                                        }}
+                                                        value={selectedSupplier?.name}
+                                                        label={'Nhà cung cấp'}
+                                                        variant="standard" />
+                                                )}
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                {!selectedProduct ? (
+                                                    <Autocomplete
+                                                        className='w-full'
+                                                        disablePortal
+                                                        options={[]}
+                                                        readOnly
+                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' label="Kho" />}
+                                                    />
+                                                ) : (
+                                                    <TextField
+                                                        className='w-full'
+                                                        type={'text'}
+                                                        InputProps={{
+                                                            readOnly: true,
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: selectedProduct !== null,
+                                                        }}
+                                                        value={selectedWarehouse?.name}
+                                                        label={'Kho'}
+                                                        variant="standard" />
+                                                )}
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                <div className='flex justify-center'>
+                                                    <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                        {formData && formData.map((item, index) => (
+                                            <TableRow key={index} className={`text-center `}>
+                                                <TableCell align='center'>
+                                                    {index + 1}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.productName}
+                                                </TableCell>
+                                                {index === selectedRow ? (
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'number'}
+                                                            inputProps={{ min: 0 }}
+                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            value={item.quantity}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            label={'Số lượng'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell align='center'>
+                                                        {item.quantity}
+                                                    </TableCell>
+                                                )}
+                                                <TableCell align='center'>
+                                                    {item.categoryName}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.supplierName}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.warehouseName}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {index === selectedRow ? (
+                                                        <div className='flex justify-center items-center space-x-2'>
+                                                            <div className='relative group'>
+                                                                <X size={20} className='cursor-pointer hover:text-red-500' onClick={() => setSelectedRow(null)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Hủy
+                                                                </span>
+                                                            </div>
+                                                            <div className='relative group'>
+                                                                <Trash2 size={20} className='cursor-pointer hover:text-red-500' onClick={() => handleDeleteItem(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Xóa
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className='flex justify-center items-center space-x-2'>
+                                                            <div className='relative group'>
+                                                                <PenSquare size={20} className='cursor-pointer hover:text-blue-500' onClick={() => setSelectedRow(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Sửa
+                                                                </span>
+                                                            </div>
+                                                            <div className='relative group'>
+                                                                <Trash2 size={20} className='cursor-pointer hover:text-red-500' onClick={() => handleDeleteItem(index)} />
+                                                                <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Xóa
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        )}
                     </div>
 
                     <div className='w-full flex justify-center align-bottom items-center mt-5 mb-10'>
-                        <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                            <strong>Thêm</strong>
-                        </Button>
-                        <Button type='button' onClick={() => router.push("/receipts")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                            <strong>Hủy</strong>
-                        </Button>
+                        {loadingData ? (
+                            <>
+                                <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 mr-2 py-3' />
+                                <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 ml-2 py-3' />
+                            </>
+                        ) : (
+                            <>
+                                <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <strong>Thêm</strong>
+                                </Button>
+                                <Button type='button' onClick={() => router.push("/export")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <strong>Hủy</strong>
+                                </Button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

@@ -76,7 +76,7 @@ export default function Navbar() {
     }, [dropdown, dropdown2, dropdown3, dropdown4]);
 
     return (
-        <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-4 font-arsenal'>
+        <div className='flex bg-[#FFFFFF] h-[75px] w-full justify-between px-4'>
             <div className='logo flex items-center ms-3'>
                 <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
             </div>

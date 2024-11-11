@@ -8,8 +8,13 @@ import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProductTable() {
+    const { toast } = useToast();
+    const router = useRouter();
     const columns = [
         { name: 'productCode', displayName: 'Mã sản phẩm' },
         { name: 'productName', displayName: 'Tên sản phẩm' },
@@ -41,18 +46,30 @@ export default function ProductTable() {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
+            params.append("warehouseId", '2');
             const url = `/products/admin/products?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
             console.log(data);
-            if (data._embedded) {
-                setProducts(data._embedded.adminProductDtoList);
-                setTotalPages(data.page.totalPages);
+            if (data.page.totalElements === 0) {
+                setProducts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy sản phẩm!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             } else {
-                alert("Danh sách rỗng");
+                setProducts(data._embedded.adminProductDtoList);
             }
+            setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách sản phẩm!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -72,26 +89,31 @@ export default function ProductTable() {
     };
 
     return (
-        <div>
+        <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='w-full overflow-x-auto'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <SearchBar
                             onSearch={handleSearch}
+                            loadingData={loadingData}
                             selectOptions={[
                                 { value: 'productCode', label: 'Mã sản phẩm' },
                                 { value: 'productName', label: 'Tên sản phẩm' }
                             ]}
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm sản phẩm
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                            ) : (
+                                <Button onClick={() => router.push("/products/create")} className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    Thêm sản phẩm
+                                    <PlusIcon />
+                                </Button>
+                            )}
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <ProductList name="Sản phẩm" editUrl="/products/update/1" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="products" />
+                        <ProductList name="Sản phẩm" editUrl="/products/updateProduct" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="products" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

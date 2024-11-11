@@ -48,6 +48,7 @@ export default function ForgotPasswordEmailPage() {
                         variant: 'destructive',
                         title: 'Thất bại',
                         description: 'Đã có lỗi xảy ra, vui lòng thử lại',
+                        duration: 3000
                     });
                 }
             } catch (e) {
@@ -56,6 +57,7 @@ export default function ForgotPasswordEmailPage() {
                     variant: 'destructive',
                     title: 'Thất bại',
                     description: 'Đã có lỗi xảy ra, vui lòng thử lại',
+                    duration: 3000
                 });
             }
         });
