@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { CircleCheck, CircleX } from 'lucide-react';
-import { Employee } from '@/sample-data/salary';
+import { DayActive, Employee } from '@/type/employee';
 import SalaryPopoverProvider from '@/app/(admin)/salary/salary-popover-provider';
 
 export type Day = {
@@ -15,26 +15,46 @@ export function DayCard({
     currentDate,
     variant,
     employee,
+    isPending,
+    startTransition,
+    activeDays,
+    refreshActiveDays,
+    setRefreshActiveDays,
 }: {
     day: Day;
     currentDate: string;
     variant: 'active' | 'inactive' | 'default';
     employee: Employee;
+    isPending: boolean;
+    startTransition: React.TransitionStartFunction;
+    activeDays: DayActive[];
+    refreshActiveDays: boolean;
+    setRefreshActiveDays: (value: boolean) => void;
 }) {
     return (
-        <SalaryPopoverProvider day={day} employee={employee} variant={variant}>
+        <SalaryPopoverProvider
+            day={day}
+            employee={employee}
+            variant={variant}
+            startTransition={startTransition}
+            activeDays={activeDays}
+            refreshActiveDays={refreshActiveDays}
+            setRefreshActiveDays={setRefreshActiveDays}
+        >
             <div
                 className={cn(
                     'bg-white p-2 border border-gray-200 rounded hover:cursor-pointer hover:bg-gray-100',
                     variant === 'active' && 'bg-green-100 hover:bg-green-200',
                     variant === 'inactive' && 'bg-red-100 hover:bg-red-200',
+                    isPending && 'pointer-events-none opacity-50',
                 )}
             >
                 <div>
                     <div className="flex justify-between">
                         <div
                             className={cn(
-                                day.localDate === currentDate
+                                new Date(day.localDate).toLocaleDateString() ===
+                                    currentDate
                                     ? 'w-6 h-6 flex items-center justify-center rounded-full bg-[#2f2f31] text-white'
                                     : '',
                             )}
