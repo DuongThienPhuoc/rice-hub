@@ -9,7 +9,7 @@ import {
     getDaysAndWeekdaysInMonth,
     getYears,
     monthNames,
-} from '@/hooks/useDate';
+} from '@/hooks/use-date';
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {

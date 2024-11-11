@@ -1,43 +1,93 @@
-'use client'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
+'use client';
+
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import CartDialog from "@/app/(customer)/cart/dialog";
-import { useProductSelectedStore } from '@/stores/cartTableStore'
+import { Button } from '@/components/ui/button';
+import CartDialog from '@/app/(customer)/cart/dialog';
+import { useProductSelectedStore } from '@/stores/cartTableStore';
 import { Trash2 } from 'lucide-react';
+import { createOrder, OrderRequest } from '@/data/order';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
-export default function CartTable() {
+export interface CartProduct {
+    cartId: number;
+    productID: number;
+    productCode: string;
+    name: string;
+    quantity: number;
+    price: number;
+    type: number;
+}
 
-    interface Product {
-        id: number;
-        productId: string;
-        name: string;
-        type: string;
-        quantity: number;
-        price: number;
-    }
-
-    const [products, setProducts] = useState<Product[]>([]);
+export default function CartTable({ customerID }: { customerID: string }) {
+    const { toast } = useToast();
+    const [products, setProducts] = useState<CartProduct[]>([]);
     useEffect(() => {
         const localStorageProducts =
             typeof window !== 'undefined' ? localStorage.getItem('cart') : null;
-        const parsedProducts: Product[] = localStorageProducts
+        const parsedProducts: CartProduct[] = localStorageProducts
             ? JSON.parse(localStorageProducts)
             : [];
         setProducts(parsedProducts);
     }, []);
+    const selectedProduct = useProductSelectedStore((state) => state.selected);
+    const updateSelectedProduct = useProductSelectedStore(
+        (state) => state.handleSelected,
+    );
+    const updateSelectedAllProduct = useProductSelectedStore(
+        (state) => state.handleSelectedAll,
+    );
+    const totalMoney = useProductSelectedStore((state) => state.total);
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
-    const selectedProduct = useProductSelectedStore(state => state.selected)
-    const updateSelectedProduct = useProductSelectedStore(state => state.handleSelected)
-    const updateSelectedAllProduct = useProductSelectedStore(state => state.handleSelectedAll)
-    const totalMoney = useProductSelectedStore(state => state.total)
-    const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+    function handleDeleteProduct(cartId: number) {
+        const newProducts = products.filter(
+            (product) => product.cartId != cartId,
+        );
+        localStorage.setItem('cart', JSON.stringify(newProducts));
+        setProducts(newProducts);
+    }
 
-    function handleDeleteProduct(id: number) {
-        const newProducts = products.filter(product => product.id != id)
-        localStorage.setItem('cart', JSON.stringify(newProducts))
-        setProducts(newProducts)
+    async function handleOrder() {
+        const orderDetails: OrderRequest = {
+            customerId: parseInt(customerID),
+            orderDetails: selectedProduct.map((product) => {
+                return {
+                    productId: product.productID,
+                    quantity: product.quantity,
+                    unitPrice: product.price,
+                    weightPerUnit: product.type
+                };
+            }),
+        };
+        try {
+            if (orderDetails.orderDetails.length > 0) {
+                const response = await createOrder(orderDetails);
+                if (response.status === 200) {
+                    setDialogOpen(true);
+                }
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Xin hãy chọn sản phẩm',
+                    description: 'Vui lòng chọn sản phẩm trước khi đặt hàng',
+                    action: <ToastAction altText="Try again">OK!</ToastAction>,
+                });
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(error?.message || 'Unexpected error occurred');
+            }
+        }
     }
 
     return (
@@ -53,7 +103,6 @@ export default function CartTable() {
                                     }}
                                 />
                             </TableHead>
-                            <TableHead>Mã sản phẩm</TableHead>
                             <TableHead>Tên sản phẩm</TableHead>
                             <TableHead>Loại</TableHead>
                             <TableHead>Số lượng</TableHead>
@@ -70,14 +119,14 @@ export default function CartTable() {
                             </TableRow>
                         ) : (
                             products.map((product) => (
-                                <TableRow key={product.id}>
+                                <TableRow key={product.cartId}>
                                     <TableCell>
                                         <Checkbox
                                             checked={
                                                 !!selectedProduct.find(
                                                     (selectedProduct) =>
-                                                        selectedProduct.id ===
-                                                        product.id,
+                                                        selectedProduct.cartId ===
+                                                        product.cartId,
                                                 )
                                             }
                                             onCheckedChange={() =>
@@ -85,7 +134,6 @@ export default function CartTable() {
                                             }
                                         />
                                     </TableCell>
-                                    <TableCell>{product.productId}</TableCell>
                                     <TableCell>{product.name}</TableCell>
                                     <TableCell>{product.type}</TableCell>
                                     <TableCell>{product.quantity}</TableCell>
@@ -94,7 +142,9 @@ export default function CartTable() {
                                         <Trash2
                                             className="w-4 h-4 hover:cursor-pointer"
                                             onClick={() =>
-                                                handleDeleteProduct(product.id)
+                                                handleDeleteProduct(
+                                                    product.cartId,
+                                                )
                                             }
                                         />
                                     </TableCell>
@@ -122,8 +172,22 @@ export default function CartTable() {
                         <Button
                             className="w-full"
                             onClick={() => {
-                                setDialogOpen(true);
-                                console.log(selectedProduct);
+                                handleOrder().catch((error) => {
+                                    toast({
+                                        variant: 'destructive',
+                                        title: 'Có lỗi xảy ra khi đặt hàng',
+                                        description:
+                                            'Có lỗi xảy ra khi đặt hàng vui lòng thử lại sau',
+                                        action: (
+                                            <ToastAction altText="Try again">
+                                                Xác nhận!
+                                            </ToastAction>
+                                        ),
+                                    });
+                                    console.error(
+                                        `Error occurred in CartPage: ${error.message}`,
+                                    );
+                                });
                             }}
                         >
                             Đặt hàng

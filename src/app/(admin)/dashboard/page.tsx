@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import BarChart from '@/components/chart/BarChart';
+import BarChart from '@/components/chart/barChart';
 import MultipleBarChart from '@/components/chart/MultipleBarChart';
 import StackBarChart from '@/components/chart/StackBarChart';
 import FloatingButton from '@/components/floating/floatingButton';
