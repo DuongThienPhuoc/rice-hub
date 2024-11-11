@@ -14,7 +14,7 @@ const getLastFiveMonths = () => {
     const months = [];
     dayjs.locale('vi');
     for (let i = 0; i < 5; i++) {
-        const month = dayjs().subtract(i, 'month').format('MMMM YYYY');
+        const month = dayjs().subtract(i, 'month').format('MMMM');
         months.unshift(month.charAt(0).toUpperCase() + month.slice(1));
     }
     return months;

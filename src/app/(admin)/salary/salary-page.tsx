@@ -84,7 +84,7 @@ function PorterCalendar({
     }
 
     return (
-        <>
+        <div className='mx-5'>
             <DatePicker />
             <div className="grid grid-cols-8 gap-1">
                 {calendar.map((day, index) => (
@@ -99,7 +99,7 @@ function PorterCalendar({
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 }
 
@@ -143,8 +143,8 @@ function DriverCalendar({
                     isFutureDate(localDate)
                         ? 'default'
                         : isActiveDate(localDate)
-                          ? 'active'
-                          : 'inactive'
+                            ? 'active'
+                            : 'inactive'
                 }
                 employee={employee}
             />

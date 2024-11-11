@@ -5,12 +5,17 @@ import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
+import GradientCircularProgress from '@/components/ui/GradientCircleProgress';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@/components/ui/toast';
 
 const Page = () => {
-    const router = useRouter();
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(true);
     const [formData, setFormData] = useState<Record<string, string | number | boolean>>({});
-    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
     const handleFieldChange = (field: string, value: string) => {
         setFormData((prevData) => ({
@@ -21,17 +26,39 @@ const Page = () => {
 
     const handleLogin = async () => {
         setLoading(true);
+
+        if (!formData.username || !formData.password) {
+            toast({
+                variant: 'destructive',
+                title: 'Đăng nhập thất bại!',
+                description: 'Vui lòng nhập đầy đủ thông tin.',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            });
+            setLoading(false);
+            return;
+        }
+
         try {
-            console.log(formData);
             const response = await api.post("/login/loginRequest", formData, {
                 headers: {
                     "Content-Type": "application/json",
                 },
             });
-            console.log('Login success');
             localStorage.setItem("role", response.data.userType);
+            localStorage.setItem("username", response.data.username);
             document.cookie = `userID=${response.data.userId}; path=/; expires=${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toUTCString()}`;
             setLoading(false);
+            setOnPageChange(true);
+            toast({
+                variant: 'default',
+                title: 'Đăng nhập thành công!',
+                duration: 3000,
+                style: {
+                    backgroundColor: '#4caf50',
+                    color: '#fff',
+                },
+            });
             if (response.data.userType && response.data.userType == 'ROLE_ADMIN') {
                 router.push('/dashboard');
             } else if (response.data.userType && response.data.userType == 'ROLE_EMPLOYEE') {
@@ -40,13 +67,20 @@ const Page = () => {
                 router.push('/');
             }
         } catch (error) {
-            console.error('Login error:', error);
+            toast({
+                variant: 'destructive',
+                title: 'Đăng nhập thất bại!',
+                description: 'Sai tên đăng nhập hoặc mật khẩu, vui lòng thử lại.',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
             setLoading(false);
+            setOnPageChange(false);
         }
     };
 
     return (
-        <div className='relative w-full h-[100vh] min-h-[600px] flex flex-col items-center'>
+        <div className='relative w-full min-h-[100vh] h-auto flex flex-col items-center overflow-y-auto'>
             <div
                 className='absolute inset-0 bg-cover bg-center'
                 style={{
@@ -59,44 +93,52 @@ const Page = () => {
                     <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
                 </div>
             </div>
-            <div className='py-[40px] bg-white border flex flex-col justify-between rounded-xl mt-auto mb-auto min-w-[300px] h-[420px] px-5 z-10'>
+            <div className='py-[40px] bg-white border flex flex-col justify-between rounded-xl my-auto min-w-[360px] lg:min-w-[380px] h-[500px] px-5 z-10'>
                 <div>
-                    <h1 className='text-center font-bold font-arsenal text-[22px]'>Đăng nhập</h1>
-                    <p className='font-semibold font-arsenal mt-[30px] mb-1'>Tên tài khoản</p>
-                    <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
+                    <h1 className='text-center font-bold text-[30px] mb-14'>Đăng nhập</h1>
+                    <p className='font-semibold mt-[30px] mb-1 text-[18px]'>Tên tài khoản</p>
+                    <div className='flex items-center border-b-2 px-2 py-1 text-[16px] border-gray-300'>
                         <FaUser className='text-gray-400 ' />
                         <input
-                            className='font-arsenal placeholder:text-[14px] placeholder:font-medium font-semibold px-2 focus:outline-none'
+                            className='placeholder:text-[16px] placeholder:font-medium font-semibold w-full px-2 focus:outline-none'
                             type='text' placeholder='Nhập tên tài khoản'
                             onChange={(e) => handleFieldChange('username', e.target.value)}
                         />
                     </div>
-                    <p className='font-semibold font-arsenal mt-[20px] mb-1'>Mật khẩu</p>
+                    <p className='font-semibold mt-[20px] mb-1 text-[18px]'>Mật khẩu</p>
                     <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                         <FaLock className='text-gray-400 ' />
                         <input
-                            className='font-arsenal placeholder:text-[14px] placeholder:font-medium font-semibold px-2 mr-[15px] focus:outline-none'
+                            className='placeholder:text-[16px] placeholder:font-medium font-semibold w-full px-2 mr-[15px] focus:outline-none'
                             type={showPassword ? 'password' : 'text'} placeholder='Nhập mật khẩu'
                             onChange={(e) => handleFieldChange('password', e.target.value)}
                         />
                         <FaEyeSlash
+                            size={20}
                             className={`text-gray-400 cursor-pointer ${showPassword ? 'hidden' : 'block'}`}
                             onClick={() => setShowPassword(true)}
                         />
                         <FaEye
+                            size={20}
                             className={`text-gray-400 cursor-pointer ${showPassword ? 'block' : 'hidden'}`}
                             onClick={() => setShowPassword(false)}
                         />
                     </div>
-                    <div className='flex justify-between text-[12px] font-semibold font-arsenal text-gray-400 mt-2'>
-                        <p onClick={() => router.push('/forgot-password')} className='hover:text-gray-600 hover:cursor-pointer'>Quên mật khẩu ?</p>
-                        <p onClick={() => router.push("/register")} className='hover:text-gray-600 hover:cursor-pointer'>Chưa có tài khoản ?</p>
+                    <div className='flex justify-between text-[14px] font-semibold text-gray-400 mt-2'>
+                        <p onClick={() => {
+                            setOnPageChange(true);
+                            router.push('/forgot-password')
+                        }} className='hover:text-gray-600 hover:cursor-pointer'>Quên mật khẩu ?</p>
+                        <p onClick={() => {
+                            setOnPageChange(true);
+                            router.push("/register")
+                        }} className='hover:text-gray-600 hover:cursor-pointer'>Chưa có tài khoản ?</p>
                     </div>
                 </div>
                 <div>
                     <Button
                         onClick={handleLogin}
-                        className='rounded-full w-full text-[12px]'
+                        className='rounded-full w-full text-[16px]'
                         style={{ boxShadow: '5px 5px 5px gray' }}
                         disabled={loading}
                     >
@@ -104,6 +146,16 @@ const Page = () => {
                     </Button>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-50 bg-black bg-opacity-40 w-full'>
+                    <div className='flex h-[100vh] justify-center items-center pb-10'>
+                        <div>
+                            <GradientCircularProgress />
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
 
     );

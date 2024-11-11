@@ -15,6 +15,7 @@ import 'flatpickr/dist/themes/material_blue.css';
 import { PlusIcon } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import crypto from 'crypto';
+import { Skeleton } from '@mui/material';
 
 export default function ImportTable() {
     const router = useRouter();
@@ -56,6 +57,7 @@ export default function ImportTable() {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
+            params.append("receiptType", 'IMPORT');
             const url = `/WarehouseReceipt/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
@@ -186,7 +188,9 @@ export default function ImportTable() {
             }
 
             const fileHash = await calculateFileHash(file);
-
+            console.log(processedFileHashes);
+            console.log(fileHash);
+            console.log(processedFileHashes.has(fileHash));
             if (processedFileHashes.has(fileHash)) {
                 Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
                 return;
@@ -237,7 +241,7 @@ export default function ImportTable() {
     const handleSubmit = async (data: any) => {
         console.log(data);
         try {
-            const response = await api.post(`/products/import`, data);
+            const response = await api.post(`/products/import/preview`, data);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
                 Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
@@ -251,7 +255,7 @@ export default function ImportTable() {
     }
 
     return (
-        <div>
+        <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='w-full overflow-x-auto'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
@@ -276,13 +280,28 @@ export default function ImportTable() {
                             </div>
                         </div>
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button
-                                onClick={() => router.push("/import/create")}
-                                className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                            >
-                                Tạo phiếu nhập
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <>
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={80} className='rounded-lg ml-0 mt-4 lg:ml-2 lg:mt-0' />
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        onClick={() => router.push("/import/create")}
+                                        className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                    >
+                                        Tạo phiếu nhập
+                                        <PlusIcon />
+                                    </Button>
+                                    <Button
+                                        className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                        onClick={handleShowDownloadMaterial}
+                                    >
+                                        Import
+                                    </Button>
+                                </>
+                            )}
                             <input
                                 type="file"
                                 id="fileInput"
@@ -290,17 +309,10 @@ export default function ImportTable() {
                                 style={{ display: 'none' }}
                                 onChange={handleFileUpload}
                             />
-                            <Button
-                                className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                                onClick={handleShowDownloadMaterial}
-                            // onClick={() => document.getElementById('fileInput')?.click()}
-                            >
-                                Import
-                            </Button>
                         </div>
                     </div>
                     <div className='overflow-x-auto'>
-                        <ReceiptList name="Phiếu nhập/xuất" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
+                        <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

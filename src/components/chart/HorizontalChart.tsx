@@ -10,7 +10,7 @@ const generateRandomRevenue = () => {
 };
 
 type ChartConfig = {
-    [key: number]: { label: string };
+    [key: string]: { label: any };
 };
 
 const HorizontalChart: React.FC<{ chartName: string }> = ({ chartName }) => {
@@ -41,34 +41,34 @@ const HorizontalChart: React.FC<{ chartName: string }> = ({ chartName }) => {
     }, [dropdown]);
 
     const chartData = [
-        { product: "1", sales: generateRandomRevenue(), fill: "#e23670" },
-        { product: "2", sales: generateRandomRevenue(), fill: "#2662d9" },
-        { product: "3", sales: generateRandomRevenue(), fill: "#2eb88a" },
-        { product: "4", sales: generateRandomRevenue(), fill: "#af57db" },
-        { product: "5", sales: generateRandomRevenue(), fill: "#e88c30" },
-        { product: "6", sales: generateRandomRevenue(), fill: "#e23670" },
-        { product: "7", sales: generateRandomRevenue(), fill: "#2662d9" },
-        { product: "8", sales: generateRandomRevenue(), fill: "#2eb88a" },
-        { product: "9", sales: generateRandomRevenue(), fill: "#af57db" },
-        { product: "10", sales: generateRandomRevenue(), fill: "#e88c30" },
+        { product: "Gạo ST25", sales: generateRandomRevenue(), fill: "#e23670" },
+        { product: "Gạo ST21", sales: generateRandomRevenue(), fill: "#2662d9" },
+        { product: "Gạo huyết rồng", sales: generateRandomRevenue(), fill: "#2eb88a" },
+        { product: "Gạo lứt", sales: generateRandomRevenue(), fill: "#af57db" },
+        { product: "Gạo nghệ", sales: generateRandomRevenue(), fill: "#e88c30" },
+        { product: "Gạo ST22", sales: generateRandomRevenue(), fill: "#e23670" },
+        { product: "Gạo ST23", sales: generateRandomRevenue(), fill: "#2662d9" },
+        { product: "Gạo huyết long", sales: generateRandomRevenue(), fill: "#2eb88a" },
+        { product: "Gạo mẻ", sales: generateRandomRevenue(), fill: "#af57db" },
+        { product: "Gạo An Nam", sales: generateRandomRevenue(), fill: "#e88c30" },
     ];
 
     const chartConfig: ChartConfig = {
-        1: { label: "Gạo ST25" },
-        2: { label: "Gạo ST21" },
-        3: { label: "Gạo huyết rồng" },
-        4: { label: "Gạo lứt" },
-        5: { label: "Gạo nghệ" },
-        6: { label: "Gạo ST25" },
-        7: { label: "Gạo ST21" },
-        8: { label: "Gạo huyết rồng" },
-        9: { label: "Gạo lứt" },
-        10: { label: "Gạo nghệ" },
+        'Gạo ST25': { label: 1 },
+        "Gạo ST21": { label: 2 },
+        "Gạo huyết rồng": { label: 3 },
+        "Gạo lứt": { label: 4 },
+        "Gạo nghệ": { label: 5 },
+        "Gạo ST22": { label: 6 },
+        "Gạo ST23": { label: 7 },
+        "Gạo huyết long": { label: 8 },
+        "Gạo mẻ": { label: 9 },
+        "Gạo An Nam": { label: 10 },
     };
 
     return (
-        <Card>
-            <CardHeader className='flex flex-row justify-between items-center'>
+        <Card className='mt-10'>
+            <CardHeader className='flex flex-row justify-between items-center space-x-3 lg:space-x-0'>
                 <div>
                     <CardTitle>Top 10 {chartName.toLocaleLowerCase()} bán chạy</CardTitle>
                     <CardDescription>{`Top 10 ${chartName.toLocaleLowerCase()} bán chạy nhất trong ${period} qua:`}</CardDescription>
@@ -91,16 +91,17 @@ const HorizontalChart: React.FC<{ chartName: string }> = ({ chartName }) => {
                 </div>
             </CardHeader>
             <CardContent>
-                <ResponsiveContainer width="100%" height={500}>
-                    <BarChart data={chartData} layout='vertical' margin={{ top: 10, right: 30, left: 30, bottom: 0 }}>
+                <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={chartData} layout='vertical' margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} />
                         <YAxis
                             dataKey="product"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={20}
                             axisLine={false}
                             tickFormatter={(value) => chartConfig[value]?.label}
+                            tick={{ fill: `black`, fontSize: 16 }}
                         />
                         <XAxis type="number" hide />
                         <Tooltip
@@ -110,6 +111,9 @@ const HorizontalChart: React.FC<{ chartName: string }> = ({ chartName }) => {
                                     currency: 'VND',
                                     maximumSignificantDigits: 2,
                                 }).format(value);
+                            }}
+                            itemStyle={{
+                                color: "#2eb88a"
                             }}
                         />
                         <Bar dataKey="sales" name={chartName} fill="#000000" radius={[4, 4, 0, 0]} />
