@@ -1,10 +1,11 @@
 import { Employee } from '@/type/employee';
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { UserCardSkeleton } from '@/app/(admin)/payroll/skeleton';
 
 type UserCardContainerProps = {
     employees: Employee[];
-    selectedEmployee: Employee;
+    selectedEmployee: Employee | undefined;
     setSelectedEmployee: React.Dispatch<
         React.SetStateAction<Employee | undefined>
     >;
@@ -45,13 +46,19 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                 </div>
             </div>
             <div className="overflow-y-auto space-y-3">
-                {employees.map((empl) => (
-                    <UserCard
-                        key={empl.fullName}
-                        employee={empl}
-                        selectedEmployee={selectedEmployee}
-                        setEmployee={setSelectedEmployee}
-                    />
+                {employees.map((employee) => (
+                    <>
+                        {selectedEmployee ? (
+                            <UserCard
+                                key={employee.id}
+                                employee={employee}
+                                selectedEmployee={selectedEmployee}
+                                setEmployee={setSelectedEmployee}
+                            />
+                        ) : (
+                            <UserCardSkeleton key={employee.id} />
+                        )}
+                    </>
                 ))}
             </div>
         </div>
@@ -78,7 +85,8 @@ const UserCard: React.FC<UserCardProps> = ({
         >
             <div>
                 <h1 className="text-[16px] font-bold">{employee.fullName}</h1>
-                <p className="text-sm text-gray-400">
+                <p className='text-sm text-muted-foreground'>{employee.phone}</p>
+                <p className="text-sm text-muted-foreground">
                     {employee.employeeRole === 'PORTER'
                         ? 'Nhân viên bốc/dỡ hàng'
                         : 'Lái xe'}

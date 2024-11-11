@@ -70,7 +70,7 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
 
     return (
         <>
-            <div className="grid grid-cols-8 gap-1">
+            <div className="grid md:grid-cols-8 grid-cols-4 gap-1">
                 {calendar.map((day, index) => (
                     <DayCard
                         key={index}

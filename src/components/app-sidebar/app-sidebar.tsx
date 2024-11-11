@@ -149,7 +149,7 @@ const categories = [
             },
             {
                 title: 'Bảng lương',
-                url: '/',
+                url: '/payroll',
                 icon: <BadgeDollarSign />,
             },
         ],
