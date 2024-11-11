@@ -4,7 +4,7 @@ import React from 'react';
 
 const Invoice = () => {
     return (
-        <div className="w-[970px] my-[20px] mx-auto font-arsenal">
+        <div className="w-[970px] my-[20px] mx-auto">
             <div className="invoice-header">
                 <div className="grid grid-cols-2 gap-4">
                     <div>

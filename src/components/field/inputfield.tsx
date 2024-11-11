@@ -1,10 +1,10 @@
 'use client';
-import { TextField } from '@mui/material';
+import { TextField, Autocomplete } from '@mui/material';
 import React from 'react';
 
 interface InputFieldProps {
     titles: { name: string, displayName: string, type: string }[];
-    data?: Record<string, string | number | boolean>;
+    data?: any;
     onFieldChange: (field: string, value: string | number | boolean) => void;
 }
 
@@ -15,6 +15,14 @@ const InputField: React.FC<InputFieldProps> = ({ titles, data, onFieldChange }) 
         onFieldChange(name, value);
     };
 
+    const formatDate = (isoDate: any) => {
+        const date = new Date(isoDate);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     return (
         <div className='w-full'>
             {titles.map(({ name, displayName, type }, index) => (
@@ -23,35 +31,59 @@ const InputField: React.FC<InputFieldProps> = ({ titles, data, onFieldChange }) 
                         <div className='flex-[2] mr-3 font-bold pt-4'> {displayName}:</div>
                     )}
                     {type !== 'hidden' ? (
-                        <div className='flex-[4] text-center mb-2'>
-                            {type === 'checkbox' ? (
-                                <input
-                                    type='checkbox'
-                                    className='py-1 border border-gray-400'
-                                    checked={!!displayData[name]}
-                                    onChange={(e) => handleChange(name, e.target.checked)}
-                                />
-                            ) : type !== 'textArea' ? (
+                        type !== 'readOnly' ? (
+                            <div className='flex-[4] text-center mb-2'>
+                                {type === 'checkbox' ? (
+                                    <input
+                                        type='checkbox'
+                                        className='py-1 border border-gray-400'
+                                        checked={!!displayData[name]}
+                                        onChange={(e) => handleChange(name, e.target.checked)}
+                                    />
+                                ) : type !== 'textArea' ? (
+                                    name === 'type' ? (
+                                        <Autocomplete
+                                            disablePortal
+                                            className='w-full'
+                                            value={displayData[name] || ''}
+                                            options={['Thanh toán lương nhân viên', 'Thanh toán tiền nhập hàng', 'Các khoản chi khác']}
+                                            onChange={(event, newValue) => handleChange(name, newValue)}
+                                            renderInput={(params) => <TextField {...params} variant='standard' label="Loại chi" />}
+                                        />
+                                    ) : (
+                                        <TextField
+                                            type={type}
+                                            onChange={(e) => handleChange(name, e.target.value)}
+                                            className='w-full'
+                                            value={typeof displayData[name] === 'string' || typeof displayData[name] === 'number' ? displayData[name] : ''}
+                                            label={displayName}
+                                            variant="standard"
+                                        />
+                                    )
+                                ) : (
+                                    <TextField
+                                        type={type}
+                                        onChange={(e) => handleChange(name, e.target.value)}
+                                        className='w-full'
+                                        value={typeof displayData[name] === 'string' ? displayData[name] : ''}
+                                        label={displayName}
+                                        rows={4}
+                                        multiline
+                                    />
+                                )}
+                            </div>
+                        ) : (
+                            <div className='flex-[4] text-center mb-2'>
                                 <TextField
-                                    type={type}
-                                    onChange={(e) => handleChange(name, e.target.value)}
+                                    type='text'
+                                    disabled
                                     className='w-full'
-                                    value={typeof displayData[name] === 'string' || typeof displayData[name] === 'number' ? displayData[name] : ''}
+                                    value={name.toLocaleLowerCase().includes('date') ? formatDate(displayData[name]) : displayData[name]}
                                     label={displayName}
                                     variant="standard"
                                 />
-                            ) : (
-                                <TextField
-                                    type={type}
-                                    onChange={(e) => handleChange(name, e.target.value)}
-                                    className='w-full'
-                                    value={typeof displayData[name] === 'string' ? displayData[name] : ''}
-                                    label={displayName}
-                                    rows={4}
-                                    multiline
-                                />
-                            )}
-                        </div>
+                            </div>
+                        )
                     ) : (
                         <input type='hidden' value={typeof displayData[name] === 'string' || typeof displayData[name] === 'number' ? displayData[name] : ''} />
                     )}

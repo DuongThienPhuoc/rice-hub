@@ -7,25 +7,19 @@ import api from "../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import Modal from 'react-modal';
-import PopupCreate from '@/components/popup/popupCreate';
-import { PlusIcon } from 'lucide-react';
+import { PlusIcon, Printer, Upload } from 'lucide-react';
+import { Skeleton } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
+    const { toast } = useToast();
     const [navbarVisible, setNavbarVisible] = useState(false);
     const [customer, setCustomer] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [isPopupVisible, setPopupVisible] = useState(false);
-    const titles = [
-        { name: 'id', displayName: 'Mã danh mục', type: 'hidden' },
-        { name: 'signDate', displayName: 'Ngày ký', type: 'text' },
-        { name: 'duration', displayName: 'Thời hạn', type: 'text' },
-        { name: 'totalValue', displayName: 'Tổng giá trị', type: 'number' },
-        { name: 'status', displayName: 'Trạng thái', type: 'text' },
-        { name: 'contractImg', displayName: 'Hợp đồng', type: 'file' },
-    ];
+    const [loadingData, setLoadingData] = useState(true);
 
     useEffect(() => {
         const updateNavbarVisibility = () => {
@@ -44,14 +38,39 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     useEffect(() => {
         const getCustomer = async () => {
+            setLoadingData(true);
             try {
                 const url = `/customer/${params.id}`;
-                console.log(url);
                 const response = await api.get(url);
                 const data = response.data;
                 setCustomer(data);
-            } catch (error) {
-                console.error("Error fetching customer:", error);
+                setSelectedImageIndex(0);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                if (error.response.status === 404) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Khách hàng không tồn tại!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại sau',
+                        duration: 3000
+                    })
+                }
+            } finally {
+                setLoadingData(false);
             }
         };
 
@@ -72,23 +91,6 @@ const Page = ({ params }: { params: { id: number } }) => {
         }
     }
 
-    const images = [
-        'https://fast.com.vn/wp-content/uploads/2024/04/mau-hop-dong-mua-ban-hang-hoa-don-gian-moi.jpg',
-        'https://luatquanghuy.vn/wp-content/uploads/mau-hop-dong-mua-ban-nha-image-01.webp',
-        'https://fast.com.vn/wp-content/uploads/2024/04/mau-hop-dong-mua-ban-hang-hoa-don-gian-moi.jpg',
-        'https://luatquanghuy.vn/wp-content/uploads/mau-hop-dong-mua-ban-nha-image-01.webp',
-        'https://fast.com.vn/wp-content/uploads/2024/04/mau-hop-dong-mua-ban-hang-hoa-don-gian-moi.jpg',
-        'https://luatquanghuy.vn/wp-content/uploads/mau-hop-dong-mua-ban-nha-image-01.webp',
-        'https://fast.com.vn/wp-content/uploads/2024/04/mau-hop-dong-mua-ban-hang-hoa-don-gian-moi.jpg',
-        'https://luatquanghuy.vn/wp-content/uploads/mau-hop-dong-mua-ban-nha-image-01.webp',
-        'https://fast.com.vn/wp-content/uploads/2024/04/mau-hop-dong-mua-ban-hang-hoa-don-gian-moi.jpg',
-    ];
-
-    const openPopup = () => setPopupVisible(true);
-    const closeCreate = () => {
-        setPopupVisible(false);
-    }
-
     const handleClickImage = (index: number) => {
         setSelectedImageIndex(index);
     };
@@ -101,144 +103,215 @@ const Page = ({ params }: { params: { id: number } }) => {
         setIsPopupOpen(false);
     };
 
-    const openImageInNewTab = (url: string) => {
-        window.open(url, '_blank');
-    };
+    const checkDuration = ((duration: any, confirmationDate: any) => {
+        const expiryDate = confirmationDate ? new Date(confirmationDate.getTime()) : null;
+        if (expiryDate) {
+            expiryDate.setMonth(expiryDate.getMonth() + duration);
+        }
+        const isExpired = expiryDate && expiryDate < new Date();
+
+        return isExpired;
+    });
 
     return (
         <div>
-            <div className='flex my-16 justify-center w-full font-arsenal'>
+            <div className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
-                        {['Thông tin khách hàng', 'Thông tin hợp đồng'].map((label, index) => (
-                            <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
-                                <button
-                                    type='button'
-                                    onClick={() => setChoice(index === 0)}
-                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                        ? 'text-white bg-black hover:bg-[#1d1d1fca]'
-                                        : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
-                                        }`}
-                                    style={{ boxShadow: '3px 3px 5px lightgray' }}
-                                >
-                                    <strong>{label}</strong>
-                                </button>
-                            </div>
-                        ))}
+                        {loadingData ? (
+                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
+                        ) : (
+                            ['Thông tin khách hàng', 'Thông tin hợp đồng'].map((label, index) => (
+                                <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
+                                    <button
+                                        type='button'
+                                        onClick={() => setChoice(index === 0)}
+                                        className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
+                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
+                                            }`}
+                                        style={{ boxShadow: '3px 3px 5px lightgray' }}
+                                    >
+                                        <strong>{label}</strong>
+                                    </button>
+                                </div>
+                            ))
+                        )}
                     </div>
                     {choice && (
                         <div className='mt-10 flex flex-col items-center'>
-                            <img
-                                src={customer?.image || "https://via.placeholder.com/150"}
-                                alt='Avatar'
-                                className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
-                            />
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="circular" height={'8rem'} width={'8rem'} />
+                            ) : (
+                                <img
+                                    src={customer?.image || "https://via.placeholder.com/150"}
+                                    alt='Avatar'
+                                    className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
+                                />
+                            )}
                         </div>
                     )}
                     <div className='flex flex-col lg:flex-row px-10'>
                         {choice ? (
-                            <>
-                                <div className='flex-1'>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tên khách hàng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.fullName || 'Chưa có thông tin'}</span>
+                            loadingData ? (
+                                <>
+                                    <div className='flex-1'>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
                                     </div>
+                                    <div className='flex-1'>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-1' />
+                                            <Skeleton animation="wave" variant="text" height={'30px'} className='flex-[2] lg:ml-5 mt-2 lg:mt-0' />
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className='flex-1'>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Tên khách hàng: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.fullName || 'Chưa có thông tin'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Giới tính: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.gender === true ? 'Nam' : 'Nữ'}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Giới tính: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.gender === true ? 'Nam' : 'Nữ'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Ngày sinh: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.dob)}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Ngày sinh: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.dob)}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Số điện thoại: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.phone || 'Chưa có thông tin'}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Số điện thoại: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.phone || 'Chưa có thông tin'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Địa chỉ: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.address || 'Chưa có thông tin'}</span>
-                                    </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Địa chỉ: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.address || 'Chưa có thông tin'}</span>
+                                        </div>
 
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Email: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.email || 'Chưa có thông tin'}</span>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Email: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.email || 'Chưa có thông tin'}</span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className='flex-1'>
-                                    <div className='lg:m-10 mb-10 mx-10 mt-0 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tổng đơn hàng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalOrders || '0'}</span>
+                                    <div className='flex-1'>
+                                        <div className='lg:m-10 mb-10 mx-10 mt-0 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Tổng đơn hàng: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalOrders || '0'}</span>
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Tổng nợ: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalDebt || '0'}</span>
+                                        </div>
+                                        <div className='m-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Lần cuối mua hàng: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.lastPurchase)}</span>
+                                        </div>
                                     </div>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tổng nợ: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalDebt || '0'}</span>
-                                    </div>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Lần cuối mua hàng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.lastPurchase)}</span>
-                                    </div>
-                                </div>
-                            </>
+                                </>
+                            )
                         ) : (
                             <>
-                                <div className="flex-1 flex flex-col items-center my-10 mx-auto">
+                                <div className="flex-1 flex flex-col items-center my-10 mx-auto pr-10">
                                     <div className="w-full max-w-2xl mb-4 border-[3px] border-black">
-                                        <img src={images[selectedImageIndex]} alt="Large Display" className="w-full object-cover" />
+                                        <img src={customer?.contracts[selectedImageIndex].imageFilePath || 'https://via.placeholder.com/150'} alt="Large Display" className="w-full object-cover" />
                                     </div>
 
                                     {navbarVisible ? (
                                         <div className="w-auto flex space-x-2">
-                                            {images.slice(0, 4).map((img, index) => (
+                                            {customer?.contracts.slice(0, 4).map((contract: any, index: any) => (
                                                 <img
                                                     key={index}
-                                                    src={img}
-                                                    alt={`Small ${index + 1}`}
-                                                    className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${index + 1 === selectedImageIndex ? 'border-blue-500' : 'border-black'}`}
-                                                    onClick={() => handleClickImage(index + 1)}
+                                                    src={contract.imageFilePath || 'https://via.placeholder.com/150'}
+                                                    alt={`Small ${index}`}
+                                                    className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${index === selectedImageIndex ? 'border-blue-500' : 'border-black'}`}
+                                                    onClick={() => handleClickImage(index)}
                                                 />
                                             ))}
-                                            {images.length > 4 && (
+                                            {customer?.contracts.length > 4 && (
                                                 <div onClick={handleOpenPopup} className="w-20 h-20 relative flex items-center justify-center cursor-pointer border-[3px] border-black">
                                                     <div
                                                         className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
                                                         style={{
-                                                            backgroundImage: `url(${images[4]})`,
+                                                            backgroundImage: `url(${customer?.contracts[4].imageFilePath || 'https://via.placeholder.com/150'})`,
                                                             opacity: 0.2
                                                         }}
                                                     ></div>
                                                     <div className="relative z-2 font-bold bg-gray-200 rounded-full px-1">
-                                                        +{images.length - 4}
+                                                        +{customer?.contracts.length - 4}
                                                     </div>
                                                 </div>
                                             )}
                                         </div>
                                     ) : (
                                         <div className="w-full flex space-x-2">
-                                            {images.slice(0, 2).map((img, index) => (
+                                            {customer?.contracts.slice(0, 2).map((contract: any, index: any) => (
                                                 <img
                                                     key={index}
-                                                    src={img}
-                                                    alt={`Small ${index + 1}`}
-                                                    className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${index + 1 === selectedImageIndex ? 'border-blue-500' : 'border-black'}`}
-                                                    onClick={() => handleClickImage(index + 1)}
+                                                    src={contract.imageFilePath || 'https://via.placeholder.com/150'}
+                                                    alt={`Small ${index}`}
+                                                    className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${index === selectedImageIndex ? 'border-blue-500' : 'border-black'}`}
+                                                    onClick={() => handleClickImage(index)}
                                                 />
                                             ))}
-                                            {images.length > 2 && (
+                                            {customer?.contracts.length > 2 && (
                                                 <div onClick={handleOpenPopup} className="w-20 h-20 relative flex items-center justify-center cursor-pointer border-[3px] border-black">
                                                     <div
                                                         className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
                                                         style={{
-                                                            backgroundImage: `url(${images[2]})`,
+                                                            backgroundImage: `url(${customer?.contracts[2].imageFilePath || 'https://via.placeholder.com/150'})`,
                                                             opacity: 0.2
                                                         }}
                                                     ></div>
                                                     <div className="relative z-2 font-bold bg-gray-200 rounded-full px-1">
-                                                        +{images.length - 2}
+                                                        +{customer?.contracts.length - 2}
                                                     </div>
                                                 </div>
                                             )}
@@ -248,26 +321,39 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <div className='flex-1 lg:my-10 mb-10 mt-0'>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Mã hợp đồng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>Chưa có thông tin</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractNumber || 'Chưa có thông tin'}</span>
+                                    </div>
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Ngày tạo: </span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractTime ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.contractTime)) : 'Chưa có thông tin'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Ngày ký: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>Chưa có thông tin</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.confirmationDate ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.confirmationDate)) : 'Chưa có thông tin'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Thời hạn: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>Chưa có thông tin</span>
-                                    </div>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tổng giá trị: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>Chưa có thông tin</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractDuration} tháng</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Trạng thái: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>Chưa có thông tin</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
+                                            {customer?.contracts[selectedImageIndex]?.confirmed
+                                                ? checkDuration(customer?.contracts[selectedImageIndex]?.contractDuration, new Date(customer?.contracts[selectedImageIndex]?.confirmationDate))
+                                                    ? 'Đã hết hiệu lực'
+                                                    : 'Còn hiệu lực'
+                                                : 'Chưa có hiệu lực'
+                                            }
+                                        </span>
                                     </div>
-                                    <div className='m-10 flex justify-center lg:justify-end'>
-                                        <Button onClick={openPopup} type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <div className='m-10 flex lg:justify-between'>
+                                        <Button type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                            Cập nhật <Upload />
+                                        </Button>
+                                        <Button type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                            In hợp đồng <Printer />
+                                        </Button>
+                                        <Button onClick={() => window.open(`/contracts/create/${params.id}`, "_blank")} type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
                                             Tạo hợp đồng <PlusIcon />
                                         </Button>
                                     </div>
@@ -277,17 +363,26 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                     {choice && (
                         <div className='w-full flex justify-center items-center my-10'>
-                            <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                <strong>Sửa</strong>
-                            </Button>
-                            <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                <strong>Trở về</strong>
-                            </Button>
+                            {loadingData ? (
+                                <>
+                                    <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 mr-2 py-3' />
+                                    <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 ml-2 py-3' />
+                                </>
+                            ) : (
+                                <>
+                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        <strong>Sửa</strong>
+                                    </Button>
+                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        <strong>Trở về</strong>
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
-            {isPopupVisible && <PopupCreate tableName="Hợp đồng" url="/contract/createContract" titles={titles} handleClose={closeCreate} />}
+
             <Modal
                 isOpen={isPopupOpen}
                 onRequestClose={handleClosePopup}
@@ -301,14 +396,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                         <button onClick={handleClosePopup}><strong>Đóng</strong></button>
                     </div>
                     <div className="grid xl:grid-cols-10 lg:grid-cols-5 grid-cols-2 gap-4 mt-10">
-                        {images.map((img, index) => (
+                        {customer?.contracts.map((contract: any, index: any) => (
                             <div
                                 key={index}
                                 className="cursor-pointer"
-                                onClick={() => openImageInNewTab(img)}
+                            // onClick={() => openImageInNewTab(img)}
                             >
                                 <img
-                                    src={img}
+                                    src={contract.imageFilePath || 'https://via.placeholder.com/150'}
                                     alt={`Contract ${index + 1}`}
                                     className="w-full h-auto object-cover border-[3px] border-black"
                                 />
@@ -317,7 +412,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </Modal>
-        </div>
+        </div >
     )
 };
 

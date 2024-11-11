@@ -4,6 +4,7 @@ import {
     DeleteActiveDayBodyRequest,
     UpdateEmployeeDayActiveBodyRequest,
 } from '@/type/employee';
+import { isAxiosError } from 'axios';
 
 export function getEmployee(role: 'driver' | 'porter') {
     try {
@@ -53,3 +54,41 @@ export function deleteActiveDay(bodyRequest: DeleteActiveDayBodyRequest) {
         throw e;
     }
 }
+
+export async function getPorterPayroll(month: number, year: number) {
+    try {
+        const response = await axios.get('/employees/porter-payroll', {
+            params: {
+                month,
+                year,
+            },
+        });
+        return response.data;
+    } catch (e) {
+        if (isAxiosError(e)) {
+            throw e.message;
+        } else {
+            throw e;
+        }
+    }
+}
+
+export async function getDriverPayroll(month: number, year: number) {
+    try {
+        const response = await axios.get('/employees/driver-payroll', {
+            params: {
+                month,
+                year,
+            },
+        });
+        return response.data;
+    } catch (e) {
+        if (isAxiosError(e)) {
+            throw e.message;
+        } else {
+            throw e;
+        }
+    }
+}
+
+

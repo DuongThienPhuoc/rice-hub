@@ -8,8 +8,11 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SupplierTable() {
+    const { toast } = useToast();
     const columns = [
         { name: 'id', displayName: 'Mã' },
         { name: 'name', displayName: 'Tên' },
@@ -62,13 +65,28 @@ export default function SupplierTable() {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
-            const url = `/suppliers/?${params.toString()}`;
+            const url = `/suppliers/getByFilter?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setSuppliers(data._embedded.supplierList);
+            if (data.page.totalElements === 0) {
+                setSuppliers([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy nhà cung cấp!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            } else {
+                setSuppliers(data._embedded.supplierList);
+            }
             setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách nhà cung cấp:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -88,12 +106,13 @@ export default function SupplierTable() {
     };
 
     return (
-        <div>
+        <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='overflow-x-auto w-full'>
                     <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
                         <SearchBar
                             onSearch={handleSearch}
+                            loadingData={loadingData}
                             selectOptions={[
                                 { value: 'name', label: 'Nhà cung cấp' },
                                 { value: 'email', label: 'Email' },
@@ -101,10 +120,14 @@ export default function SupplierTable() {
                             ]}
                         />
                         <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                Thêm nhà cung cấp
-                                <PlusIcon />
-                            </Button>
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                            ) : (
+                                <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    Thêm nhà cung cấp
+                                    <PlusIcon />
+                                </Button>
+                            )}
                         </div>
                     </div>
                     <div className='overflow-hidden'>
