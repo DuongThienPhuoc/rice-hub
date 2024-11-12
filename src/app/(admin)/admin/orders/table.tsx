@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import OrderDialogProvider from '@/app/(admin)/admin/orders/order-dialog';
 import SelectComponent from '@/app/(admin)/admin/orders/select';
 import AlertChangeStatus from '@/app/(admin)/admin/orders/alert-change-status';
+import { Separator } from '@/components/ui/separator';
 
 type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
@@ -31,9 +32,15 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
     return (
         <div className="bg-white p-4 rounded-md space-y-4">
-            <div>
-                <h1 className="text-xl font-bold tracking-tight">Đơn hàng</h1>
+            <div className="space-y-2">
+                <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+                    Đơn hàng
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                    Quản lý đơn hàng của bạn
+                </p>
             </div>
+            <Separator orientation="horizontal" />
             <div className="flex items-center justify-between">
                 <div className="relative">
                     <Search className="absolute w-4 h-4 left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -43,7 +50,10 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                     />
                 </div>
                 <div>
-                    <OrderDialogProvider newOrder={newOrder} setNewOrder={setNewOrder}>
+                    <OrderDialogProvider
+                        newOrder={newOrder}
+                        setNewOrder={setNewOrder}
+                    >
                         <Button
                             variant="outline"
                             className="flex items-center justify-between"
@@ -82,7 +92,10 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                                     </TableCell>
                                     <TableCell>{order.customer.name}</TableCell>
                                     <TableCell>
-                                        <SelectComponent value={order.status} setIsAlertOpen={setIsAlertOpen}/>
+                                        <SelectComponent
+                                            value={order.status}
+                                            setIsAlertOpen={setIsAlertOpen}
+                                        />
                                     </TableCell>
                                     <TableCell className="flex justify-center">
                                         <Button
@@ -104,7 +117,10 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                     </TableBody>
                 </Table>
             </div>
-            <AlertChangeStatus isOpen={isAlertOpen} setIsOpen={setIsAlertOpen}/>
+            <AlertChangeStatus
+                isOpen={isAlertOpen}
+                setIsOpen={setIsAlertOpen}
+            />
         </div>
     );
 };
