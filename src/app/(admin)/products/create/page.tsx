@@ -5,9 +5,9 @@
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import firebase from '../../../../api/firebaseConfig';
+import firebase from '@/config/firebaseConfig';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';

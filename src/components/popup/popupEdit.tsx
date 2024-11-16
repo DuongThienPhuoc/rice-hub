@@ -4,7 +4,7 @@
 import InputField from '@/components/field/inputfield';
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
-import api from "../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 

@@ -5,7 +5,7 @@
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { Autocomplete, Skeleton, TextField, Paper } from '@mui/material';
 import { PenSquare, PlusCircle, Trash2, X } from 'lucide-react';
 import Table from '@mui/material/Table';

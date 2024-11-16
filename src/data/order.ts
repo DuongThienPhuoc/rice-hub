@@ -1,6 +1,6 @@
-import axiosConfig from '@/api/axiosConfig';
+import axiosConfig from '@/config/axiosConfig';
 import axios, { AxiosResponse } from 'axios';
-import { AdminCreateOrderRequest } from '@/type/order';
+import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
 
 export interface Order {
     id: number;
@@ -105,6 +105,21 @@ export async function adminCreateOrder(order: AdminCreateOrderRequest) {
         return await axiosConfig.post('/order/admin/CreateOrder', order);
     } catch (e) {
         console.error('Error creating order', e);
+        throw e;
+    }
+}
+
+export async function adminUpdateOrder(
+    order: AdminUpdateOrderRequest,
+    orderId: number,
+) {
+    try {
+        const response = await axiosConfig.post(
+            `/order/admin/UpdateOrder/${orderId}`,
+            order,
+        );
+        return response.data;
+    } catch (e) {
         throw e;
     }
 }

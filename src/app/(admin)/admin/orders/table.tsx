@@ -1,5 +1,5 @@
 import React from 'react';
-import { AdminOrderResponse } from '@/type/order';
+import { AdminOrderResponse, Order } from '@/type/order';
 import {
     Table,
     TableBody,
@@ -21,15 +21,20 @@ type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
     newOrder: boolean;
     setNewOrder: (newOrder: boolean) => void;
+    refreshData: boolean;
+    setRefreshData: (refreshData: boolean) => void;
 };
 
 const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     adminOrderResponse,
     newOrder,
-    setNewOrder
+    setNewOrder,
+    refreshData,
+    setRefreshData,
 }) => {
     const router = useRouter();
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
+    const [orderUpdatePending, setOrderUpdatePending] = React.useState<Order | undefined>();
     return (
         <div className="bg-white p-4 rounded-md space-y-4">
             <div className="space-y-2">
@@ -93,7 +98,8 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                                     <TableCell>{order.customer.name}</TableCell>
                                     <TableCell>
                                         <SelectComponent
-                                            value={order.status}
+                                            order={order}
+                                            setOrderUpdatePending={setOrderUpdatePending}
                                             setIsAlertOpen={setIsAlertOpen}
                                         />
                                     </TableCell>
@@ -120,6 +126,10 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
             <AlertChangeStatus
                 isOpen={isAlertOpen}
                 setIsOpen={setIsAlertOpen}
+                orderUpdatePending={orderUpdatePending}
+                setOrderUpdatePending={setOrderUpdatePending}
+                refreshData={refreshData}
+                setRefreshData={setRefreshData}
             />
         </div>
     );

@@ -4,6 +4,15 @@ export interface AdminOrderResponse {
     page:      Page;
 }
 
+export interface AdminUpdateOrderRequest {
+    customerId:      number;
+    status:          string;
+    totalAmount:     number;
+    deposit:         number;
+    remainingAmount: number;
+    orderDetails:    OrderDetail[];
+}
+
 export interface Order {
     id:              number;
     orderCode:       string;

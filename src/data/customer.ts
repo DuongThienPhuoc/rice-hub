@@ -1,4 +1,4 @@
-import axios from '@/api/axiosConfig';
+import axios from '@/config/axiosConfig';
 import { AxiosResponse } from 'axios';
 
 export async function getCustomerList<T>(): Promise<T> {
