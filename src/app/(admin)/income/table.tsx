@@ -4,7 +4,7 @@ import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
-import api from "../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/themes/material_blue.css';
 import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";

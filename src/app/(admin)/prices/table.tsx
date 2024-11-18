@@ -7,7 +7,7 @@ import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import DropdownSearchBar from "@/components/searchbar/dropdownSearchBar";
-import api from "../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { Skeleton, Paper } from '@mui/material';

@@ -14,11 +14,12 @@ const AdminOrdersPage: React.FC = () => {
     const [adminOrderResponse, setAdminOrderResponse] =
         useState<AdminOrderResponse>();
     const [newOrder, setNewOrder] = useState<boolean>(false);
+    const [refreshData, setRefreshData] = useState<boolean>(false);
     useEffect(() => {
         getAdminOrders<AdminOrderResponse>()
             .then((response) => setAdminOrderResponse(response))
             .catch((error) => console.error(error));
-    }, [newOrder]);
+    }, [newOrder,refreshData]);
 
     return (
         <>
@@ -31,8 +32,13 @@ const AdminOrdersPage: React.FC = () => {
                 {adminOrderResponse ? (
                     <>
                         <Summary adminOrderResponse={adminOrderResponse} />
-                        <AdminOrdersTable adminOrderResponse={adminOrderResponse} newOrder={newOrder}
-                                          setNewOrder={setNewOrder} />
+                        <AdminOrdersTable
+                            adminOrderResponse={adminOrderResponse}
+                            newOrder={newOrder}
+                            setNewOrder={setNewOrder}
+                            refreshData={refreshData}
+                            setRefreshData={setRefreshData}
+                        />
                     </>
                 ) : (
                     <Skeleton />

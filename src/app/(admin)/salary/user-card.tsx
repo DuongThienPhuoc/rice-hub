@@ -31,7 +31,7 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                         setTab(0);
                     }}
                 >
-                    <h1 className="text-sm font-semibold">Bốc/Dỡ hàng</h1>
+                    <h1 className="text-sm font-medium leading-none">Nhân viên thời vụ</h1>
                 </div>
                 <div
                     className={cn(
@@ -42,7 +42,7 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                         setTab(1);
                     }}
                 >
-                    <h1 className="text-sm font-semibold">Lái xe</h1>
+                    <h1 className="text-sm font-medium leading-none">Nhân viên</h1>
                 </div>
             </div>
             <div className="overflow-y-auto space-y-3">
@@ -75,6 +75,11 @@ const UserCard: React.FC<UserCardProps> = ({
     setEmployee,
     selectedEmployee,
 }) => {
+    const roleProvider: Record<string, string> = {
+        DRIVER_EMPLOYEE: 'Lái xe',
+        PORTER_EMPLOYEE: 'Nhân viên bốc/dỡ hàng',
+        STOCK_EMPLOYEE: 'Nhân viên quản kho',
+    }
     return (
         <div
             className={cn(
@@ -87,9 +92,7 @@ const UserCard: React.FC<UserCardProps> = ({
                 <h1 className="text-[16px] font-bold">{employee.fullName}</h1>
                 <p className='text-sm text-muted-foreground'>{employee.phone}</p>
                 <p className="text-sm text-muted-foreground">
-                    {employee.employeeRole === 'PORTER'
-                        ? 'Nhân viên bốc/dỡ hàng'
-                        : 'Lái xe'}
+                    {roleProvider[employee.employeeRole]}
                 </p>
             </div>
         </div>

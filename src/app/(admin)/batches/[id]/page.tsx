@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useEffect, useState } from 'react';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Checkbox, Paper, Skeleton, TextField } from '@mui/material';

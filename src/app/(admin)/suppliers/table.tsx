@@ -5,7 +5,7 @@ import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
 import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
-import api from "../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';

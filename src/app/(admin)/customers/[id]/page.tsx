@@ -3,14 +3,14 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, PlusIcon, Upload } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import firebase from '../../../../api/firebaseConfig';
+import firebase from '@/config/firebaseConfig';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();

@@ -23,7 +23,7 @@ export default function SalaryPage() {
     const [year, setYear] = React.useState(currentYear);
     const [activeDays, setActiveDays] = React.useState<DayActive[]>();
 
-    async function fetchEmployee(role: 'driver' | 'porter') {
+    async function fetchEmployee(role: 'daily' | 'monthly') {
         startTransition(async () => {
             try {
                 const response = await getEmployee(
@@ -41,7 +41,7 @@ export default function SalaryPage() {
     }
 
     useEffect(() => {
-        fetchEmployee(tab === 0 ? 'porter' : 'driver').catch((e) => {
+        fetchEmployee(tab === 0 ? 'daily' : 'monthly').catch((e) => {
             if (e.status === 400) {
                 console.error('Employees not found');
             } else {

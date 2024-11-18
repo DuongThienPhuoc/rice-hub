@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import api from "../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import {
     Sidebar,
