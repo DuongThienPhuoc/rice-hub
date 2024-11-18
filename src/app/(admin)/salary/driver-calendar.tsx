@@ -67,6 +67,9 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
     function isFutureDate(date: string) {
         return new Date(date) >= new Date();
     }
+    function isPreviousMonth(date: string) {
+        return new Date(date).getMonth() < new Date().getMonth();
+    }
 
     return (
         <>
@@ -95,6 +98,7 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
                         activeDays={activeDays || []}
                         refreshActiveDays={refreshActiveDays}
                         setRefreshActiveDays={setRefreshActiveDays}
+                        isPrevMonth={isPreviousMonth(new Date(day.localDate).toLocaleDateString())}
                     />
                 ))}
             </div>

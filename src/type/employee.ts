@@ -10,6 +10,7 @@ export interface Employee {
     gender: boolean;
     image: string;
     employeeRole: string;
+    employeeSalaryType: string;
 }
 
 export interface DayActive {
@@ -40,7 +41,7 @@ export interface DeleteActiveDayBodyRequest {
     date: string;
 }
 
-export interface PorterPayroll {
+export interface DailyEmployeePayroll {
     id:           number;
     phone:        string;
     email:        string;
@@ -56,7 +57,7 @@ export interface PorterPayroll {
     totalMass:    number;
 }
 
-export interface DriverPayroll {
+export interface MonthlyEmployeePayroll {
     id:           number;
     phone:        string;
     email:        string;

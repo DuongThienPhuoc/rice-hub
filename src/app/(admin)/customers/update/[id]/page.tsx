@@ -3,11 +3,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import api from "../../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import firebase from '../../../../../api/firebaseConfig';
+import firebase from '@/config/firebaseConfig';
 import { FormControl, InputLabel, MenuItem, Select, Skeleton, TextField } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';

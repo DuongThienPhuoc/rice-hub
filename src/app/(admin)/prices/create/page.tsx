@@ -5,7 +5,7 @@
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { Trash2 } from 'lucide-react';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';

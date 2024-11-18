@@ -3,7 +3,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
-import api from "../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { Autocomplete, TextField } from '@mui/material';

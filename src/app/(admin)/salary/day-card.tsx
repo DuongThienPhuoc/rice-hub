@@ -20,6 +20,7 @@ export function DayCard({
     activeDays,
     refreshActiveDays,
     setRefreshActiveDays,
+    isPrevMonth,
 }: {
     day: Day;
     currentDate: string;
@@ -30,6 +31,7 @@ export function DayCard({
     activeDays: DayActive[];
     refreshActiveDays: boolean;
     setRefreshActiveDays: (value: boolean) => void;
+    isPrevMonth?: boolean;
 }) {
     return (
         <SalaryPopoverProvider
@@ -47,6 +49,7 @@ export function DayCard({
                     variant === 'active' && 'bg-green-100 hover:bg-green-200',
                     variant === 'inactive' && 'bg-red-100 hover:bg-red-200',
                     isPending && 'pointer-events-none opacity-50',
+                    isPrevMonth && 'pointer-events-none opacity-50',
                 )}
             >
                 <div>

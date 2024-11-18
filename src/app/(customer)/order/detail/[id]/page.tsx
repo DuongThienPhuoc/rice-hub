@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import {
     Card,
@@ -7,15 +7,24 @@ import {
     CardHeader,
     CardFooter,
 } from '@/components/ui/card';
-import { Package2, Calendar, DollarSign, User, Truck } from 'lucide-react';
+import {
+    Table,
+    TableRow,
+    TableHead,
+    TableCell,
+    TableBody,
+    TableHeader,
+} from '@/components/ui/table';
+import { Package2, Calendar, User, Truck, History, ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getOrderDetail } from '@/data/order';
 import { Order } from '@/type/order'
 import { statusProvider } from '@/utils/status-provider';
 import { currencyHandleProvider } from '@/utils/currency-handle';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function OrderDetailPage({
     params,
@@ -24,8 +33,12 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
-    const searchParams = useSearchParams();
+    const router = useRouter();
     const [order, setOrder] = useState<Order>();
+    const statusConverter: Record<string, string> = {
+            BANK_TRANSFER: 'Chuyển khoản ngân hàng',
+            CASH: 'Tiền mặt'
+        }
     async function fetchOrderDetail() {
         try {
             const response = await getOrderDetail(params.id);
@@ -51,7 +64,7 @@ export default function OrderDetailPage({
     }
 
     return (
-        <section className="container mx-auto">
+        <section className="container mx-auto space-y-4">
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
@@ -120,7 +133,7 @@ export default function OrderDetailPage({
                     </CardContent>
                 </Card>
             </div>
-            <div className="my-5">
+            <div>
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-1 text-lg">
@@ -129,7 +142,9 @@ export default function OrderDetailPage({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <OrderDetailTable order={order} />
+                        <div className='rounded border'>
+                            <OrderDetailTable order={order} />
+                        </div>
                     </CardContent>
                     <CardFooter className="flex justify-end">
                         <div className="text-right space-y-2">
@@ -139,13 +154,64 @@ export default function OrderDetailPage({
                             <p className="text-sm text-muted-foreground">
                                 Phụ phí: $0.00
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                                Thuế: $0.00
-                            </p>
                             <p className="mt-2 font-bold">{`Tổng tiền: ${currencyHandleProvider(order?.totalAmount)}`}</p>
                         </div>
                     </CardFooter>
                 </Card>
+            </div>
+            <div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-1 text-lg">
+                            <History className="w-5 h-5" />
+                            Lịch sử thanh toán
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='border rounded'>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Số tiền</TableHead>
+                                        <TableHead>Ngày thanh toán</TableHead>
+                                        <TableHead>Phương thức thanh toán</TableHead>
+                                        <TableHead className='text-right'>Trạng thái</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {order.receiptVoucher?.transactions?.length > 0 ? (
+                                        <>
+                                            {order.receiptVoucher?.transactions?.map((transaction) => (
+                                                <TableRow key={transaction.id}>
+                                                    <TableCell>{currencyHandleProvider(transaction.amount)}</TableCell>
+                                                    <TableCell>{new Date(transaction.transactionDate).toLocaleDateString()}</TableCell>
+                                                    <TableCell>{statusConverter[transaction.paymentMethod]}</TableCell>
+                                                    <TableCell align='right'>
+                                                        <Badge variant={statusProvider(transaction.status).variant}>
+                                                            {statusProvider(transaction.status).text}
+                                                        </Badge>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </>
+                                        ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={4} align='center'>Chưa có lịch sử thanh toán</TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+            <div>
+                <Button variant='default' onClick={
+                    () => router.back()
+                }>
+                    <ArrowLeft className='w-4 h-4' />
+                    Quay lại
+                </Button>
             </div>
         </section>
     );
