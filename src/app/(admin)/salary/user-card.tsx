@@ -31,7 +31,7 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                         setTab(0);
                     }}
                 >
-                    <h1 className="text-sm font-semibold">Lương Theo Ngày</h1>
+                    <h1 className="text-sm font-medium leading-none">Nhân viên thời vụ</h1>
                 </div>
                 <div
                     className={cn(
@@ -42,7 +42,7 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                         setTab(1);
                     }}
                 >
-                    <h1 className="text-sm font-semibold">Lương Theo Tháng</h1>
+                    <h1 className="text-sm font-medium leading-none">Nhân viên</h1>
                 </div>
             </div>
             <div className="overflow-y-auto space-y-3">

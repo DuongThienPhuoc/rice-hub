@@ -12,10 +12,14 @@ import { useRouter } from 'next/navigation';
 type PayrollTableDropdownProps = {
     children: React.ReactNode;
     employeeId: number;
+    setDialogOpen: (value: boolean) => void;
+    setEmployeeId: (value: number) => void;
 };
 export default function PayrollTableDropdownProvider({
     children,
     employeeId,
+    setDialogOpen,
+    setEmployeeId
 }: PayrollTableDropdownProps) {
     const router = useRouter();
     return (
@@ -29,7 +33,12 @@ export default function PayrollTableDropdownProvider({
                 >
                     Xem thông tin nhân viên
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push(`/expenditures`)}>
+                <DropdownMenuItem
+                    onClick={() => {
+                        setDialogOpen(true);
+                        setEmployeeId(employeeId);
+                    }}
+                >
                     Xuất phiếu chi
                 </DropdownMenuItem>
             </DropdownMenuContent>

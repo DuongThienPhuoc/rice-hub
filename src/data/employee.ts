@@ -55,9 +55,9 @@ export function deleteActiveDay(bodyRequest: DeleteActiveDayBodyRequest) {
     }
 }
 
-export async function getPorterPayroll(month: number, year: number) {
+export async function getDailyEmployeePayroll(month: number, year: number) {
     try {
-        const response = await axios.get('/employees/porter-payroll', {
+        const response = await axios.get('/employees/daily-payroll', {
             params: {
                 month,
                 year,
@@ -73,9 +73,9 @@ export async function getPorterPayroll(month: number, year: number) {
     }
 }
 
-export async function getDriverPayroll(month: number, year: number) {
+export async function getMonthlyPayroll(month: number, year: number) {
     try {
-        const response = await axios.get('/employees/driver-payroll', {
+        const response = await axios.get('/employees/monthly-payroll', {
             params: {
                 month,
                 year,

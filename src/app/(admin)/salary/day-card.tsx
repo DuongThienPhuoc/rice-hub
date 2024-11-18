@@ -31,7 +31,7 @@ export function DayCard({
     activeDays: DayActive[];
     refreshActiveDays: boolean;
     setRefreshActiveDays: (value: boolean) => void;
-    isPrevMonth: boolean;
+    isPrevMonth?: boolean;
 }) {
     return (
         <SalaryPopoverProvider

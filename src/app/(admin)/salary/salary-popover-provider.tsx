@@ -94,7 +94,7 @@ export default function SalaryPopoverProvider({
                     setDetail={setInputDetail}
                     active={active}
                     setActive={setActive}
-                    role={employee.employeeRole}
+                    role={employee.employeeSalaryType}
                     day={day}
                     employee={employee}
                     variant={variant}
@@ -211,7 +211,7 @@ function EmployeePopoverContent({
                     </label>
                 </div>
             </div>
-            {role === 'PORTER' && (
+            {role === 'DAILY' && (
                 <div className="grid grid-cols-3 items-center gap-4">
                     <Label htmlFor="mass">Số lượng (Tấn)</Label>
                     <Input
