@@ -15,7 +15,7 @@ export default function CategoryTable() {
     const { toast } = useToast();
     const [loadingData, setLoadingData] = useState(true);
     const columns = [
-        { name: 'id', displayName: 'Mã danh mục' },
+        { name: 'id', displayName: 'Mã' },
         { name: 'name', displayName: 'Tên danh mục' },
         { name: 'description', displayName: 'Mô tả chi tiết' },
     ];
@@ -103,35 +103,42 @@ export default function CategoryTable() {
         <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='overflow-x-auto w-full'>
-                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
-                        <SearchBar
-                            onSearch={handleSearch}
-                            loadingData={loadingData}
-                            selectOptions={[
-                                { value: 'name', label: 'Tên danh mục' },
-                            ]}
-                        />
-                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            {loadingData ? (
-                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                            ) : (
-                                <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                    Thêm danh mục
-                                    <PlusIcon />
-                                </Button>
-                            )}
+                    <div className='p-5 bg-white rounded-lg'>
+                        {loadingData ? (
+                            <Skeleton animation="wave" variant="text" height={40} className='rounded-lg' />
+                        ) : (
+                            <div className='font-bold mb-5 text-[1.25rem]'>Danh mục</div>
+                        )}
+                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                            <SearchBar
+                                onSearch={handleSearch}
+                                loadingData={loadingData}
+                                selectOptions={[
+                                    { value: 'name', label: 'Tên danh mục' },
+                                ]}
+                            />
+                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                                {loadingData ? (
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                ) : (
+                                    <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                        Thêm danh mục
+                                        <PlusIcon />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
+                        <div className='overflow-x-auto'>
+                            <CategoryList name="Danh mục" editUrl="/categories/updateCategory" titles={titles} columns={columns} data={categories} tableName="categories" loadingData={loadingData} handleClose={closeEdit} />
+                        </div>
+                        {totalPages > 1 && (
+                            <Paging
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
-                    <div className='overflow-x-auto'>
-                        <CategoryList name="Danh mục" editUrl="/categories/updateCategory" titles={titles} columns={columns} data={categories} tableName="categories" loadingData={loadingData} handleClose={closeEdit} />
-                    </div>
-                    {totalPages > 1 && (
-                        <Paging
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
                 </div>
             </section >
             {isPopupVisible && <PopupCreate tableName="Danh mục" url="/categories/createCategory" titles={titles} handleClose={closeCreate} />}

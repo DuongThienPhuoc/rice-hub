@@ -231,7 +231,7 @@ export default function PriceTable() {
                                                     label: price?.name
                                                 }))
                                             ) : [
-                                                { value: 'default', label: 'No prices available' }
+                                                { value: 'default', label: 'Chưa có bảng giá nào' }
                                             ]
                                         }
                                     />
@@ -287,16 +287,16 @@ export default function PriceTable() {
 
                                                     return (
                                                         <TableRow key={rowIndex}>
-                                                            <TableCell className="text-center max-w-[200px] px-4 py-3 rounded-bl-lg">
+                                                            <TableCell align='center' className="text-center max-w-[200px] px-4 py-3 rounded-bl-lg">
                                                                 {product?.productCode}
                                                             </TableCell>
-                                                            <TableCell className="text-center max-w-[200px] px-4 py-3">
+                                                            <TableCell align='center' className="text-center max-w-[200px] px-4 py-3">
                                                                 {product?.productName}
                                                             </TableCell>
-                                                            <TableCell className="text-center max-w-[200px] px-4 py-3">
+                                                            <TableCell align='center' className="text-center max-w-[200px] px-4 py-3">
                                                                 {formatCurrency(product?.importPrice || 0)}
                                                             </TableCell>
-                                                            <TableCell className="text-center max-w-[200px] px-4 py-3">
+                                                            <TableCell align='center' className="text-center max-w-[200px] px-4 py-3">
                                                                 {editingRowIndex === rowIndex ? (
                                                                     <input
                                                                         min={0}
@@ -309,7 +309,7 @@ export default function PriceTable() {
                                                                     formatCurrency(matchingProductPrice?.unit_price || product?.price)
                                                                 )}
                                                             </TableCell>
-                                                            <TableCell className="text-center px-4 py-3">
+                                                            <TableCell align='center' className="text-center px-4 py-3">
                                                                 <div className="flex min-w-[100px] justify-center space-x-3">
                                                                     {editingRowIndex === rowIndex ? (
                                                                         <>

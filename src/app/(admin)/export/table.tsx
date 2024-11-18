@@ -23,7 +23,7 @@ export default function ExportTable() {
         { name: 'batchCode', displayName: 'Lô hàng' },
         { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
         { name: 'username', displayName: 'Người tạo' },
-        { name: 'type', displayName: 'Loại phiếu' },
+        { name: 'receiptReason', displayName: 'Loại phiếu' },
     ];
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);

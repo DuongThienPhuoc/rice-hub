@@ -206,7 +206,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 </div>
                                 <SelectGroup>
                                     <SelectLabel>Chọn khách hàng</SelectLabel>
-                                    {filterCustomers.map((customer) => (
+                                    {filterCustomers?.map((customer) => (
                                         <SelectItem
                                             key={customer.id}
                                             value={customer.id.toString()}
@@ -338,7 +338,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <TableCell>
                                                             {currencyHandleProvider(
                                                                 product.unitPrice ||
-                                                                    0,
+                                                                0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="flex justify-center">

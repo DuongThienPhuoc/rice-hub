@@ -71,7 +71,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
             <div className='w-fit min-w-[300px] lg:min-w-[500px] h-auto max-h-[90vh] overflow-y-auto flex flex-col lg:flex-row bg-white rounded-lg'>
                 <div className='w-full py-3 flex flex-col justify-between items-center lg:items-start'>
                     <div className='w-full flex justify-between items-center pb-5 px-5'>
-                        <h1 className='font-bold'>Thêm {tableName} mới</h1>
+                        <h1 className='font-bold'>Thêm {tableName.toLocaleLowerCase()} mới</h1>
                         <button onClick={() => handleClose(false)}>
                             <span className="text-black text-xl hover:text-gray-500">✖</span>
                         </button>
@@ -79,7 +79,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
                     <form className='px-6 w-full' onSubmit={handleSubmit}>
                         <InputField titles={titles} data={formData} onFieldChange={handleFieldChange} />
                         <div className='w-full flex justify-center items-center py-5 px-5'>
-                            <Button className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]' type="submit">
+                            <Button className='px-5 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500' type="submit">
                                 Thêm
                             </Button>
                         </div>

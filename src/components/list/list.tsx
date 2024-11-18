@@ -12,15 +12,13 @@ import { useRouter } from 'next/navigation';
 import PopupDetail from '../popup/popupDetail';
 import PopupEdit from '../popup/popupEdit';
 import { Paper, Skeleton } from '@mui/material';
-import { CalendarClock, DollarSign, Eye, PenBox, Trash2 } from 'lucide-react';
-import PopupPay from '../popup/popupPay';
-import PopupExtend from '../popup/popupExtend';
+import { Eye, PenBox, Trash2 } from 'lucide-react';
 import api from "../../api/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 
 interface RowData {
-    [key: string]: string | number | boolean;
+    [key: string]: any;
 }
 
 interface DataTableProps {
@@ -75,11 +73,8 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
 
     const handleDelete = async (row: any) => {
-        console.log(row);
         try {
-            const response = await api.post(`/ExpenseVoucher/delete`, {
-                id: row.id
-            });
+            await api.delete(`/${tableName}/delete/${row.id}`);
             toast({
                 variant: 'default',
                 title: 'Xóa thành công',
@@ -102,22 +97,92 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         }
     }
 
-    const showAlert = (row: any) => {
+    const showAlert = async (row: any) => {
+        if (row.status === 'CANCELED') {
+            Swal.fire({
+                title: 'Xác nhận xóa vĩnh viễn',
+                text: `${name} này đã bị hủy trước đó, Nếu tiếp tục xóa thì sẽ không thể khôi phục. Bạn có muốn tiếp tục?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có, xóa!',
+                cancelButtonText: 'Không, hủy!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    handleDelete(row);
+                } else {
+                    Swal.fire('Đã hủy', `${name} không bị xóa.`, 'info');
+                }
+            });
+        } else {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: `Bạn có chắc chắn muốn xóa ${name?.toLocaleLowerCase()} này?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Có, xóa!',
+                cancelButtonText: 'Không, hủy!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    handleDelete(row);
+                } else {
+                    Swal.fire('Đã hủy', `${name} không bị xóa.`, 'info');
+                }
+            });
+        }
+    };
+
+    const deleteImportAndExport = (row: any) => {
         Swal.fire({
             title: 'Xác nhận xóa',
-            text: 'Bạn có chắc chắn muốn xóa mục này?',
-            icon: 'warning',
+            text: `Bạn có chắc chắn muốn xóa phiếu ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
+            icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa!',
             cancelButtonText: 'Không, hủy!',
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                handleDelete(row);
+                try {
+                    const response = await api.delete(`/WarehouseReceipt/delete/${row.id}`);
+                    console.log(response);
+                    if (response.status >= 200 && response.status < 300) {
+                        toast({
+                            variant: 'default',
+                            title: 'Xóa thành công',
+                            description: `Xoá phiếu ${name?.toLocaleLowerCase()} và lô hàng thành công.`,
+                            style: {
+                                backgroundColor: '#4caf50',
+                                color: '#fff',
+                            },
+                            duration: 3000
+                        })
+                        if (tableName === "import") {
+                            router.push("/import")
+                        } else {
+                            router.push("/export");
+                        }
+                    } else {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Xóa thất bại',
+                            description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                            action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                            duration: 3000
+                        })
+                    }
+                } catch (error: any) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Xóa thất bại',
+                        description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                        duration: 3000
+                    })
+                }
             } else {
-                Swal.fire('Đã hủy', 'Mục không bị xóa.', 'info');
+                Swal.fire('Đã hủy', `Lô hàng và phiếu ${tableName} không bị xóa.`, 'info');
             }
         });
-    };
+    }
 
     type RowData = {
         [key: string]: any;
@@ -132,6 +197,18 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         });
 
         if (cell === undefined || cell === null) return '';
+
+        if (tableName === 'inventory' && key === 'status') {
+            if (cell.toString() === 'PENDING') {
+                return 'Đang xử lý'
+            } else if (cell.toString() === 'CANCELED') {
+                return 'Đã hủy'
+            } else if (cell.toString() === 'COMPLETED') {
+                return 'Đã xác nhận'
+            } else {
+                return 'N/A'
+            }
+        }
 
         if (key.includes('batchCode')) {
             return (
@@ -169,7 +246,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     };
 
     return (
-        <div className='w-full mb-20 overflow-x-auto'>
+        <div className='w-full overflow-x-auto'>
             {loadingData ? (
                 <div className="w-full">
                     <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
@@ -180,89 +257,83 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                     ))}
                 </div>
             ) : (
-                <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2, overflowX: 'auto' }}>
+                <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                     <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                        <TableHead>
+                        <TableHead className='bg-[#0090d9]'>
                             <TableRow>
                                 {columns.map((column, index) => (
-                                    <TableCell key={index} align='center' className='font-semibold'>{column.displayName}</TableCell>
+                                    <TableCell key={index} className='font-semibold text-white'>{column.displayName}</TableCell>
                                 ))}
-                                <TableCell align='center' className='font-semibold'>#</TableCell>
+                                <TableCell align='center' className='font-semibold text-white'>Hành động</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {data && data.length !== 0 ? (
                                 data.map((row, rowIndex) => (
-                                    <TableRow key={rowIndex} className={`font-semibold border border-gray-200 bg-white`}>
+                                    <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                         {columns.map((column, cellIndex) => (
                                             <TableCell
-                                                align='center'
                                                 key={cellIndex}
                                             >
                                                 {renderCell(column.name, row)}
                                             </TableCell>
                                         ))}
                                         {tableName !== 'batch' && (
-                                            <TableCell className="text-center px-4 py-3">
+                                            <TableCell className="px-4 py-3">
                                                 {tableName !== 'categories' && tableName !== 'expense' && tableName !== 'suppliers' ? (
-                                                    tableName === 'income' ? (
-                                                        <div className="flex justify-center items-center space-x-3">
+                                                    <div className="flex justify-center space-x-3">
+                                                        {tableName !== "import" && (
                                                             <div className="relative group">
-                                                                <button hidden={row.remainAmount === 0} onClick={() => openDetailPopup(row)}>
-                                                                    <DollarSign size={18} />
+                                                                <button onClick={() => router.push(`/${tableName.toString()}/${row.id}`)}>
+                                                                    <Eye size={18} />
                                                                 </button>
-                                                                <span className="absolute w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                    Thanh toán
+                                                                <span className="absolute text-center w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Chi tiết
                                                                 </span>
                                                             </div>
+                                                        )}
+                                                        {tableName != "import" && tableName != "inventory" && (
                                                             <div className="relative group">
-                                                                <button hidden={row.remainAmount === 0} onClick={() => openEditPopup(row)}>
-                                                                    <CalendarClock size={18} />
+                                                                <button onClick={() => router.push(`/${tableName.toString()}/update/${row.id}`)}>
+                                                                    <PenBox size={18} />
                                                                 </button>
-                                                                <span className="absolute w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                    Gia hạn
+                                                                <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                    Chỉnh sửa
                                                                 </span>
                                                             </div>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex justify-center space-x-3">
-                                                            {tableName !== "import" && (
-                                                                <div className="relative group">
-                                                                    <button onClick={() => router.push(`/${tableName.toString()}/${row.id}`)}>
-                                                                        <Eye size={18} />
-                                                                    </button>
-                                                                    <span className="absolute w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                        Chi tiết
-                                                                    </span>
-                                                                </div>
-                                                            )}
-                                                            {tableName != "import" && (
-                                                                <div className="relative group">
-                                                                    <button onClick={() => router.push(`/${tableName.toString()}/update/${row.id}`)}>
-                                                                        <PenBox size={18} />
-                                                                    </button>
-                                                                    <span className="absolute w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                        Chỉnh sửa
-                                                                    </span>
-                                                                </div>
-                                                            )}
+                                                        )}
+                                                        {tableName != "import" && tableName != "export" ? (
                                                             <div className="relative group">
-                                                                <button onClick={showAlert}>
+                                                                <button onClick={() => showAlert(row)}>
                                                                     <Trash2 size={18} />
                                                                 </button>
-                                                                <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
                                                                     Xóa
                                                                 </span>
                                                             </div>
-                                                        </div>
-                                                    )
+                                                        ) : (
+                                                            row?.batchProductDtos?.some((item: any) => item.added === true) ? (
+                                                                <div className="relative group"></div>
+                                                            ) : (
+                                                                <div className="relative group">
+                                                                    <button onClick={() => deleteImportAndExport(row)}>
+                                                                        <Trash2 size={18} />
+                                                                    </button>
+                                                                    <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                        Xóa
+                                                                    </span>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+
                                                 ) : (
                                                     <div className="flex justify-center space-x-3">
                                                         <div className="relative group">
                                                             <button onClick={() => openDetailPopup(row)}>
                                                                 <Eye size={18} />
                                                             </button>
-                                                            <span className="absolute w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                            <span className="absolute text-center w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
                                                                 Chi tiết
                                                             </span>
                                                         </div>
@@ -270,7 +341,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                             <button onClick={() => openEditPopup(row)}>
                                                                 <PenBox size={18} />
                                                             </button>
-                                                            <span className="absolute w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                            <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
                                                                 Chỉnh sửa
                                                             </span>
                                                         </div>
@@ -278,7 +349,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                             <button onClick={() => showAlert(row)}>
                                                                 <Trash2 size={18} />
                                                             </button>
-                                                            <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                            <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
                                                                 Xóa
                                                             </span>
                                                         </div>
@@ -300,12 +371,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         </TableBody>
                     </Table>
                 </TableContainer>
-            )}
-            {(tableName == 'income') && isDetailVisible && selectedRow != null && (
-                <PopupPay data={selectedRow} handleClose={closeDetailPopup} />
-            )}
-            {(tableName == 'income') && isEditVisible && selectedRow != null && (
-                <PopupExtend data={selectedRow} handleClose={closeEditPopup} />
             )}
             {(tableName == 'categories' || tableName == 'suppliers' || tableName == 'expense') && isDetailVisible && selectedRow != null && (
                 <PopupDetail tableName={name} titles={titles} data={selectedRow} handleClose={closeDetailPopup} />

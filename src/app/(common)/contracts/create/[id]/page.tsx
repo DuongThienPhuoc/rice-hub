@@ -9,7 +9,8 @@ import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import firebase from '../../../../../api/firebaseConfig';
 import html2canvas from 'html2canvas';
-import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { jsPDF } from 'jspdf';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
@@ -101,32 +102,61 @@ const Page = ({ params }: { params: { id: number } }) => {
     }, [params.id]);
 
     const handleSubmit = async () => {
-        setHiddenButton(true);
-        const isBuyerValid = Object.values(buyer).every(value => value?.trim() !== '');
-        const isSellerValid = Object.values(seller).every(value => value?.trim() !== '');
-        const isDurationValid = duration > 0;
-        const allCheck = fromDate && toDate && location;
-
-        // if (!isBuyerValid || !isSellerValid || !isDurationValid || !allCheck) {
-        //     Swal.fire({
-        //         icon: 'error',
-        //         title: 'Lỗi',
-        //         text: 'Vui lòng điền đầy đủ thông tin vào tất cả các trường.',
-        //     });
-        //     return;
-        // }
+        await setHiddenButton(true);
 
         const storage = getStorage(firebase);
-        const canvas = await html2canvas(document.body);
-        const imageData = canvas.toDataURL('image/png');
-        const imageRef = ref(storage, `screenshots/${Date.now()}.png`);
-        const snapshot = await uploadString(imageRef, imageData, 'data_url');
-        const downloadURL = await getDownloadURL(snapshot.ref);
+        const element = document.getElementById('contract');
+        if (!element) {
+            return;
+        }
+        const canvas = await html2canvas(element, { scale: 2 });
+        const pdf = new jsPDF('p', 'mm', 'a4');
+
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        const padding = 10;
+
+        const contentWidth = pdfWidth - 2 * padding;
+        const contentHeight = pdfHeight - 2 * padding;
+
+        const canvasHeight = canvas.height;
+        const canvasWidth = canvas.width;
+        const pageHeightInCanvasUnits = (contentHeight / contentWidth) * canvasWidth;
+
+        let position = 0;
+
+        while (position < canvasHeight) {
+            const canvasSlice = document.createElement('canvas');
+            canvasSlice.width = canvasWidth;
+            canvasSlice.height = pageHeightInCanvasUnits;
+
+            const ctx = canvasSlice.getContext('2d');
+            if (!ctx) {
+                return;
+            }
+            ctx.drawImage(canvas, 0, -position, canvasWidth, canvasHeight);
+
+            const sliceImage = canvasSlice.toDataURL('image/png');
+
+            pdf.addImage(sliceImage, 'PNG', padding, padding, contentWidth, contentHeight);
+
+            position += pageHeightInCanvasUnits;
+
+            if (position < canvasHeight) {
+                pdf.addPage();
+            }
+        }
+        const pdfBlob = pdf.output('blob');
+        const storageRef = ref(storage, `contracts/Contract_${Date.now()}.pdf`);
+        const snapshot = await uploadBytes(storageRef, pdfBlob);
+        console.log("Upload Snapshot:", snapshot);
+
+        const downloadURL = await getDownloadURL(storageRef);
 
         const formData = {
             duration: duration,
             customerId: params.id,
-            image: downloadURL,
+            pdfFilePath: downloadURL,
         }
 
         if (duration > 0) {
@@ -147,9 +177,9 @@ const Page = ({ params }: { params: { id: number } }) => {
                             setTimeout(() => {
                                 print();
                                 setHiddenButton(false);
-                                router.push(`/customers/${params.id}`);
                             }, 300)
                         }
+                        router.push(`/customers/${params.id}`);
                     });
                 } else {
                     setHiddenButton(false);
@@ -162,7 +192,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             }
         } else {
             setHiddenButton(false);
-            alert('Thời hạn hợp đồng phải lớn hơn 3 tháng!');
+            alert('Hợp đồng phải có thời hạn ít nhất là 1 tháng!');
         }
     };
 
@@ -182,7 +212,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     return (
         <div className="w-full flex justify-center">
-            <div className="my-[20px] p-[20px] max-w-[1134px] bg-white">
+            <div id='contract' className="my-[20px] p-[20px] max-w-[1134px] bg-white">
                 <div className="text-center mb-[20px]">
                     <h1 className='text-[18px] uppercase font-bold'>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>
                     <p className='text-[16px]'>Độc lập - Tự do - Hạnh phúc</p>

@@ -28,11 +28,16 @@ interface FormDataItem {
     supplierName: string;
     warehouseId: number;
     warehouseName: string;
+    weightPerUnit: number;
+    unit: string;
+    unitList: any;
+    selectedUnit: any;
 }
 
 const Page = () => {
     const router = useRouter();
     const [products, setProducts] = useState<RowData[]>([]);
+    const [selectedUnit, setSelectedUnit] = useState<any>(null);
     const [selectedProduct, setSelectedProduct] = useState<RowData | null>(null);
     const [productName, setProductName] = useState('');
     const [quantity, setQuantity] = useState(0);
@@ -54,12 +59,14 @@ const Page = () => {
             setSelectedCategory(selectedProduct?.category || null);
             setSelectedSupplier(selectedProduct?.supplier || null);
             setSelectedWarehouse(selectedProduct?.productWarehouses[0]?.warehouse || null);
+            setSelectedUnit(selectedProduct?.productWarehouses[0]);
         } else {
             setProductName('');
             setSelectedProduct(null);
             setSelectedSupplier(null);
             setSelectedCategory(null);
             setSelectedWarehouse(null);
+            setSelectedUnit(null);
         }
     }, [selectedProduct])
 
@@ -110,13 +117,18 @@ const Page = () => {
             supplierName: selectedSupplier?.name,
             supplierId: selectedSupplier?.id,
             warehouseName: selectedWarehouse?.name,
-            warehouseId: selectedWarehouse?.id
+            warehouseId: selectedWarehouse?.id,
+            weightPerUnit: selectedUnit?.weightPerUnit,
+            unit: selectedUnit?.unit,
+            unitList: selectedProduct?.productWarehouses,
+            selectedUnit: selectedUnit
         };
         setFormData(prevFormData => [...prevFormData, newItem]);
         setSelectedProduct(null);
         setSelectedCategory(null);
         setSelectedSupplier(null);
         setSelectedWarehouse(null);
+        setSelectedUnit(null);
         setProductName('');
         setQuantity(0);
     }
@@ -162,7 +174,7 @@ const Page = () => {
 
     return (
         <div>
-            <div className='flex my-1 justify-center w-full'>
+            <div className='flex my-10 justify-center w-full'>
                 <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     {loadingData ? (
                         <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
@@ -213,13 +225,16 @@ const Page = () => {
                                             <TableCell align='center' className={`w-[5%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 STT
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                            <TableCell align='center' className={`w-[19%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Tên sản phẩm
                                             </TableCell>
                                             <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Số lượng
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
+                                                Quy cách
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
                                                 Danh mục
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
@@ -260,6 +275,30 @@ const Page = () => {
                                                     value={quantity}
                                                     label={'Số lượng'}
                                                     variant="standard" />
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                <Autocomplete
+                                                    className='w-full'
+                                                    options={
+                                                        selectedProduct?.productWarehouses
+                                                            ? selectedProduct.productWarehouses.filter(
+                                                                (item: any, index: any, self: any) =>
+                                                                    index ===
+                                                                    self.findIndex(
+                                                                        (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
+                                                                    )
+                                                            )
+                                                            : []
+                                                    }
+                                                    disablePortal
+                                                    value={selectedUnit}
+                                                    onChange={(event, newValue) => {
+                                                        setSelectedUnit(newValue)
+                                                    }}
+                                                    getOptionLabel={(option: any) => `${option.unit} ${option.weightPerUnit}kg`}
+                                                    renderInput={(params) => <TextField {...params}
+                                                        variant='standard' label="Quy cách" />}
+                                                />
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 {!selectedProduct ? (
@@ -352,7 +391,7 @@ const Page = () => {
                                                     <TableCell className='p-2'>
                                                         <TextField
                                                             type={'number'}
-                                                            inputProps={{ min: 0 }}
+                                                            inputProps={{ min: 1 }}
                                                             onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
                                                             value={item.quantity}
                                                             InputLabelProps={{
@@ -364,6 +403,38 @@ const Page = () => {
                                                 ) : (
                                                     <TableCell align='center'>
                                                         {item.quantity}
+                                                    </TableCell>
+                                                )}
+                                                {index === selectedRow ? (
+                                                    <TableCell className='p-2'>
+                                                        <Autocomplete
+                                                            className='w-full'
+                                                            options={
+                                                                item?.unitList
+                                                                    ? item.unitList.filter(
+                                                                        (item: any, index: any, self: any) =>
+                                                                            index ===
+                                                                            self.findIndex(
+                                                                                (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
+                                                                            )
+                                                                    )
+                                                                    : []
+                                                            }
+                                                            disablePortal
+                                                            value={item?.selectedUnit}
+                                                            onChange={(event, newValue) => {
+                                                                handleFieldChange('unit', newValue.unit, index);
+                                                                handleFieldChange('weightPerUnit', newValue.weightPerUnit, index);
+                                                                handleFieldChange('selectedUnit', newValue, index);
+                                                            }}
+                                                            getOptionLabel={(option: any) => `${option.unit} ${option.weightPerUnit}kg`}
+                                                            renderInput={(params) => <TextField {...params}
+                                                                variant='standard' label="Quy cách" />}
+                                                        />
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell align='center'>
+                                                        {item.unit} {item.weightPerUnit}kg
                                                     </TableCell>
                                                 )}
                                                 <TableCell align='center'>

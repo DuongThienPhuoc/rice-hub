@@ -9,19 +9,19 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useRouter } from 'next/navigation';
 
-export default function IncomePageBreadcrumb() {
+export default function ProductionPageBreadcrumb() {
     const router = useRouter();
     return (
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink className='text-white hover:text-black' onClick={() => router.push('/dashboard')}>
+                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
                         Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator className='text-white' />
+                <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                    <BreadcrumbPage className='text-white'>Phiếu thu</BreadcrumbPage>
+                    <BreadcrumbPage>Phiếu sản xuất</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

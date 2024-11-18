@@ -55,7 +55,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
         }
 
         try {
-            const response = await api.post(`${url}`, formData);
+            await api.post(`${url}`, formData);
             toast({
                 variant: 'default',
                 title: 'Cập nhật thành công',
@@ -91,7 +91,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
                     <form className='px-6 w-full' onSubmit={handleSubmit}>
                         <InputField titles={titles} data={formData} onFieldChange={handleFieldChange} />
                         <div className='w-full flex justify-center items-center pt-5 px-5'>
-                            <Button className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]' type="submit">
+                            <Button className='px-5 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500' type="submit">
                                 Cập nhật
                             </Button>
                         </div>

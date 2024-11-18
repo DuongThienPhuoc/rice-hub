@@ -1,5 +1,5 @@
 'use client';
-import { Button } from '@/components/ui/button';
+import * as React from 'react';
 import InventoryList from "@/components/list/list";
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
@@ -7,19 +7,24 @@ import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "../../../api/axiosConfig";
 import { useRouter } from 'next/navigation';
-import { PlusIcon } from 'lucide-react';
-import { Skeleton } from '@mui/material';
+import { ButtonGroup, Button, Skeleton } from '@mui/material';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Grow from '@mui/material/Grow';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import MenuItem from '@mui/material/MenuItem';
+import MenuList from '@mui/material/MenuList';
 
 export default function InventoryTable() {
     const router = useRouter();
     const columns = [
-        { name: 'id', displayName: 'Mã sản phẩm' },
-        { name: 'name', displayName: 'Tên sản phẩm' },
-        { name: 'unit', displayName: 'Đơn vị' },
-        { name: 'order', displayName: 'Số lượng' },
-        { name: 'batch', displayName: 'Lô hàng' },
+        { name: 'id', displayName: 'Mã phiếu' },
+        { name: 'inventoryDate', displayName: 'Ngày tạo phiếu' },
+        { name: 'warehouse.name', displayName: 'Kho' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
+    const options = ['Tạo phiếu kiểm kho sản xuất', 'Tạo phiếu kiểm kho nguyên liệu'];
     const [loadingData, setLoadingData] = useState(true);
     const [inventory, setInventory] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -31,6 +36,40 @@ export default function InventoryTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const [open, setOpen] = React.useState(false);
+    const anchorRef = React.useRef<HTMLDivElement>(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
+
+    const handleClick = () => {
+        if (options[selectedIndex] === 'Tạo phiếu kiểm kho sản xuất') {
+            router.push("/inventory/createProducts");
+        } else {
+            router.push("/inventory/createIngredients");
+        }
+    };
+
+    const handleMenuItemClick = (
+        event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+        index: number,
+    ) => {
+        setSelectedIndex(index);
+        setOpen(false);
+    };
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event: Event) => {
+        if (
+            anchorRef.current &&
+            anchorRef.current.contains(event.target as HTMLElement)
+        ) {
+            return;
+        }
+
+        setOpen(false);
+    };
 
     const getInventory = async (page?: number, search?: { field?: string, query?: string }) => {
         setLoadingData(true);
@@ -43,13 +82,13 @@ export default function InventoryTable() {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
-            const url = `/employees/?${params.toString()}`;
+            const url = `/inventory/getAll?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setInventory(data._embedded.employeeList);
+            setInventory(data._embedded.inventoryDtoList);
             setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu thu:", error);
+            console.error("Lỗi khi lấy danh sách phiếu kiểm kho:", error);
         } finally {
             setLoadingData(false);
         }
@@ -84,15 +123,76 @@ export default function InventoryTable() {
                             {loadingData ? (
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                             ) : (
-                                <Button onClick={() => router.push("/inventory/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                    Thêm phiếu kiểm kho
-                                    <PlusIcon />
-                                </Button>
+                                <>
+                                    <ButtonGroup
+                                        variant="contained"
+                                        sx={{
+                                            backgroundColor: '#1d1d1f',
+                                            '& .MuiButton-root': {
+                                                border: 'none',
+                                                '&:hover': {
+                                                    backgroundColor: '#1d1d1fca',
+                                                },
+                                            },
+                                        }}
+                                        ref={anchorRef}
+                                    >
+                                        <Button
+                                            className='bg-[#1d1d1f] hover:bg-[#1d1d1fca]'
+                                            onClick={handleClick}>{options[selectedIndex]}</Button>
+                                        <Button
+                                            className='bg-[#1d1d1f] hover:bg-[#1d1d1fca]'
+                                            size="small"
+                                            aria-controls={open ? 'split-button-menu' : undefined}
+                                            aria-expanded={open ? 'true' : undefined}
+                                            aria-label="select merge strategy"
+                                            aria-haspopup="menu"
+                                            onClick={handleToggle}
+                                        >
+                                            <ArrowDropDownIcon />
+                                        </Button>
+                                    </ButtonGroup>
+                                    <Popper
+                                        sx={{ zIndex: 1 }}
+                                        open={open}
+                                        anchorEl={anchorRef.current}
+                                        role={undefined}
+                                        transition
+                                        disablePortal
+                                    >
+                                        {({ TransitionProps, placement }) => (
+                                            <Grow
+                                                {...TransitionProps}
+                                                style={{
+                                                    transformOrigin:
+                                                        placement === 'bottom' ? 'center top' : 'center bottom',
+                                                }}
+                                            >
+                                                <Paper >
+                                                    <ClickAwayListener onClickAway={handleClose}>
+                                                        <MenuList id="split-button-menu" autoFocusItem>
+                                                            {options.map((option, index) => (
+                                                                <MenuItem
+                                                                    key={option}
+                                                                    disabled={index === 2}
+                                                                    selected={index === selectedIndex}
+                                                                    onClick={(event) => handleMenuItemClick(event, index)}
+                                                                >
+                                                                    {option}
+                                                                </MenuItem>
+                                                            ))}
+                                                        </MenuList>
+                                                    </ClickAwayListener>
+                                                </Paper>
+                                            </Grow>
+                                        )}
+                                    </Popper>
+                                </>
                             )}
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <InventoryList name="Phiếu thu" editUrl="/inventory/updateIncome" loadingData={loadingData} titles={titles} columns={columns} data={inventory} tableName="inventory" />
+                        <InventoryList name="Phiếu kiểm kho" editUrl="/inventory/updateInventory" loadingData={loadingData} titles={titles} columns={columns} data={inventory} tableName="inventory" />
                     </div>
                     {totalPages > 1 && (
                         <Paging

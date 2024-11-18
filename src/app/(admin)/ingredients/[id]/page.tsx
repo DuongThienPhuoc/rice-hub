@@ -6,9 +6,8 @@ import React, { useEffect, useState } from 'react';
 import api from "../../../../api/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import BatchList from "@/components/list/list";
-import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
+import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -17,18 +16,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [loadingData, setLoadingData] = useState(true);
-
-    const columns = [
-        { name: 'batch.batchCode', displayName: 'Mã lô hàng' },
-        { name: 'description', displayName: 'Mô tả' },
-        { name: 'price', displayName: 'Giá nhập (kg)' },
-        { name: 'unit', displayName: 'Quy cách' },
-        { name: 'quantity', displayName: 'Số lượng' },
-    ];
-
-    const titles = [
-        { name: '', displayName: '', type: '' },
-    ];
 
     useEffect(() => {
         const getProduct = async () => {
@@ -176,23 +163,23 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
                                 <div className='flex-1'>
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Mã nguyên liệu: </span>
+                                        <span className='font-bold flex-1'>Mã sản phẩm: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.productCode}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tên nguyên liệu: </span>
+                                        <span className='font-bold flex-1'>Tên sản phẩm: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.name}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Danh mục: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.category.name}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.category?.name}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Nhà cung cấp: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.supplier.name}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.supplier?.name}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
@@ -206,6 +193,28 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(product?.createAt)}</span>
                                         </div>
                                     </div>
+
+                                    <div className='flex-1'>
+                                        <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Quy cách: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
+                                                {product?.productWarehouses
+                                                    ? product.productWarehouses
+                                                        .filter(
+                                                            (item: any, index: any, self: any) =>
+                                                                index === self.findIndex(
+                                                                    (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
+                                                                )
+                                                        )
+                                                        .map((filteredItem: any, index: number) => (
+                                                            <span key={index}>
+                                                                {index > 0 && ','} {filteredItem.unit} {filteredItem.weightPerUnit}kg
+                                                            </span>
+                                                        ))
+                                                    : 'Không có quy cách'}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )
@@ -214,7 +223,55 @@ const Page = ({ params }: { params: { id: number } }) => {
                             <div className='m-10'>
                                 <p className='font-bold mb-5'>Danh sách lô hàng: </p>
                                 <div className='overflow-x-auto'>
-                                    <BatchList name="Lô hàng" editUrl="" titles={titles} columns={columns} loadingData={loadingData} data={batchProducts} tableName="batch" />
+                                    <div className='w-full mb-20 overflow-x-auto'>
+                                        {loadingData ? (
+                                            <div className="w-full">
+                                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                                {Array.from({ length: 10 }).map((_, rowIndex) => (
+                                                    <div key={rowIndex} className="flex mt-2">
+                                                        <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2, overflowX: 'auto' }}>
+                                                <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell align='center' className='font-semibold'>Mã lô hàng</TableCell>
+                                                            <TableCell align='center' className='font-semibold'>Giá nhập (kg)</TableCell>
+                                                            <TableCell align='center' className='font-semibold'>Quy cách</TableCell>
+                                                            <TableCell align='center' className='font-semibold'>Số lượng</TableCell>
+                                                            <TableCell align='center' className='font-semibold'>Mô tả</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {batchProducts && batchProducts.length !== 0 ? (
+                                                            batchProducts.map((row: any, rowIndex: any) => (
+                                                                <TableRow key={rowIndex} className={`font-semibold border border-gray-200 bg-white`}>
+                                                                    <TableCell align='center' className='font-semibold text-blue-500 hover:text-blue-300 cursor-pointer' onClick={() => router.push(`/batches/${row?.batch?.batchCode}`)}>
+                                                                        {row?.batch?.batchCode}
+                                                                    </TableCell>
+                                                                    <TableCell align='center'>{row?.price}</TableCell>
+                                                                    <TableCell align='center'>{row?.unit + ' ' + row?.weightPerUnit} kg</TableCell>
+                                                                    <TableCell align='center'>{row?.quantity}</TableCell>
+                                                                    <TableCell align='center'>{row?.description}</TableCell>
+                                                                </TableRow>
+                                                            ))
+                                                        ) : (
+                                                            <TableRow>
+                                                                <TableCell colSpan={6}>
+                                                                    <div className="my-10 mx-4 text-center text-gray-500">
+                                                                        Không có dữ liệu
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

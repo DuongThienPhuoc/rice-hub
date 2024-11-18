@@ -1,7 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
-import chevronRightIcon from '@/components/icon/chevron_right.svg';
-import chevronLeftIcon from '@/components/icon/chevron_left.svg';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PagingProps {
     currentPage: number;
@@ -49,21 +47,22 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 <button
                     onClick={() => handlePageClick(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-3 py-2 rounded-lg mr-1 ml-3 bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
+                    className="p-2 flex items-center rounded-lg mr-1 ml-3 bg-[#4ba94d] text-white hover:bg-green-500 transition-colors duration-200"
                 >
-                    <Image src={chevronLeftIcon} alt='Previous' width={10} height={10} />
+                    <ChevronLeft className='mr-1' />
+                    <span className={`hidden lg:block`}>Trang trước</span>
                 </button>
 
                 {startPage > 1 && (
                     <>
                         <button
                             onClick={() => handlePageClick(1)}
-                            className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
+                            className="px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                         >
                             1
                         </button>
                         {startPage > 2 && (
-                            <button className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
+                            <button className="px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
                         )}
                     </>
                 )}
@@ -72,7 +71,7 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                     <button
                         key={page}
                         onClick={() => handlePageClick(page)}
-                        className={`text-[12px] px-3 py-2 mx-1 rounded-lg ${currentPage === page ? 'bg-[#1d1d1fca] text-white hover:bg-[#1d1d1f7e]' : 'bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200'}`}
+                        className={`px-3 py-2 mx-1 rounded-lg ${currentPage === page ? 'bg-[#4ba94d] text-white hover:bg-green-500' : 'bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200'}`}
                     >
                         {page}
                     </button>
@@ -81,11 +80,11 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 {endPage < totalPages && (
                     <>
                         {endPage < totalPages - 1 && (
-                            <button className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
+                            <button className="px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] text-gray-400 cursor-not-allowed">...</button>
                         )}
                         <button
                             onClick={() => handlePageClick(totalPages)}
-                            className="text-[12px] px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
+                            className="px-3 py-2 mx-1 rounded-lg bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                         >
                             {totalPages}
                         </button>
@@ -95,9 +94,9 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 <button
                     onClick={() => handlePageClick(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-3 py-2 rounded-lg ml-1 mr-3 bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
+                    className="p-2 flex items-center rounded-lg ml-1 mr-3 bg-[#4ba94d] text-white hover:bg-green-500 transition-colors duration-200"
                 >
-                    <Image src={chevronRightIcon} alt='Next' width={10} height={10} />
+                    <span className={`hidden lg:block`}>Trang sau</span> <ChevronRight className='ml-1' />
                 </button>
             </div>
         </div>

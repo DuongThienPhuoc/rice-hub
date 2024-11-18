@@ -17,7 +17,7 @@ import * as XLSX from 'xlsx';
 import crypto from 'crypto';
 import { Skeleton } from '@mui/material';
 
-export default function ImportTable() {
+export default function ProductionTable() {
     const router = useRouter();
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },

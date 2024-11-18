@@ -72,37 +72,44 @@ export default function EmployeeTable() {
         <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='w-full overflow-x-auto'>
-                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
-                        <SearchBar
-                            onSearch={handleSearch}
-                            loadingData={loadingData}
-                            selectOptions={[
-                                { value: 'employeeCode', label: 'Mã nhân viên' },
-                                { value: 'fullName', label: 'Tên nhân viên' },
-                                { value: 'phoneNumber', label: 'Số điện thoại' }
-                            ]}
-                        />
-                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            {loadingData ? (
-                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                            ) : (
-                                <Button onClick={() => router.push("/employees/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                    Thêm nhân viên
-                                    <PlusIcon />
-                                </Button>
-                            )}
+                    <div className='p-5 bg-white rounded-lg'>
+                        {loadingData ? (
+                            <Skeleton animation="wave" variant="text" height={40} className='rounded-lg' />
+                        ) : (
+                            <div className='font-bold mb-5 text-[1.25rem]'>Nhân viên</div>
+                        )}
+                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                            <SearchBar
+                                onSearch={handleSearch}
+                                loadingData={loadingData}
+                                selectOptions={[
+                                    { value: 'employeeCode', label: 'Mã nhân viên' },
+                                    { value: 'fullName', label: 'Tên nhân viên' },
+                                    { value: 'phoneNumber', label: 'Số điện thoại' }
+                                ]}
+                            />
+                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                                {loadingData ? (
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                ) : (
+                                    <Button onClick={() => router.push("/employees/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                        Thêm nhân viên
+                                        <PlusIcon />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
+                        <div className='overflow-hidden'>
+                            <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" loadingData={loadingData} titles={titles} columns={columns} data={employees} tableName="employees" />
+                        </div>
+                        {totalPages > 1 && (
+                            <Paging
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
-                    <div className='overflow-hidden'>
-                        <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" loadingData={loadingData} titles={titles} columns={columns} data={employees} tableName="employees" />
-                    </div>
-                    {totalPages > 1 && (
-                        <Paging
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
                 </div>
             </section>
             <FloatingButton />

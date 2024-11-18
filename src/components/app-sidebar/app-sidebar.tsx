@@ -59,6 +59,7 @@ import {
     CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
 import { cn } from '@/lib/utils';
+import { FaChartBar } from "react-icons/fa";
 
 const categories = [
     {
@@ -66,9 +67,9 @@ const categories = [
         role: ['ROLE_ADMIN'],
         items: [
             {
-                title: 'Tài Chính',
+                title: 'Thống kê',
                 url: '/dashboard',
-                icon: <Home />,
+                icon: <FaChartBar />,
             },
         ],
     },
@@ -76,6 +77,11 @@ const categories = [
         category: 'Đơn hàng',
         role: ['ROLE_CUSTOMER'],
         items: [
+            {
+                title: 'Trang chủ',
+                url: '/',
+                icon: <Home />,
+            },
             {
                 title: 'Đặt hàng',
                 url: '/order',

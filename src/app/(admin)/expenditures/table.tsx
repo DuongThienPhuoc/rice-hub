@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { Button } from '@/components/ui/button';
 import ExpenseList from "@/components/list/list";
@@ -149,7 +150,7 @@ export default function EmployeeTable() {
                         </div>
                     </div>
                     <div className='overflow-hidden'>
-                        <ExpenseList name="Phiếu chi" editUrl="/ExpenseVoucher/update" loadingData={loadingData} titles={titles} columns={columns} data={expense} tableName="expense" handleClose={closeEdit} />
+                        <ExpenseList name="Phiếu chi" editUrl="/ExpenseVoucher/update" loadingData={loadingData} titles={titles} columns={columns} data={expense} tableName="ExpenseVoucher" handleClose={closeEdit} />
                     </div>
                     {totalPages > 1 && (
                         <Paging

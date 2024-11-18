@@ -55,6 +55,7 @@ const Page = () => {
     const [formData, setFormData] = useState<FormDataItem[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [selectedRow, setSelectedRow] = useState<any>(null);
+    const [totalPrice, setTotalPrice] = useState<number>(0);
 
     useEffect(() => {
         getSuppliers();
@@ -171,6 +172,9 @@ const Page = () => {
             alert('Vui lòng chọn kho');
             return;
         }
+
+        setTotalPrice(totalPrice + (quantity * importPrice));
+
         const newItem: FormDataItem = {
             name: productName,
             description: 'description',
@@ -208,6 +212,15 @@ const Page = () => {
             )
         );
     };
+
+    useEffect(() => {
+        const total = formData.reduce((sum, item) => {
+            const quantity = item.quantity || 0;
+            const importPrice = item.importPrice || 0;
+            return sum + quantity * importPrice;
+        }, 0);
+        setTotalPrice(total);
+    }, [formData]);
 
     const handleSubmit = async () => {
         if (formData.length < 1) {
@@ -287,7 +300,7 @@ const Page = () => {
                                             <TableCell rowSpan={2} align='center' className={`w-[5%] font-semibold text-black p-2 rounded-tl-2xl`}>
                                                 STT
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
                                                 Tên sản phẩm
                                             </TableCell>
                                             <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
@@ -305,7 +318,7 @@ const Page = () => {
                                             <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
                                                 Nhà cung cấp
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} align='center' className={`w-[20%] font-semibold text-black p-2`}>
                                                 Kho
                                             </TableCell>
                                             <TableCell rowSpan={2} align='center' className="w-[5%] font-semibold text-black p-2 rounded-tr-2xl">#</TableCell>
@@ -330,6 +343,7 @@ const Page = () => {
                                                     InputLabelProps={{
                                                         shrink: selectedProduct !== null || productName !== '' || isFocused,
                                                     }}
+                                                    className='w-full'
                                                     onFocus={() => setIsFocused(true)}
                                                     onBlur={() => setIsFocused(false)}
                                                     onChange={(e) => setProductName(e.target.value)}
@@ -608,6 +622,17 @@ const Page = () => {
                                                 </TableRow>
                                             )
                                         ))}
+                                        <TableRow>
+                                            <TableCell colSpan={7} align="center"></TableCell>
+                                            <TableCell colSpan={3} align="center" className='font-bold space-x-2 text-[20px]'>
+                                                <span>
+                                                    Tổng tiền:
+                                                </span>
+                                                <span>
+                                                    {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(totalPrice))}
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
                                     </TableBody>
                                 </Table>
                             </TableContainer>
