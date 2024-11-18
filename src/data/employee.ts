@@ -6,9 +6,9 @@ import {
 } from '@/type/employee';
 import { isAxiosError } from 'axios';
 
-export function getEmployee(role: 'driver' | 'porter') {
+export function getEmployee(role: 'daily' | 'monthly') {
     try {
-        return axios.get(`/employees/role`, { params: { role } });
+        return axios.get(`/employees/salary`, { params: { role } });
     } catch (e) {
         throw e;
     }
