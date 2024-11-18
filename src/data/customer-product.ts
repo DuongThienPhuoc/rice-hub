@@ -1,4 +1,4 @@
-import axios from '@/api/axiosConfig';
+import axios from '@/config/axiosConfig';
 
 export interface Product {
     _embedded: Embedded;

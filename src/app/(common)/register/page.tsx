@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Background from '@/components/assets/img/background.jpg'
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
-import api from "../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import GradientCircularProgress from '@/components/ui/GradientCircleProgress';

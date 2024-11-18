@@ -15,7 +15,7 @@ import { Paper, Skeleton } from '@mui/material';
 import { CalendarClock, DollarSign, Eye, PenBox, Trash2 } from 'lucide-react';
 import PopupPay from '../popup/popupPay';
 import PopupExtend from '../popup/popupExtend';
-import api from "../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 

@@ -4,6 +4,15 @@ export interface AdminOrderResponse {
     page:      Page;
 }
 
+export interface AdminUpdateOrderRequest {
+    customerId:      number;
+    status:          string;
+    totalAmount:     number;
+    deposit:         number;
+    remainingAmount: number;
+    orderDetails:    OrderDetail[];
+}
+
 export interface Order {
     id:              number;
     orderCode:       string;
@@ -14,6 +23,26 @@ export interface Order {
     remainingAmount: number;
     status:          string;
     orderDetails:    OrderDetail[];
+    receiptVoucher:  ReceiptVoucher;
+}
+
+export interface ReceiptVoucher {
+    id:           number;
+    receiptCode:  string;
+    receiptDate:  Date;
+    dueDate:      null;
+    totalAmount:  number;
+    paidAmount:   number;
+    remainAmount: number;
+    transactions: Transaction[];
+}
+
+export interface Transaction {
+    id:              number;
+    amount:          number;
+    transactionDate: Date;
+    paymentMethod:   string;
+    status:          string;
 }
 
 export interface Embedded {

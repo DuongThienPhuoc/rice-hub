@@ -26,7 +26,7 @@ export default function PayrollPage() {
         startTransition(async () => {
             try {
                 const response = await getEmployee(
-                    tab === 0 ? 'porter' : 'driver',
+                    tab === 0 ? 'daily' : 'monthly',
                 );
                 setEmployees(response.data || []);
             } catch (e) {
@@ -67,7 +67,7 @@ export default function PayrollPage() {
                             }}
                         >
                             <h1 className="text-sm font-medium leading-none">
-                                Bốc/Dỡ hàng
+                                Nhân viên thời vụ
                             </h1>
                         </div>
                         <div
@@ -80,7 +80,7 @@ export default function PayrollPage() {
                             }}
                         >
                             <h1 className="text-sm font-medium leading-none">
-                                Lái xe
+                                Nhân viên
                             </h1>
                         </div>
                     </div>
