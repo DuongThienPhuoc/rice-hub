@@ -38,6 +38,7 @@ import {
     PackageMinus,
     MonitorCheck,
     BadgeDollarSign,
+    Factory,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -59,6 +60,7 @@ import {
     CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
 import { cn } from '@/lib/utils';
+import { FaChartBar } from "react-icons/fa";
 
 const categories = [
     {
@@ -66,9 +68,9 @@ const categories = [
         role: ['ROLE_ADMIN'],
         items: [
             {
-                title: 'Tài Chính',
+                title: 'Thống kê',
                 url: '/dashboard',
-                icon: <Home />,
+                icon: <FaChartBar />,
             },
         ],
     },
@@ -76,6 +78,11 @@ const categories = [
         category: 'Đơn hàng',
         role: ['ROLE_CUSTOMER'],
         items: [
+            {
+                title: 'Trang chủ',
+                url: '/',
+                icon: <Home />,
+            },
             {
                 title: 'Đặt hàng',
                 url: '/order',
@@ -182,19 +189,24 @@ const categories = [
         role: ['ROLE_ADMIN'],
         items: [
             {
-                title: 'Nhập hàng',
+                title: 'Nhập kho',
                 url: '/import',
                 icon: <PackagePlus />,
             },
             {
-                title: 'Xuất hàng',
+                title: 'Xuất kho',
                 url: '/export',
                 icon: <PackageMinus />,
             },
             {
-                title: 'Kiểm hàng',
+                title: 'Kiểm kho',
                 url: '/inventory',
                 icon: <PenBox />,
+            },
+            {
+                title: 'Sản xuất',
+                url: '/production',
+                icon: <Factory />,
             },
         ],
     },

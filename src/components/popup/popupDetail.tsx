@@ -18,7 +18,7 @@ const PopupDetail: React.FC<PopupDetailProps> = ({ tableName, data, titles, hand
 
     return (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className='w-fit flex bg-white rounded-lg flex-col lg:flex-row'>
+            <div className='w-fit p-5 flex bg-white rounded-lg flex-col lg:flex-row'>
                 <div className='w-full py-3 h-full flex flex-col justify-between items-center lg:items-start'>
                     <div className='w-full flex justify-between items-center pb-5 px-5'>
                         <h1 className='font-bold'>Chi tiết {tableName.toLocaleLowerCase()}</h1>

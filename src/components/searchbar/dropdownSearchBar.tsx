@@ -54,7 +54,7 @@ const DropdownSearchBar: React.FC<DropdownSearchBarProps> = ({ onChange, selectO
     return (
         <div ref={dropdownRef} className="relative ml-2 mt-5 lg:mt-0">
             <Button
-                className="px-3 py-2 text-white bg-[#1d1d1f] hover:bg-[#1d1d1fcd] outline-none rounded-l-lg text-[14px]"
+                className="px-3 py-2 text-white bg-[#4ba94d] font-semibold hover:bg-green-500 outline-none rounded-l-lg text-[14px]"
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {selectedOption || selectOptions[0].label}
@@ -62,7 +62,7 @@ const DropdownSearchBar: React.FC<DropdownSearchBarProps> = ({ onChange, selectO
             </Button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-1 w-auto bg-white shadow-lg z-10">
+                <div className="absolute right-0 mt-1 w-auto border border-gray-300 bg-white shadow-lg z-10">
                     <input
                         type="text"
                         className="w-auto px-4 py-2 border-b border-gray-200 focus:outline-none"

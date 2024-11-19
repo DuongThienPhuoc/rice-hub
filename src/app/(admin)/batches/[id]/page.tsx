@@ -43,27 +43,36 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
     };
 
-    const handleUpdate = async (product: any) => {
+    const handleUpdate = async (product: any, reload: boolean) => {
         try {
-            const response = await api.put(`/batchproducts/update?batchProductId${product.id}`, {
+            const response = await api.put(`/batchproducts/update/${product.id}`, {
                 quantity: tempQuantity ? tempQuantity : product.quantity,
                 weightPerUnit: tempWeightPerUnit ? tempWeightPerUnit : product.weightPerUnit,
-                Unit: tempUnit ? tempUnit : product.unit,
+                unit: tempUnit ? tempUnit : product.unit,
                 price: tempPrice ? tempPrice : product.price,
                 description: tempDescription ? tempDescription : product.description,
             });
             if (response.status >= 200 && response.status < 300) {
-                alert(`Cập nhật thành công`);
-                getBatch();
-                getProducts();
+                if (reload === true) {
+                    alert(`Cập nhật thành công`);
+                    getBatch();
+                    getProducts();
+                }
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
             alert('Đã xảy ra lỗi, vui lòng thử lại.');
         }
     }
+
+    const areArraysEqual = (arr1: any, arr2: any) => {
+        if (arr1.length !== arr2.length) return false;
+
+        return arr1.every((obj1: any) =>
+            arr2.some((obj2: any) => JSON.stringify(obj1) === JSON.stringify(obj2))
+        );
+    };
 
     const handleDelete = async () => {
         if (selectedProducts.length < 1) {
@@ -77,57 +86,110 @@ const Page = ({ params }: { params: { id: string } }) => {
             return;
         }
 
-        Swal.fire({
-            title: 'Xác nhận xóa',
-            text: 'Bạn có chắc chắn muốn xóa những sản phẩm này khỏi lô hàng, một khi đã xóa sẽ không thể khôi phục nữa.',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Có, xóa!',
-            cancelButtonText: 'Không, hủy!',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                const productData = {
-                    batProductId: selectedProducts.map((product: any) => product?.id)
-                };
+        const productData = {
+            batProductId: selectedProducts.map((product: any) => product?.id)
+        };
 
-                try {
-                    const url = `/export/deleteMany`
-                    const response = await api.delete(url, { data: productData });
-                    if (response.status >= 200 && response.status < 300) {
-                        toast({
-                            variant: 'default',
-                            title: 'Xóa thành công',
-                            description: `Sản phẩm đã được xóa khỏi lô hàng.`,
-                            style: {
-                                backgroundColor: '#4caf50',
-                                color: '#fff',
-                            },
-                            duration: 3000
-                        })
-                        getBatch();
-                        getProducts();
-                    } else {
+        if (areArraysEqual(selectedProducts, products)) {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: `Bạn có chắc chắn muốn xóa phiếu ${batch?.receiptType === "IMPORT" ? 'nhập' : 'xuất'} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Có, xóa!',
+                cancelButtonText: 'Không, hủy!',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await api.delete(`/WarehouseReceipt/delete/${batch.warehouseReceipt.id}`);
+                        console.log(response);
+                        if (response.status >= 200 && response.status < 300) {
+                            toast({
+                                variant: 'default',
+                                title: 'Xóa thành công',
+                                description: `Xoá phiếu ${batch?.receiptType === "IMPORT" ? 'nhập' : 'xuất'} và lô hàng thành công.`,
+                                style: {
+                                    backgroundColor: '#4caf50',
+                                    color: '#fff',
+                                },
+                                duration: 3000
+                            })
+                            if (batch?.receiptType === "IMPORT") {
+                                router.push("/import")
+                            } else {
+                                router.push("/export");
+                            }
+                        } else {
+                            toast({
+                                variant: 'destructive',
+                                title: 'Xóa thất bại',
+                                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                                duration: 3000
+                            })
+                        }
+                    } catch (error: any) {
                         toast({
                             variant: 'destructive',
                             title: 'Xóa thất bại',
-                            description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                            description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
                             action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                             duration: 3000
                         })
                     }
-                } catch (error: any) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Xóa thất bại',
-                        description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
-                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                        duration: 3000
-                    })
+                } else {
+                    Swal.fire('Đã hủy', `Lô hàng và phiếu ${batch?.receiptType === "IMPORT" ? 'nhập' : 'xuất'} không bị xóa.`, 'info');
                 }
-            } else {
-                Swal.fire('Đã hủy', 'Sản phẩm không bị xóa khỏi lô hàng.', 'info');
-            }
-        });
+            });
+        } else {
+            Swal.fire({
+                title: 'Xác nhận xóa',
+                text: 'Bạn có chắc chắn muốn xóa những sản phẩm này khỏi lô hàng, một khi đã xóa sẽ không thể khôi phục nữa.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Có, xóa!',
+                cancelButtonText: 'Không, hủy!',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const url = `/batchproducts/deleteMany`
+                        const response = await api.delete(url, { data: productData });
+                        if (response.status >= 200 && response.status < 300) {
+                            toast({
+                                variant: 'default',
+                                title: 'Xóa thành công',
+                                description: `Sản phẩm đã được xóa khỏi lô hàng.`,
+                                style: {
+                                    backgroundColor: '#4caf50',
+                                    color: '#fff',
+                                },
+                                duration: 3000
+                            })
+                            getBatch();
+                            getProducts();
+                        } else {
+                            toast({
+                                variant: 'destructive',
+                                title: 'Xóa thất bại',
+                                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                                duration: 3000
+                            })
+                        }
+                    } catch (error: any) {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Xóa thất bại',
+                            description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                            action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                            duration: 3000
+                        })
+                    }
+                } else {
+                    Swal.fire('Đã hủy', 'Sản phẩm không bị xóa khỏi lô hàng.', 'info');
+                }
+            });
+        }
     }
 
     const handleSubmit = async (type: string) => {
@@ -196,7 +258,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                 if (type === 'import') {
                     Swal.fire('Đã hủy', 'Lô hàng không được nhập.', 'info');
                 } else {
-
                     Swal.fire('Đã hủy', 'Lô hàng không được xuất.', 'info');
                 }
             }
@@ -209,7 +270,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             const url = `/batches/batchCode/${params.id}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
             setBatch(data);
         } catch (error) {
             console.error("Error fetching batch:", error);
@@ -261,8 +321,8 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     return (
         <div>
-            <div className='flex my-10 justify-center px-5 w-full'>
-                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+            <div className='flex my-10 justify-center lg:px-5 w-full'>
+                <div className='w-[100%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
@@ -358,7 +418,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             </>
                                         )}
                                     </div>
-                                    <div className='overflow-x-auto'>
+                                    <div className='overflow-x-auto max-h-[400px]'>
                                         <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead>
@@ -380,7 +440,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                         </TableCell>
                                                         <TableCell rowSpan={2} align="center" className='font-semibold'>Mã sản phẩm</TableCell>
                                                         <TableCell rowSpan={2} align="center" className='font-semibold'>Tên sản phẩm</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Giá nhập</TableCell>
+                                                        {batch?.receiptType === 'IMPORT' && (
+                                                            <TableCell rowSpan={2} align="center" className='font-semibold'>Giá nhập</TableCell>
+                                                        )}
                                                         <TableCell rowSpan={1} colSpan={2} align="center" className='font-semibold'>Quy cách</TableCell>
                                                         <TableCell rowSpan={2} align="center" className='font-semibold'>Số lượng</TableCell>
                                                         <TableCell rowSpan={2} align="center" className='font-semibold w-[150px]'>Mô tả</TableCell>
@@ -416,25 +478,31 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                     {product.product.productCode}
                                                                 </TableCell>
                                                                 <TableCell align="center">{product.product.name}</TableCell>
-                                                                <TableCell align="center">
-                                                                    <TextField
-                                                                        type={'number'}
-                                                                        className='w-[100px]'
-                                                                        inputProps={{ min: 1 }}
-                                                                        onChange={(e) => setTempPrice(Number(e.target.value))}
-                                                                        value={tempPrice || product.price}
-                                                                        InputLabelProps={{
-                                                                            shrink: true,
-                                                                        }}
-                                                                        label={'Giá nhập'}
-                                                                        variant="standard" />
-                                                                </TableCell>
+                                                                {batch?.receiptType === 'IMPORT' && (
+                                                                    <TableCell align="center">
+                                                                        <TextField
+                                                                            type={'number'}
+                                                                            className='w-[100px]'
+                                                                            inputProps={{ min: 1 }}
+                                                                            onChange={(e) => {
+                                                                                setTempPrice(Number(e.target.value))
+                                                                            }}
+                                                                            value={tempPrice || product.price}
+                                                                            InputLabelProps={{
+                                                                                shrink: true,
+                                                                            }}
+                                                                            label={'Giá nhập'}
+                                                                            variant="standard" />
+                                                                    </TableCell>
+                                                                )}
                                                                 <TableCell align="center">
                                                                     <TextField
                                                                         type={'text'}
                                                                         className='w-[100px]'
                                                                         inputProps={{ min: 1 }}
-                                                                        onChange={(e) => setTempUnit(e.target.value)}
+                                                                        onChange={(e) => {
+                                                                            setTempUnit(e.target.value)
+                                                                        }}
                                                                         value={tempUnit || product.unit}
                                                                         InputLabelProps={{
                                                                             shrink: true,
@@ -447,7 +515,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         type={'number'}
                                                                         className='w-[100px]'
                                                                         inputProps={{ min: 1 }}
-                                                                        onChange={(e) => setTempWeightPerUnit(Number(e.target.value))}
+                                                                        onChange={(e) => {
+                                                                            setTempWeightPerUnit(Number(e.target.value))
+                                                                        }}
                                                                         value={tempWeightPerUnit || product.weightPerUnit}
                                                                         InputLabelProps={{
                                                                             shrink: true,
@@ -460,7 +530,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         type={'number'}
                                                                         className='w-[100px]'
                                                                         inputProps={{ min: 1 }}
-                                                                        onChange={(e) => setTempQuantity(Number(e.target.value))}
+                                                                        onChange={(e) => {
+                                                                            setTempQuantity(Number(e.target.value))
+                                                                        }}
                                                                         value={tempQuantity || product.quantity}
                                                                         InputLabelProps={{
                                                                             shrink: true,
@@ -473,22 +545,24 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         type={'text'}
                                                                         className='w-[120px]'
                                                                         inputProps={{ min: 1 }}
-                                                                        onChange={(e) => setTempDescription(e.target.value)}
+                                                                        onChange={(e) => {
+                                                                            setTempDescription(e.target.value)
+                                                                        }}
                                                                         value={tempDescription || product.description}
                                                                         InputLabelProps={{
                                                                             shrink: true,
                                                                         }}
                                                                         multiline
-                                                                        rows={3}
+                                                                        rows={2}
                                                                         label={'Mô tả'}
                                                                         variant="standard" />
                                                                 </TableCell>
                                                                 <TableCell align="center">
                                                                     <div className='flex justify-center items-center space-x-2'>
                                                                         <div className='relative group'>
-                                                                            <Upload onClick={() => handleUpdate(product)} size={18} className='cursor-pointer hover:text-green-500' />
-                                                                            <span className="absolute w-[70px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                                Cập nhật
+                                                                            <Upload onClick={() => handleUpdate(product, true)} size={18} className='cursor-pointer hover:text-green-500' />
+                                                                            <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                Lưu
                                                                             </span>
                                                                         </div>
                                                                         <div className='relative group'>
@@ -508,7 +582,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 {product.added === true ? (
                                                                     <TableCell></TableCell>
                                                                 ) : (
-
                                                                     <TableCell padding="checkbox">
                                                                         <Checkbox
                                                                             checked={selectedProducts.includes(product)}
@@ -520,19 +593,23 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                     {product.product.productCode}
                                                                 </TableCell>
                                                                 <TableCell align="center">{product.product.name}</TableCell>
-                                                                <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
+                                                                {batch?.receiptType === 'IMPORT' && (
+                                                                    <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
+                                                                )}
                                                                 <TableCell align="center">{product.unit}</TableCell>
                                                                 <TableCell align="center">{product.weightPerUnit} kg</TableCell>
                                                                 <TableCell align="center">{product.quantity}</TableCell>
                                                                 <TableCell align="center">{product.description}</TableCell>
                                                                 <TableCell align="center">
                                                                     <div className='flex justify-center items-center space-x-2'>
-                                                                        <div className='relative group'>
-                                                                            <PenSquare onClick={() => setSelectedRow(index)} size={18} className='cursor-pointer hover:text-blue-500' />
-                                                                            <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                                Sửa
-                                                                            </span>
-                                                                        </div>
+                                                                        {product.added !== true && (
+                                                                            <div className='relative group'>
+                                                                                <PenSquare onClick={() => setSelectedRow(index)} size={18} className='cursor-pointer hover:text-blue-500' />
+                                                                                <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                    Sửa
+                                                                                </span>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </TableCell>
                                                             </TableRow>

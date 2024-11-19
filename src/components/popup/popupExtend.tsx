@@ -6,8 +6,9 @@ import React, { useState } from 'react';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
-import { TextField } from '@mui/material';
-import Flatpickr from 'react-flatpickr';
+import { Autocomplete, TextField } from '@mui/material';
+import Swal from 'sweetalert2'
+import { X } from 'lucide-react';
 
 interface PopupCreateProps {
     data: Record<string, any>;
@@ -16,15 +17,9 @@ interface PopupCreateProps {
 
 const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
 
-    const [formData, setFormData] = useState({
-        id: data?.id,
-        dueDate: '',
-    });
     const { toast } = useToast();
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
-    const minDate = tomorrow.toISOString().split('T')[0];
+    const [value, setValue] = useState(1);
+    const [selectType, setSelectType] = useState('Ngày');
 
     const renderDate = (data: any) => {
         const date = new Date(data);
@@ -37,7 +32,7 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
-        if (!formData.id) {
+        if (!data.id) {
             toast({
                 variant: 'destructive',
                 title: 'Gia hạn thất bại',
@@ -48,83 +43,107 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
             return;
         }
 
-        if (formData.dueDate === '') {
-            toast({
-                variant: 'destructive',
-                title: 'Gia hạn thất bại',
-                description: 'Vui lòng chọn ngày gia hạn.',
-                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000
-            })
-            return;
-        }
-
-        const formattedDueDate = new Date(formData.dueDate).toISOString().split('T')[0];
-
-        try {
-            await api.post(`/ReceiptVoucher/extend`, {
-                ...formData,
-                dueDate: formattedDueDate
-            });
-            toast({
-                variant: 'default',
-                title: 'Gia hạn thành công',
-                description: `Hệ thống ghi nhận gia hạn phiếu thu đến ngày ${renderDate(formData.dueDate)}`,
-                style: {
-                    backgroundColor: '#4caf50',
-                    color: '#fff',
-                },
-                duration: 3000
-            })
-            handleClose(true);
-        } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Gia hạn thất bại',
-                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
-                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000
-            })
-        }
-    };
-
-    const handleFieldChange = (field: string, value: string | number | boolean) => {
-        setFormData((prevData) => ({
-            ...prevData,
-            [field]: value,
-        }));
+        Swal.fire({
+            title: 'Xác nhận gia hạn',
+            text: `Bạn có chắc muốn gia hạn cho phiếu thu này.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Có, lập!',
+            cancelButtonText: 'Không, hủy!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await api.post(`/ReceiptVoucher/extend`, {
+                        id: data.id,
+                        number: value,
+                        type: selectType
+                    });
+                    toast({
+                        variant: 'default',
+                        title: 'Gia hạn thành công',
+                        description: `Hệ thống ghi nhận gia hạn phiếu thu thêm ${value + ' ' + selectType}`,
+                        style: {
+                            backgroundColor: '#4caf50',
+                            color: '#fff',
+                        },
+                        duration: 3000
+                    })
+                    handleClose(true);
+                } catch (error: any) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Gia hạn thất bại',
+                        description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                        duration: 3000
+                    })
+                }
+            } else {
+                Swal.fire('Đã hủy', `Phiếu thu chưa được gia hạn.`, 'info');
+            }
+        })
     };
 
     return (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className='w-fit p-5 min-w-[400px] h-auto max-h-[90vh] overflow-y-auto flex flex-col lg:flex-row bg-white rounded-lg'>
-                <div className='w-full py-3 flex flex-col justify-between items-center lg:items-start'>
-                    <div className='w-full flex justify-between items-center pb-5 px-5'>
-                        <h1 className='font-bold text-[24px]'>Gia hạn phiếu thu</h1>
-                        <button onClick={() => handleClose(false)}>
-                            <span className="text-black text-xl hover:text-gray-500">✖</span>
-                        </button>
-                    </div>
-                    <form className='px-6 w-full space-y-5' onSubmit={handleSubmit}>
-                        <div>Mã phiếu: <strong><i>{data?.receiptCode}</i></strong></div>
-                        <div>Đơn hàng: <strong><i>{data?.orderDto?.orderCode}</i></strong></div>
-                        <div>Hạn thu hiện tại: <strong><i>{renderDate(data?.dueDate?.toString())}</i></strong></div>
-                        <TextField
-                            type='date'
-                            className='w-full'
-                            value={formData.dueDate}
-                            onChange={(e) => handleFieldChange('dueDate', e.target.value)}
-                            variant="standard"
-                            inputProps={{ min: minDate }}
-                        />
-                        <div className='w-full flex justify-center items-center py-5 px-5'>
-                            <Button className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]' type="submit">
-                                Gia hạn
-                            </Button>
-                        </div>
-                    </form>
+            <form onSubmit={handleSubmit} className='p-5 sm:w-[800px] w-full h-auto max-h-[90vh] overflow-y-auto bg-white sm:rounded-lg'>
+                <div className='w-full flex justify-between items-center pb-5 px-5'>
+                    <h1 className='font-bold'>Gia hạn phiếu thu</h1>
+                    <button onClick={() => handleClose(false)}>
+                        <X size={30} />
+                    </button>
                 </div>
-            </div>
+                <div className='flex flex-col'>
+                    <div className='flex-1 py-3'>
+                        <div className='px-6 w-full space-y-5' >
+                            <div>Mã phiếu: <strong><i>{data?.receiptCode}</i></strong></div>
+                            <div>Hạn thu hiện tại: <strong><i>{renderDate(data?.dueDate?.toString())}</i></strong></div>
+                        </div>
+                    </div>
+                    <div className='flex-1 py-3'>
+                        <div className='px-6 w-full space-y-5' >
+                            <div>Đơn hàng: <strong><i>{data?.orderDto?.orderCode}</i></strong></div>
+                            <div className='flex space-x-2 items-center'>
+                                <div className='w-[30%]'>Gia hạn thêm: </div>
+                                <TextField
+                                    type='number'
+                                    onChange={(e) => {
+                                        const holder = Number(e.target.value);
+                                        if (holder > 0) {
+                                            setValue(holder);
+                                        } else {
+                                            setValue(1);
+                                        }
+                                    }}
+                                    value={value}
+                                    className='w-[30%]'
+                                    variant="standard"
+                                    inputProps={{
+                                        style: { textAlign: 'center' }
+                                    }}
+                                />
+                                <Autocomplete
+                                    className='w-[40%]'
+                                    value={selectType}
+                                    disableClearable
+                                    onChange={(event, newValue) => setSelectType(newValue)}
+                                    options={['Ngày', 'Tuần', 'Tháng']}
+                                    renderInput={(params) => <TextField {...params}
+                                        variant='standard' />}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className='w-full flex justify-end items-center space-x-2 mt-10 px-5'>
+                    <Button className='px-5 py-2 text-[14px] hover:bg-green-500' type="submit">
+                        Gia hạn
+                    </Button>
+                    <Button onClick={() => handleClose(false)} className='px-5 py-2 text-[14px] bg-red-500 hover:bg-red-400' type="button">
+                        Hủy bỏ
+                    </Button>
+                </div>
+            </form>
         </div>
     );
 };

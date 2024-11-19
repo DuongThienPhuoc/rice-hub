@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import BarChart from '@/components/chart/barChart';
+import BarChart from '@/components/chart/BarChart';
 import MultipleBarChart from '@/components/chart/MultipleBarChart';
 import StackBarChart from '@/components/chart/StackBarChart';
 import FloatingButton from '@/components/floating/floatingButton';
@@ -10,8 +10,8 @@ import HorizontalChart from '@/components/chart/HorizontalChart';
 const Page = () => {
     return (
         <div>
-            <div className='flex my-5 justify-center px-5 w-full' >
-                <div className='w-[95%]'>
+            <div className='flex justify-center px-5 w-full' >
+                <div className='w-full'>
                     <div className='bg-white w-full rounded-md px-5 py-3' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                         <h1 className='text-black text-[20px] font-bold mt-3'>Báo cáo ngày</h1>
                         <div className='flex flex-col xl:flex-row mb-3'>

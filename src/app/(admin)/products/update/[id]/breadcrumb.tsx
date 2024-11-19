@@ -19,25 +19,25 @@ export default function UpdateProductPageBreadcrumb({
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
+                    <BreadcrumbLink className='text-white hover:font-bold hover:text-white' onClick={() => router.push('/dashboard')}>
                         Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/products')}>
+                    <BreadcrumbLink className='text-white hover:font-bold hover:text-white' onClick={() => router.push('/products')}>
                         Sản phẩm
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push(`/products/${productId}`)}>
+                    <BreadcrumbLink className='text-white hover:font-bold hover:text-white' onClick={() => router.push(`/products/${productId}`)}>
                         {productId}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Chỉnh sửa</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Chỉnh sửa</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

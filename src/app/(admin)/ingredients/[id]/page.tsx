@@ -6,9 +6,8 @@ import React, { useEffect, useState } from 'react';
 import api from "@/config/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import BatchList from "@/components/list/list";
-import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
+import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -17,18 +16,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [loadingData, setLoadingData] = useState(true);
-
-    const columns = [
-        { name: 'batch.batchCode', displayName: 'Mã lô hàng' },
-        { name: 'description', displayName: 'Mô tả' },
-        { name: 'price', displayName: 'Giá nhập (kg)' },
-        { name: 'unit', displayName: 'Quy cách' },
-        { name: 'quantity', displayName: 'Số lượng' },
-    ];
-
-    const titles = [
-        { name: '', displayName: '', type: '' },
-    ];
 
     useEffect(() => {
         const getProduct = async () => {
@@ -106,7 +93,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
-                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+                <div className='w-full md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
@@ -117,7 +104,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            ? 'text-white bg-[#4ba94d] hover:bg-green-500'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -175,24 +162,24 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </div>
                                 </div>
                                 <div className='flex-1'>
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Mã nguyên liệu: </span>
+                                    <div className='m-10 mt-5 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Mã sản phẩm: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.productCode}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Tên nguyên liệu: </span>
+                                        <span className='font-bold flex-1'>Tên sản phẩm: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.name}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Danh mục: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.category.name}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.category?.name}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Nhà cung cấp: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.supplier.name}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.supplier?.name}</span>
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
@@ -206,15 +193,92 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(product?.createAt)}</span>
                                         </div>
                                     </div>
+
+                                    <div className='flex-1'>
+                                        <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                            <span className='font-bold flex-1'>Quy cách: </span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
+                                                {product?.productWarehouses
+                                                    ? product.productWarehouses
+                                                        .filter(
+                                                            (item: any, index: any, self: any) =>
+                                                                index === self.findIndex(
+                                                                    (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
+                                                                )
+                                                        )
+                                                        .map((filteredItem: any, index: number) => (
+                                                            <span key={index}>
+                                                                {index > 0 && ','} {filteredItem.unit} {filteredItem.weightPerUnit}kg
+                                                            </span>
+                                                        ))
+                                                    : 'Không có quy cách'}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )
                     ) : (
                         <div className='w-full lg:px-10'>
-                            <div className='m-10'>
-                                <p className='font-bold mb-5'>Danh sách lô hàng: </p>
-                                <div className='overflow-x-auto'>
-                                    <BatchList name="Lô hàng" editUrl="" titles={titles} columns={columns} loadingData={loadingData} data={batchProducts} tableName="batch" />
+                            <div className='my-10 lg:mx-10 mx-5'>
+                                <p className='font-bold mb-5'>Lịch sử nhập xuất: </p>
+                                <div>
+                                    <div className='w-full max-h-[300px] overflow-auto'>
+                                        {loadingData ? (
+                                            <div className="w-full">
+                                                <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                                {Array.from({ length: 10 }).map((_, rowIndex) => (
+                                                    <div key={rowIndex} className="flex mt-2">
+                                                        <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
+                                                <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                                    <TableHead className='bg-[#0090d9]'>
+                                                        <TableRow>
+                                                            <TableCell className='font-semibold text-white'>Hình thức</TableCell>
+                                                            <TableCell className='font-semibold text-white'>Mã lô hàng</TableCell>
+                                                            <TableCell className='font-semibold text-white'>Giá nhập (kg)</TableCell>
+                                                            <TableCell className='font-semibold text-white'>Quy cách</TableCell>
+                                                            <TableCell className='font-semibold text-white'>Số lượng</TableCell>
+                                                            <TableCell className='font-semibold text-white'>Mô tả</TableCell>
+                                                            <TableCell className='font-semibold text-white'>Trạng thái</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {batchProducts && batchProducts.length !== 0 ? (
+                                                            console.log(batchProducts),
+                                                            batchProducts.map((row: any, rowIndex: any) => (
+                                                                <TableRow key={rowIndex} className={`font-semibold bg-white`}>
+                                                                    <TableCell>{row?.batch?.receiptType === 'IMPORT' ? 'Nhập' : 'Xuất'}</TableCell>
+                                                                    <TableCell className='font-semibold text-blue-500 hover:text-blue-300 cursor-pointer' onClick={() => router.push(`/batches/${row?.batch?.batchCode}`)}>
+                                                                        {row?.batch?.batchCode}
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.price))}
+                                                                    </TableCell>
+                                                                    <TableCell>{row?.unit + ' ' + row?.weightPerUnit} kg</TableCell>
+                                                                    <TableCell>{row?.quantity}</TableCell>
+                                                                    <TableCell>{row?.description || 'N/A'}</TableCell>
+                                                                    <TableCell>{row?.added ? 'Hoàn thành' : 'Chờ xác nhận'}</TableCell>
+                                                                </TableRow>
+                                                            ))
+                                                        ) : (
+                                                            <TableRow>
+                                                                <TableCell colSpan={6}>
+                                                                    <div className="my-10 mx-4 text-center text-gray-500">
+                                                                        Không có dữ liệu
+                                                                    </div>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        )}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -227,10 +291,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push(`/ingredients/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push(`/ingredients/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Sửa</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/ingredients")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/ingredients")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>

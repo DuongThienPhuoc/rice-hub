@@ -175,7 +175,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className="bg-white sm:max-w-[60vw] w-[90vw]">
+            <DialogContent className="bg-white sm:max-w-[60vw] w-[100vw]">
                 <DialogHeader>
                     <DialogTitle className="scroll-m-20 font-roboto border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
                         Tạo đơn hàng
@@ -206,7 +206,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 </div>
                                 <SelectGroup>
                                     <SelectLabel>Chọn khách hàng</SelectLabel>
-                                    {filterCustomers.map((customer) => (
+                                    {filterCustomers?.map((customer) => (
                                         <SelectItem
                                             key={customer.id}
                                             value={customer.id.toString()}
@@ -338,7 +338,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <TableCell>
                                                             {currencyHandleProvider(
                                                                 product.unitPrice ||
-                                                                    0,
+                                                                0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="flex justify-center">

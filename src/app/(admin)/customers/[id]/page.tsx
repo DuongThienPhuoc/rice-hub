@@ -2,39 +2,67 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import api from "@/config/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
-import Modal from 'react-modal';
-import { PlusIcon, Printer, Upload } from 'lucide-react';
+import { ChevronLeft, ChevronRight, PlusIcon, Upload } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import firebase from '@/config/firebaseConfig';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
-    const [navbarVisible, setNavbarVisible] = useState(false);
     const [customer, setCustomer] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [loadingData, setLoadingData] = useState(true);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        const updateNavbarVisibility = () => {
-            const shouldShowNavbar = window.innerWidth >= 1100;
-            setNavbarVisible(shouldShowNavbar);
-        };
+    const handleButtonClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
 
-        updateNavbarVisibility();
+    const handleFileChange = async (event: any) => {
+        const file = event.target.files[0];
+        const storage = getStorage(firebase);
 
-        window.addEventListener('resize', updateNavbarVisibility);
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Chỉ được phép tải lên tệp hình ảnh!');
+                return;
+            }
 
-        return () => {
-            window.removeEventListener('resize', updateNavbarVisibility);
-        };
-    }, []);
+            const storageRef = ref(storage, `images/${file.name}`);
+            const snapshot = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            try {
+                const url = `/contracts/updateContract`;
+                await api.post(url, {
+                    imageFilePath: downloadURL,
+                    id: customer?.contracts[selectedImageIndex].id
+                });
+                toast({
+                    variant: 'default',
+                    title: 'Tải thành công!',
+                    description: 'Tải lên hợp đồng thành công',
+                    duration: 3000
+                })
+            } catch (error: any) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Tải thất bại!',
+                    description: 'Xin vui lòng thử lại sau',
+                    duration: 3000
+                })
+            }
+        }
+    };
 
     useEffect(() => {
         const getCustomer = async () => {
@@ -91,18 +119,6 @@ const Page = ({ params }: { params: { id: number } }) => {
         }
     }
 
-    const handleClickImage = (index: number) => {
-        setSelectedImageIndex(index);
-    };
-
-    const handleOpenPopup = () => {
-        setIsPopupOpen(true);
-    };
-
-    const handleClosePopup = () => {
-        setIsPopupOpen(false);
-    };
-
     const checkDuration = ((duration: any, confirmationDate: any) => {
         const expiryDate = confirmationDate ? new Date(confirmationDate.getTime()) : null;
         if (expiryDate) {
@@ -127,7 +143,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            ? 'text-white bg-[#4ba94d] hover:bg-green-500'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -151,7 +167,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             )}
                         </div>
                     )}
-                    <div className='flex flex-col lg:flex-row px-10'>
+                    <div className='flex flex-col lg:flex-row lg:px-5'>
                         {choice ? (
                             loadingData ? (
                                 <>
@@ -259,64 +275,65 @@ const Page = ({ params }: { params: { id: number } }) => {
                             )
                         ) : (
                             <>
-                                <div className="flex-1 flex flex-col items-center my-10 mx-auto pr-10">
-                                    <div className="w-full max-w-2xl mb-4 border-[3px] border-black">
-                                        <img src={customer?.contracts[selectedImageIndex].imageFilePath || 'https://via.placeholder.com/150'} alt="Large Display" className="w-full object-cover" />
+                                <div className="flex-1 flex w-full flex-col items-center my-10">
+                                    <div className='w-full flex items-center'>
+                                        <button disabled={selectedImageIndex === 0} onClick={() => setSelectedImageIndex(selectedImageIndex - 1)} className='bg-green-500 hover:bg-green-300 rounded-full pr-0.5 mx-2'><ChevronLeft color='white' /></button>
+                                        <div className="w-full mb-4 border-[3px] border-black">
+                                            {customer?.contracts && customer?.contracts.length > 0 ? (
+                                                customer.contracts.map((contract: any, index: number) => {
+                                                    return (
+                                                        contract.imageFilePath ? (
+                                                            <div
+                                                                key={index}
+                                                                style={{ backgroundImage: `url(${contract.imageFilePath})` }}
+                                                                className={`w-full min-h-[700px] bg-cover bg-center ${selectedImageIndex !== index ? 'hidden' : ''}`}
+                                                            />
+                                                        ) : (
+                                                            <iframe
+                                                                key={index}
+                                                                src={contract.pdfFilePath}
+                                                                className={`w-full min-h-[700px] ${selectedImageIndex !== index ? 'hidden' : ''}`}
+                                                                title="PDF Viewer"
+                                                            />
+                                                        )
+                                                    );
+                                                })
+                                            ) : (
+                                                <div className='w-full flex justify-center items-center min-h-[600px]'>
+                                                    <p>Không có dữ liệu</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <button disabled={selectedImageIndex === customer?.contracts?.length - 1 || customer?.contracts?.length < 1} onClick={() => setSelectedImageIndex(selectedImageIndex + 1)} className='bg-green-500 hover:bg-green-300 rounded-full pl-0.5 mx-2'><ChevronRight color='white' /></button>
                                     </div>
+                                    <div className="flex items-center space-x-2">
+                                        {selectedImageIndex > 1 && (
+                                            <div
+                                                className="w-20 h-20 flex items-center justify-center cursor-pointer border-[3px] border-black"
+                                            >
+                                                <span className="text-gray-500 font-bold">{selectedImageIndex - 1}</span>
+                                            </div>
+                                        )}
 
-                                    {navbarVisible ? (
-                                        <div className="w-auto flex space-x-2">
-                                            {customer?.contracts.slice(0, 4).map((contract: any, index: any) => (
-                                                <img
-                                                    key={index}
-                                                    src={contract.imageFilePath || 'https://via.placeholder.com/150'}
-                                                    alt={`Small ${index}`}
-                                                    className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${index === selectedImageIndex ? 'border-blue-500' : 'border-black'}`}
-                                                    onClick={() => handleClickImage(index)}
-                                                />
-                                            ))}
-                                            {customer?.contracts.length > 4 && (
-                                                <div onClick={handleOpenPopup} className="w-20 h-20 relative flex items-center justify-center cursor-pointer border-[3px] border-black">
-                                                    <div
-                                                        className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
-                                                        style={{
-                                                            backgroundImage: `url(${customer?.contracts[4].imageFilePath || 'https://via.placeholder.com/150'})`,
-                                                            opacity: 0.2
-                                                        }}
-                                                    ></div>
-                                                    <div className="relative z-2 font-bold bg-gray-200 rounded-full px-1">
-                                                        +{customer?.contracts.length - 4}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="w-full flex space-x-2">
-                                            {customer?.contracts.slice(0, 2).map((contract: any, index: any) => (
-                                                <img
-                                                    key={index}
-                                                    src={contract.imageFilePath || 'https://via.placeholder.com/150'}
-                                                    alt={`Small ${index}`}
-                                                    className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${index === selectedImageIndex ? 'border-blue-500' : 'border-black'}`}
-                                                    onClick={() => handleClickImage(index)}
-                                                />
-                                            ))}
-                                            {customer?.contracts.length > 2 && (
-                                                <div onClick={handleOpenPopup} className="w-20 h-20 relative flex items-center justify-center cursor-pointer border-[3px] border-black">
-                                                    <div
-                                                        className="absolute top-0 left-0 w-full h-full bg-cover bg-center"
-                                                        style={{
-                                                            backgroundImage: `url(${customer?.contracts[2].imageFilePath || 'https://via.placeholder.com/150'})`,
-                                                            opacity: 0.2
-                                                        }}
-                                                    ></div>
-                                                    <div className="relative z-2 font-bold bg-gray-200 rounded-full px-1">
-                                                        +{customer?.contracts.length - 2}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
+                                        {customer?.contracts.slice(Math.max(0, selectedImageIndex - 1), Math.min(customer?.contracts.length, selectedImageIndex + 2)).map((contract: any, index: any) => (
+                                            <img
+                                                key={index}
+                                                onClick={() => setSelectedImageIndex(Math.max(0, selectedImageIndex - 1) + index)}
+                                                src={contract.imageFilePath || 'https://via.placeholder.com/150'}
+                                                alt={`Small ${Math.max(0, selectedImageIndex - 1) + index}`}
+                                                className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${Math.max(0, selectedImageIndex - 1) + index === selectedImageIndex ? 'border-blue-500' : 'border-black'
+                                                    }`}
+                                            />
+                                        ))}
+
+                                        {selectedImageIndex < customer?.contracts?.length - 2 && (
+                                            <div
+                                                className="w-20 h-20 flex items-center justify-center cursor-pointer border-[3px] border-black"
+                                            >
+                                                <span className="text-gray-500 font-bold">{customer?.contracts?.length - selectedImageIndex - 2}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className='flex-1 lg:my-10 mb-10 mt-0'>
                                     <div className='m-10 flex flex-col lg:flex-row'>
@@ -346,14 +363,19 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             }
                                         </span>
                                     </div>
-                                    <div className='m-10 flex lg:justify-between'>
-                                        <Button type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                            Cập nhật <Upload />
+                                    <div className='my-10 ml-10 flex mr-2 lg:justify-end xl:flex-row flex-col space-y-2 items-end xl:space-y-0 xl:space-x-2'>
+                                        <Button onClick={handleButtonClick} type='button' className='font-semibold w-fit px-5 py-3 text-[14px] hover:bg-green-500'>
+                                            Tải lên hợp đồng <Upload />
                                         </Button>
-                                        <Button type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                            In hợp đồng <Printer />
-                                        </Button>
-                                        <Button onClick={() => window.open(`/contracts/create/${params.id}`, "_blank")} type='button' className='font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            ref={fileInputRef}
+                                            style={{ display: 'none' }}
+                                            onChange={handleFileChange}
+                                        />
+                                        <Button onClick={() => router.push(`/contracts/create/${params.id}`)} type='button' className='w-fit font-semibold px-5 py-3 text-[14px] hover:bg-green-500'>
                                             Tạo hợp đồng <PlusIcon />
                                         </Button>
                                     </div>
@@ -370,10 +392,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </>
                             ) : (
                                 <>
-                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Sửa</strong>
                                     </Button>
-                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Trở về</strong>
                                     </Button>
                                 </>
@@ -382,36 +404,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                     )}
                 </div>
             </div>
-
-            <Modal
-                isOpen={isPopupOpen}
-                onRequestClose={handleClosePopup}
-                contentLabel="Danh sách hợp đồng"
-                ariaHideApp={false}
-                className="bg-[rgba(0,0,0,0.5)] fixed top-0 left-0 right-0 bottom-0 flex flex-col justify-center items-center"
-            >
-                <div className='bg-white p-10 rounded-lg w-[80%] h-[90%] relative overflow-y-auto'>
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-xl font-bold">Danh sách hợp đồng</h2>
-                        <button onClick={handleClosePopup}><strong>Đóng</strong></button>
-                    </div>
-                    <div className="grid xl:grid-cols-10 lg:grid-cols-5 grid-cols-2 gap-4 mt-10">
-                        {customer?.contracts.map((contract: any, index: any) => (
-                            <div
-                                key={index}
-                                className="cursor-pointer"
-                            // onClick={() => openImageInNewTab(img)}
-                            >
-                                <img
-                                    src={contract.imageFilePath || 'https://via.placeholder.com/150'}
-                                    alt={`Contract ${index + 1}`}
-                                    className="w-full h-auto object-cover border-[3px] border-black"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </Modal>
         </div >
     )
 };
