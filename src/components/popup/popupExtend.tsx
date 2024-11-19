@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { Autocomplete, TextField } from '@mui/material';
 import Swal from 'sweetalert2'
+import { X } from 'lucide-react';
 
 interface PopupCreateProps {
     data: Record<string, any>;
@@ -85,14 +86,14 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
 
     return (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <form onSubmit={handleSubmit} className='p-5 lg:w-[800px] w-[360px] h-auto max-h-[90vh] overflow-y-auto bg-white rounded-lg'>
+            <form onSubmit={handleSubmit} className='p-5 sm:w-[800px] w-full h-auto max-h-[90vh] overflow-y-auto bg-white sm:rounded-lg'>
                 <div className='w-full flex justify-between items-center pb-5 px-5'>
                     <h1 className='font-bold'>Gia hạn phiếu thu</h1>
                     <button onClick={() => handleClose(false)}>
-                        <span className="text-black text-xl hover:text-gray-500">✖</span>
+                        <X size={30} />
                     </button>
                 </div>
-                <div className='flex flex-col lg:flex-row'>
+                <div className='flex flex-col'>
                     <div className='flex-1 py-3'>
                         <div className='px-6 w-full space-y-5' >
                             <div>Mã phiếu: <strong><i>{data?.receiptCode}</i></strong></div>
@@ -135,7 +136,7 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
                     </div>
                 </div>
                 <div className='w-full flex justify-end items-center space-x-2 mt-10 px-5'>
-                    <Button className='px-5 py-2 text-[14px] hover:bg-[#1d1d1fca]' type="submit">
+                    <Button className='px-5 py-2 text-[14px] hover:bg-green-500' type="submit">
                         Gia hạn
                     </Button>
                     <Button onClick={() => handleClose(false)} className='px-5 py-2 text-[14px] bg-red-500 hover:bg-red-400' type="button">

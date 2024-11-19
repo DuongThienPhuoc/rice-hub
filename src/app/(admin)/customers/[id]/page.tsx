@@ -143,7 +143,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            ? 'text-white bg-[#4ba94d] hover:bg-green-500'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -299,10 +299,12 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                     );
                                                 })
                                             ) : (
-                                                <p>Không có dữ liệu</p>
+                                                <div className='w-full flex justify-center items-center min-h-[600px]'>
+                                                    <p>Không có dữ liệu</p>
+                                                </div>
                                             )}
                                         </div>
-                                        <button disabled={selectedImageIndex === customer?.contracts?.length - 1} onClick={() => setSelectedImageIndex(selectedImageIndex + 1)} className='bg-green-500 hover:bg-green-300 rounded-full pl-0.5 mx-2'><ChevronRight color='white' /></button>
+                                        <button disabled={selectedImageIndex === customer?.contracts?.length - 1 || customer?.contracts?.length < 1} onClick={() => setSelectedImageIndex(selectedImageIndex + 1)} className='bg-green-500 hover:bg-green-300 rounded-full pl-0.5 mx-2'><ChevronRight color='white' /></button>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         {selectedImageIndex > 1 && (
@@ -362,7 +364,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         </span>
                                     </div>
                                     <div className='my-10 ml-10 flex mr-2 lg:justify-end xl:flex-row flex-col space-y-2 items-end xl:space-y-0 xl:space-x-2'>
-                                        <Button onClick={handleButtonClick} type='button' className='font-semibold w-fit px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        <Button onClick={handleButtonClick} type='button' className='font-semibold w-fit px-5 py-3 text-[14px] hover:bg-green-500'>
                                             Tải lên hợp đồng <Upload />
                                         </Button>
 
@@ -373,7 +375,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             style={{ display: 'none' }}
                                             onChange={handleFileChange}
                                         />
-                                        <Button onClick={() => router.push(`/contracts/create/${params.id}`)} type='button' className='w-fit font-semibold px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                        <Button onClick={() => router.push(`/contracts/create/${params.id}`)} type='button' className='w-fit font-semibold px-5 py-3 text-[14px] hover:bg-green-500'>
                                             Tạo hợp đồng <PlusIcon />
                                         </Button>
                                     </div>
@@ -390,10 +392,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </>
                             ) : (
                                 <>
-                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Sửa</strong>
                                     </Button>
-                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Trở về</strong>
                                     </Button>
                                 </>

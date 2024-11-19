@@ -2,23 +2,24 @@
 'use client';
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
-import Flatpickr from 'react-flatpickr';
-import 'flatpickr/dist/themes/material_blue.css';
 import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { CalendarClock, DollarSign, Eye, EyeOff } from "lucide-react";
 import PopupPay from "@/components/popup/popupPay";
 import PopupExtend from "@/components/popup/popupExtend";
 import { useRouter } from 'next/navigation';
+import { Separator } from '@/components/ui/separator';
+import { DatePickerWithRange } from '../expenditures/date-range-picker';
+import { DateRange } from 'react-day-picker';
 
 export default function IncomeTable() {
     const router = useRouter();
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [isEditVisible, setEditVisible] = useState(false);
     const [isDetailVisible, setDetailVisible] = useState(false);
-    const [dateRange, setDateRange] = useState<[any, any]>(['', '']);
+    const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [loadingData, setLoadingData] = useState(true);
@@ -32,7 +33,6 @@ export default function IncomeTable() {
     });
 
     const getIncome = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -80,9 +80,9 @@ export default function IncomeTable() {
     }, [currentPage, currentSearch, startDate, endDate]);
 
     useEffect(() => {
-        setStartDate(dateRange[0]);
-        setEndDate(dateRange[1]);
-    }, [dateRange])
+        setStartDate(date?.from || null);
+        setEndDate(date?.to || null);
+    }, [date]);
 
     const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
@@ -121,39 +121,37 @@ export default function IncomeTable() {
                 <div className='w-full overflow-x-auto'>
                     <div className='p-5 bg-white rounded-lg'>
                         {loadingData ? (
-                            <Skeleton animation="wave" variant="text" height={40} className='rounded-lg' />
-                        ) : (
-                            <div className='font-bold mb-5 text-[1.25rem]'>Phiếu thu</div>
-                        )}
-                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
-                            <div className="border border-[#ccc] rounded-[4px] p-[5px]" style={{ boxShadow: '0px 4px 8px lightgray' }}>
-                                <Flatpickr
-                                    className='border-none outline-none p-[5px]'
-                                    value={dateRange}
-                                    onChange={([startDate, endDate]) => {
-                                        setDateRange([startDate, endDate])
-                                    }}
-                                    options={{
-                                        mode: "range",
-                                        dateFormat: "d/m/Y",
-                                        locale: {
-                                            rangeSeparator: " ~ ",
-                                        },
-                                    }}
-                                    placeholder="_/__/___ ~ _/__/___"
-                                />
-                                <span className="icon">&#x1F4C5;</span>
+                            <div className='mb-5'>
+                                <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
                             </div>
-                            <SearchBar
-                                onSearch={handleSearch}
-                                loadingData={loadingData}
-                                selectOptions={[
-                                    { value: 'id', label: 'Mã phiếu' }
-                                ]}
-                            />
+                        ) : (
+                            <div className="space-y-2 mb-5">
+                                <div className='font-bold text-[1.25rem]'>Phiếu thu</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Quản lý danh sách phiếu thu
+                                </p>
+                            </div>
+                        )}
+                        <Separator orientation="horizontal" />
+                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                            <div className='flex space-x-2 md:items-center space-y-2 md:space-y-0 md:flex-row flex-col'>
+                                <SearchBar
+                                    onSearch={handleSearch}
+                                    loadingData={loadingData}
+                                    selectOptions={[
+                                        { value: 'id', label: 'Mã phiếu' }
+                                    ]}
+                                />
+                                {loadingData ? (
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
+                                ) : (
+                                    <DatePickerWithRange date={date} setDate={setDate} />
+                                )}
+                            </div>
                         </div>
-                        <div className='overflow-hidden'>
-                            <div className='w-full overflow-x-auto'>
+                        <div>
+                            <div className='w-full'>
                                 {loadingData ? (
                                     <div className="w-full">
                                         <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
@@ -168,14 +166,14 @@ export default function IncomeTable() {
                                         <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                             <TableHead className='bg-[#0090d9]'>
                                                 <TableRow>
-                                                    <TableCell align='center' className='font-semibold text-white'>Mã phiếu</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Mã đơn hàng</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Ngày tạo phiếu</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Đối tượng thu</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Tổng giá trị</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Đã thanh toán</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Còn lại</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Hạn thu</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Mã phiếu</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Mã đơn hàng</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Ngày tạo phiếu</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Đối tượng thu</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Tổng giá trị</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Đã thanh toán</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Còn lại</TableCell>
+                                                    <TableCell className='font-semibold text-white'>Hạn thu</TableCell>
                                                     <TableCell align='center' className='font-semibold text-white'>Hành động</TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -183,17 +181,17 @@ export default function IncomeTable() {
                                                 {income && income.length !== 0 ? (
                                                     income.map((row: any, rowIndex) => (
                                                         <>
-                                                            <TableRow key={rowIndex} className={`font-semibold border border-gray-200 bg-white`}>
-                                                                <TableCell align='center'>{row.receiptCode}</TableCell>
-                                                                <TableCell align='center' onClick={() => router.push(`/admin/orders/${row.orderDto.id}`)} className="text-blue-500 cursor-pointer hover:text-blue-300 font-semibold">
+                                                            <TableRow key={rowIndex} className={`font-semibold bg-white`}>
+                                                                <TableCell>{row.receiptCode}</TableCell>
+                                                                <TableCell onClick={() => router.push(`/admin/orders/${row.orderDto.id}`)} className="text-blue-500 cursor-pointer hover:text-blue-300 font-semibold">
                                                                     {row.orderDto.orderCode}
                                                                 </TableCell>
-                                                                <TableCell align='center'>{formatDate(row.receiptDate)}</TableCell>
-                                                                <TableCell align='center'>{row.orderDto.customer.fullName}</TableCell>
-                                                                <TableCell align='center'>{formatCurrency(row.totalAmount)}</TableCell>
-                                                                <TableCell align='center'>{formatCurrency(row.paidAmount)}</TableCell>
-                                                                <TableCell align='center'>{formatCurrency(row.remainAmount)}</TableCell>
-                                                                <TableCell align='center'>{formatDate(row.dueDate)}</TableCell>
+                                                                <TableCell>{formatDate(row.receiptDate)}</TableCell>
+                                                                <TableCell>{row.orderDto.customer.fullName}</TableCell>
+                                                                <TableCell>{formatCurrency(row.totalAmount)}</TableCell>
+                                                                <TableCell>{formatCurrency(row.paidAmount)}</TableCell>
+                                                                <TableCell>{formatCurrency(row.remainAmount)}</TableCell>
+                                                                <TableCell>{formatDate(row.dueDate)}</TableCell>
                                                                 <TableCell className="text-center px-4 py-3">
                                                                     <div className="flex justify-center items-center space-x-3">
                                                                         <div className="relative group">
@@ -232,7 +230,7 @@ export default function IncomeTable() {
                                                             {showTransaction === rowIndex && row.transactionDtoList && (
                                                                 row.transactionDtoList.length > 0 ? (
                                                                     <TableRow>
-                                                                        <TableCell colSpan={9} align='center'>
+                                                                        <TableCell colSpan={9} align='center' className='p-0'>
                                                                             <div className="w-full">
                                                                                 <Table aria-label="simple table">
                                                                                     <TableHead className="bg-green-500 ">
@@ -241,8 +239,6 @@ export default function IncomeTable() {
                                                                                             <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>
                                                                                             <TableCell align='center' className="text-white">Ngày giao dịch</TableCell>
                                                                                             <TableCell align='center' className="text-white">Giá trị</TableCell>
-                                                                                            <TableCell></TableCell>
-                                                                                            <TableCell></TableCell>
                                                                                         </TableRow>
                                                                                     </TableHead>
                                                                                     <TableBody>
@@ -252,8 +248,6 @@ export default function IncomeTable() {
                                                                                                 <TableCell align='center'>{transaction.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản' : 'Tiền mặt'}</TableCell>
                                                                                                 <TableCell align='center'>{formatDate(transaction.transactionDate)}</TableCell>
                                                                                                 <TableCell align='center'>{formatCurrency(transaction.amount)}</TableCell>
-                                                                                                <TableCell></TableCell>
-                                                                                                <TableCell></TableCell>
                                                                                             </TableRow>
                                                                                         ))}
                                                                                     </TableBody>
@@ -263,17 +257,15 @@ export default function IncomeTable() {
                                                                     </TableRow>
                                                                 ) : (
                                                                     <TableRow>
-                                                                        <TableCell colSpan={9} align='center'>
+                                                                        <TableCell colSpan={9} align='center' className='p-0'>
                                                                             <div className="w-full">
                                                                                 <Table aria-label="simple table">
                                                                                     <TableHead className="bg-green-500 text-white">
                                                                                         <TableRow>
-                                                                                            <TableCell align='center'>STT</TableCell>
-                                                                                            <TableCell align='center'>Phương thức thanh toán</TableCell>
-                                                                                            <TableCell align='center'>Ngày giao dịch</TableCell>
-                                                                                            <TableCell align='center'>Giá trị</TableCell>
-                                                                                            <TableCell></TableCell>
-                                                                                            <TableCell></TableCell>
+                                                                                            <TableCell align='center' className="text-white">STT</TableCell>
+                                                                                            <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>
+                                                                                            <TableCell align='center' className="text-white">Ngày giao dịch</TableCell>
+                                                                                            <TableCell align='center' className="text-white">Giá trị</TableCell>
                                                                                         </TableRow>
                                                                                     </TableHead>
                                                                                     <TableBody>

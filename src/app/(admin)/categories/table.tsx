@@ -10,6 +10,7 @@ import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 export default function CategoryTable() {
     const { toast } = useToast();
@@ -52,7 +53,7 @@ export default function CategoryTable() {
         setLoadingData(true);
         try {
             const params = new URLSearchParams();
-            params.append("pageSize", "10");
+            params.append("pageSize", "2");
             if (page) {
                 params.append("pageNumber", page.toString());
             }
@@ -105,10 +106,19 @@ export default function CategoryTable() {
                 <div className='overflow-x-auto w-full'>
                     <div className='p-5 bg-white rounded-lg'>
                         {loadingData ? (
-                            <Skeleton animation="wave" variant="text" height={40} className='rounded-lg' />
+                            <div className='mb-5'>
+                                <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
+                            </div>
                         ) : (
-                            <div className='font-bold mb-5 text-[1.25rem]'>Danh mục</div>
+                            <div className="space-y-2 mb-5">
+                                <div className='font-bold text-[1.25rem]'>Danh mục</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Quản lý danh sách danh mục
+                                </p>
+                            </div>
                         )}
+                        <Separator orientation="horizontal" />
                         <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
                             <SearchBar
                                 onSearch={handleSearch}

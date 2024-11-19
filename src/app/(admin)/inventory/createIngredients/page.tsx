@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import FloatingButton from '@/components/floating/floatingButton';
 import { Paper, Skeleton, TextField } from '@mui/material';
@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 const Page = () => {
     const router = useRouter();
@@ -120,90 +121,105 @@ const Page = () => {
         <section className="container mx-auto">
             <div className='mx-5'>
                 <section className='col-span-4'>
-                    <div className='w-full overflow-x-auto'>
-                        <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle my-10'>
-                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                                {loadingData ? (
-                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                                ) : (
-                                    <>
-                                        <Button onClick={() => handleSubmit()} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                            Tạo phiếu
-                                            <Plus />
-                                        </Button>
-                                    </>
-                                )}
+                    <div className='w-full'>
+                        <div className='p-5 bg-white rounded-lg'>
+                            {loadingData ? (
+                                <div className='mb-5'>
+                                    <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                    <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
+                                </div>
+                            ) : (
+                                <div className="space-y-2 mb-5">
+                                    <div className='font-bold text-[1.25rem]'>Nguyên liệu</div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Tạo phiếu kiểm kho nguyên liệu
+                                    </p>
+                                </div>
+                            )}
+                            <Separator orientation="horizontal" />
+                            <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle my-5'>
+                                <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                                    {loadingData ? (
+                                        <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                    ) : (
+                                        <>
+                                            <Button onClick={() => handleSubmit()} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-green-500'>
+                                                Tạo phiếu
+                                                <Plus />
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                        <div className='overflow-hidden'>
-                            <div className='w-full mb-20 overflow-x-auto'>
-                                <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
-                                    <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell rowSpan={2} align="center" className='font-semibold'>Mã sản phẩm</TableCell>
-                                                <TableCell rowSpan={2} align="center" className='font-semibold'>Tên sản phẩm</TableCell>
-                                                <TableCell rowSpan={1} colSpan={2} align="center" className='font-semibold'>Quy cách</TableCell>
-                                                <TableCell rowSpan={2} align="center" className='font-semibold'>Số lượng</TableCell>
-                                                <TableCell rowSpan={2} align="center" className='font-semibold'>Mô tả</TableCell>
-                                            </TableRow>
-                                            <TableRow>
-                                                <TableCell align="center" className='font-semibold'>
-                                                    Loại
-                                                </TableCell>
-                                                <TableCell align="center" className='font-semibold'>
-                                                    Trọng lượng
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {products && products.map((product: any, index: any) => (
-                                                <TableRow
-                                                    key={index}
-                                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                                >
-                                                    <TableCell align="center" onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
-                                                        {product?.product?.productCode}
+                            <div className='overflow-hidden'>
+                                <div className='w-full overflow-x-auto'>
+                                    <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
+                                        <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                            <TableHead className='bg-[#0090d9]'>
+                                                <TableRow>
+                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Mã sản phẩm</TableCell>
+                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Tên sản phẩm</TableCell>
+                                                    <TableCell rowSpan={1} colSpan={2} align="center" className='font-semibold text-white'>Quy cách</TableCell>
+                                                    <TableCell rowSpan={2} className='font-semibold text-white' text-white>Số lượng</TableCell>
+                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Mô tả</TableCell>
+                                                </TableRow>
+                                                <TableRow>
+                                                    <TableCell align="center" className='font-semibold text-white'>
+                                                        Loại
                                                     </TableCell>
-                                                    <TableCell align="center">{product?.product?.name}</TableCell>
-                                                    <TableCell align="center">{product?.unit}</TableCell>
-                                                    <TableCell align="center">{product?.weightPerUnit} kg</TableCell>
-                                                    <TableCell align="center">
-                                                        <TextField
-                                                            type={'number'}
-                                                            className='w-[100px]'
-                                                            inputProps={{ min: 1 }}
-                                                            onChange={(e) => {
-                                                                handleFieldChange('checkQuantity', Number(e.target.value), index)
-                                                            }}
-                                                            value={product?.checkQuantity}
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                            label={'Số lượng'}
-                                                            variant="standard" />
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        <TextField
-                                                            type={'text'}
-                                                            className='w-[250px]'
-                                                            onChange={(e) => {
-                                                                handleFieldChange('checkDescription', e.target.value, index)
-                                                            }}
-                                                            value={product?.checkDescription}
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                            multiline
-                                                            rows={2}
-                                                            label={'Mô tả'}
-                                                            variant="standard" />
+                                                    <TableCell align="center" className='font-semibold text-white'>
+                                                        Trọng lượng
                                                     </TableCell>
                                                 </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
+                                            </TableHead>
+                                            <TableBody>
+                                                {products && products.map((product: any, index: any) => (
+                                                    <TableRow
+                                                        key={index}
+                                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                    >
+                                                        <TableCell onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                            {product?.product?.productCode}
+                                                        </TableCell>
+                                                        <TableCell>{product?.product?.name}</TableCell>
+                                                        <TableCell colSpan={2} align="center">{product?.unit} {product?.weightPerUnit} kg</TableCell>
+                                                        <TableCell>
+                                                            <TextField
+                                                                type={'number'}
+                                                                className='w-[100px]'
+                                                                inputProps={{ min: 1 }}
+                                                                onChange={(e) => {
+                                                                    handleFieldChange('checkQuantity', Number(e.target.value), index)
+                                                                }}
+                                                                value={product?.checkQuantity}
+                                                                InputLabelProps={{
+                                                                    shrink: true,
+                                                                }}
+                                                                label={'Số lượng'}
+                                                                variant="standard" />
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <TextField
+                                                                type={'text'}
+                                                                className='w-[250px]'
+                                                                onChange={(e) => {
+                                                                    handleFieldChange('checkDescription', e.target.value, index)
+                                                                }}
+                                                                value={product?.checkDescription}
+                                                                InputLabelProps={{
+                                                                    shrink: true,
+                                                                }}
+                                                                multiline
+                                                                rows={2}
+                                                                label={'Mô tả'}
+                                                                variant="standard" />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </div>
                             </div>
                         </div>
                     </div>

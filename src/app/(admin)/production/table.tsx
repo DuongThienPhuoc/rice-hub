@@ -4,18 +4,19 @@
 import { Button } from '@/components/ui/button';
 import ReceiptList from "@/components/list/list";
 import Paging from '@/components/paging/paging';
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
-import api from "../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import ExcelJS from 'exceljs';
-import Flatpickr from 'react-flatpickr';
-import 'flatpickr/dist/themes/material_blue.css';
 import { PlusIcon } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import crypto from 'crypto';
 import { Skeleton } from '@mui/material';
+import SearchBar from '@/components/searchbar/searchbar';
+import { DatePickerWithRange } from '../expenditures/date-range-picker';
+import { DateRange } from 'react-day-picker';
+import { Separator } from '@/components/ui/separator';
 
 export default function ProductionTable() {
     const router = useRouter();
@@ -32,7 +33,7 @@ export default function ProductionTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
-    const [dateRange, setDateRange] = useState<[any, any]>(['', '']);
+    const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const processedFileHashes = new Set<string>();
@@ -79,9 +80,9 @@ export default function ProductionTable() {
     }, [currentPage, startDate, endDate]);
 
     useEffect(() => {
-        setStartDate(dateRange[0]);
-        setEndDate(dateRange[1]);
-    }, [dateRange])
+        setStartDate(date?.from || null);
+        setEndDate(date?.to || null);
+    }, [date]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -119,64 +120,8 @@ export default function ProductionTable() {
         });
     };
 
-    const handleShowDownloadMaterial = () => {
-        Swal.fire({
-            title: 'Bạn đã có mẫu file import chưa?',
-            text: "Nếu chưa, bạn có thể tải xuống ở bên dưới.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Tải xuống mẫu',
-            cancelButtonText: 'Tôi có rồi',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                downloadTemplateExcel();
-            } else {
-                document.getElementById("fileInput")?.click();
-            }
-        });
-    };
-
-    const downloadTemplateExcel = () => {
-        const data = [
-            { name: "Sản phẩm mới", importPrice: 100, quantity: 10, weightPerUnit: 10, unit: "bao", categoryId: 1, supplierId: 1, unitOfMeasureId: 2, warehouseId: 1 },
-            { name: "Sản phẩm mới 2", importPrice: 200, quantity: 20, weightPerUnit: 25, unit: "bao", categoryId: 2, supplierId: 2, unitOfMeasureId: 1, warehouseId: 1 },
-            { name: "Sản phẩm mới 3", importPrice: 300, quantity: 30, weightPerUnit: 70, unit: "bao", categoryId: 3, supplierId: 3, unitOfMeasureId: 3, warehouseId: 2 }
-        ];
-
-        const categories = [
-            { id: 1, categoryName: "Category 1" },
-            { id: 2, categoryName: "Category 2" },
-            { id: 3, categoryName: "Category 3" }
-        ];
-        const suppliers = [
-            { id: 1, supplierName: "Supplier 1" },
-            { id: 2, supplierName: "Supplier 2" },
-            { id: 3, supplierName: "Supplier 3" }
-        ];
-        const unitsOfMeasure = [
-            { id: 1, measureName: "Measure 1" },
-            { id: 2, measureName: "Measure 2" },
-            { id: 3, measureName: "Measure 3" }
-        ];
-        const warehouses = [
-            { id: 1, warehouseName: "Warehouse 1" },
-            { id: 2, warehouseName: "Warehouse 2" }
-        ];
-
-        const dataSheet = XLSX.utils.json_to_sheet(data);
-        const categorySheet = XLSX.utils.json_to_sheet(categories);
-        const supplierSheet = XLSX.utils.json_to_sheet(suppliers);
-        const measureSheet = XLSX.utils.json_to_sheet(unitsOfMeasure);
-        const warehouseSheet = XLSX.utils.json_to_sheet(warehouses);
-
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, dataSheet, "Products");
-        XLSX.utils.book_append_sheet(workbook, categorySheet, "Categories");
-        XLSX.utils.book_append_sheet(workbook, supplierSheet, "Suppliers");
-        XLSX.utils.book_append_sheet(workbook, measureSheet, "UnitsOfMeasure");
-        XLSX.utils.book_append_sheet(workbook, warehouseSheet, "Warehouses");
-
-        XLSX.writeFile(workbook, 'template.xlsx');
+    const handleSearch = () => {
+        setCurrentPage(1);
     };
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -256,69 +201,70 @@ export default function ProductionTable() {
         <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='w-full overflow-x-auto'>
-                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
-                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            <div className="border border-[#ccc] rounded-[4px] p-[5px]" style={{ boxShadow: '0px 4px 8px lightgray' }}>
-                                <Flatpickr
-                                    className='border-none outline-none p-[5px]'
-                                    value={dateRange}
-                                    onChange={([startDate, endDate]) => {
-                                        setDateRange([startDate, endDate])
-                                    }}
-                                    options={{
-                                        mode: "range",
-                                        dateFormat: "d/m/Y",
-                                        locale: {
-                                            rangeSeparator: " ~ ",
-                                        },
-                                    }}
-                                    placeholder="_/__/___ ~ _/__/___"
-                                />
-                                <span className="icon">&#x1F4C5;</span>
+                    <div className='p-5 bg-white rounded-lg'>
+                        {loadingData ? (
+                            <div className='mb-5'>
+                                <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
                             </div>
-                        </div>
-                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            {loadingData ? (
-                                <>
+                        ) : (
+                            <div className="space-y-2 mb-5">
+                                <div className='font-bold text-[1.25rem]'>Phiếu sản xuất</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Quản lý danh sách phiếu sản xuất
+                                </p>
+                            </div>
+                        )}
+                        <Separator orientation="horizontal" />
+                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                                <div className='flex space-x-2 items-center'>
+                                    <SearchBar
+                                        onSearch={handleSearch}
+                                        loadingData={loadingData}
+                                        selectOptions={[
+                                            { value: 'id', label: 'Mã phiếu' }
+                                        ]}
+                                    />
+                                    {loadingData ? (
+                                        <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
+                                    ) : (
+                                        <DatePickerWithRange date={date} setDate={setDate} />
+                                    )}
+                                </div>
+                            </div>
+                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                                {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                                    <Skeleton animation="wave" variant="rectangular" height={40} width={80} className='rounded-lg ml-0 mt-4 lg:ml-2 lg:mt-0' />
-                                </>
-                            ) : (
-                                <>
+                                ) : (
                                     <Button
-                                        onClick={() => router.push("/import/create")}
-                                        className="px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
+                                        onClick={() => router.push("/production/create")}
+                                        className="p-3 text-[14px] hover:bg-green-500"
                                     >
-                                        Tạo phiếu nhập
+                                        Tạo phiếu sản xuất
                                         <PlusIcon />
                                     </Button>
-                                    <Button
-                                        className="ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]"
-                                        onClick={handleShowDownloadMaterial}
-                                    >
-                                        Import
-                                    </Button>
-                                </>
-                            )}
-                            <input
-                                type="file"
-                                id="fileInput"
-                                accept=".xlsx, .xls"
-                                style={{ display: 'none' }}
-                                onChange={handleFileUpload}
-                            />
+                                )}
+                                <input
+                                    type="file"
+                                    id="fileInput"
+                                    accept=".xlsx, .xls"
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileUpload}
+                                />
+                            </div>
                         </div>
+                        <div className='overflow-x-auto'>
+                            <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
+                        </div>
+                        {totalPages > 1 && (
+                            <Paging
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
-                    <div className='overflow-x-auto'>
-                        <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
-                    </div>
-                    {totalPages > 1 && (
-                        <Paging
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
                 </div>
             </section>
             <FloatingButton />

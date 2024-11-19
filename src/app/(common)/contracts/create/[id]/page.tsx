@@ -149,7 +149,6 @@ const Page = ({ params }: { params: { id: number } }) => {
         const pdfBlob = pdf.output('blob');
         const storageRef = ref(storage, `contracts/Contract_${Date.now()}.pdf`);
         const snapshot = await uploadBytes(storageRef, pdfBlob);
-        console.log("Upload Snapshot:", snapshot);
 
         const downloadURL = await getDownloadURL(storageRef);
 
@@ -164,23 +163,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                 const response = await api.post(`/contracts/createContract`, formData);
 
                 if (response.status >= 200 && response.status < 300) {
-                    Swal.fire({
-                        title: 'Tạo hợp đồng thành công!',
-                        text: 'Bạn có muốn tải xuống hợp đồng?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Có, tải!',
-                        cancelButtonText: 'Không, hủy!',
-                    }).then(async (result) => {
-                        if (result.isConfirmed) {
-                            setHiddenButton(true);
-                            setTimeout(() => {
-                                print();
-                                setHiddenButton(false);
-                            }, 300)
-                        }
-                        router.push(`/customers/${params.id}`);
-                    });
+                    alert('Tạo hợp đồng thành công.');
+                    router.push(`/customers/${params.id}`);
                 } else {
                     setHiddenButton(false);
                     throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
@@ -510,7 +494,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 </div>
 
                 <div className='flex justify-end'>
-                    <button className={cn("rounded-lg px-4 py-2 bg-black hover:bg-[#1d1d1fca] text-white font-semibold", hiddenButton && 'hidden')}
+                    <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold", hiddenButton && 'hidden')}
                         onClick={() => {
                             handleSubmit();
                         }}>Tạo hợp đồng

@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import api from "../../../../api/axiosConfig";
+import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
@@ -194,7 +194,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             ['Thông tin phiếu kiểm kho'].map((label, index) => (
                                 <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
                                     <div
-                                        className={`w-[100%] text-center mt-5 lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
+                                        className={`w-[100%] text-center mt-5 lg:mt-10 p-[7px] text-white bg-[#4ba94d]`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
                                     >
                                         <strong>{label}</strong>
@@ -296,14 +296,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead>
                                                     <TableRow>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Mã sản phẩm</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Tên sản phẩm</TableCell>
-                                                        <TableCell rowSpan={1} colSpan={2} align="center" className='font-semibold'>Quy cách</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Số lượng trong hệ thống</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Số lượng thực tế</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Số lượng chênh lệch</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold w-[150px]'>Mô tả</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>#</TableCell>
+                                                        <TableCell rowSpan={2} className='font-semibold'>Mã sản phẩm</TableCell>
+                                                        <TableCell rowSpan={2} className='font-semibold'>Tên sản phẩm</TableCell>
+                                                        <TableCell rowSpan={1} align="center" colSpan={2} className='font-semibold'>Quy cách</TableCell>
+                                                        <TableCell rowSpan={2} className='font-semibold'>Số lượng trong hệ thống</TableCell>
+                                                        <TableCell rowSpan={2} className='font-semibold'>Số lượng thực tế</TableCell>
+                                                        <TableCell rowSpan={2} className='font-semibold'>Số lượng chênh lệch</TableCell>
+                                                        <TableCell rowSpan={2} className='font-semibold w-[150px]'>Mô tả</TableCell>
+                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Hành động</TableCell>
                                                     </TableRow>
                                                     <TableRow>
                                                         <TableCell align="center" className='font-semibold'>
@@ -321,14 +321,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                <TableCell align="center" onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                <TableCell onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product.product.productCode}
                                                                 </TableCell>
-                                                                <TableCell align="center">{product.product.name}</TableCell>
-                                                                <TableCell align="center">{product?.unit}</TableCell>
-                                                                <TableCell align="center">{product?.weightPerUnit} kg</TableCell>
-                                                                <TableCell align="center">{product?.systemQuantity}</TableCell>
-                                                                <TableCell align="center">
+                                                                <TableCell>{product.product.name}</TableCell>
+                                                                <TableCell>{product?.unit}</TableCell>
+                                                                <TableCell>{product?.weightPerUnit} kg</TableCell>
+                                                                <TableCell>{product?.systemQuantity}</TableCell>
+                                                                <TableCell>
                                                                     <TextField
                                                                         type={'number'}
                                                                         className='w-[100px]'
@@ -343,8 +343,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                         label={'Số lượng'}
                                                                         variant="standard" />
                                                                 </TableCell>
-                                                                <TableCell align="center">{product?.quantity_discrepancy}</TableCell>
-                                                                <TableCell align="center">
+                                                                <TableCell>{product?.quantity_discrepancy}</TableCell>
+                                                                <TableCell>
                                                                     <TextField
                                                                         type={'text'}
                                                                         className='w-[120px]'
@@ -373,20 +373,19 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                <TableCell align="center" onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                <TableCell onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product?.product?.productCode}
                                                                 </TableCell>
-                                                                <TableCell align="center">{product?.product?.name}</TableCell>
-                                                                <TableCell align="center">{product?.unit}</TableCell>
-                                                                <TableCell align="center">{product?.weightPerUnit} kg</TableCell>
-                                                                <TableCell align="center">{product?.systemQuantity}</TableCell>
-                                                                <TableCell align="center">{product?.quantity}</TableCell>
-                                                                <TableCell align="center">{product?.quantity_discrepancy}</TableCell>
-                                                                <TableCell align="center">{product?.description || 'N/A'}</TableCell>
+                                                                <TableCell>{product?.product?.name}</TableCell>
+                                                                <TableCell align='center' colSpan={2}>{product?.unit} {product?.weightPerUnit} kg</TableCell>
+                                                                <TableCell>{product?.systemQuantity}</TableCell>
+                                                                <TableCell>{product?.quantity}</TableCell>
+                                                                <TableCell>{product?.quantity_discrepancy}</TableCell>
+                                                                <TableCell>{product?.description || 'N/A'}</TableCell>
                                                                 <TableCell align="center">
                                                                     <div className='flex justify-center items-center'>
                                                                         <div className='relative group'>
-                                                                            <PenSquare onClick={() => setSelectedRow(index)} size={18} className='cursor-pointer hover:text-blue-500' />
+                                                                            <PenSquare onClick={() => setSelectedRow(index)} size={18} className='cursor-pointer' />
                                                                             <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
                                                                                 Sửa
                                                                             </span>
@@ -411,7 +410,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push('/inventory')} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push('/inventory')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>

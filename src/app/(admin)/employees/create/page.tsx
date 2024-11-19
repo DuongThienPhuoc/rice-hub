@@ -112,7 +112,7 @@ const Page = () => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            ? 'text-white bg-[#4ba94d] hover:bg-green-500'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -136,7 +136,7 @@ const Page = () => {
                                     alt='Avatar'
                                     className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                 />
-                                <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                                <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-blue-400 bg-[#0090d9] cursor-pointer rounded-lg text-white">
                                     {image ? 'Thay ảnh' : 'Thêm ảnh'}
                                 </label>
                             </>
@@ -361,10 +361,10 @@ const Page = () => {
                             </>
                         ) : (
                             <>
-                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>

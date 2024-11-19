@@ -11,6 +11,7 @@ import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 export default function ProductTable() {
     const { toast } = useToast();
@@ -93,10 +94,19 @@ export default function ProductTable() {
                 <div className='w-full overflow-x-auto'>
                     <div className='p-5 bg-white rounded-lg'>
                         {loadingData ? (
-                            <Skeleton animation="wave" variant="text" height={40} className='rounded-lg' />
+                            <div className='mb-5'>
+                                <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
+                            </div>
                         ) : (
-                            <div className='font-bold mb-5 text-[1.25rem]'>Nguyên liệu</div>
+                            <div className="space-y-2 mb-5">
+                                <div className='font-bold text-[1.25rem]'>Nguyên liệu</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Quản lý danh sách nguyên liệu
+                                </p>
+                            </div>
                         )}
+                        <Separator orientation="horizontal" />
                         <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
                             <SearchBar
                                 onSearch={handleSearch}

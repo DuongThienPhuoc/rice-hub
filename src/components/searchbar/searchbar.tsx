@@ -1,7 +1,7 @@
 'use client';
 import { Skeleton } from '@mui/material';
 import { ChevronDown, ChevronUp, SearchIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface Option {
     value: string;
@@ -17,6 +17,7 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectOptions, loadingData }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState(selectOptions[0]);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -28,13 +29,31 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectOptions, loadingD
         }
     };
 
+    const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            setIsOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            document.addEventListener('click', handleClickOutside);
+        } else {
+            document.removeEventListener('click', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [isOpen]);
+
     return (
         <form className={`bg-[#FFFFFF] flex rounded-lg border ${!loadingData && 'border-[#4ba94d]'} `} onSubmit={handleSearch}>
             {loadingData ? (
                 <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
             ) : (
                 <>
-                    <div className="relative text-[14px]">
+                    <div ref={dropdownRef} className="relative text-[14px]">
                         <div
                             className="p-2 bg-[#4ba94d] hover:bg-green-500 flex items-center text-white font-semibold rounded-l-lg cursor-pointer"
                             onClick={() => setIsOpen(!isOpen)}
@@ -42,11 +61,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectOptions, loadingD
                             {selected.label} {isOpen ? (<ChevronUp size={20} className='ml-1' />) : (<ChevronDown size={20} className='ml-1' />)}
                         </div>
                         {isOpen && (
-                            <div className="absolute bg-white border border-gray-300 mt-1 rounded-lg shadow-lg">
+                            <div className="absolute bg-white border border-gray-300 mt-1">
                                 {selectOptions.map((option) => (
                                     <div
                                         key={option.value}
-                                        className="p-2 rounded-lg hover:bg-green-500 hover:text-white cursor-pointer"
+                                        className="p-2 hover:bg-gray-200 cursor-pointer"
                                         onClick={() => {
                                             setSelected(option);
                                             setIsOpen(false);

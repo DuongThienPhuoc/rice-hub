@@ -33,25 +33,25 @@ export function DatePickerWithRange({
                         id="date"
                         variant={'outline'}
                         className={cn(
-                            'w-[300px] justify-start text-left font-normal',
+                            'w-[300px] justify-start text-left bg-[#4ba94d] h-[40px] font-semibold hover:bg-green-500',
                             !date && 'text-muted-foreground',
                         )}
                     >
-                        <CalendarIcon />
-                        {date?.from ? (
-                            date.to ? (
-                                <>
-                                    {format(date.from, 'MM/dd/yyyy')} -{' '}
-                                    {format(date.to, 'MM/dd/yyyy')}
-                                </>
+                        <CalendarIcon color='white' />
+                        <div className="font-semibold text-white">
+                            {date?.from ? (
+                                date.to ? (
+                                    <>
+                                        {format(date.from, 'MM/dd/yyyy')} -{' '}
+                                        {format(date.to, 'MM/dd/yyyy')}
+                                    </>
+                                ) : (
+                                    format(date.from, 'MM/dd/yyyy')
+                                )
                             ) : (
-                                format(date.from, 'MM/dd/yyyy')
-                            )
-                        ) : (
-                            <span className="font-semibold">
-                                Chọn khoảng ngày
-                            </span>
-                        )}
+                                <>Chọn khoảng ngày</>
+                            )}
+                        </div>
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">

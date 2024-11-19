@@ -11,9 +11,11 @@ export default function DashboardPageBreadcrumb() {
     return (
         <Breadcrumb className="my-5">
             <BreadcrumbList>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Trang quản lý</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>
+                        Trang quản lý
+                    </BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

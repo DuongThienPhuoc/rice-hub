@@ -250,12 +250,12 @@ const Page = () => {
     return (
         <div>
             <div className='w-full flex my-10 justify-center'>
-                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+                <div className='w-full md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     {loadingData ? (
                         <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
                     ) : (
                         <div
-                            className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
+                            className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-[#4ba94d]`}
                             style={{ boxShadow: '3px 3px 5px lightgray' }}
                         >
                             <strong>Thông tin phiếu nhập</strong>
@@ -285,7 +285,7 @@ const Page = () => {
                             </div>
                         </div>
                     )}
-                    <div className='lg:px-10 mt-5 px-2 overflow-x-auto w-full'>
+                    <div className='lg:px-10 mt-5 px-2 w-full'>
                         {loadingData ? (
                             <div className="w-full">
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='rounded-t-lg' />
@@ -293,41 +293,41 @@ const Page = () => {
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='rounded-b-lg mt-2' />
                             </div>
                         ) : (
-                            <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+                            <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                                    <TableHead>
+                                    <TableHead className='bg-[#0090d9]'>
                                         <TableRow>
-                                            <TableCell rowSpan={2} align='center' className={`w-[5%] font-semibold text-black p-2 rounded-tl-2xl`}>
+                                            <TableCell rowSpan={2} className={`w-[5%] font-semibold text-white`}>
                                                 STT
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} className={`w-[10%] font-semibold text-white`}>
                                                 Tên sản phẩm
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} className={`w-[10%] font-semibold text-white`}>
                                                 Giá nhập
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} className={`w-[10%] font-semibold text-white`}>
                                                 Số lượng
                                             </TableCell>
-                                            <TableCell colSpan={2} align='center' className={`w-[20%] font-semibold text-black p-2`}>
+                                            <TableCell align='center' colSpan={2} className={`w-[20%] font-semibold text-white`}>
                                                 Quy cách
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} className={`w-[15%] font-semibold text-white`}>
                                                 Danh mục
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[15%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} className={`w-[15%] font-semibold text-white`}>
                                                 Nhà cung cấp
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className={`w-[20%] font-semibold text-black p-2`}>
+                                            <TableCell rowSpan={2} className={`w-[20%] font-semibold text-white`}>
                                                 Kho
                                             </TableCell>
-                                            <TableCell rowSpan={2} align='center' className="w-[5%] font-semibold text-black p-2 rounded-tr-2xl">#</TableCell>
+                                            <TableCell rowSpan={2} className="w-[5%] font-semibold text-white">Hành động</TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell align='center' className={`w-[10%] font-semibold text-white`}>
                                                 Loại
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-black p-2`}>
+                                            <TableCell align='center' className={`w-[10%] font-semibold text-white`}>
                                                 Trọng lượng
                                             </TableCell>
                                         </TableRow>
@@ -465,16 +465,18 @@ const Page = () => {
                                                 )}
                                             </TableCell>
                                             <TableCell align='center' className='p-2'>
-                                                <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
+                                                <div className='flex justify-center'>
+                                                    <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                         {formData && formData.map((item, index) => (
                                             index === selectedRow ? (
                                                 <TableRow key={index} className={`text-center `}>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {index + 1}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {item.name}
                                                     </TableCell>
                                                     <TableCell className='p-2'>
@@ -579,31 +581,31 @@ const Page = () => {
                                                 </TableRow>
                                             ) : (
                                                 <TableRow key={index} className={`text-center `}>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {index + 1}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {item.name}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.importPrice))}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {item.quantity}
                                                     </TableCell>
                                                     <TableCell colSpan={2} align='center'>
                                                         {item.unit} {item.weightPerUnit}kg
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {item.categoryName}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {item.supplierName}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         {item.warehouseName}
                                                     </TableCell>
-                                                    <TableCell align='center'>
+                                                    <TableCell>
                                                         <div className='flex justify-center items-center space-x-2'>
                                                             <div className='relative group'>
                                                                 <PenSquare size={20} className='cursor-pointer hover:text-blue-500' onClick={() => setSelectedRow(index)} />
@@ -623,7 +625,7 @@ const Page = () => {
                                             )
                                         ))}
                                         <TableRow>
-                                            <TableCell colSpan={7} align="center"></TableCell>
+                                            <TableCell colSpan={7}></TableCell>
                                             <TableCell colSpan={3} align="center" className='font-bold space-x-2 text-[20px]'>
                                                 <span>
                                                     Tổng tiền:

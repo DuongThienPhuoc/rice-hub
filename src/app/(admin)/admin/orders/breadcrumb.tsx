@@ -15,13 +15,13 @@ export default function AdminOrdersPageBreadcrumb() {
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/')}>
+                    <BreadcrumbLink className='text-white hover:text-black' onClick={() => router.push('/dashboard')}>
                         Trang chủ
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Đơn hàng</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Đơn hàng</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

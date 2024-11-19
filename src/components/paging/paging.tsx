@@ -47,10 +47,10 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 <button
                     onClick={() => handlePageClick(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="p-2 flex items-center rounded-lg mr-1 ml-3 bg-[#4ba94d] text-white hover:bg-green-500 transition-colors duration-200"
+                    className="p-2 flex items-center rounded-lg mx-1 bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                 >
                     <ChevronLeft className='mr-1' />
-                    <span className={`hidden lg:block`}>Trang trước</span>
+                    <span className={`hidden lg:block mr-1`}>Trang trước</span>
                 </button>
 
                 {startPage > 1 && (
@@ -94,9 +94,10 @@ const Paging: React.FC<PagingProps> = ({ currentPage, totalPages, onPageChange }
                 <button
                     onClick={() => handlePageClick(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="p-2 flex items-center rounded-lg ml-1 mr-3 bg-[#4ba94d] text-white hover:bg-green-500 transition-colors duration-200"
+                    className="p-2 flex items-center rounded-lg mx-1 bg-[#f5f5f7] hover:bg-gray-300 transition-colors duration-200"
                 >
-                    <span className={`hidden lg:block`}>Trang sau</span> <ChevronRight className='ml-1' />
+                    <span className={`hidden lg:block ml-1`}>Trang sau</span>
+                    <ChevronRight className='ml-1' />
                 </button>
             </div>
         </div>

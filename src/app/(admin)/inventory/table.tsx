@@ -15,6 +15,9 @@ import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
+import { Separator } from '@/components/ui/separator';
+import { DateRange } from 'react-day-picker';
+import { DatePickerWithRange } from '../expenditures/date-range-picker';
 
 export default function InventoryTable() {
     const router = useRouter();
@@ -24,6 +27,9 @@ export default function InventoryTable() {
         { name: 'warehouse.name', displayName: 'Kho' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
+    const [date, setDate] = React.useState<DateRange | undefined>();
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     const options = ['Tạo phiếu kiểm kho sản xuất', 'Tạo phiếu kiểm kho nguyên liệu'];
     const [loadingData, setLoadingData] = useState(true);
     const [inventory, setInventory] = useState([]);
@@ -98,6 +104,13 @@ export default function InventoryTable() {
         getInventory(currentPage, currentSearch);
     }, [currentPage, currentSearch]);
 
+    useEffect(() => {
+        setStartDate(date?.from || null);
+        setEndDate(date?.to || null);
+        console.log(startDate);
+        console.log(endDate);
+    }, [date]);
+
     const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
         setCurrentSearch({ field, query });
@@ -111,96 +124,121 @@ export default function InventoryTable() {
         <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='w-full overflow-x-auto'>
-                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
-                        <SearchBar
-                            onSearch={handleSearch}
-                            loadingData={loadingData}
-                            selectOptions={[
-                                { value: 'id', label: 'Mã phiếu' }
-                            ]}
-                        />
-                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            {loadingData ? (
-                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                            ) : (
-                                <>
-                                    <ButtonGroup
-                                        variant="contained"
-                                        sx={{
-                                            backgroundColor: '#1d1d1f',
-                                            '& .MuiButton-root': {
-                                                border: 'none',
-                                                '&:hover': {
-                                                    backgroundColor: '#1d1d1fca',
+                    <div className='p-5 bg-white rounded-lg'>
+                        {loadingData ? (
+                            <div className='mb-5'>
+                                <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
+                            </div>
+                        ) : (
+                            <div className="space-y-2 mb-5">
+                                <div className='font-bold text-[1.25rem]'>Phiếu kiểm kho</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Quản lý danh sách phiếu kiểm kho
+                                </p>
+                            </div>
+                        )}
+                        <Separator orientation="horizontal" />
+                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                            <div className='flex flex-col lg:flex-row items-center mt-2 lg:mt-0'>
+                                <div className='flex space-x-2 md:items-center space-y-2 md:space-y-0 md:flex-row flex-col'>
+                                    <SearchBar
+                                        onSearch={handleSearch}
+                                        loadingData={loadingData}
+                                        selectOptions={[
+                                            { value: 'id', label: 'Mã phiếu' }
+                                        ]}
+                                    />
+                                    {loadingData ? (
+                                        <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
+                                    ) : (
+                                        <DatePickerWithRange date={date} setDate={setDate} />
+                                    )}
+                                </div>
+                            </div>
+                            <div className='flex flex-col lg:flex-row items-center mt-2 lg:mt-0'>
+                                {loadingData ? (
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
+                                ) : (
+                                    <>
+                                        <ButtonGroup
+                                            variant="contained"
+                                            sx={{
+                                                backgroundColor: '#4ba94d',
+                                                '& .MuiButton-root': {
+                                                    border: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: '#22c55e',
+                                                    },
                                                 },
-                                            },
-                                        }}
-                                        ref={anchorRef}
-                                    >
-                                        <Button
-                                            className='bg-[#1d1d1f] hover:bg-[#1d1d1fca]'
-                                            onClick={handleClick}>{options[selectedIndex]}</Button>
-                                        <Button
-                                            className='bg-[#1d1d1f] hover:bg-[#1d1d1fca]'
-                                            size="small"
-                                            aria-controls={open ? 'split-button-menu' : undefined}
-                                            aria-expanded={open ? 'true' : undefined}
-                                            aria-label="select merge strategy"
-                                            aria-haspopup="menu"
-                                            onClick={handleToggle}
+                                            }}
+                                            ref={anchorRef}
                                         >
-                                            <ArrowDropDownIcon />
-                                        </Button>
-                                    </ButtonGroup>
-                                    <Popper
-                                        sx={{ zIndex: 1 }}
-                                        open={open}
-                                        anchorEl={anchorRef.current}
-                                        role={undefined}
-                                        transition
-                                        disablePortal
-                                    >
-                                        {({ TransitionProps, placement }) => (
-                                            <Grow
-                                                {...TransitionProps}
-                                                style={{
-                                                    transformOrigin:
-                                                        placement === 'bottom' ? 'center top' : 'center bottom',
-                                                }}
+                                            <Button
+                                                className='bg-[#4ba94d] hover:bg-green-500'
+                                                onClick={handleClick}>{options[selectedIndex]}</Button>
+                                            <Button
+                                                className='bg-[#4ba94d] hover:bg-green-500'
+                                                size="small"
+                                                aria-controls={open ? 'split-button-menu' : undefined}
+                                                aria-expanded={open ? 'true' : undefined}
+                                                aria-label="select merge strategy"
+                                                aria-haspopup="menu"
+                                                onClick={handleToggle}
                                             >
-                                                <Paper >
-                                                    <ClickAwayListener onClickAway={handleClose}>
-                                                        <MenuList id="split-button-menu" autoFocusItem>
-                                                            {options.map((option, index) => (
-                                                                <MenuItem
-                                                                    key={option}
-                                                                    disabled={index === 2}
-                                                                    selected={index === selectedIndex}
-                                                                    onClick={(event) => handleMenuItemClick(event, index)}
-                                                                >
-                                                                    {option}
-                                                                </MenuItem>
-                                                            ))}
-                                                        </MenuList>
-                                                    </ClickAwayListener>
-                                                </Paper>
-                                            </Grow>
-                                        )}
-                                    </Popper>
-                                </>
-                            )}
+                                                <ArrowDropDownIcon />
+                                            </Button>
+                                        </ButtonGroup>
+                                        <Popper
+                                            sx={{ zIndex: 1 }}
+                                            open={open}
+                                            anchorEl={anchorRef.current}
+                                            role={undefined}
+                                            transition
+                                            disablePortal
+                                        >
+                                            {({ TransitionProps, placement }) => (
+                                                <Grow
+                                                    {...TransitionProps}
+                                                    style={{
+                                                        transformOrigin:
+                                                            placement === 'bottom' ? 'center top' : 'center bottom',
+                                                    }}
+                                                >
+                                                    <Paper >
+                                                        <ClickAwayListener onClickAway={handleClose}>
+                                                            <MenuList id="split-button-menu" autoFocusItem>
+                                                                {options.map((option, index) => (
+                                                                    <MenuItem
+                                                                        key={option}
+                                                                        disabled={index === 2}
+                                                                        selected={index === selectedIndex}
+                                                                        onClick={(event) => handleMenuItemClick(event, index)}
+                                                                    >
+                                                                        {option}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </MenuList>
+                                                        </ClickAwayListener>
+                                                    </Paper>
+                                                </Grow>
+                                            )}
+                                        </Popper>
+                                    </>
+                                )}
+                            </div>
                         </div>
+                        <div className='overflow-hidden'>
+                            <InventoryList name="Phiếu kiểm kho" editUrl="/inventory/updateInventory" loadingData={loadingData} titles={titles} columns={columns} data={inventory} tableName="inventory" />
+                        </div>
+                        {totalPages > 1 && (
+                            <Paging
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
-                    <div className='overflow-hidden'>
-                        <InventoryList name="Phiếu kiểm kho" editUrl="/inventory/updateInventory" loadingData={loadingData} titles={titles} columns={columns} data={inventory} tableName="inventory" />
-                    </div>
-                    {totalPages > 1 && (
-                        <Paging
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
                 </div>
             </section>
             <FloatingButton />
