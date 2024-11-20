@@ -47,10 +47,9 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
             </div>
             <div className="overflow-y-auto space-y-3">
                 {employees.map((employee) => (
-                    <>
+                    <React.Fragment key={employee.id}>
                         {selectedEmployee ? (
                             <UserCard
-                                key={employee.id}
                                 employee={employee}
                                 selectedEmployee={selectedEmployee}
                                 setEmployee={setSelectedEmployee}
@@ -58,7 +57,7 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                         ) : (
                             <UserCardSkeleton key={employee.id} />
                         )}
-                    </>
+                    </React.Fragment>
                 ))}
             </div>
         </div>

@@ -50,7 +50,7 @@ const PorterCalendar: React.FC<PorterCalendarProps> = ({
     function isActiveDate(date: string) {
         return activeDays?.some(
             (activeDay) =>
-                new Date(activeDay.dayActive).toLocaleDateString() === date,
+                new Date(activeDay.dayActive).toLocaleDateString('en-US') === date,
         );
     }
 
@@ -76,7 +76,7 @@ const PorterCalendar: React.FC<PorterCalendarProps> = ({
                                     isActiveDate(
                                         new Date(
                                             day.localDate,
-                                        ).toLocaleDateString(),
+                                        ).toLocaleDateString('en-US'),
                                     )
                                         ? 'active'
                                         : 'default'
