@@ -256,7 +256,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     return (
         <div>
             <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full'>
-                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+                <div className='w-full md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
@@ -267,7 +267,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] cursor-default ${choice === (index === 0)
-                                            ? 'text-white bg-black'
+                                            ? 'text-white bg-[#4ba94d]'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -321,7 +321,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         alt='Avatar'
                                         className="w-[80%] h-[auto] border-[5px] border-black object-cover"
                                     />
-                                    <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] cursor-pointer hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                                    <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] cursor-pointer hover:bg-blue-400 bg-[#0090d9] rounded-lg text-white">
                                         {image ? 'Thay ảnh' : 'Thêm ảnh'}
                                     </label>
 
@@ -335,7 +335,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
                             </div>
                             <div className='flex-1'>
-                                <div className='mx-10 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
+                                <div className='mx-10 mt-5 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1 pt-4'>Tên nguyên liệu: </span>
                                     <TextField
                                         type={'text'}
@@ -394,10 +394,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Cập nhật</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push(`/ingredients/${params.id}`)} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push(`/ingredients/${params.id}`)} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>

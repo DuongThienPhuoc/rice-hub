@@ -1,35 +1,35 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Separator } from '@/components/ui/separator';
 import { DatePickerWithRange } from '@/app/(admin)/expenditures/date-range-picker';
-import { CirclePlus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableCell,
-    TableRow,
-    TableBody,
-    TableHead,
-    TableHeader, TableFooter
-} from '@/components/ui/table';
 import { ExpenseVoucher } from '@/type/expenditures';
 import { getExpenditures } from '@/data/expenditures';
 import { currencyHandleProvider } from '@/utils/currency-handle';
 import AddPaymentVoucherDialogProvider from '@/app/(admin)/expenditures/dialog';
-import PaginationComponent from '@/components/pagination/pagination';
 import { DateRange } from 'react-day-picker';
 import { Ellipsis } from 'lucide-react';
 import ActionDropdownProvider from '@/app/(admin)/payroll/action-dropdown';
+import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import SearchBar from '@/components/searchbar/searchbar';
+import Paging from '@/components/paging/paging';
 
 export default function EmployeeTable() {
     const [expenditures, setExpenditures] = React.useState<ExpenseVoucher[]>(
         [],
     );
+    const [loadingData, setLoadingData] = useState(true);
     const [totalPage, setTotalPage] = React.useState<number>(0);
     const [currentPage, setCurrentPage] = React.useState<number>(0);
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [reFresh, setReFresh] = React.useState(false);
+
+    const handleSearch = () => {
+
+    };
 
     useEffect(() => {
         const endDateUTC = new Date(date?.to || new Date());
@@ -41,6 +41,7 @@ export default function EmployeeTable() {
             pageNumber: currentPage + 1,
         })
             .then((data) => {
+                setLoadingData(false);
                 setExpenditures(data._embedded?.expenseVoucherDtoList || []);
                 setTotalPage(data.page.totalPages);
             })
@@ -48,93 +49,128 @@ export default function EmployeeTable() {
     }, [reFresh, currentPage, date]);
 
     return (
-        <div className="bg-white p-4 space-y-4 rounded border">
-            <div className="space-y-2">
-                <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                    Phiếu chi
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                    Quản lý danh sách phiếu chi
-                </p>
-            </div>
+        <div className="bg-white mx-5 p-5 rounded">
+            {loadingData ? (
+                <div className='mb-5'>
+                    <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                    <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
+                </div>
+            ) : (
+                <div className="space-y-2 mb-5">
+                    <div className='font-bold text-[1.25rem]'>Phiếu chi</div>
+                    <p className="text-sm text-muted-foreground">
+                        Quản lý danh sách phiếu chi
+                    </p>
+                </div>
+            )}
             <Separator orientation="horizontal" />
-            <div className="flex justify-between">
-                <DatePickerWithRange date={date} setDate={setDate} />
-                <AddPaymentVoucherDialogProvider
-                    refresh={reFresh}
-                    setRefresh={setReFresh}
-                >
-                    <Button
-                        className="flex items-center gap-2"
-                        variant="outline"
+            <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                <div className='flex space-x-2 md:items-center space-y-2 md:space-y-0 md:flex-row flex-col'>
+                    <SearchBar
+                        onSearch={handleSearch}
+                        loadingData={loadingData}
+                        selectOptions={[
+                            { value: 'id', label: 'Mã phiếu' }
+                        ]}
+                    />
+                    {loadingData ? (
+                        <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
+                    ) : (
+                        <DatePickerWithRange date={date} setDate={setDate} />
+                    )}
+                </div>
+                {loadingData ? (
+                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                ) : (
+                    <AddPaymentVoucherDialogProvider
+                        refresh={reFresh}
+                        setRefresh={setReFresh}
                     >
-                        <CirclePlus className="w-4 h-4" />
-                        <span>Thêm phiếu chi</span>
-                    </Button>
-                </AddPaymentVoucherDialogProvider>
+                        <Button className='ml-0 mt-2 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                            <span>Thêm phiếu chi</span>
+                            <Plus />
+                        </Button>
+                    </AddPaymentVoucherDialogProvider>
+                )}
             </div>
-            <div className="rounded border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Mã phiếu chi</TableHead>
-                            <TableHead>Ngày xuất</TableHead>
-                            <TableHead>Tổng tiền</TableHead>
-                            <TableHead>Loại</TableHead>
-                            <TableHead className="text-center">
-                                Hành động
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {expenditures.length > 0 && (
-                            <>
-                                {expenditures.map((expenditure) => (
-                                    <TableRow key={expenditure.id}>
-                                        <TableCell>
-                                            {expenditure.expenseCode}
-                                        </TableCell>
-                                        <TableCell>
-                                            {new Date(
-                                                expenditure.expenseDate,
-                                            ).toLocaleDateString()}
-                                        </TableCell>
-                                        <TableCell>
-                                            {currencyHandleProvider(
-                                                expenditure.totalAmount,
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {expenditure.type}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <ActionDropdownProvider expenseVoucher={expenditure}>
-                                                <div className="flex w-6 h-6 items-center justify-center rounded hover:bg-[#cbd5e1]">
-                                                    <Ellipsis className="w-4 h-4" />
-                                                </div>
-                                            </ActionDropdownProvider>
+            <div className='overflow-hidden'>
+                <div className='w-full overflow-x-auto'>
+                    {loadingData ? (
+                        <div className="w-full">
+                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                            {Array.from({ length: 10 }).map((_, rowIndex) => (
+                                <div key={rowIndex} className="flex mt-2">
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
+                            <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                <TableHead className='bg-[#0090d9]'>
+                                    <TableRow>
+                                        <TableCell color='white' className='font-semibold text-white'>Mã phiếu chi</TableCell>
+                                        <TableCell className='font-semibold text-white'>Ngày xuất</TableCell>
+                                        <TableCell className='font-semibold text-white'>Tổng tiền</TableCell>
+                                        <TableCell className='font-semibold text-white'>Loại</TableCell>
+                                        <TableCell align='center' className='font-semibold text-white'>
+                                            Hành động
                                         </TableCell>
                                     </TableRow>
-                                ))}
-                            </>
-                        )}
-                    </TableBody>
-                    <TableFooter>
-                        <TableRow>
-                            <TableCell
-                                colSpan={4}
-                                className="bg-white hover:bg-none"
-                            >
-                                <PaginationComponent
-                                    totalPages={totalPage}
-                                    currentPage={currentPage}
-                                    setCurrentPage={setCurrentPage}
-                                />
-                            </TableCell>
-                        </TableRow>
-                    </TableFooter>
-                </Table>
+                                </TableHead>
+                                <TableBody>
+                                    {expenditures.length > 0 ? (
+                                        <>
+                                            {expenditures.map((expenditure) => (
+                                                <TableRow key={expenditure.id}>
+                                                    <TableCell>
+                                                        {expenditure.expenseCode}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {new Date(
+                                                            expenditure.expenseDate,
+                                                        ).toLocaleDateString()}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {currencyHandleProvider(
+                                                            expenditure.totalAmount,
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {expenditure.type}
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        <ActionDropdownProvider expenseVoucher={expenditure}>
+                                                            <div className="flex w-6 h-6 items-center justify-center rounded hover:bg-[#cbd5e1]">
+                                                                <Ellipsis className="w-4 h-4" />
+                                                            </div>
+                                                        </ActionDropdownProvider>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </>
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5}>
+                                                <div className="my-10 mx-4 text-center text-gray-500">
+                                                    Không có dữ liệu
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </div>
             </div>
+            {totalPage > 1 && (
+                <Paging
+                    currentPage={currentPage}
+                    totalPages={totalPage}
+                    onPageChange={setCurrentPage}
+                />
+            )}
         </div>
     );
 }

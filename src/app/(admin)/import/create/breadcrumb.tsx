@@ -15,19 +15,19 @@ export default function CreateImportPageBreadcrumb() {
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/dashboard')}>
                         Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/import')}>
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/import')}>
                         Phiếu nhập
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Thêm phiếu nhập</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Thêm phiếu nhập</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

@@ -84,7 +84,7 @@ export default function MonthlyEmployeeDialog({
                                     <TableCell>
                                         {new Date(
                                             day.dayActive,
-                                        ).toLocaleDateString()}
+                                        ).toLocaleDateString('en-US')}
                                     </TableCell>
                                     <TableCell>{day.mass}</TableCell>
                                     <TableCell>

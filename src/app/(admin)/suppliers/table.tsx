@@ -10,6 +10,7 @@ import PopupCreate from "@/components/popup/popupCreate";
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 export default function SupplierTable() {
     const { toast } = useToast();
@@ -109,37 +110,53 @@ export default function SupplierTable() {
         <div className='mx-5'>
             <section className='col-span-4'>
                 <div className='overflow-x-auto w-full'>
-                    <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-10'>
-                        <SearchBar
-                            onSearch={handleSearch}
-                            loadingData={loadingData}
-                            selectOptions={[
-                                { value: 'name', label: 'Nhà cung cấp' },
-                                { value: 'email', label: 'Email' },
-                                { value: 'phoneNumber', label: 'Số điện thoại' }
-                            ]}
-                        />
-                        <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
-                            {loadingData ? (
-                                <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                            ) : (
-                                <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
-                                    Thêm nhà cung cấp
-                                    <PlusIcon />
-                                </Button>
-                            )}
+                    <div className='p-5 bg-white rounded-lg'>
+                        {loadingData ? (
+                            <div className='mb-5'>
+                                <Skeleton animation="wave" variant="text" height={40} width={100} className='rounded-lg' />
+                                <Skeleton animation="wave" variant="text" height={30} width={200} className='rounded-lg' />
+                            </div>
+                        ) : (
+                            <div className="space-y-2 mb-5">
+                                <div className='font-bold text-[1.25rem]'>Nhà cung cấp</div>
+                                <p className="text-sm text-muted-foreground">
+                                    Quản lý danh sách nhà cung cấp
+                                </p>
+                            </div>
+                        )}
+                        <Separator orientation="horizontal" />
+                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                            <SearchBar
+                                onSearch={handleSearch}
+                                loadingData={loadingData}
+                                selectOptions={[
+                                    { value: 'name', label: 'Nhà cung cấp' },
+                                    { value: 'email', label: 'Email' },
+                                    { value: 'phoneNumber', label: 'Số điện thoại' }
+                                ]}
+                            />
+                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                                {loadingData ? (
+                                    <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                ) : (
+                                    <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                        Thêm nhà cung cấp
+                                        <PlusIcon />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
+                        <div className='overflow-hidden'>
+                            <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} loadingData={loadingData} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
+                        </div>
+                        {totalPages > 1 && (
+                            <Paging
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        )}
                     </div>
-                    <div className='overflow-hidden'>
-                        <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} loadingData={loadingData} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
-                    </div>
-                    {totalPages > 1 && (
-                        <Paging
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
                 </div>
             </section>
             {isPopupVisible && <PopupCreate tableName="Nhà cung cấp" url="/suppliers/createSupplier" titles={titles} handleClose={closeCreate} />}

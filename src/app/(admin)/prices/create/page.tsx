@@ -198,14 +198,14 @@ const Page = () => {
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
-                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+                <div className='w-full md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     <div className='flex flex-col lg:flex-row'>
                         <div className={`flex-1`}>
                             {loadingData ? (
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
                             ) : (
                                 <div
-                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] text-center text-white bg-black`}
+                                    className={`w-[100%] mt-5 lg:mt-10 p-[7px] text-center text-white bg-[#4ba94d]`}
                                     style={{ boxShadow: '3px 3px 5px lightgray' }}
                                 >
                                     <strong>Thông tin bảng giá</strong>
@@ -234,51 +234,12 @@ const Page = () => {
                                     />
                                     <Button
                                         onClick={handleCreatePrice}
-                                        className="lg:w-1/4 w-full lg:ml-2 py-2 text-[14px] hover:bg-gray-700 bg-gray-800 text-white"
+                                        className="lg:w-1/4 w-full lg:ml-2 py-2 text-[14px] hover:bg-blue-400 bg-[#0090d9] text-white"
                                     >
                                         Tạo bảng giá mới
                                     </Button>
                                 </div>
                             )}
-
-                            <div className="m-10 max-h-[300px] overflow-y-auto">
-                                {loadingData ? (
-                                    <div className="my-2">
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                    </div>
-                                ) : (
-                                    prices.length > 0 ? (
-                                        prices.map((price, index) => (
-                                            <div key={price.id} className="flex items-center my-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setSelectedPrice(price)}
-                                                    className={`flex-1 px-3 py-2 text-[14px] border-2 ${price.id === selectedPrice?.id ? "border-blue-500" : "border-gray-300"
-                                                        } rounded-md`}
-                                                >
-                                                    {price.name}
-                                                </button>
-                                                {index > 0 ? (
-                                                    <button
-                                                        type="button"
-                                                        className="ml-2 text-red-500 hover:text-red-700"
-                                                    >
-                                                        <Trash2 width={20} />
-                                                    </button>
-                                                ) : (
-                                                    <div className="ml-2"></div>
-                                                )}
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-center text-gray-500">Không có bảng giá</p>
-                                    )
-                                )}
-                            </div>
                         </div>
 
                         <div className="flex-1 lg:pl-5">
@@ -304,44 +265,62 @@ const Page = () => {
                                     />
                                     <Button
                                         onClick={handleApplyPrice}
-                                        className="lg:w-1/4 w-full lg:ml-2 py-2 text-[14px] hover:bg-gray-700 bg-gray-800 text-white"
+                                        className="lg:w-1/4 w-full lg:ml-2 py-2 text-[14px] hover:bg-blue-400 bg-[#0090d9] text-white"
                                     >
                                         Áp dụng
                                     </Button>
                                 </div>
                             )}
-
-                            <div className="mt-6 max-h-[300px] overflow-y-auto p-4">
-                                {loadingData ? (
-                                    <div className="my-2">
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="mx-10 max-h-[300px] overflow-y-auto lg:px-5">
+                            {loadingData ? (
+                                <Skeleton animation="wave" variant="rectangular" height={40} className='w-[200px] rounded-lg mt-2' />
+                            ) : (
+                                <Autocomplete
+                                    className='w-[200px] mb-5'
+                                    options={prices}
+                                    getOptionLabel={(option) => option.name}
+                                    onChange={(event, newValue) => setSelectedPrice(newValue)}
+                                    disablePortal
+                                    renderInput={(params) => <TextField {...params} variant='standard' label="Bảng giá" />}
+                                />
+                            )}
+                            {loadingData ? (
+                                <div className="my-2">
+                                    <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
+                                    <Skeleton animation="wave" variant="rectangular" height={40} className='w-full rounded-lg mt-2' />
+                                </div>
+                            ) : (
+                                priceCustomer?.length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                        {priceCustomer?.map((customer: any) => (
+                                            <div
+                                                key={customer.id}
+                                                className="flex items-center w-full justify-between space-x-2 px-2 border-2 border-gray-300 rounded-md"
+                                            >
+                                                <span className="text-center text-[14px]">{customer.fullName}</span>
+                                                <div className="relative group mt-2">
+                                                    <button type="button" className="text-gray-600">
+                                                        <Trash2 width={20} />
+                                                    </button>
+                                                    <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-1 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                        Xóa
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : (
-                                    priceCustomer?.length > 0 ? (
-                                        priceCustomer?.map((customer: any) => (
-                                            <div key={customer.id} className="flex items-center my-2">
-                                                <span className="flex-1 px-3 py-2 text-[14px] border-2 border-gray-300 rounded-md">
-                                                    {customer.fullName}
-                                                </span>
-                                                <button
-                                                    type="button"
-                                                    className="ml-2 text-red-500 hover:text-red-700"
-                                                >
-                                                    <Trash2 width={20} />
-                                                </button>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="w-full flex border border-gray-300 justify-center mt-2 items-center py-10 text-gray-500">
-                                            Danh sách rỗng
-                                        </div>
-                                    )
-                                )}
-                            </div>
+                                    <div className="w-full flex border border-gray-300 justify-center mt-2 items-center py-10 text-gray-500">
+                                        Danh sách rỗng
+                                    </div>
+                                )
+                            )}
                         </div>
                     </div>
 
@@ -349,7 +328,7 @@ const Page = () => {
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} className='w-[80px] px-5 py-3 rounded-lg' />
                         ) : (
-                            <Button type='button' onClick={() => router.push("/employees")} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                            <Button type='button' onClick={() => router.push("/employees")} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                 <strong>Trở về</strong>
                             </Button>
                         )}

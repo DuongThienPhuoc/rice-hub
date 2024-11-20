@@ -51,18 +51,18 @@ export default function SalaryPopoverProvider({
     function getEmployeeActiveDate(date: string) {
         return activeDays?.find(
             (activeDay) =>
-                new Date(activeDay.dayActive).toLocaleDateString() === date,
+                new Date(activeDay.dayActive).toLocaleDateString('en-US') === date,
         );
     }
 
     function handlePopoverActive() {
         setActive(variant === 'active');
         setInputDetail(
-            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString())
+            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString('en-US'))
                 ?.mass || 0,
         );
         setNote(
-            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString())
+            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString('en-US'))
                 ?.note || '',
         );
         setPopoverActive(!popoverActive);
@@ -71,11 +71,11 @@ export default function SalaryPopoverProvider({
     useEffect(() => {
         setActive(variant === 'active');
         setInputDetail(
-            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString())
+            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString('en-US'))
                 ?.mass || 0,
         );
         setNote(
-            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString())
+            getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString('en-US'))
                 ?.note || '',
         );
     }, [employee]);
@@ -86,7 +86,7 @@ export default function SalaryPopoverProvider({
             <PopoverContent className="w-80 space-y-4">
                 <div>
                     <p className="font-medium leading-none">
-                        Ngày: {new Date(day.localDate).toLocaleDateString()}{' '}
+                        Ngày: {new Date(day.localDate).toLocaleDateString('en-US')}{' '}
                     </p>
                 </div>
                 <EmployeePopoverContent
@@ -248,7 +248,7 @@ function EmployeePopoverContent({
                                             employeeId: employee.id,
                                             dayActive: new Date(
                                                 day.localDate,
-                                            ).toLocaleDateString(),
+                                            ).toLocaleDateString('en-US'),
                                             mass: detail || null,
                                             note: note,
                                         };
@@ -272,7 +272,7 @@ function EmployeePopoverContent({
                                             employeeId: employee.id,
                                             date: new Date(
                                                 day.localDate,
-                                            ).toLocaleDateString(),
+                                            ).toLocaleDateString('en-US'),
                                         };
                                     handleDeleteEmployeeActiveDay(
                                         bodyRequest,
@@ -298,7 +298,7 @@ function EmployeePopoverContent({
                                             employeeId: employee.id,
                                             dayActive: new Date(
                                                 day.localDate,
-                                            ).toLocaleDateString(),
+                                            ).toLocaleDateString('en-US'),
                                             mass: detail || null,
                                             note: note,
                                         };
