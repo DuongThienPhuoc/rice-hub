@@ -37,7 +37,6 @@ export default function CustomerTable() {
     ];
 
     const getCustomers = async (page?: number, search?: { field?: string, query?: string }) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");

@@ -35,7 +35,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     };
 
     useEffect(() => {
-        setLoadingData(true);
         const getCustomer = async () => {
             try {
                 const url = `/customer/${params.id}`;

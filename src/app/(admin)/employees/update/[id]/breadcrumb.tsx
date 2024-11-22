@@ -19,25 +19,25 @@ export default function UpdateEmployeePageBreadcrumb({
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/dashboard')}>
                         Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/employees')}>
-                        Khách hàng
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/employees')}>
+                        Nhân viên
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push(`/employees/${employeeId}`)}>
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push(`/employees/${employeeId}`)}>
                         {employeeId}
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Chỉnh sửa</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Chỉnh sửa</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

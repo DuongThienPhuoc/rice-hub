@@ -210,6 +210,18 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             }
         }
 
+        if (key === 'role.employeeRole.roleName') {
+            if (cell.toString() === 'DRIVER_EMPLOYEE') {
+                return 'Nhân viên giao hàng'
+            } else if (cell.toString() === 'PORTER_EMPLOYEE') {
+                return 'Nhân viên bốc/dỡ hàng'
+            } else if (cell.toString() === 'STOCK_EMPLOYEE') {
+                return 'Nhân viên quản kho'
+            } else {
+                return 'N/A'
+            }
+        }
+
         if (key.includes('batchCode')) {
             return (
                 <a
@@ -262,9 +274,9 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         <TableHead className='bg-[#0090d9]'>
                             <TableRow>
                                 {columns.map((column, index) => (
-                                    <TableCell key={index} className='font-semibold text-white'>{column.displayName}</TableCell>
+                                    <TableCell key={index}><p className='font-semibold text-white'>{column.displayName}</p></TableCell>
                                 ))}
-                                <TableCell align='center' className='font-semibold text-white'>Hành động</TableCell>
+                                <TableCell align='center'><p className='font-semibold text-white'>Hành động</p></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

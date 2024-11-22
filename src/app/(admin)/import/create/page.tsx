@@ -107,7 +107,6 @@ const Page = () => {
     };
 
     const getProducts = async () => {
-        setLoadingData(true);
         try {
             const url = `/products/`;
             const response = await api.get(url);
@@ -297,38 +296,39 @@ const Page = () => {
                                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                     <TableHead className='bg-[#0090d9]'>
                                         <TableRow>
-                                            <TableCell rowSpan={2} className={`w-[5%] font-semibold text-white`}>
-                                                STT
+                                            <TableCell rowSpan={2} className={`w-[5%]`}>
+                                                <p className='font-semibold text-white'>STT</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%] font-semibold text-white`}>
-                                                Tên sản phẩm
+                                            <TableCell rowSpan={2} className={`w-[10%]`}>
+                                                <p className='font-semibold text-white'>Tên sản phẩm</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%] font-semibold text-white`}>
-                                                Giá nhập
+                                            <TableCell rowSpan={2} className={`w-[10%]`}>
+                                                <p className='font-semibold text-white'>Giá nhập</p>
+
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%] font-semibold text-white`}>
-                                                Số lượng
+                                            <TableCell rowSpan={2} className={`w-[10%]`}>
+                                                <p className='font-semibold text-white'>Số lượng</p>
                                             </TableCell>
-                                            <TableCell align='center' colSpan={2} className={`w-[20%] font-semibold text-white`}>
-                                                Quy cách
+                                            <TableCell align='center' colSpan={2} className={`w-[20%]`}>
+                                                <p className='font-semibold text-white'>Quy cách</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[15%] font-semibold text-white`}>
-                                                Danh mục
+                                            <TableCell rowSpan={2} className={`w-[15%]`}>
+                                                <p className='font-semibold text-white'>Danh mục</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[15%] font-semibold text-white`}>
-                                                Nhà cung cấp
+                                            <TableCell rowSpan={2} className={`w-[15%]`}>
+                                                <p className='font-semibold text-white'>Nhà cung cấp</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[20%] font-semibold text-white`}>
-                                                Kho
+                                            <TableCell rowSpan={2} className={`w-[20%]`}>
+                                                <p className='font-semibold text-white'>Kho</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className="w-[5%] font-semibold text-white">Hành động</TableCell>
+                                            <TableCell rowSpan={2} className="w-[5%]"><p className='font-semibold text-white'>Hành động</p></TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-white`}>
-                                                Loại
+                                            <TableCell align='center' className={`w-[10%] `}>
+                                                <p className='font-semibold text-white'>Loại</p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold text-white`}>
-                                                Trọng lượng
+                                            <TableCell align='center' className={`w-[10%]`}>
+                                                <p className='font-semibold text-white'>Trọng lượng</p>
                                             </TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -649,10 +649,10 @@ const Page = () => {
                             </>
                         ) : (
                             <>
-                                <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/import")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/import")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
 

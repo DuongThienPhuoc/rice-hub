@@ -19,21 +19,22 @@ export default function OrderDetailPageBreadcrumb({
         <Breadcrumb className='my-5'>
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/')}>
-                        Trang chủ
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/dashboard')}>
+                        Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
                     <BreadcrumbLink
+                        className='text-white hover:text-white hover:font-bold'
                         onClick={() => router.push('/admin/orders')}
                     >
                         Đơn hàng
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>{orderID}</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>{orderID}</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

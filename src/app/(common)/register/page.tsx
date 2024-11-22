@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-import GradientCircularProgress from '@/components/ui/GradientCircleProgress';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ToastAction } from '@/components/ui/toast';
 
 const Page = () => {
@@ -93,20 +93,27 @@ const Page = () => {
                     transform: 'scaleX(-1)',
                 }}
             />
-            <div className='flex z-20 bg-[#FFFFFF] h-[75px] w-full justify-between px-4'>
-                <div className='logo flex items-center ms-3'>
-                    <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
+            <div className='relative py-[40px] bg-white border flex flex-col sm:rounded-xl lg:items-center sm:my-auto min-w-full sm:min-w-[360px] lg:min-w-[380px] h-[100vh] sm:h-fit px-5 z-10'>
+                <div className='absolute top-2 left-4'>
+                    <h1
+                        className='font-extrabold text-[20px]'
+                        style={{
+                            background: 'linear-gradient(90deg, #ffbf00, #22c55e, #0090d9)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}
+                    >
+                        Ricehub
+                    </h1>
                 </div>
-            </div>
-            <div className='py-[40px] bg-white border flex flex-col rounded-xl lg:items-center my-20 min-w-[360px] lg:min-w-[380px] h-fit px-5 z-10'>
-                <h1 className='text-center font-bold text-[30px] mb-10'>Đăng ký</h1>
+                <h1 className='text-center font-bold text-[30px] my-5'>Đăng ký</h1>
                 <div className='flex flex-col sm:flex-row'>
                     <div className='flex-1 mr-3'>
                         <p className='font-semibold mt-[30px] text-[18px] mb-1'>Tên đầy đủ</p>
                         <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                             <FaUser className='text-gray-400 ' />
                             <input
-                                className='placeholder:text-[16px] placeholder:font-medium font-semibold px-2 focus:outline-none'
+                                className='placeholder:text-[16px] w-full placeholder:font-medium font-semibold px-2 focus:outline-none'
                                 type='text' placeholder='Nhập họ và tên'
                                 onChange={(e) => handleFieldChange('name', e.target.value)}
                             />
@@ -115,7 +122,7 @@ const Page = () => {
                         <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                             <FaUser className='text-gray-400 ' />
                             <input
-                                className='placeholder:text-[16px] placeholder:font-medium font-semibold px-2 focus:outline-none'
+                                className='placeholder:text-[16px] w-full placeholder:font-medium font-semibold px-2 focus:outline-none'
                                 type='text' placeholder='Nhập số điện thoại'
                                 onChange={(e) => handleFieldChange('phone', e.target.value)}
                             />
@@ -124,18 +131,18 @@ const Page = () => {
                         <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                             <FaUser className='text-gray-400 ' />
                             <input
-                                className='placeholder:text-[16px] placeholder:font-medium font-semibold px-2 focus:outline-none'
+                                className='placeholder:text-[16px] w-full placeholder:font-medium font-semibold px-2 focus:outline-none'
                                 type='text' placeholder='Nhập email'
                                 onChange={(e) => handleFieldChange('email', e.target.value)}
                             />
                         </div>
                     </div>
-                    <div className='flex-1 ml-3'>
+                    <div className='flex-1 sm:ml-3'>
                         <p className='font-semibold mt-[30px] text-[18px] mb-1'>Tên tài khoản</p>
                         <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                             <FaUser className='text-gray-400 ' />
                             <input
-                                className='placeholder:text-[16px] placeholder:font-medium font-semibold px-2 focus:outline-none'
+                                className='placeholder:text-[16px] w-full placeholder:font-medium font-semibold px-2 focus:outline-none'
                                 type='text' placeholder='Nhập tên tài khoản'
                                 onChange={(e) => handleFieldChange('username', e.target.value)}
                             />
@@ -144,7 +151,7 @@ const Page = () => {
                         <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                             <FaLock className='text-gray-400 ' />
                             <input
-                                className='placeholder:text-[16px] placeholder:font-medium font-semibold px-2 mr-[15px] focus:outline-none'
+                                className='placeholder:text-[16px] w-full placeholder:font-medium font-semibold px-2 mr-[15px] focus:outline-none'
                                 type={showPassword ? 'password' : 'text'} placeholder='Nhập mật khẩu'
                                 onChange={(e) => handleFieldChange('password', e.target.value)}
                             />
@@ -164,7 +171,7 @@ const Page = () => {
                             <FaLock
                                 className='text-gray-400 ' />
                             <input
-                                className='placeholder:text-[16px] placeholder:font-medium font-semibold px-2 mr-[15px] focus:outline-none'
+                                className='placeholder:text-[16px] w-full placeholder:font-medium font-semibold px-2 mr-[15px] focus:outline-none'
                                 type={showPassword2 ? 'password' : 'text'} placeholder='Xác nhận mật khẩu'
                                 onChange={(e) => handleFieldChange('passwordConfirmation', e.target.value)}
                             />
@@ -201,9 +208,9 @@ const Page = () => {
 
             {onPageChange === true && (
                 <div className='fixed z-50 bg-black bg-opacity-40 w-full'>
-                    <div className='flex h-[100vh] justify-center items-center pb-10'>
-                        <div>
-                            <GradientCircularProgress />
+                    <div className='flex'>
+                        <div className='w-full'>
+                            <LinearIndeterminate />
                         </div>
                     </div>
                 </div>

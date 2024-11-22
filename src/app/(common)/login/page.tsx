@@ -5,7 +5,7 @@ import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import GradientCircularProgress from '@/components/ui/GradientCircleProgress';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 
@@ -88,14 +88,22 @@ const Page = () => {
                     transform: 'scaleX(-1)',
                 }}
             />
-            <div className='flex fixed z-20 bg-[#FFFFFF] h-[75px] w-full justify-between px-4'>
-                <div className='logo flex items-center ms-3'>
-                    <h1 className='font-extrabold text-[32px]'>Ricehub</h1>
+            <div className='relative py-[40px] bg-white border flex flex-col justify-between sm:rounded-xl my-auto min-w-full sm:min-w-[360px] lg:min-w-[380px] h-[100vh] sm:h-[500px] px-5 z-10'>
+                <div className='absolute top-2'>
+                    <h1
+                        className='font-extrabold text-[20px]'
+                        style={{
+                            background: 'linear-gradient(90deg, #ffbf00, #22c55e, #0090d9)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}
+                    >
+                        Ricehub
+                    </h1>
                 </div>
-            </div>
-            <div className='py-[40px] bg-white border flex flex-col justify-between rounded-xl my-auto min-w-[360px] lg:min-w-[380px] h-[500px] px-5 z-10'>
+
                 <div>
-                    <h1 className='text-center font-bold text-[30px] mb-14'>Đăng nhập</h1>
+                    <h1 className='text-center font-bold text-[30px] mt-5 mb-10'>Đăng nhập</h1>
                     <p className='font-semibold mt-[30px] mb-1 text-[18px]'>Tên tài khoản</p>
                     <div className='flex items-center border-b-2 px-2 py-1 text-[16px] border-gray-300'>
                         <FaUser className='text-gray-400 ' />
@@ -148,14 +156,13 @@ const Page = () => {
             </div>
             {onPageChange === true && (
                 <div className='fixed z-50 bg-black bg-opacity-40 w-full'>
-                    <div className='flex h-[100vh] justify-center items-center pb-10'>
-                        <div>
-                            <GradientCircularProgress />
+                    <div className='flex'>
+                        <div className='w-full'>
+                            <LinearIndeterminate />
                         </div>
                     </div>
                 </div>
             )}
-
         </div>
 
     );

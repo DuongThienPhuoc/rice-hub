@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import {
@@ -45,42 +46,40 @@ export default function PayrollPage() {
 
     return (
         <section className="container mx-auto grid gap-2">
-            <div className="bg-white p-4 rounded-lg border space-y-4 col-span-4">
-                <div className="space-y-2">
-                    <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-                        Bảng lương
-                    </h3>
+            <div className="bg-white p-5 mx-5 rounded-lg space-y-4 col-span-4 overflow-x-auto max-w-[100vw]">
+                <div className="space-y-2 mb-5">
+                    <div className='font-bold text-[1.25rem]'>Bảng lương</div>
                     <p className="text-sm text-muted-foreground">
                         Quản lý nhân viên của bạn
                     </p>
                 </div>
                 <Separator orientation="horizontal" />
                 <div className='grid gap-2 md:flex md:justify-between'>
-                    <div className="bg-[#f4f4f5] md:w-1/4 p-1 grid grid-cols-2 gap-2 rounded">
+                    <div className="bg-[#4ba94d] text-white md:w-1/4 p-1 grid grid-cols-2 gap-2 rounded">
                         <div
                             className={cn(
                                 'flex items-center justify-center rounded h-10 hover:cursor-pointer',
-                                tab === 0 && 'bg-white',
+                                tab === 0 && 'bg-white text-black',
                             )}
                             onClick={() => {
                                 setTab(0);
                             }}
                         >
-                            <h1 className="text-sm font-medium leading-none">
+                            <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
                                 Nhân viên thời vụ
                             </h1>
                         </div>
                         <div
                             className={cn(
                                 'flex items-center justify-center rounded h-10 hover:cursor-pointer',
-                                tab === 1 && 'bg-white',
+                                tab === 1 && 'bg-white text-black',
                             )}
                             onClick={() => {
                                 setTab(1);
                             }}
                         >
-                            <h1 className="text-sm font-medium leading-none">
-                                Nhân viên
+                            <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
+                                Nhân viên chính thức
                             </h1>
                         </div>
                     </div>

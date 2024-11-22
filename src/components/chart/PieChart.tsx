@@ -17,7 +17,7 @@ const generateRandomData = () => {
 
 const chartData = [
     { category: "Gạo", revenue: generateRandomData(), fill: "#e23670" },
-    { category: "Thóc", revenue: generateRandomData(), fill: "#2662d9" },
+    { category: "Thóc", revenue: generateRandomData(), fill: "#0090d9" },
     { category: "Ngô", revenue: generateRandomData(), fill: "#2eb88a" },
     { category: "Cám", revenue: generateRandomData(), fill: "#af57db" },
     { category: "Thức ăn chăn nuôi", revenue: generateRandomData(), fill: "#e88c30" },

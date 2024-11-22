@@ -166,15 +166,15 @@ export default function IncomeTable() {
                                         <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                             <TableHead className='bg-[#0090d9]'>
                                                 <TableRow>
-                                                    <TableCell className='font-semibold text-white'>Mã phiếu</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Mã đơn hàng</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Ngày tạo phiếu</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Đối tượng thu</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Tổng giá trị</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Đã thanh toán</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Còn lại</TableCell>
-                                                    <TableCell className='font-semibold text-white'>Hạn thu</TableCell>
-                                                    <TableCell align='center' className='font-semibold text-white'>Hành động</TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Mã phiếu</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Mã đơn hàng</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Ngày tạo phiếu</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Đối tượng thu</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Tổng giá trị</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Đã thanh toán</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Còn lại</p></TableCell>
+                                                    <TableCell><p className='font-semibold text-white'>Hạn thu</p></TableCell>
+                                                    <TableCell align='center'><p className='font-semibold text-white'>Hành động</p></TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -233,7 +233,7 @@ export default function IncomeTable() {
                                                                         <TableCell colSpan={9} align='center' className='p-0'>
                                                                             <div className="w-full">
                                                                                 <Table aria-label="simple table">
-                                                                                    <TableHead className="bg-green-500 ">
+                                                                                    <TableHead className="bg-[#4ba94d]">
                                                                                         <TableRow>
                                                                                             <TableCell align='center' className="text-white">STT</TableCell>
                                                                                             <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>
@@ -260,7 +260,7 @@ export default function IncomeTable() {
                                                                         <TableCell colSpan={9} align='center' className='p-0'>
                                                                             <div className="w-full">
                                                                                 <Table aria-label="simple table">
-                                                                                    <TableHead className="bg-green-500 text-white">
+                                                                                    <TableHead className="bg-[#4ba94d] text-white">
                                                                                         <TableRow>
                                                                                             <TableCell align='center' className="text-white">STT</TableCell>
                                                                                             <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>

@@ -105,7 +105,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                 setLoadingData(false);
             }
         };
-        setLoadingData(true);
 
         if (params.id) {
             getProduct();

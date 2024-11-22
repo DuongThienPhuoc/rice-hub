@@ -66,7 +66,6 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     useEffect(() => {
         const getCustomer = async () => {
-            setLoadingData(true);
             try {
                 const url = `/customer/${params.id}`;
                 const response = await api.get(url);

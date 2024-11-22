@@ -16,6 +16,7 @@ export default function EmployeeTable() {
     const columns = [
         { name: 'employeeCode', displayName: 'Mã nhân viên' },
         { name: 'fullName', displayName: 'Tên nhân viên' },
+        { name: 'role.employeeRole.roleName', displayName: 'Chức vụ' },
         { name: 'email', displayName: 'Email' },
         { name: 'phone', displayName: 'Số điện thoại' },
         { name: 'address', displayName: 'Địa chỉ' },
@@ -34,7 +35,6 @@ export default function EmployeeTable() {
     ];
 
     const getEmployees = async (page?: number, search?: { field?: string, query?: string }) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
