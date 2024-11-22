@@ -185,12 +185,12 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 <section className="max-h-[650px] overflow-y-auto">
                     <div>
                         <Label htmlFor="customer">Khách hàng</Label>
-                        {/*TODO: Change to ComboBox*/}
+
                         <Select
                             value={selectedCustomer}
                             onValueChange={(e) => setSelectedCustomer(e)}
                         >
-                            <SelectTrigger id="customer" className="w-[280px]">
+                            <SelectTrigger id="customer" className="w-[280px] bg-[#4ba94d] text-white">
                                 <SelectValue placeholder="Chọn khách hàng" />
                             </SelectTrigger>
                             <SelectContent>
@@ -228,14 +228,14 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         </h1>
                         <div className="border rounded-md">
                             <Table>
-                                <TableHeader>
+                                <TableHeader className='bg-[#0090d9]'>
                                     <TableRow>
-                                        <TableHead>Tên hàng hoá</TableHead>
-                                        <TableHead>Loại</TableHead>
-                                        <TableHead>Đơn vị</TableHead>
-                                        <TableHead>Đơn giá</TableHead>
+                                        <TableHead><p className='text-white font-semibold'>Tên hàng hoá</p></TableHead>
+                                        <TableHead><p className='text-white font-semibold'>Loại</p></TableHead>
+                                        <TableHead><p className='text-white font-semibold'>Đơn vị</p></TableHead>
+                                        <TableHead><p className='text-white font-semibold'>Đơn giá</p></TableHead>
                                         <TableHead className="text-center">
-                                            Thêm
+                                            <p className='text-white font-semibold'>Thêm</p>
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -305,18 +305,22 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 </h1>
                                 <div className="border rounded-md">
                                     <Table>
-                                        <TableHeader>
+                                        <TableHeader className='bg-[#0090d9]'>
                                             <TableRow>
                                                 <TableHead>
-                                                    Tên hàng hoá
+                                                    <p className='font-semibold text-white'>Tên hàng hoá</p>
                                                 </TableHead>
-                                                <TableHead>Loại</TableHead>
                                                 <TableHead>
-                                                    Số lượng (Bao)
+                                                    <p className='font-semibold text-white'>Loại</p>
                                                 </TableHead>
-                                                <TableHead>Đơn giá</TableHead>
+                                                <TableHead>
+                                                    <p className='font-semibold text-white'>Số lượng (Bao)</p>
+                                                </TableHead>
+                                                <TableHead>
+                                                    <p className='font-semibold text-white'>Đơn giá</p>
+                                                </TableHead>
                                                 <TableHead className="text-center">
-                                                    Xoá
+                                                    <p className='font-semibold text-white'>Xoá</p>
                                                 </TableHead>
                                             </TableRow>
                                         </TableHeader>

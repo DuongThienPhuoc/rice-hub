@@ -17,7 +17,7 @@ export default function SalaryPage() {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     const currentDate = new Date().toLocaleDateString();
-    const [calendar,setCalendar] = React.useState(getDaysAndWeekdaysInMonth(currentYear, currentMonth))
+    const [calendar, setCalendar] = React.useState(getDaysAndWeekdaysInMonth(currentYear, currentMonth))
     const [isPending, startTransition] = React.useTransition();
     const [month, setMonth] = React.useState(currentMonth);
     const [year, setYear] = React.useState(currentYear);
@@ -75,7 +75,7 @@ export default function SalaryPage() {
                     />
                 </div>
                 <div className="md:col-span-4 space-y-2">
-                    <DatePicker month={month} year={year} setMonth={setMonth} setYear={setYear}/>
+                    <DatePicker month={month} year={year} setMonth={setMonth} setYear={setYear} />
                     {tab === 0 ? (
                         <PorterCalendar
                             employee={selectedEmployee}

@@ -46,7 +46,6 @@ export default function PriceTable() {
     });
 
     const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -270,19 +269,31 @@ export default function PriceTable() {
                                         <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                             <TableHead className='bg-[#0090d9]'>
                                                 <TableRow>
-                                                    <TableCell className={`font-semibold text-white`}>
-                                                        Mã sản phẩm
+                                                    <TableCell>
+                                                        <p className={`font-semibold text-white`}>
+                                                            Mã sản phẩm
+                                                        </p>
                                                     </TableCell>
-                                                    <TableCell className={`font-semibold text-white`}>
-                                                        Tên sản phẩm
+                                                    <TableCell>
+                                                        <p className={`font-semibold text-white`}>
+                                                            Tên sản phẩm
+                                                        </p>
                                                     </TableCell>
-                                                    <TableCell className={`font-semibold text-white`}>
-                                                        Giá nhập
+                                                    <TableCell>
+                                                        <p className={`font-semibold text-white`}>
+                                                            Giá nhập
+                                                        </p>
                                                     </TableCell>
-                                                    <TableCell className={`font-semibold text-white`}>
-                                                        Đơn giá (kg)
+                                                    <TableCell>
+                                                        <p className={`font-semibold text-white`}>
+                                                            Đơn giá (kg)
+                                                        </p>
                                                     </TableCell>
-                                                    <TableCell align='center' className="font-semibold text-white rounded-tr-lg">Hành động</TableCell>
+                                                    <TableCell align='center'>
+                                                        <p className={`font-semibold text-white`}>
+                                                            Hành động
+                                                        </p>
+                                                    </TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>

@@ -86,7 +86,7 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
 
     return (
         <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <form onSubmit={handleSubmit} className='p-5 sm:w-[800px] w-full h-auto max-h-[90vh] overflow-y-auto bg-white sm:rounded-lg'>
+            <form onSubmit={handleSubmit} className='p-5 sm:w-[800px] w-full h-100 h-auto max-h-[90vh] overflow-y-auto bg-white sm:rounded-lg'>
                 <div className='w-full flex justify-between items-center pb-5 px-5'>
                     <h1 className='font-bold'>Gia hạn phiếu thu</h1>
                     <button onClick={() => handleClose(false)}>

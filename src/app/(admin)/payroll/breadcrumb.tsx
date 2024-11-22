@@ -15,13 +15,13 @@ export default function PayrollPageBreadcrumb() {
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/dashboard')}>
                         Trang Quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>Bảng lương</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Bảng lương</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

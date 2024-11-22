@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import Background from '@/components/assets/img/background.jpg'
 
 export const metadata: Metadata = {
     title: 'Quên mật khẩu',
@@ -13,7 +14,14 @@ export default function ForgotPasswordLayout({
 }) {
     return (
         <main>
-            <section className="flex items-center justify-center min-h-screen">
+            <section className="relative flex items-center justify-center min-h-screen">
+                <div
+                    className='absolute inset-0 bg-cover bg-center'
+                    style={{
+                        backgroundImage: `url(${Background.src})`,
+                        transform: 'scaleX(-1)',
+                    }}
+                />
                 {children}
             </section>
         </main>

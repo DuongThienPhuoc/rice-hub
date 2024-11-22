@@ -21,28 +21,32 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
 }) => {
     return (
         <div className="p-2 pb-0 border rounded h-[320px] bg-white flex flex-col gap-2">
-            <div className="bg-[#f4f4f5] p-1 grid grid-cols-2 gap-2 rounded">
+            <div className="bg-[#4ba94d] text-white p-1 grid grid-cols-2 gap-2 rounded">
                 <div
                     className={cn(
                         'flex items-center justify-center rounded h-10 hover:cursor-pointer',
-                        tab === 0 && 'bg-white',
+                        tab === 0 && 'bg-white text-black',
                     )}
                     onClick={() => {
                         setTab(0);
                     }}
                 >
-                    <h1 className="text-sm font-medium leading-none">Nhân viên thời vụ</h1>
+                    <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
+                        Nhân viên thời vụ
+                    </h1>
                 </div>
                 <div
                     className={cn(
                         'flex items-center justify-center rounded h-10 hover:cursor-pointer',
-                        tab === 1 && 'bg-white',
+                        tab === 1 && 'bg-white text-black',
                     )}
                     onClick={() => {
                         setTab(1);
                     }}
                 >
-                    <h1 className="text-sm font-medium leading-none">Nhân viên</h1>
+                    <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
+                        Nhân viên chính thức
+                    </h1>
                 </div>
             </div>
             <div className="overflow-y-auto space-y-3">
@@ -76,7 +80,7 @@ const UserCard: React.FC<UserCardProps> = ({
     selectedEmployee,
 }) => {
     const roleProvider: Record<string, string> = {
-        DRIVER_EMPLOYEE: 'Lái xe',
+        DRIVER_EMPLOYEE: 'Nhân viên giao hàng',
         PORTER_EMPLOYEE: 'Nhân viên bốc/dỡ hàng',
         STOCK_EMPLOYEE: 'Nhân viên quản kho',
     }

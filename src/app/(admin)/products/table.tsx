@@ -37,7 +37,6 @@ export default function ProductTable() {
     ];
 
     const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -117,7 +116,7 @@ export default function ProductTable() {
                                     { value: 'productName', label: 'Tên sản phẩm' }
                                 ]}
                             />
-                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                            <div className='flex flex-col lg:flex-row items-center mt-0'>
                                 {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (

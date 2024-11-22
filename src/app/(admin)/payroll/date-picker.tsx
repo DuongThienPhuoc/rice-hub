@@ -26,7 +26,7 @@ const PayrollDatePicker: React.FC<DatePickerProps> = ({
                 defaultValue={month.toString()}
                 onValueChange={(e) => setMonth(parseInt(e))}
             >
-                <SelectTrigger className="h-[48px] bg-white font-semibold">
+                <SelectTrigger className="h-[48px] bg-[#4ba94d] text-white font-semibold">
                     <SelectValue placeholder="Tháng" />
                 </SelectTrigger>
                 <SelectContent>
@@ -41,7 +41,7 @@ const PayrollDatePicker: React.FC<DatePickerProps> = ({
                 defaultValue={year.toString()}
                 onValueChange={(e) => setYear(parseInt(e))}
             >
-                <SelectTrigger className="h-[48px] bg-white font-semibold">
+                <SelectTrigger className="h-[48px] bg-[#4ba94d] text-white font-semibold">
                     <SelectValue placeholder="Năm" />
                 </SelectTrigger>
                 <SelectContent>

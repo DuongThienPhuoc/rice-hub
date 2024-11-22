@@ -71,7 +71,6 @@ const Page = () => {
     }, [selectedProduct])
 
     const getProducts = async () => {
-        setLoadingData(true);
         try {
             const url = `/products/`;
             const response = await api.get(url);
@@ -175,12 +174,12 @@ const Page = () => {
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
-                <div className='w-[95%] md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
+                <div className='w-full md:w-[80%] flex bg-white rounded-lg flex-col' style={{ boxShadow: '5px 5px 5px lightgray' }}>
                     {loadingData ? (
                         <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='mt-5 lg:mt-10 p-[7px]' />
                     ) : (
                         <div
-                            className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
+                            className={`w-[100%] mt-5 text-center lg:mt-10 p-[7px] text-white bg-[#4ba94d]`}
                             style={{ boxShadow: '3px 3px 5px lightgray' }}
                         >
                             <strong>Thông tin phiếu xuất</strong>
@@ -218,32 +217,46 @@ const Page = () => {
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='rounded-b-lg mt-2' />
                             </div>
                         ) : (
-                            <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+                            <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                                    <TableHead>
+                                    <TableHead className='bg-[#0090d9]'>
                                         <TableRow>
-                                            <TableCell align='center' className={`w-[5%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                STT
+                                            <TableCell align='center' className={`w-[5%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    STT
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[19%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Tên sản phẩm
+                                            <TableCell align='center' className={`w-[19%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Tên sản phẩm
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Số lượng
+                                            <TableCell align='center' className={`w-[10%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Số lượng
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Quy cách
+                                            <TableCell align='center' className={`w-[15%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Quy cách
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Danh mục
+                                            <TableCell align='center' className={`w-[10%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Danh mục
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Nhà cung cấp
+                                            <TableCell align='center' className={`w-[15%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Nhà cung cấp
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[15%] font-semibold bg-white text-black p-2 rounded-tl-2xl`}>
-                                                Kho
+                                            <TableCell align='center' className={`w-[15%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Kho
+                                                </p>
                                             </TableCell>
-                                            <TableCell align='center' className="w-[5%] font-semibold bg-white text-black p-2 rounded-tr-2xl">#</TableCell>
+                                            <TableCell align='center' className="w-[5%]"><p className='font-semibold text-white'>#</p></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -495,10 +508,10 @@ const Page = () => {
                             </>
                         ) : (
                             <>
-                                <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/export")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/export")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>

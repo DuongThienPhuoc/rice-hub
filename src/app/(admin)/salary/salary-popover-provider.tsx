@@ -244,14 +244,15 @@ function EmployeePopoverContent({
                                 className="w-full"
                                 onClick={() => {
                                     const bodyRequest: EmployeeDayActiveBodyRequest =
-                                        {
-                                            employeeId: employee.id,
-                                            dayActive: new Date(
-                                                day.localDate,
-                                            ).toLocaleDateString(),
-                                            mass: detail || null,
-                                            note: note,
-                                        };
+                                    {
+                                        employeeId: employee.id,
+                                        dayActive: new Date(
+                                            day.localDate,
+                                        ).toLocaleDateString(),
+                                        amountPerMass: 0.0,
+                                        mass: detail || null,
+                                        note: note,
+                                    };
                                     handleUpdateEmployeeActiveDay(
                                         bodyRequest,
                                     ).catch((e) => {
@@ -268,12 +269,12 @@ function EmployeePopoverContent({
                                 className="w-full"
                                 onClick={() => {
                                     const bodyRequest: DeleteActiveDayBodyRequest =
-                                        {
-                                            employeeId: employee.id,
-                                            date: new Date(
-                                                day.localDate,
-                                            ).toLocaleDateString(),
-                                        };
+                                    {
+                                        employeeId: employee.id,
+                                        date: new Date(
+                                            day.localDate,
+                                        ).toLocaleDateString(),
+                                    };
                                     handleDeleteEmployeeActiveDay(
                                         bodyRequest,
                                     ).catch((e) => {
@@ -294,14 +295,15 @@ function EmployeePopoverContent({
                                 className="w-full"
                                 onClick={() => {
                                     const bodyRequest: EmployeeDayActiveBodyRequest =
-                                        {
-                                            employeeId: employee.id,
-                                            dayActive: new Date(
-                                                day.localDate,
-                                            ).toLocaleDateString(),
-                                            mass: detail || null,
-                                            note: note,
-                                        };
+                                    {
+                                        employeeId: employee.id,
+                                        dayActive: new Date(
+                                            day.localDate,
+                                        ).toLocaleDateString(),
+                                        amountPerMass: 0.0,
+                                        mass: detail || null,
+                                        note: note,
+                                    };
                                     handleCreateEmployeeActiveDay(
                                         bodyRequest,
                                     ).catch((e) => {

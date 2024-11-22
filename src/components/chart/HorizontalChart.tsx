@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useRef, useState } from 'react';
 import { BarChart, Bar, XAxis, Tooltip, YAxis, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,12 +43,12 @@ const HorizontalChart: React.FC<{ chartName: string }> = ({ chartName }) => {
 
     const chartData = [
         { product: "Gạo ST25", sales: generateRandomRevenue(), fill: "#e23670" },
-        { product: "Gạo ST21", sales: generateRandomRevenue(), fill: "#2662d9" },
+        { product: "Gạo ST21", sales: generateRandomRevenue(), fill: "#0090d9" },
         { product: "Gạo huyết rồng", sales: generateRandomRevenue(), fill: "#2eb88a" },
         { product: "Gạo lứt", sales: generateRandomRevenue(), fill: "#af57db" },
         { product: "Gạo nghệ", sales: generateRandomRevenue(), fill: "#e88c30" },
         { product: "Gạo ST22", sales: generateRandomRevenue(), fill: "#e23670" },
-        { product: "Gạo ST23", sales: generateRandomRevenue(), fill: "#2662d9" },
+        { product: "Gạo ST23", sales: generateRandomRevenue(), fill: "#0090d9" },
         { product: "Gạo huyết long", sales: generateRandomRevenue(), fill: "#2eb88a" },
         { product: "Gạo mẻ", sales: generateRandomRevenue(), fill: "#af57db" },
         { product: "Gạo An Nam", sales: generateRandomRevenue(), fill: "#e88c30" },

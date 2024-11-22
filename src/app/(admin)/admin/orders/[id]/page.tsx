@@ -45,7 +45,7 @@ export default function OrderDetailPage({
         fetchOrderDetail().catch((e) => console.error(e));
     }, []);
 
-    if(!order) {
+    if (!order) {
         //Todo: Add skeleton loader
         return <></>
     }
@@ -75,7 +75,7 @@ export default function OrderDetailPage({
                         <div className="flex justify-between">
                             <span className="font-semibold">Trạng thái</span>
                             <span>
-                                <Badge variant={statusProvider(order.status).variant}>
+                                <Badge className='bg-[#4ba94d] hover:bg-green-500' variant={statusProvider(order.status).variant}>
                                     {statusProvider(order?.status).text}
                                 </Badge>
                             </span>
