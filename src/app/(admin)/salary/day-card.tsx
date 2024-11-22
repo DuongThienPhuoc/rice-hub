@@ -56,7 +56,7 @@ export function DayCard({
                     <div className="flex justify-between">
                         <div
                             className={cn(
-                                new Date(day.localDate).toLocaleDateString() ===
+                                new Date(day.localDate).toLocaleDateString('en-US') ===
                                     currentDate
                                     ? 'w-6 h-6 flex items-center justify-center rounded-full bg-[#2f2f31] text-white'
                                     : '',

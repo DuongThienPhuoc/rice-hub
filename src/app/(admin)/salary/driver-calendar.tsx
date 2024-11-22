@@ -60,7 +60,7 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
     function isActiveDate(date: string) {
         return activeDays?.some(
             (activeDay) =>
-                new Date(activeDay.dayActive).toLocaleDateString() === date,
+                new Date(activeDay.dayActive).toLocaleDateString('en-US') === date,
         );
     }
 
@@ -81,13 +81,13 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
                         currentDate={currentDate}
                         variant={
                             isFutureDate(
-                                new Date(day.localDate).toLocaleDateString(),
+                                new Date(day.localDate).toLocaleDateString('en-US'),
                             )
                                 ? 'default'
                                 : isActiveDate(
                                     new Date(
                                         day.localDate,
-                                    ).toLocaleDateString(),
+                                    ).toLocaleDateString('en-US'),
                                 )
                                     ? 'active'
                                     : 'inactive'
@@ -98,7 +98,7 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
                         activeDays={activeDays || []}
                         refreshActiveDays={refreshActiveDays}
                         setRefreshActiveDays={setRefreshActiveDays}
-                        isPrevMonth={isPreviousMonth(new Date(day.localDate).toLocaleDateString())}
+                        isPrevMonth={isPreviousMonth(new Date(day.localDate).toLocaleDateString('en-US'))}
                     />
                 ))}
             </div>

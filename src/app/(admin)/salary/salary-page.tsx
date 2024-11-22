@@ -16,7 +16,7 @@ export default function SalaryPage() {
     const [selectedEmployee, setSelectedEmployee] = React.useState<Employee>();
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = new Date().toLocaleDateString('en-US');
     const [calendar, setCalendar] = React.useState(getDaysAndWeekdaysInMonth(currentYear, currentMonth))
     const [isPending, startTransition] = React.useTransition();
     const [month, setMonth] = React.useState(currentMonth);
