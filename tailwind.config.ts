@@ -91,7 +91,9 @@ const config: Config = {
   	},
   	fontFamily: {
   		arsenal: ['Arsenal', 'sans-serif'],
-        roboto: ['Roboto', 'sans-serif']
+        roboto: ['Roboto', 'sans-serif'],
+		amatic: ['Amatic SC', 'cursive'],
+		philosopher: ['Philosopher', 'sans-serif'],
   	}
   },
   plugins: [require("tailwindcss-animate")],
