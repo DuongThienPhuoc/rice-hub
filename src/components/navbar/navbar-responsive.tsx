@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import style from '@/style/Landing-page.module.css';
+import style from '@/style/landing-page.module.css';
 import { useState } from 'react';
 
 export default function NavbarResponsive() {

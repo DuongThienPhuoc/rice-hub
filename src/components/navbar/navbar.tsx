@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import style from '@/style/Landing-page.module.css';
+import style from '@/style/landing-page.module.css';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

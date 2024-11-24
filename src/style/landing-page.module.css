@@ -1,7 +1,8 @@
-.category_container{
+.category_container {
     position: relative;
 }
-.category_container::after{
+
+.category_container::after {
     content: '';
     height: 4px;
     width: 0;
@@ -10,11 +11,12 @@
     bottom: 0;
     transition: width 0.5s;
 }
-.category_container:hover::after{
+
+.category_container:hover::after {
     width: 80%;
 }
 
-.order_button{
+.order_button {
     background-color: #905630;
     color: white;
     padding: 10px 20px;
@@ -25,16 +27,17 @@
     font-weight: 700;
 }
 
-.order_button:hover{
+.order_button:hover {
     transition: all 0.5s;
     transform: scale(1.5);
     background-color: #3e603b;
 }
 
-.navbar{
+.navbar {
     position: relative;
 }
-.navbar::after{
+
+.navbar::after {
     content: "";
     position: absolute;
     height: 1px;
@@ -43,6 +46,21 @@
     bottom: 0;
     transition: all 0.5s;
 }
-.navbar:hover::after{
+
+.navbar:hover::after {
     width: 100%;
+}
+
+.footer {
+    position: relative;
+}
+
+.footer::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 20%;
+    background-color: #3e603b;
 }

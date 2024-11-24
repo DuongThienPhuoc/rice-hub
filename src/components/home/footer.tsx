@@ -1,4 +1,6 @@
 import { ChevronRight, Mail, MapPin, Phone, Link } from 'lucide-react';
+import style from '@/style/landing-page.module.css'
+import { cn } from '@/lib/utils';
 
 export default function Footer() {
     return (
@@ -6,7 +8,7 @@ export default function Footer() {
             <div className="w-[90vw] gap-10 md:w-[60vw] mx-auto grid grid-cols-1 md:grid-cols-3 md:gap-10">
                 <div>
                     <div className="space-y-4">
-                        <h1 className="font-philosopher text-[20px] font-bold">
+                        <h1 className={cn("font-philosopher text-[20px] font-bold",style.footer)}>
                             Về gạo Thanh Quang
                         </h1>
                         <p className="text-[16px] text-justify font-philosopher">
@@ -23,9 +25,9 @@ export default function Footer() {
                 </div>
                 <div>
                     <div className="space-y-4">
-                        <p className="font-philosopher text-[20px] font-bold">
+                        <h1 className={cn("font-philosopher text-[20px] font-bold",style.footer)}>
                             Hỗ trợ khách hàng
-                        </p>
+                        </h1>
                         <div>
                             <ul className="font-philosopher space-y-4">
                                 <li className="flex items-center gap-2">
