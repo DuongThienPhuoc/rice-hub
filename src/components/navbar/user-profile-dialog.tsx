@@ -1,8 +1,8 @@
 import {
     Dialog,
-    DialogContent,
+    DialogContent, DialogDescription,
     DialogHeader,
-    DialogTitle,
+    DialogTitle
 } from '@/components/ui/dialog';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,26 +19,28 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { User, Phone, Lock } from 'lucide-react';
+import { User as UserInterface } from '@/type/user';
 
 export default function UserProfileDialog({
     open,
     setOpen,
+    user
 }: {
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
+    user: UserInterface
 }) {
     const [isEdit, setIsEdit] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof userProfileFormSchema>>({
         resolver: zodResolver(userProfileFormSchema),
         defaultValues: {
-            fullName: 'John Doe',
-            phoneNumber: '0829388273',
-            userName: 'johndoe',
-            email: 'johndoe@gmail.com',
+            fullName: user.name,
+            phoneNumber: user.phone,
+            userName: user.username,
+            email: user.email,
         },
     });
-
     function handleEdit() {
         setIsEdit(!isEdit);
     }
@@ -55,6 +57,7 @@ export default function UserProfileDialog({
                     <DialogTitle className="text-2xl font-bold text-center">
                         Thông tin cá nhân
                     </DialogTitle>
+                    <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
