@@ -14,19 +14,19 @@ export default function OrderDetailTable({
 }: {
     order: Order;
 }) {
-    const formater = new Intl.NumberFormat('vi-VN',{
+    const formater = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND'
     })
     return (
         <Table>
-            <TableHeader>
+            <TableHeader className='bg-[#0090d9]'>
                 <TableRow>
-                    <TableHead>Sản Phẩm</TableHead>
-                    <TableHead>Quy cách</TableHead>
-                    <TableHead>Số lượng</TableHead>
-                    <TableHead>Giá</TableHead>
-                    <TableHead className="text-right">Thành tiền</TableHead>
+                    <TableHead><p className='font-semibold text-white'>Sản Phẩm</p></TableHead>
+                    <TableHead><p className='font-semibold text-white'>Quy cách</p></TableHead>
+                    <TableHead><p className='font-semibold text-white'>Số lượng</p></TableHead>
+                    <TableHead><p className='font-semibold text-white'>Giá</p></TableHead>
+                    <TableHead className="text-right"><p className='font-semibold text-white'>Thành tiền</p></TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

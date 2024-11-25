@@ -109,12 +109,15 @@ export default function EmployeeTable() {
                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                 <TableHead className='bg-[#0090d9]'>
                                     <TableRow>
-                                        <TableCell color='white' className='font-semibold text-white'>Mã phiếu chi</TableCell>
-                                        <TableCell className='font-semibold text-white'>Ngày xuất</TableCell>
-                                        <TableCell className='font-semibold text-white'>Tổng tiền</TableCell>
-                                        <TableCell className='font-semibold text-white'>Loại</TableCell>
-                                        <TableCell align='center' className='font-semibold text-white'>
-                                            Hành động
+                                        <TableCell><p className='font-semibold text-white'>Mã phiếu chi</p></TableCell>
+                                        <TableCell><p className='font-semibold text-white'>Ngày xuất</p></TableCell>
+                                        <TableCell><p className='font-semibold text-white'>Tổng tiền</p></TableCell>
+                                        <TableCell><p className='font-semibold text-white'>Loại</p></TableCell>
+                                        <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                        <TableCell align='center'>
+                                            <p className='font-semibold text-white'>
+                                                Hành động
+                                            </p>
                                         </TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -139,12 +142,17 @@ export default function EmployeeTable() {
                                                     <TableCell>
                                                         {expenditure.type}
                                                     </TableCell>
-                                                    <TableCell align="center">
-                                                        <ActionDropdownProvider expenseVoucher={expenditure}>
-                                                            <div className="flex w-6 h-6 items-center justify-center rounded hover:bg-[#cbd5e1]">
-                                                                <Ellipsis className="w-4 h-4" />
-                                                            </div>
-                                                        </ActionDropdownProvider>
+                                                    <TableCell>
+                                                        {expenditure?.note || 'N/A'}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className='flex justify-center'>
+                                                            <ActionDropdownProvider expenseVoucher={expenditure}>
+                                                                <div className="flex w-6 h-6 items-center justify-center rounded hover:bg-[#cbd5e1]">
+                                                                    <Ellipsis className="w-4 h-4" />
+                                                                </div>
+                                                            </ActionDropdownProvider>
+                                                        </div>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}

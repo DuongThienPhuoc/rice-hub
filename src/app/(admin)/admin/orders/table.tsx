@@ -63,12 +63,12 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                     <TableHead className='bg-[#0090d9]'>
                         <TableRow>
-                            <TableCell className='font-semibold text-white'>Mã đơn hàng</TableCell>
-                            <TableCell className='font-semibold text-white'>Ngày đặt</TableCell>
-                            <TableCell className='font-semibold text-white'>Người đặt</TableCell>
-                            <TableCell className='font-semibold text-white'>Trạng thái</TableCell>
-                            <TableCell align='center' className='font-semibold text-white'>
-                                Xem chi tiết
+                            <TableCell><p className='font-semibold text-white'>Mã đơn hàng</p></TableCell>
+                            <TableCell><p className='font-semibold text-white'>Ngày đặt</p></TableCell>
+                            <TableCell><p className='font-semibold text-white'>Người đặt</p></TableCell>
+                            <TableCell><p className='font-semibold text-white'>Trạng thái</p></TableCell>
+                            <TableCell align='center'>
+                                <p className='font-semibold text-white'>Xem chi tiết</p>
                             </TableCell>
                         </TableRow>
                     </TableHead>

@@ -46,7 +46,6 @@ export default function ProductionTable() {
     };
 
     const getData = async (page?: number, startDate?: any, endDate?: any) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");

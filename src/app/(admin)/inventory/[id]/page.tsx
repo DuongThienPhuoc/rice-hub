@@ -29,7 +29,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     }, []);
 
     const getInventory = async () => {
-        setLoadingData(true);
         try {
             const url = `/inventory/getInventory/${params.id}`;
             const response = await api.get(url);

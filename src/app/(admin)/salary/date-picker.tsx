@@ -26,7 +26,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                 defaultValue={month.toString()}
                 onValueChange={(e) => setMonth(parseInt(e))}
             >
-                <SelectTrigger className="w-[180px] bg-white">
+                <SelectTrigger className="w-[180px] bg-[#4ba94d] text-white">
                     <SelectValue placeholder="Tháng" />
                 </SelectTrigger>
                 <SelectContent>
@@ -41,7 +41,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                 defaultValue={year.toString()}
                 onValueChange={(e) => setYear(parseInt(e))}
             >
-                <SelectTrigger className="w-[180px] bg-white">
+                <SelectTrigger className="w-[180px] bg-[#4ba94d] text-white">
                     <SelectValue placeholder="Năm" />
                 </SelectTrigger>
                 <SelectContent>

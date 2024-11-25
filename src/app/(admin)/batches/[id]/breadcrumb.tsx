@@ -19,19 +19,17 @@ export default function BatchDetailPageBreadcrumb({
         <Breadcrumb className="my-5">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                    <BreadcrumbLink onClick={() => router.push('/dashboard')}>
+                    <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/dashboard')}>
                         Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbLink>
-                        Lô hàng
-                    </BreadcrumbLink>
+                <BreadcrumbSeparator className='text-white' />
+                <BreadcrumbItem className='text-white'>
+                    Lô hàng
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage>{batchId}</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>{batchId}</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

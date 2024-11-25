@@ -29,7 +29,6 @@ const Page = () => {
     }, []);
 
     const getProducts = async () => {
-        setLoadingData(true);
         try {
             const url = `/productwarehouse/getAllProducts`;
             const response = await api.get(url);
@@ -159,18 +158,22 @@ const Page = () => {
                                         <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                             <TableHead className='bg-[#0090d9]'>
                                                 <TableRow>
-                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Mã sản phẩm</TableCell>
-                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Tên sản phẩm</TableCell>
-                                                    <TableCell rowSpan={1} align="center" colSpan={2} className='font-semibold text-white'>Quy cách</TableCell>
-                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Số lượng</TableCell>
-                                                    <TableCell rowSpan={2} className='font-semibold text-white'>Mô tả</TableCell>
+                                                    <TableCell rowSpan={2}><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
+                                                    <TableCell rowSpan={2}><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
+                                                    <TableCell rowSpan={1} colSpan={2} align="center"><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                    <TableCell rowSpan={2}><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                    <TableCell rowSpan={2}><p className='font-semibold text-white'>Mô tả</p></TableCell>
                                                 </TableRow>
                                                 <TableRow>
-                                                    <TableCell align="center" className='font-semibold text-white'>
-                                                        Loại
+                                                    <TableCell align="center">
+                                                        <p className='font-semibold text-white'>
+                                                            Loại
+                                                        </p>
                                                     </TableCell>
-                                                    <TableCell align="center" className='font-semibold text-white'>
-                                                        Trọng lượng
+                                                    <TableCell align="center" >
+                                                        <p className='font-semibold text-white'>
+                                                            Trọng lượng
+                                                        </p>
                                                     </TableCell>
                                                 </TableRow>
                                             </TableHead>

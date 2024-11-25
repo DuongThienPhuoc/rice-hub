@@ -17,6 +17,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({});
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
+    const [employeeRoles, setEmployeeRoles] = useState<any>([]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -31,22 +32,35 @@ const Page = ({ params }: { params: { id: number } }) => {
         }
     };
 
-    useEffect(() => {
-        setLoadingData(true);
-        const getEmployee = async () => {
-            try {
-                const url = `/employees/${params.id}`;
-                const response = await api.get(url);
-                const data = response.data;
-                setEmployee(data);
-            } catch (error) {
-                console.error("Error fetching employee:", error);
-            } finally {
-                setLoadingData(false);
-            }
-        };
+    const getEmployeeRoles = async () => {
+        try {
+            const url = `/employeerole/all`;
+            const response = await api.get(url);
+            const data = response.data;
+            setEmployeeRoles(data);
+        } catch (error) {
+            console.error("Error fetching employee role:", error);
+        } finally {
+            setLoadingData(false);
+        }
+    };
 
+    const getEmployee = async () => {
+        try {
+            const url = `/employees/${params.id}`;
+            const response = await api.get(url);
+            const data = response.data;
+            setEmployee(data);
+        } catch (error) {
+            console.error("Error fetching employee:", error);
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
+    useEffect(() => {
         if (params.id) {
+            getEmployeeRoles();
             getEmployee();
         }
     }, [params.id]);
@@ -111,9 +125,9 @@ const Page = ({ params }: { params: { id: number } }) => {
                 active: true,
                 gender: employee.gender,
                 salaryType: 'DAILY',
-                dailyWage: employee.dailyWage || 0,
                 bankName: employee.bankName,
                 bankNumber: employee.bankNumber,
+                dailyWage: employee.role.salaryDetail.dailyWage,
             });
             setImage(employee.image);
         }
@@ -133,7 +147,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            ? 'text-white bg-[#4ba94d] hover:bg-green-500'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -157,7 +171,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     alt='Avatar'
                                     className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                 />
-                                <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-[#1d1d1fca] bg-black rounded-lg text-white">
+                                <label htmlFor="fileInput" className="mt-4 px-4 py-2 font-bold text-[14px] hover:bg-blue-400 bg-[#0090d9] cursor-pointer rounded-lg text-white">
                                     {image ? 'Thay ảnh' : 'Thêm ảnh'}
                                 </label>
                             </>
@@ -320,24 +334,51 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         variant="standard" />
                                 </div>
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Vị trí: </span>
+                                    <span className='font-bold flex-1 pt-4'>Chức vụ: </span>
                                     <FormControl className='flex-[2]' variant="standard" sx={{ minWidth: 120 }}>
-                                        <InputLabel id="demo-simple-select-standard-label">Chọn vị trí</InputLabel>
+                                        <InputLabel id="demo-simple-select-standard-label">Chọn chức vụ</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-standard-label"
                                             id="demo-simple-select-standard"
                                             value={formData.employeeRoleId?.toString() || ''}
                                             onChange={(e) => handleFieldChange('employeeRoleId', e.target.value)}
-                                            label="Chọn giới tính"
+                                            label="Chọn chức vụ"
                                         >
                                             <MenuItem value="">
-                                                <em>Chọn vị trí</em>
+                                                <em>Chọn chức vụ</em>
                                             </MenuItem>
-                                            <MenuItem value={1}>Nhân viên quản kho</MenuItem>
-                                            <MenuItem value={2}>Nhân viên bán hàng</MenuItem>
+                                            {employeeRoles &&
+                                                employeeRoles.map((role: any) => {
+                                                    return (
+                                                        <MenuItem key={role.id} value={role.id}>
+                                                            {role.roleName === 'PORTER_EMPLOYEE' && 'Nhân viên bốc/dỡ hàng'}
+                                                            {role.roleName === 'DRIVER_EMPLOYEE' && 'Nhân viên giao hàng'}
+                                                            {role.roleName === 'STOCK_EMPLOYEE' && 'Nhân viên quản kho'}
+                                                        </MenuItem>
+                                                    );
+                                                })
+                                            }
                                         </Select>
                                     </FormControl>
                                 </div>
+                                {formData?.employeeRoleId !== '' && formData?.employeeRoleId !== 2 && (
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Lương ngày: </span>
+                                        <TextField
+                                            type={'number'}
+                                            className='flex-[2]'
+                                            onChange={(e) => {
+                                                if (Number(e.target.value) <= 0) {
+                                                    handleFieldChange('dailyWage', 0)
+                                                } else {
+                                                    handleFieldChange('dailyWage', Number(e.target.value))
+                                                }
+                                            }}
+                                            value={formData.dailyWage.toString()}
+                                            label={'Nhập lương ngày'}
+                                            variant="standard" />
+                                    </div>
+                                )}
                             </div>
                             <div className='flex-1'>
                                 <div className='mx-10 flex flex-col lg:flex-row lg:my-10'>
@@ -371,10 +412,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Cập nhật</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>

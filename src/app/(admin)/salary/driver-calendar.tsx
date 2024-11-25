@@ -85,12 +85,12 @@ const DriverCalendar: React.FC<DriverCalendarProps> = ({
                             )
                                 ? 'default'
                                 : isActiveDate(
-                                        new Date(
-                                            day.localDate,
-                                        ).toLocaleDateString('en-US'),
-                                    )
-                                  ? 'active'
-                                  : 'inactive'
+                                    new Date(
+                                        day.localDate,
+                                    ).toLocaleDateString('en-US'),
+                                )
+                                    ? 'active'
+                                    : 'inactive'
                         }
                         employee={employee}
                         isPending={isPending}

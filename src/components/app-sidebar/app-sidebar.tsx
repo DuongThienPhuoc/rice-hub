@@ -244,7 +244,7 @@ export default function AppSidebar() {
                 open={userProfileDialog}
                 setOpen={setUserProfileDialog}
             />
-            <SidebarHeader>
+            <SidebarHeader className="px-1 py-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <DropdownMenu>

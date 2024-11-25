@@ -265,7 +265,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     }
 
     const getBatch = async () => {
-        setLoadingData(true);
         try {
             const url = `/batches/batchCode/${params.id}`;
             const response = await api.get(url);
@@ -330,7 +329,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             ['Thông tin lô hàng'].map((label, index) => (
                                 <div key={index} className={`flex-1 ${index === 0 ? 'flex justify-end' : ''}`}>
                                     <div
-                                        className={`w-[100%] text-center mt-5 lg:mt-10 p-[7px] text-white bg-black hover:bg-[#1d1d1fca]}`}
+                                        className={`w-[100%] text-center mt-5 lg:mt-10 p-[7px] text-white bg-[#4ba94d] hover:bg-green-500`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
                                     >
                                         <strong>{label}</strong>
@@ -383,7 +382,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         )}
                     </div>
                     <div className='lg:px-10 w-full lg:mt-0 mt-10'>
-                        <div className='mx-10'>
+                        <div className='mx-5'>
                             {loadingData ? (
                                 <div className="w-full">
                                     <Skeleton animation="wave" variant="text" height={'30px'} width={200} className='mb-5' />
@@ -401,10 +400,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             <>
                                                 <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
                                                 <div className='flex justify-end items-center'>
-                                                    <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] hover:bg-[#1d1d1fca]'>
+                                                    <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] hover:bg-green-500'>
                                                         <strong>Xóa sản phẩm</strong>
                                                     </Button>
-                                                    <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                                    <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                                         <strong>Xác nhận nhập kho</strong>
                                                     </Button>
                                                 </div>
@@ -412,20 +411,29 @@ const Page = ({ params }: { params: { id: string } }) => {
                                         ) : (
                                             <>
                                                 <p className='font-bold lg:mt-0 mt-5'>Danh sách nguyên liệu: </p>
-                                                <Button type='button' onClick={() => handleSubmit('export')} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                                <Button type='button' onClick={() => handleSubmit('export')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                                     <strong>Xác nhận xuất kho</strong>
                                                 </Button>
                                             </>
                                         )}
                                     </div>
                                     <div className='overflow-x-auto max-h-[400px]'>
-                                        <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+                                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                                                <TableHead>
+                                                <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
                                                         <TableCell rowSpan={2} padding="checkbox">
                                                             {hasUnaddedProducts && (
                                                                 <Checkbox
+                                                                    sx={{
+                                                                        color: 'white',
+                                                                        '&.Mui-checked': {
+                                                                            color: 'white',
+                                                                        },
+                                                                        '&.MuiCheckbox-indeterminate': {
+                                                                            color: 'white',
+                                                                        },
+                                                                    }}
                                                                     indeterminate={selectedProducts.length > 0 && selectedProducts.length < products.filter((product) => !product.added).length}
                                                                     checked={selectedProducts.length === products.filter((product) => !product.added).length}
                                                                     onChange={(e) => {
@@ -438,22 +446,26 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 />
                                                             )}
                                                         </TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Mã sản phẩm</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Tên sản phẩm</TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         {batch?.receiptType === 'IMPORT' && (
-                                                            <TableCell rowSpan={2} align="center" className='font-semibold'>Giá nhập</TableCell>
+                                                            <TableCell rowSpan={2}><p className='font-semibold text-white'>Giá nhập</p> </TableCell>
                                                         )}
-                                                        <TableCell rowSpan={1} colSpan={2} align="center" className='font-semibold'>Quy cách</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Số lượng</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold w-[150px]'>Mô tả</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>#</TableCell>
+                                                        <TableCell rowSpan={1} colSpan={2} align="center"><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white w-[150px]'>Mô tả</p></TableCell>
+                                                        <TableCell rowSpan={2} align='center'><p className='font-semibold text-white'>Hành động</p></TableCell>
                                                     </TableRow>
                                                     <TableRow>
-                                                        <TableCell align="center" className='font-semibold'>
-                                                            Loại
+                                                        <TableCell align="center" >
+                                                            <p className='font-semibold text-white'>
+                                                                Loại
+                                                            </p>
                                                         </TableCell>
-                                                        <TableCell align="center" className='font-semibold'>
-                                                            Trọng lượng
+                                                        <TableCell align="center" >
+                                                            <p className='font-semibold text-white'>
+                                                                Trọng lượng
+                                                            </p>
                                                         </TableCell>
                                                     </TableRow>
                                                 </TableHead>
@@ -474,12 +486,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         />
                                                                     </TableCell>
                                                                 )}
-                                                                <TableCell align="center" onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                <TableCell onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product.product.productCode}
                                                                 </TableCell>
-                                                                <TableCell align="center">{product.product.name}</TableCell>
+                                                                <TableCell>{product.product.name}</TableCell>
                                                                 {batch?.receiptType === 'IMPORT' && (
-                                                                    <TableCell align="center">
+                                                                    <TableCell>
                                                                         <TextField
                                                                             type={'number'}
                                                                             className='w-[100px]'
@@ -525,7 +537,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         label={'Trọng lượng'}
                                                                         variant="standard" />
                                                                 </TableCell>
-                                                                <TableCell align="center">
+                                                                <TableCell>
                                                                     <TextField
                                                                         type={'number'}
                                                                         className='w-[100px]'
@@ -540,7 +552,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         label={'Số lượng'}
                                                                         variant="standard" />
                                                                 </TableCell>
-                                                                <TableCell align="center">
+                                                                <TableCell>
                                                                     <TextField
                                                                         type={'text'}
                                                                         className='w-[120px]'
@@ -589,18 +601,17 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         />
                                                                     </TableCell>
                                                                 )}
-                                                                <TableCell align="center" onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                <TableCell onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product.product.productCode}
                                                                 </TableCell>
-                                                                <TableCell align="center">{product.product.name}</TableCell>
+                                                                <TableCell>{product.product.name}</TableCell>
                                                                 {batch?.receiptType === 'IMPORT' && (
                                                                     <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
                                                                 )}
-                                                                <TableCell align="center">{product.unit}</TableCell>
-                                                                <TableCell align="center">{product.weightPerUnit} kg</TableCell>
-                                                                <TableCell align="center">{product.quantity}</TableCell>
-                                                                <TableCell align="center">{product.description}</TableCell>
-                                                                <TableCell align="center">
+                                                                <TableCell colSpan={2} align="center">{product.unit} {product.weightPerUnit} kg</TableCell>
+                                                                <TableCell>{product.quantity}</TableCell>
+                                                                <TableCell>{product.description}</TableCell>
+                                                                <TableCell>
                                                                     <div className='flex justify-center items-center space-x-2'>
                                                                         {product.added !== true && (
                                                                             <div className='relative group'>
@@ -630,7 +641,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push(`${batch?.receiptType === "IMPORT" ? '/import' : '/export'}`)} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push(`${batch?.receiptType === "IMPORT" ? '/import' : '/export'}`)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
