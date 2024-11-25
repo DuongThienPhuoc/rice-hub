@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Navbar() {
-    const [useName, setUserName] = useState<string>('');
+    const [userName, setUserName] = useState<string>('');
     const category = [
         {
             name: 'Trang chủ',
@@ -61,7 +61,7 @@ export default function Navbar() {
                                         'border-b-4 border-[#3e603b]',
                                     item.name !== 'Trang chủ' &&
                                         style.category_container,
-                                    useName &&
+                                    userName &&
                                         item.name === 'Đăng nhập' &&
                                         'hidden',
                                 )}
@@ -81,11 +81,11 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
-            {useName && (
-                <div>
+            {userName && (
+                <div className='pr-5'>
                     <p className={cn('font-amatic font-bold text-[25px]')}>
                         Xin chào{' '}
-                        <span className="font-bold">{`${useName}!`}</span>
+                        <span className="font-bold">{`${userName}!`}</span>
                     </p>
                 </div>
             )}
