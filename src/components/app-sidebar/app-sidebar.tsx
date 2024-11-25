@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import api from "@/config/axiosConfig";
-import { useRouter } from 'next/navigation';
+import api from '@/config/axiosConfig';
+import { usePathname, useRouter } from 'next/navigation';
 import {
     Sidebar,
     SidebarContent,
@@ -15,30 +14,30 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import {
-    Home,
-    ChevronsUpDown,
-    User,
-    ShoppingCart,
-    ScrollText,
-    LogOut,
-    ChevronDown,
-    Library,
-    Package,
-    DollarSign,
-    SquareArrowRight,
-    Import,
     ArrowRightFromLine,
+    BadgeDollarSign,
+    ChevronDown,
+    ChevronsUpDown,
+    DollarSign,
+    Factory,
+    Home,
+    Import,
+    Library,
+    LogOut,
     Logs,
+    MonitorCheck,
+    Package,
+    PackageCheck,
+    PackageMinus,
+    PackagePlus,
+    PenBox,
+    ScrollText,
+    ShoppingCart,
+    SquareArrowRight,
+    User,
+    UserCog,
     UserPen,
     Users,
-    UserCog,
-    PackageCheck,
-    PenBox,
-    PackagePlus,
-    PackageMinus,
-    MonitorCheck,
-    BadgeDollarSign,
-    Factory,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -53,16 +52,26 @@ import {
 } from '@/components/ui/dropdown-menu';
 import UserProfileDialog from '@/components/navbar/user-profile-dialog';
 import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@radix-ui/react-collapsible';
 import { cn } from '@/lib/utils';
-import { FaChartBar } from "react-icons/fa";
+import { FaChartBar } from 'react-icons/fa';
+import { User as UserInterface } from '@/type/user';
+import { getUserInformation } from '@/data/user';
 
-const categories = [
+type SidebarItem = {
+    category: string;
+    role: string[];
+    items: {
+        title: string;
+        url: string;
+        icon: React.ReactElement;
+    }[];
+};
+const categories: SidebarItem[] = [
     {
         category: 'Quản lý tài chính',
         role: ['ROLE_ADMIN'],
@@ -216,15 +225,42 @@ export default function AppSidebar() {
     const [userProfileDialog, setUserProfileDialog] = useState(false);
     const pathName = usePathname();
     const [role, setRole] = React.useState<string>('');
+    const [userName, setUserName] = React.useState<string>('');
     const router = useRouter();
-    useEffect(() => {
-        const role = typeof window != 'undefined' ? localStorage.getItem('role') : '';
-        if (role !== null) {
-            setRole(role)
-        }
-    }, [role])
+    const [userInformation, setUserInformation] = useState<UserInterface>(
+        {} as UserInterface,
+    );
 
-    function isHidden(category: any) {
+    useEffect(() => {
+        const role =
+            typeof window != 'undefined' ? localStorage.getItem('role') : '';
+        const userName =
+            typeof window != 'undefined'
+                ? localStorage.getItem('username')
+                : '';
+        if (role !== null && userName !== null) {
+            setRole(role);
+            setUserName(userName);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUserInformation().catch((error) => {
+            console.error('Error occurred while retrieving user information:', error);
+        })
+    }, [userName]);
+
+    async function fetchUserInformation(){
+        try {
+            if (!userName) return;
+            const data = await getUserInformation<UserInterface>(userName);
+            setUserInformation(data);
+        } catch (error) {
+            throw error
+        }
+    }
+
+    function isHidden(category: SidebarItem) {
         return !category.role.includes(role);
     }
 
@@ -234,16 +270,19 @@ export default function AppSidebar() {
             await api.post(url);
             router.push('/');
         } catch (error) {
-            console.error("Đăng xuất thất bại:", error);
+            console.error('Đăng xuất thất bại:', error);
         }
-    }
+    };
 
     return (
         <Sidebar collapsible="icon">
-            <UserProfileDialog
+            {userProfileDialog && (
+                <UserProfileDialog
                 open={userProfileDialog}
                 setOpen={setUserProfileDialog}
-            />
+                user={userInformation}
+                />
+            )}
             <SidebarHeader className="px-1 py-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -253,18 +292,18 @@ export default function AppSidebar() {
                                     <div className="flex items-center gap-2">
                                         <Avatar className="w-6 h-6">
                                             <AvatarImage
-                                                src="https://github.com/shadcn.png"
+                                                src={userInformation.image || ''}
                                                 alt="@logo"
                                             />
-                                            <AvatarFallback>P</AvatarFallback>
+                                            <AvatarFallback>{userName?.split('')[0]?.toUpperCase()}</AvatarFallback>
                                         </Avatar>
                                         <div>
                                             <span className="font-semibold text-sm">
-                                                phuockingboy
+                                                {userName}
                                             </span>
                                             <br />
                                             <span className="font-normal text-[12px]">
-                                                phuocvip2@gmail.com
+                                                {userInformation.email}
                                             </span>
                                         </div>
                                     </div>
@@ -305,7 +344,9 @@ export default function AppSidebar() {
                         className="group/collapsible"
                         key={category.category}
                     >
-                        <SidebarGroup className={cn(isHidden(category) ? 'hidden' : '')}>
+                        <SidebarGroup
+                            className={cn(isHidden(category) ? 'hidden' : '')}
+                        >
                             <SidebarGroupLabel asChild>
                                 <CollapsibleTrigger>
                                     {category.category}
