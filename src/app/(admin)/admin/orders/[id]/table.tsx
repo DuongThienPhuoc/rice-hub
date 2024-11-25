@@ -14,7 +14,7 @@ export default function OrderDetailTable({
 }: {
     order: Order;
 }) {
-    const formater = new Intl.NumberFormat('vi-VN',{
+    const formater = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND'
     })
@@ -22,7 +22,7 @@ export default function OrderDetailTable({
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead>Sản Phẩm</TableHead>
+                    <TableHead>Sản phẩm</TableHead>
                     <TableHead>Quy cách</TableHead>
                     <TableHead>Số lượng</TableHead>
                     <TableHead>Giá</TableHead>

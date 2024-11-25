@@ -24,7 +24,7 @@ export default function AlertDelete({
             <AlertDialogContent className="bg-white">
                 <AlertDialogHeader>
                     <AlertDialogTitle>
-                        Bạn có chắc chắn muốn xoá san phẩm này?
+                        Bạn có chắc chắn muốn xoá sản phẩm này?
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                         Hành động này sẽ xoá sản phẩm khỏi danh sách

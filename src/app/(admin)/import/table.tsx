@@ -26,6 +26,7 @@ export default function ImportTable() {
         { name: 'batchCode', displayName: 'Lô hàng' },
         { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
         { name: 'username', displayName: 'Người tạo' },
+        { name: 'status', displayName: 'Trạng thái' },
     ];
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);

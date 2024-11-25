@@ -176,7 +176,7 @@ const Page = () => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {products && products.map((product: any, index: any) => (
+                                                {products && products.length > 0 ? products.map((product: any, index: any) => (
                                                     <TableRow
                                                         key={index}
                                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -218,7 +218,15 @@ const Page = () => {
                                                                 variant="standard" />
                                                         </TableCell>
                                                     </TableRow>
-                                                ))}
+                                                )) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={6}>
+                                                            <div className="my-10 mx-4 text-center text-gray-500">
+                                                                Không có dữ liệu
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
                                             </TableBody>
                                         </Table>
                                     </TableContainer>

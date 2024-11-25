@@ -54,15 +54,36 @@ const Page = ({ params }: { params: { id: string } }) => {
             });
             if (response.status >= 200 && response.status < 300) {
                 if (reload === true) {
-                    alert(`Cập nhật thành công`);
+                    toast({
+                        variant: 'default',
+                        title: 'Cập nhật thành công',
+                        description: `Lô hàng đã được cập nhật thành công.`,
+                        style: {
+                            backgroundColor: '#4caf50',
+                            color: '#fff',
+                        },
+                        duration: 3000
+                    })
                     getBatch();
                     getProducts();
                 }
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
             }
-        } catch (error) {
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     }
 
@@ -270,8 +291,14 @@ const Page = ({ params }: { params: { id: string } }) => {
             const response = await api.get(url);
             const data = response.data;
             setBatch(data);
-        } catch (error) {
-            console.error("Error fetching batch:", error);
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         } finally {
             setLoadingData(false)
         }

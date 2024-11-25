@@ -110,12 +110,12 @@ const categories = [
                 icon: <Library />,
             },
             {
-                title: 'Sản Phẩm',
+                title: 'Sản phẩm',
                 url: '/products',
                 icon: <Package />,
             },
             {
-                title: 'Nguyên Liệu',
+                title: 'Nguyên liệu',
                 url: '/ingredients',
                 icon: <SquareArrowRight />,
             },

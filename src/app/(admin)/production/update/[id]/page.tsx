@@ -15,24 +15,41 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Trash2, X } from 'lucide-react';
 
-interface RowData {
-    [key: string]: any;
-}
-
-const Page = () => {
+const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
-    const [ingredients, setIngredients] = useState<RowData[]>([]);
-    const [products, setProducts] = useState<RowData[]>([]);
-    const [selectedIngredient, setSelectedIngredient] = useState<RowData | null>(null);
+    const [ingredients, setIngredients] = useState<any>([]);
+    const [products, setProducts] = useState<any>([]);
+    const [selectedIngredient, setSelectedIngredient] = useState<any>(null);
     const [loadingData, setLoadingData] = useState(true);
     const [inputWeight, setInputWeight] = useState<any>('');
-    const [outputs, setOutputs] = useState<any>([{ selectedProduct: null, ratio: 0, weight: '' }]);
+    const [outputs, setOutputs] = useState<any>([]);
     const [note, setNote] = useState<any>('');
+    const [production, setProduction] = useState<any>([]);
 
     useEffect(() => {
-        getProducts();
-        getIngredients();
-    }, []);
+        const fetchData = async () => {
+            await Promise.all([getProducts(), getIngredients(), getProduction()]);
+        };
+        fetchData();
+    }, [params]);
+
+    useEffect(() => {
+        if (production?.productId) {
+            const ingredient = ingredients.find((i: any) => i.id === production.productId);
+            setSelectedIngredient(ingredient);
+            setInputWeight(production.quantity);
+            setNote(production.note);
+            if (production?.finishedProducts && products.length > 0) {
+                const newOutputs = production.finishedProducts.map((fp: any) => ({
+                    selectedProduct: products.find((p: any) => p.id === fp.productId),
+                    ratio: fp.proportion,
+                    weight: fp.quanity,
+                }));
+                setOutputs([...outputs, ...newOutputs]);
+            }
+        }
+    }, [production?.productId, ingredients]);
+
 
     const getProducts = async () => {
         try {
@@ -42,6 +59,19 @@ const Page = () => {
             setProducts(data);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
+    const getProduction = async () => {
+        try {
+            const url = `/productionOrder/getById/${params.id}`;
+            const response = await api.get(url);
+            const data = response.data;
+            setProduction(data);
+        } catch (error) {
+            console.error("Lỗi khi lấy phiếu sản xuất:", error);
         } finally {
             setLoadingData(false);
         }
@@ -103,10 +133,9 @@ const Page = () => {
         });
 
         try {
-            const response = await api.post(`/productionOrder/createProductionOrder`, {
+            const response = await api.post(`/productionOrder/update/${params.id}`, {
                 description: note,
                 quantity: inputWeight,
-                username: localStorage.getItem("username"),
                 productWarehouseId: selectedIngredient?.id || 0,
                 finishedProductDtoList: outputs.map((output: any) => {
                     return {
@@ -117,8 +146,8 @@ const Page = () => {
                 })
             });
             if (response.status >= 200 && response.status < 300) {
-                alert(`Phiếu sản xuất đã được tạo thành công`);
-                router.push("/production");
+                alert(`Phiếu sản xuất đã được cập nhật thành công`);
+                router.push(`/production/${params.id}`);
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
@@ -197,6 +226,16 @@ const Page = () => {
                                     )}
                                 </div>
                                 <div className='flex-1'>
+                                    <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold lg:pt-5 w-[80px]'>Ghi chú: </span>
+                                        <TextField
+                                            className='lg:ml-10 mt-2 lg:mt-0 w-full lg:min-w-[80%]'
+                                            onChange={(e) => setNote(e.target.value)}
+                                            value={note}
+                                            multiline
+                                            rows={4}
+                                            label={'Mô tả'} />
+                                    </div>
                                 </div>
                             </>
                         )}
@@ -236,7 +275,7 @@ const Page = () => {
                                                 <TableCell className='px-2 py-4'>
                                                     <Autocomplete
                                                         disablePortal
-                                                        options={products.filter((p) => p.productWarehouses[0]?.warehouse.id === 2)}
+                                                        options={products.filter((p: any) => p.productWarehouses[0]?.warehouse.id === 2)}
                                                         value={output?.selectedProduct || null}
                                                         getOptionLabel={(option) => option?.name}
                                                         onChange={(event, newValue) => {
@@ -304,9 +343,9 @@ const Page = () => {
                         ) : (
                             <>
                                 <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
-                                    <strong>Thêm</strong>
+                                    <strong>Cập nhật</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/production")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => router.push(`/production/${params.id}`)} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>
