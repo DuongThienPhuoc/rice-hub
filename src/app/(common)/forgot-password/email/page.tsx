@@ -25,10 +25,12 @@ import {
 import { forgotPassword } from '@/data/forgot-password';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function ForgotPasswordEmailPage() {
     const router = useRouter();
+    const [onPageChange, setOnPageChange] = useState(false);
     const form = useForm<z.infer<typeof forgotPasswordFormSchema>>({
         resolver: zodResolver(forgotPasswordFormSchema),
         defaultValues: {
@@ -64,7 +66,7 @@ export default function ForgotPasswordEmailPage() {
     }
 
     return (
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md z-10">
             <CardHeader className="space-y-1">
                 <CardTitle>Quên mật khẩu</CardTitle>
                 <CardDescription>
@@ -108,11 +110,21 @@ export default function ForgotPasswordEmailPage() {
                     <Link
                         href="/login"
                         className="text-blue-500 hover:underline"
+                        onClick={() => setOnPageChange(true)}
                     >
                         Quay lại đăng nhập
                     </Link>
                 </div>
             </CardFooter>
+            {onPageChange === true && (
+                <div className='fixed z-50 top-0  left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
         </Card>
     );
 }

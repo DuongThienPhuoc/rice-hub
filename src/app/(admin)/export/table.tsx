@@ -41,7 +41,6 @@ export default function ExportTable() {
 
     const getData = async (page?: number, startDate?: any, endDate?: any) => {
         try {
-            setLoadingData(true);
             const params = new URLSearchParams();
             params.append("pageSize", "10");
             if (page) {

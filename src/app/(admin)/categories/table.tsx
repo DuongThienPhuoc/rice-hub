@@ -50,7 +50,6 @@ export default function CategoryTable() {
     }
 
     const getCategories = async (page?: number, search?: { field?: string, query?: string }) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "2");

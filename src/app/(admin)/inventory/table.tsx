@@ -78,7 +78,6 @@ export default function InventoryTable() {
     };
 
     const getInventory = async (page?: number, search?: { field?: string, query?: string }) => {
-        setLoadingData(true);
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");

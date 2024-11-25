@@ -52,7 +52,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                 setLoadingData(false);
             }
         };
-        setLoadingData(true);
 
         if (params.id) {
             getBatch();
@@ -238,13 +237,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                     <TableHead className='bg-[#0090d9]'>
                                                         <TableRow>
-                                                            <TableCell className='font-semibold text-white'>Hình thức</TableCell>
-                                                            <TableCell className='font-semibold text-white'>Mã lô hàng</TableCell>
-                                                            <TableCell className='font-semibold text-white'>Giá nhập (kg)</TableCell>
-                                                            <TableCell className='font-semibold text-white'>Quy cách</TableCell>
-                                                            <TableCell className='font-semibold text-white'>Số lượng</TableCell>
-                                                            <TableCell className='font-semibold text-white'>Mô tả</TableCell>
-                                                            <TableCell className='font-semibold text-white'>Trạng thái</TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Hình thức</p></TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Mã lô hàng</p></TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Giá nhập (kg)</p></TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                            <TableCell><p className='font-semibold text-white'>Trạng thái</p></TableCell>
                                                         </TableRow>
                                                     </TableHead>
                                                     <TableBody>

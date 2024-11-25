@@ -17,7 +17,6 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [loadingData, setLoadingData] = useState(true);
 
     useEffect(() => {
-        setLoadingData(true);
         const getEmployee = async () => {
             try {
                 const url = `/employees/${params.id}`;
@@ -48,6 +47,10 @@ const Page = ({ params }: { params: { id: number } }) => {
         }
     }
 
+    const formatCurrency = (value: any) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value));
+    };
+
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
@@ -62,7 +65,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         type='button'
                                         onClick={() => setChoice(index === 0)}
                                         className={`w-[100%] mt-5 lg:mt-10 p-[7px] ${choice === (index === 0)
-                                            ? 'text-white bg-black hover:bg-[#1d1d1fca]'
+                                            ? 'text-white bg-[#4ba94d] hover:bg-green-500'
                                             : 'text-black bg-[#f5f5f7] hover:bg-gray-200'
                                             }`}
                                         style={{ boxShadow: '3px 3px 5px lightgray' }}
@@ -126,6 +129,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Email: </span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.email}</span>
+                                    </div>
+
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Số điện thoại: </span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.phone}</span>
+                                    </div>
+
+                                    <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Giới tính: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.gender === true ? 'Nam' : 'Nữ'}</span>
                                     </div>
@@ -136,18 +149,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Số điện thoại: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.phone}</span>
-                                    </div>
-
-                                    <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Địa chỉ: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.address}</span>
-                                    </div>
-
-                                    <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Email: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{employee?.email}</span>
                                     </div>
                                 </div>
                             )
@@ -172,12 +175,22 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1'>Vị trí: </span>
+                                    <span className='font-bold flex-1'>Chức vụ: </span>
                                     <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
-                                        {employee?.role.employeeRole.roleName === 'ROLE_STOCK' && 'Nhân viên quản kho'}
-                                        {employee?.role.employeeRole.roleName === 'ROLE_SALE' && 'Nhân viên bán hàng'}
+                                        {employee?.role?.employeeRole?.roleName === 'STOCK_EMPLOYEE' && 'Nhân viên quản kho'}
+                                        {employee?.role?.employeeRole?.roleName === 'DRIVER_EMPLOYEE' && 'Nhân viên giao hàng'}
+                                        {employee?.role?.employeeRole?.roleName === 'PORTER_EMPLOYEE' && 'Nhân viên bốc/dỡ hàng'}
                                     </span>
                                 </div>
+
+                                {employee?.role?.employeeRole?.roleName !== 'PORTER_EMPLOYEE' && (
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1'>Chức vụ: </span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
+                                            {employee?.role?.salaryDetail?.dailyWage ? formatCurrency(employee.role.salaryDetail.dailyWage) : formatCurrency(0)}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -217,10 +230,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push(`/employees/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push(`/employees/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Sửa</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/employees")} className='px-5 ml-2 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                <Button type='button' onClick={() => router.push("/employees")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>

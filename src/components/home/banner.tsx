@@ -1,20 +1,51 @@
-import Image from "next/image";
-import bannerImg from '@/components/assets/img/dong-lua.jpg'
+'use client';
 
+import { Arimo } from 'next/font/google';
+import { cn } from '@/lib/utils';
+import style from '@/style/landing-page.module.css';
+import { useRouter } from 'next/navigation';
+
+const arimo = Arimo({
+    subsets: ['latin'],
+    display: 'swap',
+});
 export default function Banner() {
+    const router = useRouter();
     return (
-        <div className='relative z-0'>
-            <Image src={bannerImg} alt='banner' className='h-96 lg:h-[700px] w-full object-cover object-bottom '/>
-            <div
-                className='absolute flex flex-col top-8 gap-y-3 w-full bg-opacity-80 py-6 px-10 text-white lg:top-[190px] lg:left-28 lg:w-[700px] bg-[#3e886d]'>
-                <h1 className='font-extrabold text-3xl sm:text-6xl'>Gạo ngon chất<br/>lượng</h1>
-                <p className='text-12px sm:text-[18px]'>Chúng tôi cung cấp gạo đặc sản được thu mua từ các vùng chuyên canh, sản
-                    xuất lúa gạo lớn trên cả
-                    nước , đảm bảo: gạo không đấu trộn, không chất bảo quản, không hoá chất tẩy trắng, tạo mùi</p>
-                <div className='text-center bg-[#005c44] w-1/5 py-3 cursor-pointer'>
-                    <p className='font-bold'>Liên hệ</p>
+        <section className="w-full h-[100vh] bg-[url('/images/banner_img.jpg')] bg-cover bg-center">
+            <div className="w-full bg-black/50 h-full flex flex-col justify-center">
+                <div className="text-center space-y-4">
+                    <h1 className="text-white font-amatic font-semibold text-[106px]">
+                        Cám gạo Thanh Quang
+                    </h1>
+                    <h2
+                        className={cn(
+                            'text-white text-[15px]',
+                            arimo.className,
+                        )}
+                    >
+                        CÁM GẠO CHẤT LƯỢNG - GIÁ TRỊ TỰ NHIÊN.
+                    </h2>
+                    <h3
+                        className={cn(
+                            'text-white text-[15px]',
+                            arimo.className,
+                        )}
+                    >
+                        LÀ ĐƠN VỊ SẢN XUẤT & CUNG CẤP CÁM GẠO UY TÍN, ĐẢM BẢO
+                        NGUỒN NGUYÊN LIỆU TỰ NHIÊN, AN TOÀN VÀ BỀN VỮNG
+                    </h3>
+                </div>
+                <div className="text-center mt-20 z-10">
+                    <button
+                        className={cn(arimo.className, style.order_button)}
+                        onClick={() => router.push('/order')}
+                    >
+                        Đặt hàng ngay
+                    </button>
                 </div>
             </div>
-        </div>
-    )
+            <div className="absolute bg-[url('/images/brush_overlay.png')] bg-no-repeat bg-bottom bottom-0 w-full h-full z-0"></div>
+        </section>
+    );
 }

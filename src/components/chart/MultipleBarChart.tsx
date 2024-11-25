@@ -51,7 +51,7 @@ const MultipleBarChartComponent: React.FC<{ chartName: string, color1: string, c
             return (
                 <div className="custom-tooltip" style={tooltipStyle}>
                     <p style={tooltipTextStyle}>
-                        <span className={`text-[#2662d9]`}>
+                        <span className={`text-[#0090d9]`}>
                             Số lượng đơn: {payload[0]?.value} {chartName.toLowerCase()}
                         </span>
                         <br />

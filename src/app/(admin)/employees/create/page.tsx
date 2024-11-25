@@ -15,6 +15,7 @@ const Page = () => {
     const [choice, setChoice] = useState(true);
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
+    const [employeeRoles, setEmployeeRoles] = useState<any>([]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -61,6 +62,23 @@ const Page = () => {
             [field]: value,
         }));
     };
+
+    const getEmployeeRoles = async () => {
+        try {
+            const url = `/employeerole/all`;
+            const response = await api.get(url);
+            const data = response.data;
+            setEmployeeRoles(data);
+        } catch (error) {
+            console.error("Error fetching employee role:", error);
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
+    useEffect(() => {
+        getEmployeeRoles();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -300,25 +318,54 @@ const Page = () => {
                                         variant="standard" />
                                 </div>
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Vị trí: </span>
+                                    <span className='font-bold flex-1 pt-4'>Chức vụ: </span>
                                     <FormControl className='flex-[2]' variant="standard" sx={{ minWidth: 120 }}>
-                                        <InputLabel id="demo-simple-select-standard-label">Chọn vị trí</InputLabel>
+                                        <InputLabel id="demo-simple-select-standard-label">Chọn chức vụ</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-standard-label"
                                             id="demo-simple-select-standard"
                                             value={formData.employeeRoleId.toString()}
                                             onChange={(e) => handleFieldChange('employeeRoleId', e.target.value)}
-                                            label="Chọn giới tính"
+                                            label="Chọn chức vụ"
                                         >
                                             <MenuItem value="">
-                                                <em>Chọn vị trí</em>
+                                                <em>Chọn chức vụ</em>
                                             </MenuItem>
-                                            <MenuItem value={1}>Nhân viên quản kho</MenuItem>
-                                            <MenuItem value={2}>Nhân viên bán hàng</MenuItem>
+                                            {employeeRoles &&
+                                                employeeRoles.map((role: any) => {
+                                                    return (
+                                                        <MenuItem key={role.id} value={role.id}>
+                                                            {role.roleName === 'DRIVER_EMPLOYEE' && 'Nhân viên giao hàng'}
+                                                            {role.roleName === 'PORTER_EMPLOYEE' && 'Nhân viên bốc/dỡ hàng'}
+                                                            {role.roleName === 'STOCK_EMPLOYEE' && 'Nhân viên quản kho'}
+                                                        </MenuItem>
+                                                    );
+                                                })
+                                            }
                                         </Select>
                                     </FormControl>
                                 </div>
-                                <div className='m-10 flex flex-col lg:flex-row'>
+                                {formData?.employeeRoleId !== '' && formData?.employeeRoleId !== 2 && (
+                                    <div className='m-10 flex flex-col lg:flex-row'>
+                                        <span className='font-bold flex-1 pt-4'>Lương ngày: </span>
+                                        <TextField
+                                            type={'number'}
+                                            className='flex-[2]'
+                                            onChange={(e) => {
+                                                if (Number(e.target.value) <= 0) {
+                                                    handleFieldChange('dailyWage', 0)
+                                                } else {
+                                                    handleFieldChange('dailyWage', Number(e.target.value))
+                                                }
+                                            }}
+                                            value={formData.dailyWage.toString()}
+                                            label={'Nhập lương ngày'}
+                                            variant="standard" />
+                                    </div>
+                                )}
+                            </div>
+                            <div className='flex-1'>
+                                <div className='mx-10 flex flex-col lg:flex-row lg:my-10'>
                                     <span className='font-bold flex-1 pt-4'>Mật khẩu: </span>
                                     <TextField
                                         type={'text'}
@@ -328,9 +375,7 @@ const Page = () => {
                                         label={'Nhập mật khẩu'}
                                         variant="standard" />
                                 </div>
-                            </div>
-                            <div className='flex-1'>
-                                <div className='mx-10 flex flex-col lg:flex-row lg:my-10'>
+                                <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1 pt-4'>Tên ngân hàng: </span>
                                     <TextField
                                         type={'text'}

@@ -27,7 +27,6 @@ const Page = () => {
     const [loadingData, setLoadingData] = useState(true);
 
     const getPrices = async () => {
-        setLoadingData(true);
         try {
             const url = `/price/all`;
             const response = await api.get(url);
