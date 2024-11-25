@@ -15,9 +15,10 @@ export interface ProductDtoList {
     name: string;
     productCode: string;
     description: string;
-    price: number;
+    customerPrice: string;
     image: string;
     categoryId: string;
+    categoryName: string;
     supplierId: number;
     unitOfMeasureId: number;
     warehouseId: null;

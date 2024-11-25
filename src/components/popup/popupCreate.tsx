@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import { X } from 'lucide-react';
 
 interface PopupCreateProps {
     tableName: string;
@@ -73,7 +74,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
                     <div className='w-full flex justify-between items-center pb-5 px-5'>
                         <h1 className='font-bold'>Thêm {tableName.toLocaleLowerCase()} mới</h1>
                         <button onClick={() => handleClose(false)}>
-                            <span className="text-black text-xl hover:text-gray-500">✖</span>
+                            <X size={20} />
                         </button>
                     </div>
                     <form className='px-6 w-full' onSubmit={handleSubmit}>

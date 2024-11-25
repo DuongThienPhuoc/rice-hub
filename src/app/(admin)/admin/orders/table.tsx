@@ -52,7 +52,7 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                         newOrder={newOrder}
                         setNewOrder={setNewOrder}
                     >
-                        <Button className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                        <Button className='ml-0 lg:ml-4 mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
                             <span>Tạo đơn hàng</span>
                             <Plus />
                         </Button>

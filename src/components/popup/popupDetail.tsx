@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 import TextField from '@/components/field/textfield';
+import { X } from 'lucide-react';
 import React from 'react';
 
 interface PopupDetailProps {
@@ -23,7 +24,7 @@ const PopupDetail: React.FC<PopupDetailProps> = ({ tableName, data, titles, hand
                     <div className='w-full flex justify-between items-center pb-5 px-5'>
                         <h1 className='font-bold'>Chi tiết {tableName.toLocaleLowerCase()}</h1>
                         <button onClick={handleClose}>
-                            <span className="text-black text-xl hover:text-gray-500">✖</span>
+                            <X size={20} />
                         </button>
                     </div>
                     <div className='px-6'>

@@ -29,6 +29,7 @@ import PaginationComponent from '@/components/pagination/pagination';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
+import { currencyHandleProvider } from '@/utils/currency-handle';
 
 export default function OrderPage() {
     const router = useRouter();
@@ -196,7 +197,7 @@ export default function OrderPage() {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                {product.price}
+                                                {currencyHandleProvider(Number(product.customerPrice))}
                                             </TableCell>
                                             <TableCell className='flex justify-center'>
                                                 <span>
@@ -204,13 +205,14 @@ export default function OrderPage() {
                                                         onClick={() => {
                                                             setOpen(true);
                                                             updateProducts({
-                                                                id:product.id,
+                                                                id: product.id,
                                                                 productCode:
                                                                     product.productCode,
                                                                 name: product.name,
                                                                 description:
                                                                     product.description,
-                                                                price: product.price,
+                                                                categoryName: product.categoryName,
+                                                                customerPrice: currencyHandleProvider(Number(product.customerPrice)),
                                                                 image: product.image,
                                                                 categoryId:
                                                                     product.categoryId,

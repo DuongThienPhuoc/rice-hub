@@ -231,9 +231,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 <TableHeader className='bg-[#0090d9]'>
                                     <TableRow>
                                         <TableHead><p className='text-white font-semibold'>Tên hàng hoá</p></TableHead>
-                                        <TableHead><p className='text-white font-semibold'>Loại</p></TableHead>
-                                        <TableHead><p className='text-white font-semibold'>Đơn vị</p></TableHead>
-                                        <TableHead><p className='text-white font-semibold'>Đơn giá</p></TableHead>
+                                        <TableHead><p className='text-white font-semibold'>Danh mục</p></TableHead>
+                                        <TableHead><p className='text-white font-semibold'>Đơn giá (kg)</p></TableHead>
                                         <TableHead className="text-center">
                                             <p className='text-white font-semibold'>Thêm</p>
                                         </TableHead>
@@ -246,10 +245,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 {product.name}
                                             </TableCell>
                                             <TableCell>
-                                                {product.categoryId}
-                                            </TableCell>
-                                            <TableCell>
-                                                {product.unitOfMeasureId}
+                                                {product.categoryName}
                                             </TableCell>
                                             <TableCell>
                                                 {product.price}
