@@ -28,6 +28,7 @@ export interface ProductDtoList {
 export interface UnitWeightPairsList {
     productUnit: string;
     weightPerUnit: number;
+    quantity: number
 }
 
 export interface Links {

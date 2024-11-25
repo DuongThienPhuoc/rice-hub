@@ -158,7 +158,6 @@ export default function OrderPage() {
                                     <TableRow>
                                         <TableHead>Tên hàng hoá</TableHead>
                                         <TableHead>Loại</TableHead>
-                                        <TableHead>Đơn vị</TableHead>
                                         <TableHead>Đơn giá</TableHead>
                                         <TableHead className='text-center w-36'>Thêm vào giỏ hàng</TableHead>
                                     </TableRow>
@@ -171,29 +170,7 @@ export default function OrderPage() {
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="outline">
-                                                    {product.categoryId === '1'
-                                                        ? 'Gạo'
-                                                        : product.categoryId ===
-                                                            '2'
-                                                            ? 'Cám'
-                                                            : product.categoryId ===
-                                                                '3'
-                                                                ? 'Thóc'
-                                                                : product.categoryId ===
-                                                                    '4'
-                                                                    ? 'Trấu'
-                                                                    : 'Thức ăn chăn nuôi'}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline">
-                                                    {product.unitOfMeasureId ===
-                                                        1
-                                                        ? 'Tấn'
-                                                        : product.unitOfMeasureId ===
-                                                            2
-                                                            ? 'Kg'
-                                                            : 'Yến'}
+                                                    {product.categoryName}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
@@ -212,7 +189,7 @@ export default function OrderPage() {
                                                                 description:
                                                                     product.description,
                                                                 categoryName: product.categoryName,
-                                                                customerPrice: currencyHandleProvider(Number(product.customerPrice)),
+                                                                customerPrice: product.customerPrice,
                                                                 image: product.image,
                                                                 categoryId:
                                                                     product.categoryId,

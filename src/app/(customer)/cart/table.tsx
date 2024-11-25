@@ -17,6 +17,7 @@ import { Trash2 } from 'lucide-react';
 import { createOrder, OrderRequest } from '@/data/order';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import { currencyHandleProvider } from '@/utils/currency-handle';
 
 export interface CartProduct {
     cartId: number;
@@ -31,6 +32,7 @@ export interface CartProduct {
 export default function CartTable({ customerID }: { customerID: string }) {
     const { toast } = useToast();
     const [products, setProducts] = useState<CartProduct[]>([]);
+    const [refresh, setRefresh] = useState<boolean>(false);
     useEffect(() => {
         const localStorageProducts =
             typeof window !== 'undefined' ? localStorage.getItem('cart') : null;
@@ -38,7 +40,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
             ? JSON.parse(localStorageProducts)
             : [];
         setProducts(parsedProducts);
-    }, []);
+    }, [refresh]);
     const selectedProduct = useProductSelectedStore((state) => state.selected);
     const updateSelectedProduct = useProductSelectedStore(
         (state) => state.handleSelected,
@@ -46,6 +48,9 @@ export default function CartTable({ customerID }: { customerID: string }) {
     const updateSelectedAllProduct = useProductSelectedStore(
         (state) => state.handleSelectedAll,
     );
+    const clearSelectedProduct = useProductSelectedStore(
+        (state) => state.clearSelected
+    )
     const totalMoney = useProductSelectedStore((state) => state.total);
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
@@ -73,6 +78,9 @@ export default function CartTable({ customerID }: { customerID: string }) {
             if (orderDetails.orderDetails.length > 0) {
                 const response = await createOrder(orderDetails);
                 if (response.status === 200) {
+                    localStorage.setItem('cart', JSON.stringify([]));
+                    clearSelectedProduct();
+                    setRefresh(!refresh);
                     setDialogOpen(true);
                 }
             } else {
@@ -98,6 +106,9 @@ export default function CartTable({ customerID }: { customerID: string }) {
                         <TableRow>
                             <TableHead>
                                 <Checkbox
+                                    checked={
+                                        selectedProduct.length === products.length
+                                    }
                                     onCheckedChange={() => {
                                         updateSelectedAllProduct(products);
                                     }}
@@ -106,6 +117,8 @@ export default function CartTable({ customerID }: { customerID: string }) {
                             <TableHead>Tên sản phẩm</TableHead>
                             <TableHead>Loại</TableHead>
                             <TableHead>Số lượng</TableHead>
+                            <TableHead>Tổng trọng lượng</TableHead>
+                            <TableHead>Đơn giá (kg)</TableHead>
                             <TableHead>Thành tiền</TableHead>
                             <TableHead></TableHead>
                         </TableRow>
@@ -135,9 +148,11 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                         />
                                     </TableCell>
                                     <TableCell>{product.name}</TableCell>
-                                    <TableCell>{product.type}</TableCell>
+                                    <TableCell>{`${product.type}kg`}</TableCell>
                                     <TableCell>{product.quantity}</TableCell>
-                                    <TableCell>{product.price}</TableCell>
+                                    <TableCell>{`${product.quantity * product.type}kg`}</TableCell>
+                                    <TableCell>{currencyHandleProvider(product.price)}</TableCell>
+                                    <TableCell>{currencyHandleProvider(product.price * product.quantity * product.type)}</TableCell>
                                     <TableCell>
                                         <Trash2
                                             className="w-4 h-4 hover:cursor-pointer"
@@ -158,7 +173,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                 <div className="grid gap-5">
                     <div className="flex justify-between gap-28 border-b border-[#E5E7EB]">
                         <p className="font-semibold">Tạm tính:</p>
-                        <p>{totalMoney}</p>
+                        <p>{currencyHandleProvider(totalMoney)}</p>
                     </div>
                     <div className="flex justify-between gap-28 border-b border-[#E5E7EB]">
                         <p className="font-semibold">Giảm giá:</p>
@@ -166,7 +181,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                     </div>
                     <div className="flex justify-between gap-28 border-b border-[#E5E7EB]">
                         <p className="font-semibold">Thành tiền:</p>
-                        <p className="font-semibold">{totalMoney}</p>
+                        <p className="font-semibold">{currencyHandleProvider(totalMoney)}</p>
                     </div>
                     <div>
                         <Button
