@@ -9,7 +9,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import CartDialog from '@/app/(customer)/cart/dialog';
 import { useProductSelectedStore } from '@/stores/cartTableStore';
@@ -18,6 +18,18 @@ import { createOrder, OrderRequest } from '@/data/order';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { currencyHandleProvider } from '@/utils/currency-handle';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Input } from '@/components/ui/input';
 
 export interface CartProduct {
     cartId: number;
@@ -98,6 +110,20 @@ export default function CartTable({ customerID }: { customerID: string }) {
         }
     }
 
+    function handleChangeProductQuantity(e: React.ChangeEvent<HTMLInputElement>, changeCartProductId: number) {
+        const newProduct = products.map((product) => {
+            if (product.cartId === changeCartProductId) {
+                return {
+                    ...product,
+                    quantity: parseInt(e.target.value)
+                }
+            }
+            return product;
+        })
+        localStorage.setItem('cart', JSON.stringify(newProduct));
+        setRefresh(!refresh);
+    }
+
     return (
         <section className="grid gap-5">
             <div className="bg-white p-3 rounded-lg border">
@@ -107,7 +133,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                             <TableHead>
                                 <Checkbox
                                     checked={
-                                        selectedProduct.length === products.length
+                                        selectedProduct.length === products.length && products.length !== 0
                                     }
                                     onCheckedChange={() => {
                                         updateSelectedAllProduct(products);
@@ -149,7 +175,13 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                     </TableCell>
                                     <TableCell>{product.name}</TableCell>
                                     <TableCell>{`${product.type}kg`}</TableCell>
-                                    <TableCell>{product.quantity}</TableCell>
+                                    <TableCell>
+                                        <Input
+                                            defaultValue={product.quantity}
+                                            onChange={(e) => handleChangeProductQuantity(e,product.cartId)}
+                                            className='w-fit'
+                                            type='number'/>
+                                    </TableCell>
                                     <TableCell>{`${product.quantity * product.type}kg`}</TableCell>
                                     <TableCell>{currencyHandleProvider(product.price)}</TableCell>
                                     <TableCell>{currencyHandleProvider(product.price * product.quantity * product.type)}</TableCell>
@@ -184,33 +216,49 @@ export default function CartTable({ customerID }: { customerID: string }) {
                         <p className="font-semibold">{currencyHandleProvider(totalMoney)}</p>
                     </div>
                     <div>
-                        <Button
-                            className="w-full"
-                            onClick={() => {
-                                handleOrder().catch((error) => {
-                                    toast({
-                                        variant: 'destructive',
-                                        title: 'Có lỗi xảy ra khi đặt hàng',
-                                        description:
-                                            'Có lỗi xảy ra khi đặt hàng vui lòng thử lại sau',
-                                        action: (
-                                            <ToastAction altText="Try again">
-                                                Xác nhận!
-                                            </ToastAction>
-                                        ),
-                                    });
-                                    console.error(
-                                        `Error occurred in CartPage: ${error.message}`,
-                                    );
-                                });
-                            }}
-                        >
-                            Đặt hàng
-                        </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button className="w-full">
+                                    Đặt hàng
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className='bg-white'>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Thông báo!</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Bạn có chắc chắn muốn đặt hàng ?
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={() => {
+                                            handleOrder().catch((error) => {
+                                                toast({
+                                                    variant: 'destructive',
+                                                    title: 'Có lỗi xảy ra khi đặt hàng',
+                                                    description:
+                                                        'Có lỗi xảy ra khi đặt hàng vui lòng thử lại sau',
+                                                    action: (
+                                                        <ToastAction altText="Try again">
+                                                            Xác nhận!
+                                                        </ToastAction>
+                                                    ),
+                                                });
+                                                console.error(
+                                                    `Error occurred in CartPage: ${error.message}`,
+                                                );
+                                            });
+                                        }}
+                                    >Đặt hàng</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
             </section>
             <CartDialog open={dialogOpen} setOpen={setDialogOpen} />
+
         </section>
     );
 }

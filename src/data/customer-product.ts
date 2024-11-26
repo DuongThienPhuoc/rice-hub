@@ -28,7 +28,7 @@ export interface ProductDtoList {
 export interface UnitWeightPairsList {
     productUnit: string;
     weightPerUnit: number;
-    quantity: number
+    quantity: number;
 }
 
 export interface Links {
@@ -50,15 +50,22 @@ export async function getProductList({
     pageNumber = 1,
     pageSize = 5,
     forceFirstAndLastRels = true,
+    categoryName = null,
 }: {
     pageNumber?: number;
     pageSize?: number;
     forceFirstAndLastRels?: boolean;
+    categoryName?: string | null;
 }) {
     try {
-        return axios.get(
-            `/products/customer/products?pageNumber=${pageNumber}&pageSize=${pageSize}&forceFirstAndLastRels=${forceFirstAndLastRels}`,
-        );
+        return axios.get('/products/customer/products', {
+            params: {
+                pageNumber,
+                pageSize,
+                categoryName,
+                forceFirstAndLastRels,
+            },
+        });
     } catch (e) {
         if (e instanceof Error) {
             throw new Error(e.message);
