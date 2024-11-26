@@ -1,7 +1,28 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Package } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CustomerOrderHistoryResponse } from '@/type/customer-order';
+import { getOrderHistory } from '@/data/order';
+import { currencyHandleProvider } from '@/utils/currency-handle';
 
-export default function OrderSummary() {
+export default function OrderSummary({ userID }: { userID: string }) {
+    const [customerOrderHistoryResponse, setCustomerOrderHistoryResponse] =
+        useState<CustomerOrderHistoryResponse>(
+            {} as CustomerOrderHistoryResponse,
+        );
+    useEffect(() => {
+        getOrderHistory({ customerID: userID }).then((response) => {
+            setCustomerOrderHistoryResponse(response.data);
+        });
+    }, [userID]);
+    const totalAmount =
+        customerOrderHistoryResponse?._embedded?.orderList.reduce(
+            (acc, order) => acc + order.totalAmount,
+            0,
+        );
+
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card>
@@ -12,7 +33,9 @@ export default function OrderSummary() {
                     <Package className="w-5 h-5 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">5</div>
+                    <div className="text-2xl font-bold">
+                        {customerOrderHistoryResponse.page?.totalElements}
+                    </div>
                 </CardContent>
             </Card>
             <Card>
@@ -23,7 +46,9 @@ export default function OrderSummary() {
                     <DollarSign className="w-5 h-5 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">1000000</div>
+                    <div className="text-2xl font-bold">
+                        {currencyHandleProvider(totalAmount || 0)}
+                    </div>
                 </CardContent>
             </Card>
         </div>
