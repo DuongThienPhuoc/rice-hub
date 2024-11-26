@@ -26,10 +26,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { getProductList } from '@/data/customer-product';
 import { useProductStore } from '@/stores/productStore';
 import PaginationComponent from '@/components/pagination/pagination';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { currencyHandleProvider } from '@/utils/currency-handle';
+import { SidebarTriggerCommon } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
-import { currencyHandleProvider } from '@/utils/currency-handle';
 
 export default function OrderPage() {
     const router = useRouter();
@@ -78,7 +78,7 @@ export default function OrderPage() {
     return (
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 mb-5">
-                <SidebarTrigger />
+                <SidebarTriggerCommon />
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <OrderPageBreadcrumb />
             </header>
@@ -108,7 +108,8 @@ export default function OrderPage() {
                                     >
                                         <div className="p-2 border-b">
                                             <div className="relative">
-                                                <Search className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                <Search
+                                                    className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                                 <input
                                                     type="text"
                                                     className="pl-6 h-full rounded outline-0 focus:outline-0"
@@ -184,23 +185,23 @@ export default function OrderPage() {
                                                             updateProducts({
                                                                 id: product.id,
                                                                 productCode:
-                                                                    product.productCode,
+                                                                product.productCode,
                                                                 name: product.name,
                                                                 description:
-                                                                    product.description,
+                                                                product.description,
                                                                 categoryName: product.categoryName,
                                                                 customerPrice: product.customerPrice,
                                                                 image: product.image,
                                                                 categoryId:
-                                                                    product.categoryId,
+                                                                product.categoryId,
                                                                 supplierId:
-                                                                    product.supplierId,
+                                                                product.supplierId,
                                                                 unitOfMeasureId:
-                                                                    product.unitOfMeasureId,
+                                                                product.unitOfMeasureId,
                                                                 unitWeightPairsList:
-                                                                    product.unitWeightPairsList,
+                                                                product.unitWeightPairsList,
                                                                 warehouseId:
-                                                                    product.warehouseId,
+                                                                product.warehouseId,
                                                             });
                                                         }}
                                                         className="h-5 w-5 hover:cursor-pointer"
