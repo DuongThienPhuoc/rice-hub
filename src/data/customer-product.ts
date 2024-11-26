@@ -15,7 +15,7 @@ export interface ProductDtoList {
     name: string;
     productCode: string;
     description: string;
-    customerPrice: string;
+    customerPrice: number;
     image: string;
     categoryId: string;
     categoryName: string;

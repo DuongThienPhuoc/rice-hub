@@ -6,10 +6,9 @@ import { TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
 import firebase from '@/config/firebaseConfig';
 import html2canvas from 'html2canvas';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { jsPDF } from 'jspdf';
 
 const Page = ({ params }: { params: { id: number } }) => {
@@ -146,9 +145,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                 pdf.addPage();
             }
         }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const pdfBlob = pdf.output('blob');
         const storageRef = ref(storage, `contracts/Contract_${Date.now()}.pdf`);
-        const snapshot = await uploadBytes(storageRef, pdfBlob);
+        // const snapshot = await uploadBytes(storageRef, pdfBlob);
 
         const downloadURL = await getDownloadURL(storageRef);
 

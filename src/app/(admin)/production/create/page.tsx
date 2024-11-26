@@ -13,7 +13,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Trash2, X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 interface RowData {
     [key: string]: any;
@@ -27,7 +27,7 @@ const Page = () => {
     const [loadingData, setLoadingData] = useState(true);
     const [inputWeight, setInputWeight] = useState<any>('');
     const [outputs, setOutputs] = useState<any>([{ selectedProduct: null, ratio: 0, weight: '' }]);
-    const [note, setNote] = useState<any>('');
+    const note = ''
 
     useEffect(() => {
         getProducts();

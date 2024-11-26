@@ -16,7 +16,6 @@ import { CheckSquare, CircleX, Upload, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
-import { validateHeaderValue } from 'http';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();

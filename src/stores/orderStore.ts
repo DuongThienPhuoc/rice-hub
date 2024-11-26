@@ -15,7 +15,7 @@ export const orderStore = create<State & Actions>((set) => ({
         name: '',
         categoryName: '',
         description: '',
-        customerPrice: '',
+        customerPrice: 0,
         image: '',
         categoryId: '',
         supplierId: 0,
