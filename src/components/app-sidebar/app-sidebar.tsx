@@ -268,7 +268,9 @@ export default function AppSidebar() {
         try {
             const url = `/logout/logoutRequest`;
             await api.post(url);
-            router.push('/');
+            localStorage.removeItem('role');
+            localStorage.removeItem('username');
+            router.push('/login');
         } catch (error) {
             console.error('Đăng xuất thất bại:', error);
         }

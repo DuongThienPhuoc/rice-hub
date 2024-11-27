@@ -5,7 +5,7 @@ interface TextFieldProps {
     titles: { name: string, displayName: string }[];
     data: Record<string, string | number | boolean>;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const formatDate = (isoDate: any) => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, '0');
@@ -13,7 +13,7 @@ const formatDate = (isoDate: any) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
 };
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const formatCurrency = (amount: any) => {
     return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 };

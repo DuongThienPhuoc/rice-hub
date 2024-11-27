@@ -9,10 +9,11 @@ type State = {
 type Actions = {
     handleSelected: (product: CartProduct) => void;
     handleSelectedAll: (products: CartProduct[]) => void;
+    clearSelected: () => void;
 };
 
 function totalMoney(products: CartProduct[]): number {
-    return products.reduce((acc, product) => acc + product.price, 0);
+    return products.reduce((acc, product) => acc + (product.price * product.quantity * product.type), 0);
 }
 
 export const useProductSelectedStore = create<State & Actions>((set) => ({
@@ -52,4 +53,5 @@ export const useProductSelectedStore = create<State & Actions>((set) => ({
                 total: totalMoney(newSelectedProduct),
             };
         }),
+    clearSelected: () => set({ selected: [], total: 0 }),
 }));

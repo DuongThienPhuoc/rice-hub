@@ -45,7 +45,7 @@ export default function OrderPageDialog({
             productCode: product.productCode,
             name: product.name,
             quantity: quantity,
-            price: product.price,
+            price: product.customerPrice,
             type: type,
         };
         if (order.type === 0 || order.quantity === 0) {
