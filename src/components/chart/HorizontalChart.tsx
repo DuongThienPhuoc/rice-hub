@@ -19,7 +19,7 @@ interface HorizontalChartProps {
 }
 
 const HorizontalChart: React.FC<HorizontalChartProps> = ({ chartName, data, setType, loading }) => {
-    const [period, setPeriod] = useState("tuần");
+    const [period, setPeriod] = useState("tháng");
     const [dropdown, setDropdown] = useState(false);
     const [chartData, setChartData] = useState<any[]>([]);
     const [chartConfig, setChartConfig] = useState<ChartConfig>({});
@@ -93,6 +93,13 @@ const HorizontalChart: React.FC<HorizontalChartProps> = ({ chartName, data, setT
                     )}
                     <div className={dropdown ? 'absolute w-32 z-[1000] bg-[#FFFFFF] shadow-lg top-8 left-0' : 'hidden'}>
                         <ul className='flex flex-col'>
+                            <li className='hover:bg-gray-200 p-2 font-semibold border-b-[1px]'
+                                onClick={() => {
+                                    setPeriod('tuần')
+                                    setType('week')
+                                }}>
+                                Tuần này
+                            </li>
                             <li className='hover:bg-gray-200 p-2 font-semibold border-b-[1px]'
                                 onClick={() => {
                                     setPeriod('tháng')

@@ -22,7 +22,7 @@ import { DatePickerWithRange } from '../expenditures/date-range-picker';
 export default function InventoryTable() {
     const router = useRouter();
     const columns = [
-        { name: 'id', displayName: 'Mã phiếu' },
+        { name: 'inventoryCode', displayName: 'Mã phiếu' },
         { name: 'inventoryDate', displayName: 'Ngày tạo phiếu' },
         { name: 'warehouse.name', displayName: 'Kho' },
         { name: 'status', displayName: 'Trạng thái' },

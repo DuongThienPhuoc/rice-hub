@@ -12,6 +12,7 @@ import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function ProductTable() {
     const { toast } = useToast();
@@ -20,10 +21,10 @@ export default function ProductTable() {
         { name: 'productCode', displayName: 'Mã nguyên liệu' },
         { name: 'productName', displayName: 'Tên nguyên liệu' },
         { name: 'price', displayName: 'Giá nhập (kg)' },
-        { name: 'productQuantity', displayName: 'Tồn kho (kg)' },
         { name: 'importDate', displayName: 'Ngày nhập' },
         { name: 'supplierName', displayName: 'Nhà cung cấp' },
     ];
+    const [onPageChange, setOnPageChange] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
     const [products, setProducts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -119,7 +120,10 @@ export default function ProductTable() {
                                 {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
-                                    <Button onClick={() => router.push("/ingredients/create")} className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                    <Button onClick={() => {
+                                        router.push("/ingredients/create")
+                                        setOnPageChange(true);
+                                    }} className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
                                         Thêm nguyên liệu
                                         <PlusIcon />
                                     </Button>
@@ -127,7 +131,7 @@ export default function ProductTable() {
                             </div>
                         </div>
                         <div className='overflow-hidden'>
-                            <ProductList name="Sản phẩm" editUrl="/ingredients/updateIngredient" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="ingredients" />
+                            <ProductList name="Nguyên liệu" editUrl="/ingredients/updateIngredient" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="ingredients" handleClose={() => getProducts(currentPage, currentSearch)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -139,6 +143,15 @@ export default function ProductTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

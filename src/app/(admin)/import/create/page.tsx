@@ -42,7 +42,7 @@ const Page = () => {
     const [categories, setCategories] = useState<RowData[]>([]);
     const [warehouses, setWarehouses] = useState<RowData[]>([]);
     const [products, setProducts] = useState<RowData[]>([]);
-    const [selectedProduct, setSelectedProduct] = useState<RowData | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [productName, setProductName] = useState('');
     const [importPrice, setImportPrice] = useState(0);
@@ -78,7 +78,6 @@ const Page = () => {
             setImportPrice(0);
             setProductName('');
             setSelectedSupplier(null);
-            setSelectedProduct(null);
             setSelectedCategory(null);
             setSelectedWarehouse(null);
         }
@@ -275,10 +274,10 @@ const Page = () => {
                                     className='flex-[4] lg:mx-5 my-4 lg:my-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                     disablePortal
                                     options={products}
-                                    value={selectedProduct}
-                                    getOptionLabel={(option) => option.name}
+                                    getOptionLabel={(option) => option.category.name + " " + option.name + " (" + option.supplier.name + ")"}
                                     sx={{ width: 300 }}
-                                    onChange={(event, newValue) => { setSelectedProduct(newValue) }}
+                                    ListboxProps={{ style: { maxHeight: '200px' } }}
+                                    onChange={(event, newValue) => setSelectedProduct(newValue)}
                                     renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm sản phẩm" />}
                                 />
                             </div>
@@ -376,12 +375,12 @@ const Page = () => {
                                                     variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>
-                                                <TextField
-                                                    type={'text'}
-                                                    onChange={(e) => setType(e.target.value)}
-                                                    value={type}
-                                                    label={'Loại'}
-                                                    variant="standard" />
+                                                <Autocomplete
+                                                    disablePortal
+                                                    options={['Bao', 'Túi']}
+                                                    onChange={(event, newValue) => setType(newValue)}
+                                                    renderInput={(params) => <TextField {...params} variant='standard' label="Loại" />}
+                                                />
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 <TextField

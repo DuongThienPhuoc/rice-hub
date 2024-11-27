@@ -11,6 +11,9 @@ import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '@/config/firebaseConfig';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import FloatingButton from '@/components/floating/floatingButton';
+import { ToastAction } from '@radix-ui/react-toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -20,6 +23,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [loadingData, setLoadingData] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const handleButtonClick = () => {
         if (fileInputRef.current) {
@@ -28,20 +32,29 @@ const Page = ({ params }: { params: { id: number } }) => {
     };
 
     const handleFileChange = async (event: any) => {
-        const file = event.target.files[0];
+        const fileInput = event.target;
+        const file = fileInput.files[0];
         const storage = getStorage(firebase);
 
         if (file) {
+            setOnPageChange(true);
             if (!file.type.startsWith('image/')) {
-                alert('Chỉ được phép tải lên tệp hình ảnh!');
+                toast({
+                    variant: 'destructive',
+                    title: 'Tải thất bại!',
+                    description: 'Chỉ được phép tải lên tệp hình ảnh',
+                    duration: 3000
+                });
+                fileInput.value = "";
+                setOnPageChange(false);
                 return;
             }
 
             const storageRef = ref(storage, `images/${file.name}`);
-            const snapshot = await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(snapshot.ref);
-
             try {
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+
                 const url = `/contracts/updateContract`;
                 await api.post(url, {
                     imageFilePath: downloadURL,
@@ -51,56 +64,72 @@ const Page = ({ params }: { params: { id: number } }) => {
                     variant: 'default',
                     title: 'Tải thành công!',
                     description: 'Tải lên hợp đồng thành công',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
                     duration: 3000
-                })
+                });
+                getCustomer();
             } catch (error: any) {
+                const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
                 toast({
                     variant: 'destructive',
-                    title: 'Tải thất bại!',
-                    description: 'Xin vui lòng thử lại sau',
+                    title: 'Tải thất bại',
+                    description: (
+                        <div>
+                            {messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))}
+                        </div>
+                    ),
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                     duration: 3000
                 })
+            } finally {
+                fileInput.value = "";
+                setOnPageChange(false);
             }
         }
     };
 
-    useEffect(() => {
-        const getCustomer = async () => {
-            try {
-                const url = `/customer/${params.id}`;
-                const response = await api.get(url);
-                const data = response.data;
-                setCustomer(data);
-                setSelectedImageIndex(0);
-                if (!data?.id) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Lỗi khi lấy thông tin khách hàng!',
-                        description: 'Xin vui lòng thử lại',
-                        duration: 3000
-                    })
-                }
-            } catch (error: any) {
-                if (error.response.status === 404) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Khách hàng không tồn tại!',
-                        description: 'Xin vui lòng thử lại',
-                        duration: 3000
-                    })
-                } else {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
-                        description: 'Xin vui lòng thử lại sau',
-                        duration: 3000
-                    })
-                }
-            } finally {
-                setLoadingData(false);
+    const getCustomer = async () => {
+        try {
+            const url = `/customer/${params.id}`;
+            const response = await api.get(url);
+            const data = response.data;
+            setCustomer(data);
+            setSelectedImageIndex(0);
+            if (!data?.id) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Lỗi khi lấy thông tin khách hàng!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000
+                })
             }
-        };
+        } catch (error: any) {
+            if (error.response.status === 404) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Khách hàng không tồn tại!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000
+                })
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                    description: 'Xin vui lòng thử lại sau',
+                    duration: 3000
+                })
+            }
+        } finally {
+            setLoadingData(false);
+        }
+    };
 
+    useEffect(() => {
         if (params.id) {
             getCustomer();
         }
@@ -314,7 +343,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             </div>
                                         )}
 
-                                        {customer?.contracts.slice(Math.max(0, selectedImageIndex - 1), Math.min(customer?.contracts.length, selectedImageIndex + 2)).map((contract: any, index: any) => (
+                                        {customer?.contracts?.slice(Math.max(0, selectedImageIndex - 1), Math.min(customer?.contracts.length, selectedImageIndex + 2)).map((contract: any, index: any) => (
                                             <img
                                                 key={index}
                                                 onClick={() => setSelectedImageIndex(Math.max(0, selectedImageIndex - 1) + index)}
@@ -337,35 +366,38 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <div className='flex-1 lg:my-10 mb-10 mt-0'>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Mã hợp đồng: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractNumber || 'Chưa có thông tin'}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts && customer?.contracts[selectedImageIndex]?.contractNumber || 'Chưa có hợp đồng'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Ngày tạo: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractTime ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.contractTime)) : 'Chưa có thông tin'}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts && customer?.contracts[selectedImageIndex]?.contractTime ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.contractTime)) : 'Chưa có hợp đồng'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Ngày ký: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.confirmationDate ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.confirmationDate)) : 'Chưa có thông tin'}</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts && customer?.contracts[selectedImageIndex]?.confirmationDate ? new Intl.DateTimeFormat('en-GB').format(new Date(customer?.contracts[selectedImageIndex]?.confirmationDate)) : 'Chưa có hợp đồng'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Thời hạn: </span>
-                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts[selectedImageIndex]?.contractDuration} tháng</span>
+                                        <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.contracts && customer?.contracts[selectedImageIndex]?.contractDuration ? customer?.contracts[selectedImageIndex]?.contractDuration + ' tháng' : 'Chưa có hợp đồng'}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Trạng thái: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
-                                            {customer?.contracts[selectedImageIndex]?.confirmed
+                                            {customer?.contracts && customer?.contracts[selectedImageIndex]?.confirmed ? customer?.contracts[selectedImageIndex]?.confirmed
                                                 ? checkDuration(customer?.contracts[selectedImageIndex]?.contractDuration, new Date(customer?.contracts[selectedImageIndex]?.confirmationDate))
                                                     ? 'Đã hết hiệu lực'
                                                     : 'Còn hiệu lực'
                                                 : 'Chưa có hiệu lực'
+                                                : 'Chưa có hợp đồng'
                                             }
                                         </span>
                                     </div>
                                     <div className='my-10 ml-10 flex mr-2 lg:justify-end xl:flex-row flex-col space-y-2 items-end xl:space-y-0 xl:space-x-2'>
-                                        <Button onClick={handleButtonClick} type='button' className='font-semibold w-fit px-5 py-3 text-[14px] hover:bg-green-500'>
-                                            Tải lên hợp đồng <Upload />
-                                        </Button>
+                                        {customer?.contracts?.length > 0 && (
+                                            <Button onClick={handleButtonClick} type='button' className='font-semibold w-fit px-5 py-3 text-[14px] hover:bg-green-500'>
+                                                Tải lên hợp đồng <Upload />
+                                            </Button>
+                                        )}
 
                                         <input
                                             type="file"
@@ -374,7 +406,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             style={{ display: 'none' }}
                                             onChange={handleFileChange}
                                         />
-                                        <Button onClick={() => router.push(`/contracts/create/${params.id}`)} type='button' className='w-fit font-semibold px-5 py-3 text-[14px] hover:bg-green-500'>
+                                        <Button onClick={() => {
+                                            router.push(`/contracts/create/${params.id}`)
+                                            setOnPageChange(true);
+                                        }} type='button' className='w-fit font-semibold px-5 py-3 text-[14px] hover:bg-green-500'>
                                             Tạo hợp đồng <PlusIcon />
                                         </Button>
                                     </div>
@@ -391,10 +426,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </>
                             ) : (
                                 <>
-                                    <Button type='button' onClick={() => router.push(`/customers/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
+                                    <Button type='button' onClick={() => {
+                                        router.push(`/customers/update/${params.id}`)
+                                        setOnPageChange(true);
+                                    }} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Sửa</strong>
                                     </Button>
-                                    <Button type='button' onClick={() => router.push("/customers")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
+                                    <Button type='button' onClick={() => {
+                                        router.push("/customers")
+                                        setOnPageChange(true);
+                                    }} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Trở về</strong>
                                     </Button>
                                 </>
@@ -403,6 +444,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     )}
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div >
     )
 };

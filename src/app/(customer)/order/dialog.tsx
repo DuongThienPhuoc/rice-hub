@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -36,6 +36,7 @@ export default function OrderPageDialog({
     const quantity = useCartDialogStore((state) => state.quantity);
     const setType = useCartDialogStore((state) => state.setType);
     const setQuantity = useCartDialogStore((state) => state.setQuantity);
+    const [productUnit,setProductUnit] = useState<string>('')
 
     function handleSubmitOrder() {
         const getOrderId = JSON.parse(localStorage.getItem('cart') || '[]').length;
@@ -44,6 +45,7 @@ export default function OrderPageDialog({
             productID: product.id,
             productCode: product.productCode,
             name: product.name,
+            productUnit: productUnit,
             quantity: quantity,
             price: product.customerPrice,
             type: type,
@@ -80,13 +82,17 @@ export default function OrderPageDialog({
                 <section className="grid gap-4 gap-y-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label>Loại</Label>
-                        <Select onValueChange={(e) => setType(parseInt(e))}>
+                        <Select onValueChange={(e) => {
+                            const value = JSON.parse(e)
+                            setProductUnit(value.productUnit)
+                            setType(value.weightPerUnit)
+                        }}>
                             <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Chọn quy cách đóng gói" />
                             </SelectTrigger>
                             <SelectContent>
                                 {product.unitWeightPairsList.map((weight, index) => (
-                                    <SelectItem key={index} value={weight.weightPerUnit.toString()}>
+                                    <SelectItem key={index} value={JSON.stringify(weight)}>
                                         {weight.weightPerUnit} Kg
                                     </SelectItem>
                                 ))}

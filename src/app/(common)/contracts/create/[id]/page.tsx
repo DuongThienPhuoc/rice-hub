@@ -8,10 +8,14 @@ import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import firebase from '@/config/firebaseConfig';
 import html2canvas from 'html2canvas';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { jsPDF } from 'jspdf';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { ToastAction } from '@radix-ui/react-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
+    const { toast } = useToast();
     const router = useRouter();
     const [currentDate, setCurrentDate] = useState('');
     const [hiddenButton, setHiddenButton] = useState(false);
@@ -20,6 +24,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
     const [count, setCount] = useState(2);
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const [buyer, setBuyer] = useState({
         address: '',
@@ -57,7 +62,6 @@ const Page = ({ params }: { params: { id: number } }) => {
             const url = `/user/get/${username}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(response);
             setSeller({
                 name: data.name,
                 address: data.address,
@@ -68,9 +72,12 @@ const Page = ({ params }: { params: { id: number } }) => {
                 bank: '',
             });
         } catch (error) {
-            console.error("Error fetching user:", error);
-        } finally {
-
+            toast({
+                variant: 'destructive',
+                title: 'Hệ thống gặp sự cố khi lấy thông tin người dùng!',
+                description: 'Xin vui lòng thử lại sau',
+                duration: 3000
+            })
         }
     };
 
@@ -80,7 +87,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                 const url = `/customer/${params.id}`;
                 const response = await api.get(url);
                 const data = response.data;
-                console.log(response);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin khách hàng!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
                 setBuyer({
                     name: data.fullName,
                     address: data.address,
@@ -91,7 +105,12 @@ const Page = ({ params }: { params: { id: number } }) => {
                     bank: '',
                 });
             } catch (error) {
-                console.error("Error fetching customer:", error);
+                toast({
+                    variant: 'destructive',
+                    title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                    description: 'Xin vui lòng thử lại sau',
+                    duration: 3000
+                })
             }
         };
 
@@ -101,7 +120,8 @@ const Page = ({ params }: { params: { id: number } }) => {
     }, [params.id]);
 
     const handleSubmit = async () => {
-        await setHiddenButton(true);
+        setHiddenButton(true);
+        setOnPageChange(true);
 
         const storage = getStorage(firebase);
         const element = document.getElementById('contract');
@@ -145,10 +165,9 @@ const Page = ({ params }: { params: { id: number } }) => {
                 pdf.addPage();
             }
         }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const pdfBlob = pdf.output('blob');
         const storageRef = ref(storage, `contracts/Contract_${Date.now()}.pdf`);
-        // const snapshot = await uploadBytes(storageRef, pdfBlob);
+        await uploadBytes(storageRef, pdfBlob);
 
         const downloadURL = await getDownloadURL(storageRef);
 
@@ -158,25 +177,60 @@ const Page = ({ params }: { params: { id: number } }) => {
             pdfFilePath: downloadURL,
         }
 
-        if (duration > 0) {
-            try {
-                const response = await api.post(`/contracts/createContract`, formData);
-
-                if (response.status >= 200 && response.status < 300) {
-                    alert('Tạo hợp đồng thành công.');
-                    router.push(`/customers/${params.id}`);
-                } else {
-                    setHiddenButton(false);
-                    throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
-                }
-            } catch (error) {
-                setHiddenButton(false);
-                console.error('Error submitting form:', error);
-                alert('Đã xảy ra lỗi, vui lòng thử lại.');
-            }
-        } else {
+        if (duration < 1) {
             setHiddenButton(false);
-            alert('Hợp đồng phải có thời hạn ít nhất là 1 tháng!');
+            setOnPageChange(false);
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại!',
+                description: 'Hợp đồng phải có thời hạn ít nhất là 1 tháng.',
+                duration: 3000
+            });
+            return;
+        }
+        setOnPageChange(true);
+        try {
+            const response = await api.post(`/contracts/createContract`, formData);
+            if (response.status >= 200 && response.status < 300) {
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công!',
+                    description: 'Hợp đồng đẫ được tạo thành công',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                });
+                router.push(`/customers/${params.id}`);
+                setOnPageChange(false);
+            } else {
+                setHiddenButton(false);
+                setOnPageChange(false);
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại!',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    duration: 3000
+                });
+            }
+        } catch (error: any) {
+            setHiddenButton(false);
+            setOnPageChange(false);
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: (
+                    <div>
+                        {messages.map((msg: any, index: any) => (
+                            <div key={index}>{msg}</div>
+                        ))}
+                    </div>
+                ),
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
@@ -493,7 +547,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
 
-                <div className='flex justify-end'>
+                <div className='flex justify-end space-x-5'>
+                    <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold", hiddenButton && 'hidden')}
+                        onClick={() => {
+                            router.push(`/customers/${params.id}`);
+                            setOnPageChange(true)
+                        }}>Trở về
+                    </button>
                     <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold", hiddenButton && 'hidden')}
                         onClick={() => {
                             handleSubmit();
@@ -501,6 +561,15 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </button>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     )
 };

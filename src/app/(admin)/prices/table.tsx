@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
@@ -20,6 +21,7 @@ import TableRow from '@mui/material/TableRow';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 interface RowData {
     [key: string]: any;
@@ -28,6 +30,7 @@ interface RowData {
 export default function PriceTable() {
     const { toast } = useToast();
     const router = useRouter();
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
@@ -122,6 +125,7 @@ export default function PriceTable() {
     }
 
     const handleSubmit = async (productId: number, priceId: number, unitPrice: number) => {
+        setOnPageChange(true);
         try {
             const formData = ({
                 productPrice: [
@@ -144,6 +148,7 @@ export default function PriceTable() {
                         color: '#fff',
                     },
                 })
+                setOnPageChange(false);
                 getPrices();
             } else {
                 toast({
@@ -153,6 +158,7 @@ export default function PriceTable() {
                     duration: 3000,
                     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 })
+                setOnPageChange(false);
             }
         } catch (error: any) {
             toast({
@@ -162,12 +168,14 @@ export default function PriceTable() {
                 description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
             })
+            setOnPageChange(false);
         }
     };
 
     const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
 
-    const handleEditClick = (rowIndex: number) => {
+    const handleEditClick = (rowIndex: number, price: any) => {
+        setCurrentInput(price);
         setEditingRowIndex(rowIndex);
     };
 
@@ -221,7 +229,6 @@ export default function PriceTable() {
                                 selectOptions={[
                                     { value: 'productCode', label: 'Mã sản phẩm' },
                                     { value: 'productName', label: 'Tên sản phẩm' },
-                                    { value: 'category', label: 'Danh mục' },
                                 ]}
                             />
                             <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
@@ -232,7 +239,10 @@ export default function PriceTable() {
                                     </>
                                 ) : (
                                     <>
-                                        <Button onClick={() => router.push("/prices/create")} className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                        <Button onClick={() => {
+                                            router.push("/prices/create")
+                                            setOnPageChange(true)
+                                        }} className='ml-2 mt-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
                                             Thêm bảng giá
                                             <PlusIcon />
                                         </Button>
@@ -281,6 +291,16 @@ export default function PriceTable() {
                                                     </TableCell>
                                                     <TableCell>
                                                         <p className={`font-semibold text-white`}>
+                                                            Danh mục
+                                                        </p>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <p className={`font-semibold text-white`}>
+                                                            Nhà cung cấp
+                                                        </p>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <p className={`font-semibold text-white`}>
                                                             Giá nhập
                                                         </p>
                                                     </TableCell>
@@ -302,76 +322,111 @@ export default function PriceTable() {
                                                         const matchingProductPrice = currentPrice?.productPrices?.find(
                                                             (pPrice: any) => pPrice?.product?.id === product?.id || pPrice?.product === product?.id
                                                         );
-
-                                                        return (
-                                                            <TableRow key={rowIndex}>
-                                                                <TableCell className="max-w-[200px]">
-                                                                    {product?.productCode}
-                                                                </TableCell>
-                                                                <TableCell className="max-w-[200px]">
-                                                                    {product?.productName}
-                                                                </TableCell>
-                                                                <TableCell className="max-w-[200px]">
-                                                                    {formatCurrency(product?.importPrice || 0)}
-                                                                </TableCell>
-                                                                <TableCell className="max-w-[200px]">
-                                                                    {editingRowIndex === rowIndex ? (
-                                                                        <input
-                                                                            min={0}
-                                                                            type="number"
-                                                                            value={currentInput || matchingProductPrice?.unit_price || product.price}
-                                                                            onChange={handleInputChange}
-                                                                            className="border-b-2 border-gray-300 w-[100px] focus:border-gray-500 focus:outline-none"
-                                                                        />
-                                                                    ) : (
-                                                                        formatCurrency(matchingProductPrice?.unit_price || product?.price)
-                                                                    )}
-                                                                </TableCell>
-                                                                <TableCell align='center' className="text-center px-4 py-3">
-                                                                    <div className="flex min-w-[100px] justify-center space-x-3">
+                                                        if (product.disable === false) {
+                                                            return (
+                                                                <TableRow key={rowIndex}>
+                                                                    <TableCell onClick={() => router.push(`/products/${product?.id}`)} className="text-blue-500 max-w-[200px] cursor-pointer hover:text-blue-300 font-semibold">
+                                                                        {product?.productCode}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px]">
+                                                                        {product?.productName}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px]">
+                                                                        {product?.categoryName}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px]">
+                                                                        {product?.supplierName}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px]">
+                                                                        {formatCurrency(product?.price || 0)}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px]">
                                                                         {editingRowIndex === rowIndex ? (
-                                                                            <>
-                                                                                <div className='relative group'>
-                                                                                    <button
-                                                                                        onClick={() => handleSave(rowIndex)}
-                                                                                        className="group w-6 h-6 md:w-auto md:h-auto"
-                                                                                    >
-                                                                                        <Save size={18} />
-                                                                                    </button>
-                                                                                    <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                                        Lưu
-                                                                                    </span>
-                                                                                </div>
-                                                                                <span className="px-1">|</span>
-                                                                                <div className='relative group'>
-                                                                                    <button
-                                                                                        onClick={() => handleCancel()}
-                                                                                        className="group w-6 h-6 md:w-auto md:h-auto"
-                                                                                    >
-                                                                                        <X size={20} />
-                                                                                    </button>
-                                                                                    <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                                        Hủy
-                                                                                    </span>
-                                                                                </div>
-                                                                            </>
+                                                                            <input
+                                                                                min={0}
+                                                                                type="number"
+                                                                                value={currentInput}
+                                                                                onChange={(e) => {
+                                                                                    if (Number(e.target.value) >= 0) {
+                                                                                        handleInputChange(e)
+                                                                                    }
+                                                                                }}
+                                                                                className="border-b-2 border-gray-300 w-[100px] focus:border-gray-500 focus:outline-none"
+                                                                            />
                                                                         ) : (
-                                                                            <div className="relative group">
-                                                                                <button
-                                                                                    onClick={() => handleEditClick(rowIndex)}
-                                                                                    className="group w-12 h-6 md:w-auto md:h-auto"
-                                                                                >
-                                                                                    <PenBox size={18} />
-                                                                                </button>
-                                                                                <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                                    Chỉnh sửa
-                                                                                </span>
-                                                                            </div>
+                                                                            formatCurrency(matchingProductPrice?.unit_price || 0)
                                                                         )}
-                                                                    </div>
-                                                                </TableCell>
-                                                            </TableRow>
-                                                        );
+                                                                    </TableCell>
+                                                                    <TableCell align='center' className="text-center px-4 py-3">
+                                                                        <div className="flex min-w-[100px] justify-center space-x-3">
+                                                                            {editingRowIndex === rowIndex ? (
+                                                                                <>
+                                                                                    <div className='relative group'>
+                                                                                        <button
+                                                                                            onClick={() => handleSave(rowIndex)}
+                                                                                            className="group w-6 h-6 md:w-auto md:h-auto"
+                                                                                        >
+                                                                                            <Save size={18} />
+                                                                                        </button>
+                                                                                        <span className="absolute text-center w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                            Lưu
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <span className="px-1">|</span>
+                                                                                    <div className='relative group'>
+                                                                                        <button
+                                                                                            onClick={() => handleCancel()}
+                                                                                            className="group w-6 h-6 md:w-auto md:h-auto"
+                                                                                        >
+                                                                                            <X size={20} />
+                                                                                        </button>
+                                                                                        <span className="absolute text-center w-[60px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                            Hủy
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </>
+                                                                            ) : (
+                                                                                <div className="relative group">
+                                                                                    <button
+                                                                                        onClick={() => handleEditClick(rowIndex, matchingProductPrice?.unit_price)}
+                                                                                        className="group w-12 h-6 md:w-auto md:h-auto"
+                                                                                    >
+                                                                                        <PenBox size={18} />
+                                                                                    </button>
+                                                                                    <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                        Chỉnh sửa
+                                                                                    </span>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        } else {
+                                                            return (
+                                                                <TableRow key={rowIndex}>
+                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
+                                                                        {product?.productCode}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
+                                                                        {product?.productName}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
+                                                                        {product?.categoryName}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
+                                                                        {product?.supplierName}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
+                                                                        {formatCurrency(product?.price || 0)}
+                                                                    </TableCell>
+                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
+                                                                        {formatCurrency(matchingProductPrice?.unit_price || 0)}
+                                                                    </TableCell>
+                                                                    <TableCell className='opacity-40 pointer-events-none'></TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        }
                                                     })
                                                 ) : (
                                                     <TableRow>
@@ -398,6 +453,15 @@ export default function PriceTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

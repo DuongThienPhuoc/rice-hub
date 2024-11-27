@@ -39,17 +39,18 @@ const Page = ({ params }: { params: { id: number } }) => {
             setSelectedIngredient(ingredient);
             setInputWeight(production.quantity);
             setNote(production.note);
+
             if (production?.finishedProducts && products.length > 0) {
                 const newOutputs = production.finishedProducts.map((fp: any) => ({
                     selectedProduct: products.find((p: any) => p.id === fp.productId),
                     ratio: fp.proportion,
-                    weight: fp.quanity,
+                    weight: fp.quantity,
                 }));
-                setOutputs([...outputs, ...newOutputs]);
+
+                setOutputs(newOutputs);
             }
         }
-    }, [production?.productId, ingredients]);
-
+    }, [production?.productId, ingredients, products]);
 
     const getProducts = async () => {
         try {
@@ -125,12 +126,19 @@ const Page = ({ params }: { params: { id: number } }) => {
             return;
         }
 
-        outputs.map((output: any, index: any) => {
-            if (output.selectedProduct === '' || output.ratio === '' || output.ratio === 0 || output.weight === '' || output.weight === 0) {
+        for (let index = 0; index < outputs.length; index++) {
+            const output = outputs[index];
+            if (
+                output.selectedProduct === '' ||
+                output.ratio === '' ||
+                output.ratio === 0 ||
+                output.weight === '' ||
+                output.weight === 0
+            ) {
                 alert(`Thông tin của sản phẩm thứ ${index + 1} không hợp lệ!`);
                 return;
             }
-        });
+        }
 
         try {
             const response = await api.post(`/productionOrder/update/${params.id}`, {
@@ -226,22 +234,12 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     )}
                                 </div>
                                 <div className='flex-1'>
-                                    <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold lg:pt-5 w-[80px]'>Ghi chú: </span>
-                                        <TextField
-                                            className='lg:ml-10 mt-2 lg:mt-0 w-full lg:min-w-[80%]'
-                                            onChange={(e) => setNote(e.target.value)}
-                                            value={note}
-                                            multiline
-                                            rows={4}
-                                            label={'Mô tả'} />
-                                    </div>
                                 </div>
                             </>
                         )}
                     </div>
                     <div className='lg:px-10 mt-5 px-2 w-full'>
-                        <p className='font-bold mb-5'>Sản phẩm đầu ra :</p>
+                        <p className='font-bold mb-5'>Danh sách thành phẩm :</p>
                         {loadingData ? (
                             <div className="w-full">
                                 <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} className='rounded-t-lg' />
@@ -275,13 +273,19 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                 <TableCell className='px-2 py-4'>
                                                     <Autocomplete
                                                         disablePortal
-                                                        options={products.filter((p: any) => p.productWarehouses[0]?.warehouse.id === 2)}
+                                                        options={products.filter(
+                                                            (p: any) =>
+                                                                p.productWarehouses[0]?.warehouse.id === 2 &&
+                                                                !outputs.some((output: any) => output.selectedProduct?.id === p.id)
+                                                        )}
                                                         value={output?.selectedProduct || null}
-                                                        getOptionLabel={(option) => option?.name}
+                                                        getOptionLabel={(option) => option?.name || ''}
                                                         onChange={(event, newValue) => {
-                                                            handleOutputChange(index, 'selectedProduct', newValue)
+                                                            handleOutputChange(index, 'selectedProduct', newValue);
                                                         }}
-                                                        renderInput={(params) => <TextField {...params} variant='standard' label="Chọn sản phẩm" />}
+                                                        renderInput={(params) => (
+                                                            <TextField {...params} variant="standard" label="Chọn sản phẩm" />
+                                                        )}
                                                     />
                                                 </TableCell>
                                                 <TableCell className='max-w-[100px] '>

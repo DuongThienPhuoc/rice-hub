@@ -8,6 +8,7 @@ import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { X } from 'lucide-react';
+import LinearIndeterminate from '../ui/LinearIndeterminate';
 
 interface PopupCreateProps {
     tableName: string;
@@ -21,7 +22,7 @@ interface PopupCreateProps {
 }
 
 const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handleClose }) => {
-
+    const [onPageChange, setOnPageChange] = useState(false);
     const [formData, setFormData] = useState<Record<string, string | boolean | number>>({});
     const { toast } = useToast();
     useEffect(() => {
@@ -43,8 +44,9 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setOnPageChange(true);
         try {
-            await api.post(`${url}`, formData);
+            const response = await api.post(`${url}`, formData);
             toast({
                 variant: 'default',
                 title: 'Tạo thành công',
@@ -55,6 +57,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
                 },
                 duration: 3000
             })
+            setOnPageChange(false);
             handleClose(true);
         } catch (error: any) {
             toast({
@@ -64,6 +67,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
+            setOnPageChange(false);
         }
     };
 
@@ -87,6 +91,15 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
                     </form>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

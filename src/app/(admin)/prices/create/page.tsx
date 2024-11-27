@@ -6,10 +6,13 @@ import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from "@/config/axiosConfig";
-import { Trash2 } from 'lucide-react';
-import { Autocomplete, Skeleton, TextField } from '@mui/material';
+import { Trash2, X } from 'lucide-react';
+import { Autocomplete, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, Skeleton, TextField } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import Swal from 'sweetalert2';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 interface RowData {
     [key: string]: any;
@@ -21,18 +24,49 @@ const Page = () => {
     const [prices, setPrices] = useState<RowData[]>([]);
     const [customers, setCustomers] = useState<RowData[]>([]);
     const [priceName, setPriceName] = useState('');
+    const [newPriceName, setNewPriceName] = useState('');
     const [priceCustomer, setPriceCustomer] = useState<RowData | null>(null);
-    const [selectedCustomer, setSelectedCustomer] = useState<RowData | null>(null);
     const [selectedPrice, setSelectedPrice] = useState<RowData | null>(null);
     const [loadingData, setLoadingData] = useState(true);
+    const [showInput, setShowInput] = useState(false);
+    const [onPageChange, setOnPageChange] = useState(false);
+    const MenuProps = {
+        PaperProps: {
+            style: {
+                maxHeight: 48 * 4.5 + 8,
+                width: 250,
+            },
+        },
+    };
+
+    const [customerName, setCustomerName] = React.useState<string[]>([]);
+    const [ids, setIds] = React.useState<string[]>([]);
+
+    const handleChange = (event: SelectChangeEvent<typeof customerName>) => {
+        const {
+            target: { value },
+        } = event;
+
+        const newCustomerNames = typeof value === 'string' ? value.split(',') : value;
+        setCustomerName(newCustomerNames);
+
+        const selectedIds = customers
+            .filter(customer => newCustomerNames.includes(customer.fullName))
+            .map(customer => customer.id);
+
+        setIds(selectedIds);
+    };
 
     const getPrices = async () => {
         try {
             const url = `/price/all`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
             setPrices(data);
+            if (!priceCustomer) {
+                setSelectedPrice(data.find((price: any) => price.id === 1) || null);
+                setPriceCustomer(data.find((price: any) => price.id === 1)?.customers)
+            }
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -52,6 +86,7 @@ const Page = () => {
 
     useEffect(() => {
         getCustomers();
+        getPrices();
     }, []);
 
     const getCustomers = async () => {
@@ -74,11 +109,8 @@ const Page = () => {
         setPriceName(e);
     }
 
-    useEffect(() => {
-        getPrices();
-    }, []);
-
     const handleCreatePrice = async () => {
+        setOnPageChange(true);
         if (priceName === '' || priceName.trim().length < 1) {
             toast({
                 variant: 'destructive',
@@ -88,6 +120,7 @@ const Page = () => {
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
             })
             return;
+            setOnPageChange(false);
         }
 
         const formData = ({
@@ -110,7 +143,67 @@ const Page = () => {
                     },
                     duration: 3000
                 })
+                setOnPageChange(false);
+                setPriceName('');
                 getPrices();
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
+                setOnPageChange(false);
+            }
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
+            setOnPageChange(false);
+        }
+    }
+
+    const handleUpdatePrice = async () => {
+        if (newPriceName === '' || newPriceName.trim().length < 1) {
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại!',
+                description: 'Xin vui lòng nhập tên bảng giá',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
+            return;
+        }
+
+        const formData = ({
+            customerIds: [
+                0
+            ],
+            name: newPriceName,
+            priceId: selectedPrice?.id
+        })
+
+        try {
+            const response = await api.post(`/price/admin/UpdatePrice`, formData);
+            if (response.status >= 200 && response.status < 300) {
+                toast({
+                    variant: 'default',
+                    title: 'Cập nhật thành công',
+                    description: `Bảng giá đã được cập nhật thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
+                setNewPriceName('');
+                getPrices();
+                setShowInput(false);
             } else {
                 toast({
                     variant: 'destructive',
@@ -131,6 +224,64 @@ const Page = () => {
         }
     }
 
+    const handleDeletePrice = async () => {
+        if (!selectedPrice) {
+            toast({
+                variant: 'destructive',
+                title: 'Xóa thất bại!',
+                description: 'Vui lòng chọn bảng giá',
+                duration: 3000,
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+            })
+            return;
+        }
+
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: `Bạn có chắc chắn muốn xóa bảng giá này không, một khi đã xóa thì sẽ đặt lại tất cả khách hàng về giá chung.`,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonText: 'Có, xóa!',
+            cancelButtonText: 'Không!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.delete(`/price/admin/DeletePrice/${selectedPrice.id}`);
+                    if (response.status >= 200 && response.status < 300) {
+                        toast({
+                            variant: 'default',
+                            title: 'Xóa thành công',
+                            description: `Bảng giá đã được xóa thành công`,
+                            duration: 3000,
+                            style: {
+                                backgroundColor: '#4caf50',
+                                color: '#fff',
+                            },
+                        })
+                        getPrices();
+                        setSelectedPrice(prices[0]);
+                    } else {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Xóa thất bại!',
+                            description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                            duration: 3000,
+                            action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                        })
+                    }
+                } catch (error: any) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Xóa thất bại',
+                        duration: 3000,
+                        description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    })
+                }
+            }
+        })
+    }
+
     const handleApplyPrice = async () => {
         if (!selectedPrice) {
             toast({
@@ -144,7 +295,7 @@ const Page = () => {
         }
 
 
-        if (!selectedCustomer) {
+        if (!ids || ids.length < 1) {
             toast({
                 variant: 'destructive',
                 title: 'Tạo thất bại!',
@@ -156,7 +307,7 @@ const Page = () => {
         }
 
         const formData = ({
-            customerIds: selectedCustomer.id,
+            customerIds: ids,
             priceId: selectedPrice.id,
         })
 
@@ -166,13 +317,15 @@ const Page = () => {
                 toast({
                     variant: 'default',
                     title: 'Áp dụng thành công',
-                    description: `Bảng giá đã được áp dụng thành công cho ${selectedCustomer.fullName}`,
+                    description: `Bảng giá đã được áp dụng thành công`,
                     duration: 3000,
                     style: {
                         backgroundColor: '#4caf50',
                         color: '#fff',
                     },
                 })
+                setCustomerName([]);
+                setIds([]);
                 getPrices();
             } else {
                 toast({
@@ -212,8 +365,8 @@ const Page = () => {
                             )}
                         </div>
                     </div>
-                    <div className="flex flex-col xl:flex-row lg:px-10 px-2 mt-10">
-                        <div className="flex-1 lg:pr-5">
+                    <div className="flex flex-col xl:flex-row xl:px-10 mt-10 xl:space-x-5">
+                        <div className="flex-1">
                             {loadingData ? (
                                 <div className="m-5 flex flex-col lg:flex-row items-center">
                                     <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-1/4 w-full rounded-lg' />
@@ -241,7 +394,7 @@ const Page = () => {
                             )}
                         </div>
 
-                        <div className="flex-1 lg:pl-5">
+                        <div className="flex-1">
                             {loadingData ? (
                                 <div className="m-5 flex flex-col lg:flex-row items-center">
                                     <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-1/4 w-full rounded-lg' />
@@ -251,17 +404,25 @@ const Page = () => {
                             ) : (
                                 <div className="m-5 flex flex-col lg:flex-row items-center">
                                     <span className="font-bold lg:w-1/4 w-full">Khách hàng:</span>
-                                    <Autocomplete
-                                        className="lg:w-2/4 w-full lg:mx-5 my-4"
-                                        disablePortal
-                                        clearOnEscape
-                                        options={customers}
-                                        getOptionLabel={(option) => option.fullName}
-                                        onChange={(event, newValue) => setSelectedCustomer(newValue)}
-                                        renderInput={(params) => (
-                                            <TextField {...params} variant="standard" label="Tìm kiếm khách hàng" />
-                                        )}
-                                    />
+                                    <FormControl className='lg:w-2/4 w-full lg:mx-5 my-4'>
+                                        <InputLabel id="demo-multiple-checkbox-label">Chọn khách hàng</InputLabel>
+                                        <Select
+                                            id="demo-multiple-checkbox"
+                                            multiple
+                                            value={customerName}
+                                            onChange={handleChange}
+                                            renderValue={(selected) => selected.join(', ')}
+                                            MenuProps={MenuProps}
+                                            variant='standard'
+                                        >
+                                            {customers.map((customer) => (
+                                                <MenuItem key={customer.id} value={customer.fullName}>
+                                                    <Checkbox checked={customerName.includes(customer.fullName)} />
+                                                    <ListItemText primary={customer.fullName} />
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
                                     <Button
                                         onClick={handleApplyPrice}
                                         className="lg:w-1/4 w-full lg:ml-2 py-2 text-[14px] hover:bg-blue-400 bg-[#0090d9] text-white"
@@ -277,14 +438,61 @@ const Page = () => {
                             {loadingData ? (
                                 <Skeleton animation="wave" variant="rectangular" height={40} className='w-[200px] rounded-lg mt-2' />
                             ) : (
-                                <Autocomplete
-                                    className='w-[200px] mb-5'
-                                    options={prices}
-                                    getOptionLabel={(option) => option.name}
-                                    onChange={(event, newValue) => setSelectedPrice(newValue)}
-                                    disablePortal
-                                    renderInput={(params) => <TextField {...params} variant='standard' label="Bảng giá" />}
-                                />
+                                <div className='flex items-center'>
+                                    <Autocomplete
+                                        className='w-[200px] mb-5'
+                                        options={prices}
+                                        getOptionLabel={(option) => option.name}
+                                        defaultValue={prices[0]}
+                                        value={selectedPrice}
+                                        disableClearable
+                                        onChange={(event, newValue) => setSelectedPrice(newValue)}
+                                        disablePortal
+                                        renderInput={(params) => <TextField {...params} variant='standard' label="Bảng giá" />}
+                                    />
+                                    {selectedPrice?.id !== 1 && (
+                                        <>
+                                            <Button
+                                                onClick={() => {
+                                                    setNewPriceName(selectedPrice?.name);
+                                                    setShowInput(true)
+                                                }}
+                                                className="w-fit ml-5 py-2 text-[14px] hover:bg-green-500 text-white"
+                                            >
+                                                Sửa
+                                            </Button>
+                                            <Dialog open={showInput} onClose={() => setShowInput(false)}>
+                                                <div className='flex justify-between min-w-[400px]'>
+                                                    <DialogTitle>Cập nhật bảng giá</DialogTitle>
+                                                    <X size={20} className='cursor-pointer mx-3 my-5 text-black' onClick={() => setShowInput(false)} />
+                                                </div>
+                                                <DialogContent>
+                                                    <TextField
+                                                        label="Nhập tên bảng giá"
+                                                        variant="standard"
+                                                        value={newPriceName}
+                                                        onChange={(e) => setNewPriceName(e.target.value)}
+                                                        fullWidth
+                                                    />
+                                                </DialogContent>
+                                                <DialogActions>
+                                                    <Button
+                                                        onClick={handleUpdatePrice}
+                                                        className='mx-3 mb-2'
+                                                    >
+                                                        Cập nhật
+                                                    </Button>
+                                                </DialogActions>
+                                            </Dialog>
+                                            <Button
+                                                onClick={handleDeletePrice}
+                                                className="w-fit ml-3 py-2 text-[14px] hover:bg-red-500 bg-red-600 text-white"
+                                            >
+                                                Xóa
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
                             )}
                             {loadingData ? (
                                 <div className="my-2">
@@ -327,13 +535,26 @@ const Page = () => {
                         {loadingData ? (
                             <Skeleton animation="wave" variant="rectangular" height={40} className='w-[80px] px-5 py-3 rounded-lg' />
                         ) : (
-                            <Button type='button' onClick={() => router.push("/employees")} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                            <Button type='button' onClick={() => {
+                                router.push("/prices")
+                                setOnPageChange(true);
+                            }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                 <strong>Trở về</strong>
                             </Button>
                         )}
                     </div>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };

@@ -175,9 +175,9 @@ const Page = () => {
                 </div>
             </div>
             {onPageChange === true && (
-                <div className='fixed z-50 bg-black bg-opacity-40 w-full'>
+                <div className='fixed z-[1000] bg-black bg-opacity-40 w-full'>
                     <div className='flex'>
-                        <div className='w-full'>
+                        <div className='w-full h-[100vh]'>
                             <LinearIndeterminate />
                         </div>
                     </div>
