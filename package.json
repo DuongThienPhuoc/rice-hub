@@ -58,6 +58,7 @@
     "firebase": "^10.14.1",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.2.4",
+    "jose": "^5.9.6",
     "jspdf": "^2.5.2",
     "lucide-react": "^0.445.0",
     "next": "14.2.11",
