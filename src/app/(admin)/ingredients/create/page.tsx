@@ -11,6 +11,8 @@ import firebase from '@/config/firebaseConfig';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 type UnitWeightPair = {
     productUnit: string;
@@ -31,6 +33,7 @@ const Page = () => {
     const [categories, setCategories] = useState<RowData[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -183,10 +186,17 @@ const Page = () => {
                 })
             }
         } catch (error: any) {
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
             toast({
                 variant: 'destructive',
                 title: 'Tạo thất bại',
-                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                description: (
+                    <div>
+                        {messages.map((msg: any, index: any) => (
+                            <div key={index}>{msg}</div>
+                        ))}
+                    </div>
+                ),
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
@@ -336,7 +346,10 @@ const Page = () => {
                                 <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/ingredients")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push("/ingredients")
+                                    setOnPageChange(true);
+                                }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>
@@ -344,6 +357,16 @@ const Page = () => {
                     </div>
                 </div>
             </form>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };

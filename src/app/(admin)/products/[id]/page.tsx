@@ -2,12 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import api from "@/config/axiosConfig";
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -15,49 +18,58 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [batchProducts, setBatchProducts] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
+    const selectOptions = [
+        { value: '1', label: 'Tồn kho' },
+        { value: '2', label: 'Lịch sử nhập xuất' }
+    ]
+    const [selected, setSelected] = useState(selectOptions[0]);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const [loadingData, setLoadingData] = useState(true);
+    const [onPageChange, setOnPageChange] = useState(false);
+
 
     useEffect(() => {
-        const getProduct = async () => {
-            try {
-                const url = `/products/${params.id}`;
-                const response = await api.get(url);
-                const data = response.data;
-                setProduct(data);
-                if (!data?.id) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Lỗi khi lấy thông tin sản phẩm!',
-                        description: 'Xin vui lòng thử lại',
-                        duration: 3000
-                    })
-                }
-            } catch (error: any) {
-                if (error.response.status === 404) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Sản phẩm không tồn tại!',
-                        description: 'Xin vui lòng thử lại',
-                        duration: 3000
-                    })
-                } else {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Hệ thống gặp sự cố khi lấy thông tin sản phẩm!',
-                        description: 'Xin vui lòng thử lại sau',
-                        duration: 3000
-                    })
-                }
-            } finally {
-                setLoadingData(false);
-            }
-        };
-
         if (params.id) {
             getBatch();
             getProduct();
         }
     }, [params.id]);
+
+    const getProduct = async () => {
+        try {
+            const url = `/products/${params.id}`;
+            const response = await api.get(url);
+            const data = response.data;
+            setProduct(data);
+            if (!data?.id) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Lỗi khi lấy thông tin sản phẩm!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000
+                })
+            }
+        } catch (error: any) {
+            if (error.response.status === 404) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Sản phẩm không tồn tại!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000
+                })
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Hệ thống gặp sự cố khi lấy thông tin sản phẩm!',
+                    description: 'Xin vui lòng thử lại sau',
+                    duration: 3000
+                })
+            }
+        } finally {
+            setLoadingData(false);
+        }
+    };
 
     const getBatch = async () => {
         try {
@@ -88,6 +100,24 @@ const Page = ({ params }: { params: { id: number } }) => {
             return '../../....';
         }
     }
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+            setIsOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) {
+            document.addEventListener('click', handleClickOutside);
+        } else {
+            document.removeEventListener('click', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, [isOpen]);
 
     return (
         <div>
@@ -232,7 +262,33 @@ const Page = ({ params }: { params: { id: number } }) => {
                     ) : (
                         <div className='w-full lg:px-10'>
                             <div className='lg:mx-10 my-10 mx-5'>
-                                <p className='font-bold mb-5'>Lịch sử nhập xuất: </p>
+                                <div className='mb-5'>
+                                    <div ref={dropdownRef} className="relative text-[14px]">
+                                        <div
+                                            className="p-2 bg-[#4ba94d] hover:bg-green-500 flex items-center text-white font-semibold w-fit rounded-lg cursor-pointer"
+                                            onClick={() => setIsOpen(!isOpen)}
+                                        >
+                                            {selected.label} {isOpen ? (<ChevronUp size={20} className='ml-1' />) : (<ChevronDown size={20} className='ml-1' />)}
+                                        </div>
+                                        {isOpen && (
+                                            <div className="absolute bg-white border border-gray-300 mt-1">
+                                                {selectOptions.map((option) => (
+                                                    <div
+                                                        key={option.value}
+                                                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                                                        onClick={() => {
+                                                            setSelected(option);
+                                                            setIsOpen(false);
+                                                        }}
+                                                    >
+                                                        {option.label}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
                                 <div>
                                     <div className='w-full max-h-300px overflow-auto'>
                                         {loadingData ? (
@@ -248,41 +304,73 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                                                 <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                     <TableHead className='bg-[#0090d9]'>
-                                                        <TableRow>
-                                                            <TableCell><p className='font-semibold text-white'>Hình thức</p></TableCell>
-                                                            <TableCell><p className='font-semibold text-white'>Mã lô hàng</p></TableCell>
-                                                            <TableCell><p className='font-semibold text-white'>Giá nhập (kg)</p></TableCell>
-                                                            <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
-                                                            <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
-                                                            <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
-                                                            <TableCell><p className='font-semibold text-white'>Trạng thái</p></TableCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        {batchProducts && batchProducts.length !== 0 ? (
-                                                            batchProducts.map((row: any, rowIndex: any) => (
-                                                                <TableRow key={rowIndex} className={`font-semibold bg-white`}>
-                                                                    <TableCell>{row?.batch?.receiptType === 'IMPORT' ? 'Nhập' : 'Xuất'}</TableCell>
-                                                                    <TableCell className='font-semibold text-blue-500 hover:text-blue-300 cursor-pointer' onClick={() => router.push(`/batches/${row?.batch?.batchCode}`)}>
-                                                                        {row?.batch?.batchCode}
-                                                                    </TableCell>
-                                                                    <TableCell>
-                                                                        {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.price))}
-                                                                    </TableCell>
-                                                                    <TableCell>{row?.unit + ' ' + row?.weightPerUnit} kg</TableCell>
-                                                                    <TableCell>{row?.quantity}</TableCell>
-                                                                    <TableCell>{row?.description || 'N/A'}</TableCell>
-                                                                    <TableCell>{row?.added ? 'Hoàn thành' : 'Chờ xác nhận'}</TableCell>
-                                                                </TableRow>
-                                                            ))
+                                                        {selected.value === '2' ? (
+                                                            <TableRow>
+                                                                <TableCell><p className='font-semibold text-white'>Mã lô hàng</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Giá nhập (kg)</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Hình thức</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Trạng thái</p></TableCell>
+                                                            </TableRow>
                                                         ) : (
                                                             <TableRow>
-                                                                <TableCell colSpan={6}>
-                                                                    <div className="my-10 mx-4 text-center text-gray-500">
-                                                                        Không có dữ liệu
-                                                                    </div>
-                                                                </TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Giá nhập (kg)</p></TableCell>
                                                             </TableRow>
+                                                        )}
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {selected.value === '2' ? (
+                                                            batchProducts && batchProducts.length !== 0 ? (
+                                                                batchProducts.map((row: any, rowIndex: any) => (
+                                                                    <TableRow key={rowIndex} className={`font-semibold bg-white`}>
+                                                                        <TableCell className='font-semibold text-blue-500 hover:text-blue-300 cursor-pointer' onClick={() => router.push(`/batches/${row?.batch?.batchCode}`)}>
+                                                                            {row?.batch?.batchCode}
+                                                                        </TableCell>
+                                                                        <TableCell>
+                                                                            {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.price))}
+                                                                        </TableCell>
+                                                                        <TableCell>{row?.unit + ' ' + row?.weightPerUnit} kg</TableCell>
+                                                                        <TableCell>{row?.quantity || 0} {row?.unit || 'kg'}</TableCell>
+                                                                        <TableCell>{row?.batch?.receiptType === 'IMPORT' ? 'Nhập kho' : 'Xuất kho'}</TableCell>
+                                                                        <TableCell>{row?.description || 'N/A'}</TableCell>
+                                                                        <TableCell>{row?.added ? 'Hoàn thành' : 'Chờ xác nhận'}</TableCell>
+                                                                    </TableRow>
+                                                                ))
+                                                            ) : (
+                                                                <TableRow>
+                                                                    <TableCell colSpan={7}>
+                                                                        <div className="my-10 mx-4 text-center text-gray-500">
+                                                                            Không có dữ liệu
+                                                                        </div>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        ) : (
+                                                            product?.productWarehouses && product?.productWarehouses !== 0 ? (
+                                                                product?.productWarehouses.map((row: any, rowIndex: any) => (
+                                                                    <TableRow key={rowIndex} className={`font-semibold bg-white`}>
+                                                                        <TableCell>{rowIndex + 1}</TableCell>
+                                                                        <TableCell>{(row.weightPerUnit !== 0 && row.unit) ? row.unit + " " + row.weightPerUnit + " kg" : 'Chưa đóng gói'}</TableCell>
+                                                                        <TableCell>{row?.quantity || 0} {row?.unit || 'kg'}</TableCell>
+                                                                        <TableCell>
+                                                                            {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.importPrice || 0))}
+                                                                        </TableCell>
+                                                                    </TableRow>
+                                                                ))
+                                                            ) : (
+                                                                <TableRow>
+                                                                    <TableCell colSpan={4}>
+                                                                        <div className="my-10 mx-4 text-center text-gray-500">
+                                                                            Không có dữ liệu
+                                                                        </div>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            )
                                                         )}
                                                     </TableBody>
                                                 </Table>
@@ -301,10 +389,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push(`/products/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push(`/products/update/${params.id}`)
+                                    setOnPageChange(true)
+                                }} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Sửa</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/products")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push("/products")
+                                    setOnPageChange(true)
+                                }} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -312,6 +406,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div >
     );
 };

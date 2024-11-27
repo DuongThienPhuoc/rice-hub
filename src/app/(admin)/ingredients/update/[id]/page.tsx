@@ -11,6 +11,8 @@ import firebase from '@/config/firebaseConfig';
 import { Autocomplete, Skeleton, TextField } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 type UnitWeightPair = {
     productUnit: string;
@@ -32,6 +34,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
     const [product, setProduct] = useState<any>(null);
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -193,7 +196,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        setOnPageChange(true);
         try {
             const storage = getStorage(firebase);
             const fileInput = document.getElementById("fileInput") as HTMLInputElement;
@@ -239,15 +242,24 @@ const Page = ({ params }: { params: { id: number } }) => {
                     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                     duration: 3000
                 })
+                setOnPageChange(false);
             }
         } catch (error: any) {
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
             toast({
                 variant: 'destructive',
                 title: 'Cập nhật thất bại',
-                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                description: (
+                    <div>
+                        {messages.map((msg: any, index: any) => (
+                            <div key={index}>{msg}</div>
+                        ))}
+                    </div>
+                ),
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
+            setOnPageChange(false);
         }
     };
 
@@ -396,7 +408,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Cập nhật</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push(`/ingredients/${params.id}`)} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push(`/ingredients/${params.id}`)
+                                    setOnPageChange(true)
+                                }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -404,6 +419,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </form>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };

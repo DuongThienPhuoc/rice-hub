@@ -118,7 +118,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không, hủy!',
+                cancelButtonText: 'Không',
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
