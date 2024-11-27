@@ -83,7 +83,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!token) {
-        return NextResponse.redirect(new URL('/login', request.url));
+        const loginUrl = new URL('/login', request.nextUrl);
+        loginUrl.searchParams.set('message', 'Get the fuck out of here boyy!');
+        return NextResponse.redirect(loginUrl);
     }
 
     try {
@@ -96,9 +98,11 @@ export async function middleware(request: NextRequest) {
         }
     } catch (e) {
         console.error('Invalid token:', e);
-        return NextResponse.redirect(new URL('/login', request.url));
+        return NextResponse.redirect(new URL('/login', request.nextUrl));
     }
-    return NextResponse.redirect(new URL('/login', request.url));
+    const loginUrl = new URL('/login', request.nextUrl);
+    loginUrl.searchParams.set('message', 'Get the fuck out of here boyy!');
+    return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
