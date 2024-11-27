@@ -36,6 +36,7 @@ export interface CartProduct {
     cartId: number;
     productID: number;
     productCode: string;
+    productUnit: string;
     name: string;
     quantity: number;
     price: number;
@@ -82,6 +83,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                 return {
                     productId: product.productID,
                     quantity: product.quantity,
+                    productUnit: product.productUnit,
                     unitPrice: product.price,
                     weightPerUnit: product.type
                 };
