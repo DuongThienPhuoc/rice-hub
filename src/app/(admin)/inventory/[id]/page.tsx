@@ -275,14 +275,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         <>
                                             <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
                                             <div className='flex justify-end items-center'>
-                                                {inventory?.status === 'PENDING' || inventory?.status === 'CANCELED' && (
-                                                    <Button onClick={() => showAlert()} className='px-5 py-3 mr-2 text-[14px] hover:bg-[#1d1d1fca]'>
-                                                        Hủy phiếu
+                                                {(inventory?.status === 'PENDING' || inventory?.status === 'CANCELED') && (
+                                                    <Button onClick={() => showAlert()} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
+                                                        {inventory?.status === 'CANCELED' ? 'Xóa phiếu' : 'Hủy phiếu'}
                                                         <CircleX />
                                                     </Button>
                                                 )}
                                                 {inventory?.status === 'PENDING' && (
-                                                    <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                                    <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                                         Xác nhận phiếu
                                                         <CheckSquare />
                                                     </Button>
@@ -291,25 +291,31 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         </>
                                     </div>
                                     <div className='overflow-x-auto max-h-[400px]'>
-                                        <TableContainer component={Paper} sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+                                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                                                <TableHead>
+                                                <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
-                                                        <TableCell rowSpan={2} className='font-semibold'>Mã sản phẩm</TableCell>
-                                                        <TableCell rowSpan={2} className='font-semibold'>Tên sản phẩm</TableCell>
-                                                        <TableCell rowSpan={1} align="center" colSpan={2} className='font-semibold'>Quy cách</TableCell>
-                                                        <TableCell rowSpan={2} className='font-semibold'>Số lượng trong hệ thống</TableCell>
-                                                        <TableCell rowSpan={2} className='font-semibold'>Số lượng thực tế</TableCell>
-                                                        <TableCell rowSpan={2} className='font-semibold'>Số lượng chênh lệch</TableCell>
-                                                        <TableCell rowSpan={2} className='font-semibold w-[150px]'>Mô tả</TableCell>
-                                                        <TableCell rowSpan={2} align="center" className='font-semibold'>Hành động</TableCell>
+                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
+                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
+                                                        <TableCell rowSpan={1} align="center" colSpan={2}><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng trong hệ thống</p></TableCell>
+                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng thực tế</p></TableCell>
+                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng chênh lệch</p></TableCell>
+                                                        <TableCell rowSpan={2} className='w-[150px]'><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                        {inventory?.status !== 'CANCELED' && (
+                                                            <TableCell rowSpan={2} align="center"><p className='font-semibold text-white'>Hành động</p></TableCell>
+                                                        )}
                                                     </TableRow>
                                                     <TableRow>
-                                                        <TableCell align="center" className='font-semibold'>
-                                                            Loại
+                                                        <TableCell align="center">
+                                                            <p className='font-semibold text-white'>
+                                                                Loại
+                                                            </p>
                                                         </TableCell>
-                                                        <TableCell align="center" className='font-semibold'>
-                                                            Trọng lượng
+                                                        <TableCell align="center">
+                                                            <p className='font-semibold text-white'>
+                                                                Trọng lượng
+                                                            </p>
                                                         </TableCell>
                                                     </TableRow>
                                                 </TableHead>
@@ -351,8 +357,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                             handleFieldChange('description', e.target.value, index)
                                                                         }}
                                                                         value={product?.description}
-                                                                        multiline
-                                                                        rows={2}
                                                                         label={'Mô tả'}
                                                                         variant="standard" />
                                                                 </TableCell>
@@ -381,16 +385,18 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell>{product?.quantity}</TableCell>
                                                                 <TableCell>{product?.quantity_discrepancy}</TableCell>
                                                                 <TableCell>{product?.description || 'N/A'}</TableCell>
-                                                                <TableCell align="center">
-                                                                    <div className='flex justify-center items-center'>
-                                                                        <div className='relative group'>
-                                                                            <PenSquare onClick={() => setSelectedRow(index)} size={18} className='cursor-pointer' />
-                                                                            <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                                Sửa
-                                                                            </span>
+                                                                {inventory?.status !== 'CANCELED' && (
+                                                                    <TableCell align="center">
+                                                                        <div className='flex justify-center items-center'>
+                                                                            <div className='relative group'>
+                                                                                <PenSquare onClick={() => setSelectedRow(index)} size={18} className='cursor-pointer' />
+                                                                                <span className="absolute w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                    Sửa
+                                                                                </span>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </TableCell>
+                                                                    </TableCell>
+                                                                )}
                                                             </TableRow>
                                                         )
                                                     ))}

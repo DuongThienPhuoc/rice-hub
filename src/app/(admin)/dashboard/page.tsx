@@ -20,7 +20,7 @@ const Page = () => {
     const [dailyReport, setDailyReport] = useState<any>([]);
     const [quantityReport, setQuantityReport] = useState<any>([]);
     const [quantityType, setQuantityType] = useState<any>('week');
-    const [topProductType, setTopProductType] = useState('week');
+    const [topProductType, setTopProductType] = useState('month');
     const [topProductReport, setTopProductReport] = useState<any>([]);
 
     const getExpenseReport = async (type: string) => {

@@ -75,7 +75,7 @@ const Page = () => {
             const url = `/products/`;
             const response = await api.get(url);
             const data = response.data;
-            setProducts(data.filter((p: any) => p.productWarehouses[0].warehouse.id === 1));
+            setProducts(data);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách sản phẩm:", error);
         } finally {
@@ -200,10 +200,10 @@ const Page = () => {
                                     className='flex-[4] lg:mx-5 my-4 lg:my-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                     disablePortal
                                     options={products}
-                                    value={selectedProduct}
-                                    getOptionLabel={(option) => option.name}
+                                    getOptionLabel={(option) => option.category.name + " " + option.name + " (" + option.supplier.name + ")"}
                                     sx={{ width: 300 }}
-                                    onChange={(event, newValue) => { setSelectedProduct(newValue) }}
+                                    ListboxProps={{ style: { maxHeight: '200px' } }}
+                                    onChange={(event, newValue) => setSelectedProduct(newValue)}
                                     renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm sản phẩm" />}
                                 />
                             </div>

@@ -56,9 +56,9 @@ export default function ForgotPasswordPage() {
                 </CardContent>
             </Card>
             {onPageChange === true && (
-                <div className='fixed z-50 top-0 bg-black bg-opacity-40 w-full'>
+                <div className='fixed z-[1000] bg-black bg-opacity-40 w-full'>
                     <div className='flex'>
-                        <div className='w-full'>
+                        <div className='w-full h-[100vh]'>
                             <LinearIndeterminate />
                         </div>
                     </div>

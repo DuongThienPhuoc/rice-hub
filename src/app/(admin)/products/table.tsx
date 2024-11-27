@@ -12,17 +12,20 @@ import { Skeleton } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function ProductTable() {
     const { toast } = useToast();
     const router = useRouter();
+    const [onPageChange, setOnPageChange] = useState(false);
     const columns = [
         { name: 'productCode', displayName: 'Mã sản phẩm' },
         { name: 'productName', displayName: 'Tên sản phẩm' },
-        { name: 'price', displayName: 'Giá nhập (kg)' },
-        { name: 'productQuantity', displayName: 'Tồn kho (kg)' },
-        { name: 'importDate', displayName: 'Ngày nhập' },
+        { name: 'categoryName', displayName: 'Danh mục' },
         { name: 'supplierName', displayName: 'Nhà cung cấp' },
+        { name: 'price', displayName: 'Giá nhập (kg)' },
+        { name: 'importDate', displayName: 'Ngày tạo' },
+        { name: 'updateAt', displayName: 'Ngày sửa' },
     ];
     const [loadingData, setLoadingData] = useState(true);
     const [products, setProducts] = useState([]);
@@ -50,7 +53,6 @@ export default function ProductTable() {
             const url = `/products/admin/products?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
             if (data.page.totalElements === 0) {
                 setProducts([]);
                 toast({
@@ -120,7 +122,10 @@ export default function ProductTable() {
                                 {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
-                                    <Button onClick={() => router.push("/products/create")} className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                    <Button onClick={() => {
+                                        router.push("/products/create")
+                                        setOnPageChange(true);
+                                    }} className='ml-0 mt-4 lg:ml-2 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
                                         Thêm sản phẩm
                                         <PlusIcon />
                                     </Button>
@@ -128,7 +133,7 @@ export default function ProductTable() {
                             </div>
                         </div>
                         <div className='overflow-hidden'>
-                            <ProductList name="Sản phẩm" editUrl="/products/updateProduct" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="products" />
+                            <ProductList name="Sản phẩm" editUrl="/products/updateProduct" titles={titles} loadingData={loadingData} columns={columns} data={products} tableName="products" handleClose={() => getProducts(currentPage, currentSearch)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -140,6 +145,15 @@ export default function ProductTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

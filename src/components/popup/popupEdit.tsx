@@ -8,6 +8,7 @@ import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { X } from 'lucide-react';
+import LinearIndeterminate from '../ui/LinearIndeterminate';
 
 interface PopupEditProps {
     tableName: string;
@@ -24,6 +25,7 @@ interface PopupEditProps {
 const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, handleClose }) => {
     const { toast } = useToast();
     const [formData, setFormData] = useState<Record<string, string | number | boolean>>({});
+    const [onPageChange, setOnPageChange] = useState(false);
 
     useEffect(() => {
         const initialFormData = titles.reduce((acc, title) => {
@@ -42,6 +44,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
+        setOnPageChange(true);
         e.preventDefault();
 
         if (!formData.id || formData.id == 0) {
@@ -52,6 +55,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
+            setOnPageChange(false);
             return;
         }
 
@@ -67,6 +71,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
                 },
                 duration: 3000
             })
+            setOnPageChange(false);
             handleClose(true);
         } catch (error: any) {
             toast({
@@ -76,6 +81,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
+            setOnPageChange(false);
         }
     };
 
@@ -99,6 +105,15 @@ const PopupEdit: React.FC<PopupEditProps> = ({ tableName, url, data, titles, han
                     </form>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

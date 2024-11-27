@@ -489,35 +489,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             ) : (
                                 <>
                                     <div className='flex justify-between lg:flex-row flex-col-reverse items-center mb-5'>
-                                        <>
-                                            <p className='font-bold lg:mt-0 mt-5'>Danh sách thành phẩm: </p>
-                                            <div className='flex justify-end items-center space-x-2'>
-                                                {production?.status === 'PENDING' || production?.status === 'CANCELED' && (
-                                                    <Button onClick={() => showAlert()} className='px-5 py-3 text-[14px] bg-red-600 hover:bg-red-500'>
-                                                        {production?.status === 'CANCELED' ? ('Xóa phiếu') : ('Hủy phiếu')}
-                                                        <CircleX />
-                                                    </Button>
-                                                )}
-                                                {production?.status === 'PENDING' && (
-                                                    <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                        Xác nhận sản xuất
-                                                        <CheckSquare />
-                                                    </Button>
-                                                )}
-                                                {production?.status === 'IN_PROCESS' || production?.status === 'COMPLETED' && (
-                                                    <Button onClick={() => handleFinish()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                        Cập nhật thành phẩm
-                                                        <Upload />
-                                                    </Button>
-                                                )}
-                                                {production?.status === 'COMPLETED' && (
-                                                    <Button onClick={() => setIsPopupOpen(true)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                        Xác nhận hoàn thành
-                                                        <CheckSquare />
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        </>
+                                        <p className='font-bold lg:mt-0 mt-5'>Danh sách thành phẩm: </p>
                                     </div>
                                     <div className='overflow-x-auto max-h-[400px]'>
                                         <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
@@ -527,18 +499,11 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                         <TableCell><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tỉ lệ (%)</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Số lượng dự tính (kg)</p></TableCell>
-                                                        {production?.status === 'IN_PROCESS' || production?.status === 'COMPLETED' && (
+                                                        <TableCell><p className='font-semibold text-white'>Khối lượng dự tính (kg)</p></TableCell>
+                                                        {(production?.status === 'IN_PROCESS' || production?.status === 'COMPLETED' || production?.status === 'CONFIRMED') && (
                                                             <>
-                                                                <TableCell><p className='font-semibold text-white'>Số lượng thực tế (kg)</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Số lượng hỏng (kg)</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Ghi chú</p></TableCell>
-                                                            </>
-                                                        )}
-                                                        {production?.status === 'CONFIRMED' && (
-                                                            <>
-                                                                <TableCell><p className='font-semibold text-white'>Số lượng thực tế (kg)</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Số lượng hỏng (kg)</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Khối lượng thành phẩm (kg)</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Khối lượng hỏng (kg)</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Ghi chú</p></TableCell>
                                                             </>
                                                         )}
@@ -555,7 +520,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                             <TableCell>{product?.productName}</TableCell>
                                                             <TableCell>{product?.proportion}</TableCell>
                                                             <TableCell>{product?.quantity || '0'}kg</TableCell>
-                                                            {production?.status === 'IN_PROCESS' || production?.status === 'COMPLETED' && (
+                                                            {(production?.status === 'IN_PROCESS' || production?.status === 'COMPLETED') && (
                                                                 <>
                                                                     <TableCell className='max-w-[50px] '>
                                                                         <TextField
@@ -614,7 +579,34 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             </Table>
                                         </TableContainer>
                                     </div>
+
                                 </>
+                            )}
+                        </div>
+                        <div className='flex justify-center lg:justify-end lg:flex-row flex-col items-end lg:items-center space-y-2 lg:space-y-0 lg:space-x-2 mx-5 lg:mx-10 mt-5'>
+                            {(production?.status === 'PENDING' || production?.status === 'CANCELED') && (
+                                <Button onClick={() => showAlert()} className='px-5 py-3 text-[14px] bg-red-600 hover:bg-red-500'>
+                                    {production?.status === 'CANCELED' ? ('Xóa phiếu') : ('Hủy phiếu')}
+                                    <CircleX />
+                                </Button>
+                            )}
+                            {production?.status === 'PENDING' && (
+                                <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                    Xác nhận sản xuất
+                                    <CheckSquare />
+                                </Button>
+                            )}
+                            {(production?.status === 'IN_PROCESS' || production?.status === 'COMPLETED') && (
+                                <Button onClick={() => handleFinish()} className="px-5 py-3 text-[14px] hover:bg-green-500">
+                                    Cập nhật thành phẩm
+                                    <Upload />
+                                </Button>
+                            )}
+                            {production?.status === 'COMPLETED' && (
+                                <Button onClick={() => setIsPopupOpen(true)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                    Xác nhận hoàn thành
+                                    <CheckSquare />
+                                </Button>
                             )}
                         </div>
                     </div>
@@ -626,7 +618,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                {production?.status === 'PENDING' || production?.status === 'CANCELED' && (
+                                {(production?.status === 'PENDING' || production?.status === 'CANCELED') && (
                                     <Button type='button' onClick={() => router.push(`/production/update/${params.id}`)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Sửa</strong>
                                     </Button>

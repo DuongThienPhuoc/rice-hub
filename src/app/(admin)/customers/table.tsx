@@ -12,17 +12,18 @@ import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function CustomerTable() {
     const { toast } = useToast();
     const router = useRouter();
+    const [onPageChange, setOnPageChange] = useState(false);
     const columns = [
         { name: 'fullName', displayName: 'Tên khách hàng' },
         { name: 'email', displayName: 'Email' },
         { name: 'phone', displayName: 'Số điện thoại' },
         { name: 'address', displayName: 'Địa chỉ' },
         { name: 'active', displayName: 'Trạng thái' },
-        { name: '', displayName: '' },
     ];
     const [loadingData, setLoadingData] = useState(true);
     const [customers, setCustomers] = useState([]);
@@ -119,7 +120,10 @@ export default function CustomerTable() {
                                 {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
-                                    <Button onClick={() => router.push("/customers/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                    <Button onClick={() => {
+                                        router.push("/customers/create")
+                                        setOnPageChange(true);
+                                    }} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
                                         Thêm khách hàng
                                         <PlusIcon />
                                     </Button>
@@ -127,7 +131,7 @@ export default function CustomerTable() {
                             </div>
                         </div>
                         <div className='overflow-hidden'>
-                            <EmployeeList name="Nhân viên" editUrl="/customers/updateCustomer" titles={titles} loadingData={loadingData} columns={columns} data={customers} tableName="customers" />
+                            <EmployeeList name="Nhân viên" editUrl="/customers/updateCustomer" titles={titles} loadingData={loadingData} columns={columns} data={customers} tableName="customers" handleClose={() => getCustomers(currentPage, currentSearch)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -139,6 +143,15 @@ export default function CustomerTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );
