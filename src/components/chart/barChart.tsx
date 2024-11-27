@@ -14,14 +14,13 @@ interface BarChartProps {
     chartName: string;
     color: string;
     data: any;
-    type: any;
     loading: boolean;
     setType: (type: any) => void;
 }
 
 const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType, data, loading }) => {
     const [chartData, setChartData] = useState<{ label: string; revenue: number }[]>([]);
-    const [period, setPeriod] = useState("tháng");
+    const [period, setPeriod] = useState("tuần");
     const [dropdown, setDropdown] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
 
@@ -49,49 +48,126 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
 
     useEffect(() => {
         let periodData: { label: string; revenue: number }[] = [];
-        switch (period) {
-            case 'tuần':
-                const weekLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
-                const today = dayjs();
-                const startOfWeek = today.startOf('week').add(1, 'day');
-                periodData = weekLabels.map((label, index) => {
-                    const targetDate = startOfWeek.add(index, 'day');
-                    const matchingData = data.find((item: any) => {
-                        return targetDate.date() === item.period;
+        if (chartName !== 'Chi tiêu') {
+            switch (period) {
+                case 'tuần':
+                    const weekLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+                    const today = dayjs();
+                    const startOfWeek = today.startOf('week');
+                    periodData = weekLabels.map((label, index) => {
+                        const targetDate = startOfWeek.add(index, 'day');
+                        const matchingData = data?.find((item: any) => {
+                            const date = new Date(item.timePeriod);
+                            const day = date.getDate();
+                            return targetDate.date() === day;
+                        });
+
+                        if (chartName !== 'Doanh thu') {
+                            return {
+                                label,
+                                revenue: matchingData ? matchingData.weight : 0,
+                            };
+                        } else {
+                            return {
+                                label,
+                                revenue: matchingData ? matchingData.revenue : 0,
+                            };
+                        }
                     });
+                    break;
 
-                    return {
-                        label,
-                        revenue: matchingData ? matchingData.totalAmount : 0,
-                    };
-                });
+                case 'tháng':
+                    const currentMonthDays = dayjs().daysInMonth();
+                    periodData = Array.from({ length: currentMonthDays }, (_, index) => {
+                        const day = (index + 1).toString().padStart(2, '0');
+                        const matchingData = data?.find((item: any) => dayjs(item.timePeriod).format('DD') === day);
 
-                break;
-            case 'tháng':
-                const currentMonthDays = dayjs().daysInMonth();
-                periodData = Array.from({ length: currentMonthDays }, (_, index) => {
-                    const matchingData = data.find((item: any) => item.period === index + 1);
-                    return {
-                        label: (index + 1).toString(),
-                        revenue: matchingData ? matchingData.totalAmount : 0,
-                    };
-                });
-                break;
-            case 'năm':
-                const yearLabels = [
-                    'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12',
-                ];
+                        if (chartName !== 'Doanh thu') {
+                            return {
+                                label: day,
+                                revenue: matchingData ? matchingData.weight : 0,
+                            };
+                        } else {
+                            return {
+                                label: day,
+                                revenue: matchingData ? matchingData.revenue : 0,
+                            };
+                        }
+                    });
+                    break;
 
-                periodData = yearLabels.map((label, index) => {
-                    const month = index + 1;
-                    const matchingData = data.find((item: any) => item.period === month);
+                case 'năm':
+                    const yearLabels = [
+                        'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12',
+                    ];
 
-                    return {
-                        label,
-                        revenue: matchingData ? matchingData.totalAmount : 0,
-                    };
-                });
-                break;
+                    periodData = yearLabels.map((label, index) => {
+                        const month = index + 1;
+                        const matchingData = data.find((item: any) => {
+                            const itemMonth = parseInt(item.timePeriod.split('-')[1], 10);
+                            return itemMonth === month;
+                        });
+
+                        if (chartName !== 'Doanh thu') {
+                            return {
+                                label,
+                                revenue: matchingData ? matchingData.weight : 0,
+                            };
+                        } else {
+                            return {
+                                label,
+                                revenue: matchingData ? matchingData.revenue : 0,
+                            };
+                        }
+                    });
+                    break;
+            }
+        } else {
+            switch (period) {
+                case 'tuần':
+                    const weekLabels = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ Nhật'];
+                    const today = dayjs();
+                    const startOfWeek = today.startOf('week');
+                    periodData = weekLabels.map((label, index) => {
+                        const targetDate = startOfWeek.add(index, 'day');
+                        const matchingData = data?.find((item: any) => {
+                            return targetDate.date() === item.period;
+                        });
+
+                        return {
+                            label,
+                            revenue: matchingData ? matchingData.totalAmount : 0,
+                        };
+                    });
+                    break;
+
+                case 'tháng':
+                    const currentMonthDays = dayjs().daysInMonth();
+                    periodData = Array.from({ length: currentMonthDays }, (_, index) => {
+                        const matchingData = data?.find((item: any) => item.period === index + 1);
+                        return {
+                            label: (index + 1).toString(),
+                            revenue: matchingData ? matchingData.totalAmount : 0,
+                        };
+                    });
+                    break;
+
+                case 'năm':
+                    const yearLabels = [
+                        'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'T11', 'T12',
+                    ];
+
+                    periodData = yearLabels.map((label, index) => {
+                        const month = index + 1;
+                        const matchingData = data.find((item: any) => item.period === month);
+
+                        return {
+                            label,
+                            revenue: matchingData ? matchingData.totalAmount : 0,
+                        };
+                    });
+                    break;
+            }
         }
         setChartData(periodData);
     }, [period, data]);
@@ -136,7 +212,11 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                                 className="hover:bg-gray-200 p-2 font-semibold border-b-[1px]"
                                 onClick={() => {
                                     setPeriod('tháng');
-                                    setType('day');
+                                    if (chartName === "Chi tiêu") {
+                                        setType('day');
+                                    } else {
+                                        setType('month');
+                                    }
                                 }}
                             >
                                 Tháng này
@@ -154,7 +234,11 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                                 className="hover:bg-gray-200 p-2 font-semibold border-b-[1px]"
                                 onClick={() => {
                                     setPeriod('năm');
-                                    setType('month');
+                                    if (chartName === "Chi tiêu") {
+                                        setType('month');
+                                    } else {
+                                        setType('year');
+                                    }
                                 }}
                             >
                                 Năm nay

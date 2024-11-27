@@ -4,6 +4,7 @@ import React from 'react';
 
 interface InputFieldProps {
     titles: { name: string, displayName: string, type: string }[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: any;
     onFieldChange: (field: string, value: string | number | boolean) => void;
 }
@@ -14,7 +15,7 @@ const InputField: React.FC<InputFieldProps> = ({ titles, data, onFieldChange }) 
     const handleChange = (name: string, value: string | number | boolean) => {
         onFieldChange(name, value);
     };
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formatDate = (isoDate: any) => {
         const date = new Date(isoDate);
         const day = String(date.getDate()).padStart(2, '0');

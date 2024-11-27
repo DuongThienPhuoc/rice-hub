@@ -3,7 +3,7 @@ import OrderSummary from '@/app/(customer)/order/history/order-summary';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export default async function OrderHistoryPage() {
+export default function OrderHistoryPage() {
     const cookiesStorage = cookies();
     const userID = cookiesStorage.get('userID');
     if (!userID) {
@@ -11,8 +11,8 @@ export default async function OrderHistoryPage() {
     }
     return (
         <section className="container mx-auto space-y-8">
-            <OrderSummary />
-            <OrderTable userID={userID.value} />
+            <OrderSummary userID={userID.value}/>
+            <OrderTable userID={userID.value}/>
         </section>
     );
 }

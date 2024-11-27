@@ -161,7 +161,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </div>
                                 </div>
                                 <div className='flex-1'>
-                                    <div className='m-10 mt-5 flex flex-col lg:flex-row'>
+                                    <div className='m-10 mt-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Mã sản phẩm: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.productCode}</span>
                                     </div>

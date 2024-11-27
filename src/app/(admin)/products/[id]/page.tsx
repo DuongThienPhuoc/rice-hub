@@ -161,7 +161,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </div>
                                 </div>
                                 <div className='flex-1'>
-                                    <div className='m-10 mt-5 flex flex-col lg:flex-row'>
+                                    <div className='m-10 mt-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Mã sản phẩm: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{product?.productCode}</span>
                                     </div>
@@ -197,20 +197,32 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
                                             <span className='font-bold flex-1'>Quy cách: </span>
                                             <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
-                                                {product?.productWarehouses
-                                                    ? product.productWarehouses
-                                                        .filter(
+                                                {product?.productWarehouses ? (
+                                                    (() => {
+                                                        const filteredItems = product.productWarehouses.filter(
                                                             (item: any, index: any, self: any) =>
-                                                                index === self.findIndex(
-                                                                    (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
+                                                                index ===
+                                                                self.findIndex(
+                                                                    (t: any) =>
+                                                                        t.unit === item.unit &&
+                                                                        t.weightPerUnit === item.weightPerUnit &&
+                                                                        item.weightPerUnit > 0
                                                                 )
-                                                        )
-                                                        .map((filteredItem: any, index: number) => (
-                                                            <span key={index}>
-                                                                {index > 0 && ','} {filteredItem.unit} {filteredItem.weightPerUnit}kg
-                                                            </span>
-                                                        ))
-                                                    : 'Không có quy cách'}
+                                                        );
+
+                                                        return filteredItems.length > 0 ? (
+                                                            filteredItems.map((filteredItem: any, index: number) => (
+                                                                <span key={index}>
+                                                                    {index > 0 && ','} {filteredItem.unit} {filteredItem.weightPerUnit}kg
+                                                                </span>
+                                                            ))
+                                                        ) : (
+                                                            'Không có quy cách'
+                                                        );
+                                                    })()
+                                                ) : (
+                                                    'Không có quy cách'
+                                                )}
                                             </span>
                                         </div>
                                     </div>

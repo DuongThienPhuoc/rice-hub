@@ -7,10 +7,9 @@ import {
     CardHeader,
     CardFooter,
 } from '@/components/ui/card';
-import { Package2, Calendar, DollarSign, User, Truck } from 'lucide-react';
+import { Package2, Calendar, User, Truck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getOrderDetail } from '@/data/order';
 import { Order } from '@/type/order'
@@ -24,7 +23,6 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
-    const searchParams = useSearchParams();
     const [order, setOrder] = useState<Order>();
     async function fetchOrderDetail() {
         try {
@@ -75,7 +73,7 @@ export default function OrderDetailPage({
                         <div className="flex justify-between">
                             <span className="font-semibold">Trạng thái</span>
                             <span>
-                                <Badge className='bg-[#4ba94d] hover:bg-green-500' variant={statusProvider(order.status).variant}>
+                                <Badge className='bg-[#4ba94d] hover:bg-green-500 text-white' variant={statusProvider(order.status).variant}>
                                     {statusProvider(order?.status).text}
                                 </Badge>
                             </span>

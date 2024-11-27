@@ -198,13 +198,15 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
 
         if (cell === undefined || cell === null) return '';
 
-        if (tableName === 'inventory' && key === 'status') {
+        if (tableName === 'inventory' || tableName === 'production' && key === 'status') {
             if (cell.toString() === 'PENDING') {
-                return 'Đang xử lý'
+                return 'Đang chờ xác nhận'
             } else if (cell.toString() === 'CANCELED') {
                 return 'Đã hủy'
             } else if (cell.toString() === 'COMPLETED') {
                 return 'Đã xác nhận'
+            } else if (cell.toString() === 'IN_PROCESS') {
+                return 'Đang xử lý'
             } else {
                 return 'N/A'
             }
@@ -305,24 +307,32 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                             </div>
                                                         )}
                                                         {tableName != "import" && tableName != "inventory" && (
-                                                            <div className="relative group">
-                                                                <button onClick={() => router.push(`/${tableName.toString()}/update/${row.id}`)}>
-                                                                    <PenBox size={18} />
-                                                                </button>
-                                                                <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                    Chỉnh sửa
-                                                                </span>
-                                                            </div>
+                                                            tableName === 'production' && row.status !== 'PENDING' ? (
+                                                                <></>
+                                                            ) : (
+                                                                <div className="relative group">
+                                                                    <button onClick={() => router.push(`/${tableName.toString()}/update/${row.id}`)}>
+                                                                        <PenBox size={18} />
+                                                                    </button>
+                                                                    <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                        Chỉnh sửa
+                                                                    </span>
+                                                                </div>
+                                                            )
                                                         )}
                                                         {tableName != "import" && tableName != "export" ? (
-                                                            <div className="relative group">
-                                                                <button onClick={() => showAlert(row)}>
-                                                                    <Trash2 size={18} />
-                                                                </button>
-                                                                <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                    Xóa
-                                                                </span>
-                                                            </div>
+                                                            tableName === 'production' && row.status !== 'PENDING' ? (
+                                                                <></>
+                                                            ) : (
+                                                                <div className="relative group">
+                                                                    <button onClick={() => showAlert(row)}>
+                                                                        <Trash2 size={18} />
+                                                                    </button>
+                                                                    <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                        Xóa
+                                                                    </span>
+                                                                </div>
+                                                            )
                                                         ) : (
                                                             row?.batchProductDtos?.some((item: any) => item.added === true) ? (
                                                                 <div className="relative group"></div>

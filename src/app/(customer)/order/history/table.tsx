@@ -23,16 +23,21 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from '@/components/ui/pagination';
+import { CustomerOrderHistoryResponse } from '@/type/customer-order';
+import { getOrderHistory } from '@/data/order';
 import { useEffect, useState } from 'react';
-import { getOrderHistory, OrderList } from '@/data/order';
+import { currencyHandleProvider } from '@/utils/currency-handle';
 
 export default function OrderTable({ userID }: { userID: string }) {
-    const [orderList, setOrderList] = useState<OrderList>([]);
+
+    const [customerOrderHistoryResponse, setCustomerOrderHistoryResponse] = useState<CustomerOrderHistoryResponse>({} as CustomerOrderHistoryResponse);
+
     useEffect(() => {
         getOrderHistory({ customerID: userID }).then((response) => {
-            setOrderList(response.data);
+            setCustomerOrderHistoryResponse(response.data);
         });
     }, [userID]);
+
     type OrderStatus = {
         variant:
             | 'default'
@@ -80,7 +85,7 @@ export default function OrderTable({ userID }: { userID: string }) {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orderList.map((order) => (
+                        {customerOrderHistoryResponse?._embedded?.orderList?.map((order) => (
                             <TableRow key={order.id}>
                                 <TableCell className="font-medium">
                                     {order.orderCode}
@@ -104,7 +109,7 @@ export default function OrderTable({ userID }: { userID: string }) {
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    {order.totalAmount}
+                                    {currencyHandleProvider(order.totalAmount)}
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <Button variant="ghost" asChild>

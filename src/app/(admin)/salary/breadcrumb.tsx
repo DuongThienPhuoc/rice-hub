@@ -21,7 +21,7 @@ export default function SalaryPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage className='text-white'>Lương Nhân Viên</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Chấm công</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

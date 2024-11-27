@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, ShoppingCart, CirclePlus } from 'lucide-react';
+import { Search, ShoppingCart, CirclePlus, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -22,13 +22,15 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Check } from 'lucide-react';
 import { getProductList } from '@/data/customer-product';
 import { useProductStore } from '@/stores/productStore';
 import PaginationComponent from '@/components/pagination/pagination';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { currencyHandleProvider } from '@/utils/currency-handle';
+import { SidebarTriggerCommon } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
+import { getCategories } from '@/data/category';
 
 export default function OrderPage() {
     const router = useRouter();
@@ -39,13 +41,16 @@ export default function OrderPage() {
     const updateProducts = orderStore((state) => state.updateProducts);
     const products = useProductStore((state) => state.products);
     const setProducts = useProductStore((state) => state.setProducts);
+    const [productCategories,setProductCategories] = useState<string[]>([])
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     async function getProduct() {
         try {
             const response = await getProductList({
                 pageSize: 5,
                 pageNumber: currentPage + 1,
+                categoryName: selectedCategory,
             });
-            setProducts(response.data._embedded.productDtoList);
+            setProducts(response.data._embedded?.productDtoList);
             setTotalPages(response.data.page.totalPages);
         } catch (e) {
             if (e instanceof Error) {
@@ -55,29 +60,32 @@ export default function OrderPage() {
         }
     }
 
+    async function fetchCategories() {
+        try {
+            const response = await getCategories<string[]>();
+            setProductCategories(response);
+        } catch (e) {
+            if (e instanceof Error) {
+                throw new Error(`An error occurred while fetching categories: ${e.message}`)
+            }
+            throw new Error('An error occurred while fetching categories')
+        }
+    }
+
+    useEffect(() => {
+        fetchCategories()
+            .catch((e) => console.error(e));
+    }, []);
+
     useEffect(() => {
         getProduct()
             .catch((e) => console.error(e));
-    }, [currentPage]);
-
-    //TODO: This is a mock data for product categories
-    interface ProductCategory {
-        id: number;
-        name: string;
-    }
-
-    const productCategories: Array<ProductCategory> = [
-        { id: 1, name: 'Cám' },
-        { id: 2, name: 'Cám cp' },
-        { id: 3, name: 'Đỗ' },
-        { id: 4, name: 'Gạo rượu' },
-        { id: 5, name: 'Men rượu' },
-    ];
+    }, [currentPage, selectedCategory]);
 
     return (
         <>
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 mb-5">
-                <SidebarTrigger />
+                <SidebarTriggerCommon />
                 <Separator orientation="vertical" className="mr-2 h-4" />
                 <OrderPageBreadcrumb />
             </header>
@@ -85,7 +93,7 @@ export default function OrderPage() {
                 <div>
                     <section className="col-span-4">
                         <section className="mb-2 flex justify-between">
-                            <div className="flex gap-x-1">
+                            <div className="flex gap-1">
                                 <Input
                                     type="text"
                                     className="bg-white"
@@ -93,13 +101,23 @@ export default function OrderPage() {
                                 />
                                 <Popover>
                                     <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            className="gap-1 bg-white border-dashed"
-                                        >
-                                            <CirclePlus className="h-3.5 w-3.5" />
-                                            <span>Loại</span>
-                                        </Button>
+                                        <div className="h-[36px] px-5 bg-white rounded-md border border-dashed flex items-center gap-1 hover:cursor-pointer">
+                                            <CirclePlus className="h-4 w-4" />
+                                            <span className="text-sm font-semibold">
+                                                Loại
+                                            </span>
+                                            {selectedCategory !== null && (
+                                                <>
+                                                    <Separator
+                                                        orientation="vertical"
+                                                        className="h-4 mx-2"
+                                                    />
+                                                    <div className="h-auto text-sm font-medium leading-none bg-[#f4f4f5] px-[4px] py-[5px] rounded-md  items-center inline-flex whitespace-nowrap">
+                                                        {selectedCategory}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </PopoverTrigger>
                                     <PopoverContent
                                         align="start"
@@ -118,20 +136,23 @@ export default function OrderPage() {
                                         <div className="p-2">
                                             <ul>
                                                 {productCategories.map(
-                                                    (category) => (
+                                                    (category, index) => (
                                                         <li
-                                                            key={category.id}
-                                                            className="flex items-center gap-x-1 hover:bg-gray-100 p-2 rounded-lg"
+                                                            key={index}
+                                                            className="relative flex items-center gap-x-1 hover:bg-gray-100 p-2 rounded-lg hover:cursor-pointer text-sm font-medium"
+                                                            onClick={() => {
+                                                                setSelectedCategory(
+                                                                    category,
+                                                                );
+                                                            }}
                                                         >
-                                                            <Checkbox
-                                                                id={category.id.toString()}
-                                                            />
-                                                            <label
-                                                                className="text-sm font-medium w-full"
-                                                                htmlFor={category.id.toString()}
-                                                            >
-                                                                {category.name}
-                                                            </label>
+                                                            {selectedCategory ===
+                                                                category && (
+                                                                <Check className="h-4 w-4 absolute left-2" />
+                                                            )}
+                                                            <span className="pl-5">
+                                                                {category}
+                                                            </span>
                                                         </li>
                                                     ),
                                                 )}
@@ -139,6 +160,15 @@ export default function OrderPage() {
                                         </div>
                                     </PopoverContent>
                                 </Popover>
+                                {selectedCategory !== null && (
+                                    <div
+                                        className="whitespace-nowrap text-sm font-medium leading-none flex items-center gap-1 hover:cursor-pointer hover:bg-white px-4 rounded-md"
+                                        onClick={() => setSelectedCategory(null)}
+                                    >
+                                        <span>Bỏ lọc</span>
+                                        <X className="h-4 w-4" />
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <Button
@@ -157,60 +187,46 @@ export default function OrderPage() {
                                     <TableRow>
                                         <TableHead>Tên hàng hoá</TableHead>
                                         <TableHead>Loại</TableHead>
-                                        <TableHead>Đơn vị</TableHead>
                                         <TableHead>Đơn giá</TableHead>
-                                        <TableHead className='text-center w-36'>Thêm vào giỏ hàng</TableHead>
+                                        <TableHead className="text-center w-36">
+                                            Thêm vào giỏ hàng
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {products.map((product, key) => (
+                                    {products?.map((product, key) => (
                                         <TableRow key={key}>
                                             <TableCell className="font-medium hover:cursor-pointer">
                                                 {product.name}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="outline">
-                                                    {product.categoryId === '1'
-                                                        ? 'Gạo'
-                                                        : product.categoryId ===
-                                                            '2'
-                                                            ? 'Cám'
-                                                            : product.categoryId ===
-                                                                '3'
-                                                                ? 'Thóc'
-                                                                : product.categoryId ===
-                                                                    '4'
-                                                                    ? 'Trấu'
-                                                                    : 'Thức ăn chăn nuôi'}
+                                                    {product.categoryName}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant="outline">
-                                                    {product.unitOfMeasureId ===
-                                                        1
-                                                        ? 'Tấn'
-                                                        : product.unitOfMeasureId ===
-                                                            2
-                                                            ? 'Kg'
-                                                            : 'Yến'}
-                                                </Badge>
+                                                {currencyHandleProvider(
+                                                    Number(
+                                                        product.customerPrice,
+                                                    ),
+                                                )}
                                             </TableCell>
-                                            <TableCell>
-                                                {product.price}
-                                            </TableCell>
-                                            <TableCell className='flex justify-center'>
+                                            <TableCell className="flex justify-center">
                                                 <span>
                                                     <ShoppingCart
                                                         onClick={() => {
                                                             setOpen(true);
                                                             updateProducts({
-                                                                id:product.id,
+                                                                id: product.id,
                                                                 productCode:
                                                                     product.productCode,
                                                                 name: product.name,
                                                                 description:
                                                                     product.description,
-                                                                price: product.price,
+                                                                categoryName:
+                                                                    product.categoryName,
+                                                                customerPrice:
+                                                                    product.customerPrice,
                                                                 image: product.image,
                                                                 categoryId:
                                                                     product.categoryId,

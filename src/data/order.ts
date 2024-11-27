@@ -1,35 +1,13 @@
 import axiosConfig from '@/config/axiosConfig';
 import axios, { AxiosResponse } from 'axios';
 import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
-
-export interface Order {
-    id: number;
-    orderCode: string;
-    orderDate: Date;
-    totalAmount: number;
-    deposit: number;
-    remainingAmount: number;
-    status: string;
-}
-
-export type OrderList = Order[];
-
-export interface OrderRequest {
-    customerId: number;
-    orderDetails: OrderDetail[];
-}
-
-export interface OrderDetail {
-    productId: number;
-    quantity: number;
-    unitPrice: number;
-}
+import { OrderRequest, CustomerOrderHistoryResponse } from '@/type/customer-order';
 
 export async function getOrderHistory({ customerID }: { customerID: string }) {
     try {
-        const response: AxiosResponse<OrderList> =
-            await axiosConfig.get<OrderList>(
-                `/order/history/${customerID}`,
+        const response: AxiosResponse<CustomerOrderHistoryResponse> =
+            await axiosConfig.get<CustomerOrderHistoryResponse>(
+                `/order/customer/${customerID}`,
                 //TODO: Change the endpoint to '/order/customer'
             );
         return {

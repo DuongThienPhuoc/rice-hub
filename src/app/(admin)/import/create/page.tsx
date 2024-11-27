@@ -293,7 +293,7 @@ const Page = () => {
                             </div>
                         ) : (
                             <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
-                                <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                <Table sx={{ minWidth: 1000, borderCollapse: 'collapse' }} aria-label="simple table">
                                     <TableHead className='bg-[#0090d9]'>
                                         <TableRow>
                                             <TableCell rowSpan={2} className={`w-[5%]`}>

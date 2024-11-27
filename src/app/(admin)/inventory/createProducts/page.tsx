@@ -144,7 +144,7 @@ const Page = () => {
                                         <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                     ) : (
                                         <>
-                                            <Button onClick={() => handleSubmit()} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-[#1d1d1fca]'>
+                                            <Button onClick={() => handleSubmit()} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] hover:bg-green-500'>
                                                 Tạo phiếu
                                                 <Plus />
                                             </Button>
@@ -178,7 +178,7 @@ const Page = () => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {products && products.map((product: any, index: any) => (
+                                                {products && products.length > 0 ? products.map((product: any, index: any) => (
                                                     <TableRow
                                                         key={index}
                                                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -220,7 +220,15 @@ const Page = () => {
                                                                 variant="standard" />
                                                         </TableCell>
                                                     </TableRow>
-                                                ))}
+                                                )) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={6}>
+                                                            <div className="my-10 mx-4 text-center text-gray-500">
+                                                                Không có dữ liệu
+                                                            </div>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )}
                                             </TableBody>
                                         </Table>
                                     </TableContainer>

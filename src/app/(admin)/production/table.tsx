@@ -8,10 +8,7 @@ import React, { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
-import ExcelJS from 'exceljs';
 import { PlusIcon } from 'lucide-react';
-import crypto from 'crypto';
 import { Skeleton } from '@mui/material';
 import SearchBar from '@/components/searchbar/searchbar';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
@@ -21,10 +18,11 @@ import { Separator } from '@/components/ui/separator';
 export default function ProductionTable() {
     const router = useRouter();
     const columns = [
-        { name: 'id', displayName: 'Mã phiếu' },
-        { name: 'batchCode', displayName: 'Lô hàng' },
-        { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
-        { name: 'username', displayName: 'Người tạo' },
+        { name: 'productionCode', displayName: 'Mã phiếu' },
+        { name: 'productName', displayName: 'Nguyên liệu' },
+        { name: 'productionDate', displayName: 'Ngày tạo phiếu' },
+        { name: 'creator.fullName', displayName: 'Người tạo' },
+        { name: 'status', displayName: 'Trạng thái' },
     ];
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -36,19 +34,11 @@ export default function ProductionTable() {
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const processedFileHashes = new Set<string>();
-
-    const calculateFileHash = async (file: File): Promise<string> => {
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-        return hash;
-    };
 
     const getData = async (page?: number, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
-            params.append("pageSize", "10");
+            params.append("size", "10");
             if (page) {
                 params.append("pageNumber", page.toString());
             }
@@ -56,19 +46,17 @@ export default function ProductionTable() {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
-            params.append("receiptType", 'IMPORT');
-            const url = `/WarehouseReceipt/?${params.toString()}`;
+            const url = `/productionOrder/getWithFilter?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
-            if (data?._embedded?.warehouseReceiptDtoList) {
-                setReceipts(data._embedded.warehouseReceiptDtoList);
-                setTotalPages(data.page.totalPages);
+            if (data?.content) {
+                setReceipts(data.content);
+                setTotalPages(data.totalPages);
             } else {
                 setReceipts([]);
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
+            console.error("Lỗi khi lấy danh sách phiếu sản xuất:", error);
         } finally {
             setLoadingData(false);
         }
@@ -87,114 +75,23 @@ export default function ProductionTable() {
         setCurrentPage(page);
     };
 
-    const showAlert = (data: any, fileInput: HTMLInputElement) => {
-        Swal.fire({
-            title: 'Xác nhận thêm danh sách sản phẩm',
-            text: 'Bạn có chắc chắn muốn thêm danh sách sản phẩm này?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Có, thêm!',
-            cancelButtonText: 'Không, hủy!',
-        }).then(async (result) => {
-            fileInput.value = '';
-            if (result.isConfirmed) {
-                handleSubmit(data);
-            } else {
-                Swal.fire('Đã hủy', 'Danh sách không được thêm.', 'info');
-            }
-        });
-    };
-
-    const fileToBuffer = (file: File): Promise<Buffer> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const arrayBuffer = reader.result as ArrayBuffer;
-                resolve(Buffer.from(arrayBuffer));
-            };
-            reader.onerror = (error) => {
-                reject(error);
-            };
-            reader.readAsArrayBuffer(file);
-        });
-    };
+    // const fileToBuffer = (file: File): Promise<Buffer> => {
+    //     return new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.onload = () => {
+    //             const arrayBuffer = reader.result as ArrayBuffer;
+    //             resolve(Buffer.from(arrayBuffer));
+    //         };
+    //         reader.onerror = (error) => {
+    //             reject(error);
+    //         };
+    //         reader.readAsArrayBuffer(file);
+    //     });
+    // };
 
     const handleSearch = () => {
         setCurrentPage(1);
     };
-
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        try {
-            const file = event.target.files?.[0];
-            if (!file) {
-                throw new Error("Chưa có file nào được chọn");
-            }
-
-            const fileHash = await calculateFileHash(file);
-            console.log(processedFileHashes);
-            console.log(fileHash);
-            console.log(processedFileHashes.has(fileHash));
-            if (processedFileHashes.has(fileHash)) {
-                Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
-                return;
-            }
-
-            Swal.fire({
-                title: 'Đang xử lý...',
-                text: 'Vui lòng chờ, dữ liệu đang được xử lí.',
-                allowOutsideClick: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const workbook = new ExcelJS.Workbook();
-            const fileBuffer = await fileToBuffer(file);
-            await workbook.xlsx.load(fileBuffer);
-            const worksheet = workbook.getWorksheet(1);
-
-            const rows = worksheet?.rowCount;
-            if (rows === 0) {
-                throw new Error("File rỗng");
-            }
-
-            const processedData: Array<any> = [];
-
-            const headers = worksheet?.getRow(1).values as string[];
-            console.log(headers);
-
-            worksheet?.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-                if (rowNumber === 1) return;
-
-                const rowData: { [key: string]: any } = {};
-                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    rowData[headers[colNumber]] = cell.value;
-                });
-                processedData.push(rowData);
-            });
-            Swal.close();
-            processedFileHashes.add(fileHash);
-            const fileInput = event.target;
-            showAlert(processedData, fileInput);
-        } catch (error) {
-            Swal.fire('Lỗi khi xử lý file', 'error');
-        }
-    };
-
-    const handleSubmit = async (data: any) => {
-        try {
-            const response = await api.post(`/products/import/preview`, data);
-            if (response.status >= 200 && response.status < 300) {
-                getData(currentPage);
-                Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
-            } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
-            }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
-        }
-    }
 
     return (
         <div className='mx-5'>
@@ -244,17 +141,10 @@ export default function ProductionTable() {
                                         <PlusIcon />
                                     </Button>
                                 )}
-                                <input
-                                    type="file"
-                                    id="fileInput"
-                                    accept=".xlsx, .xls"
-                                    style={{ display: 'none' }}
-                                    onChange={handleFileUpload}
-                                />
                             </div>
                         </div>
                         <div className='overflow-x-auto'>
-                            <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
+                            <ReceiptList name="Phiếu sản xuất" editUrl="/production/updateProduction" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="production" />
                         </div>
                         {totalPages > 1 && (
                             <Paging
