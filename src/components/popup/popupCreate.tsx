@@ -46,7 +46,7 @@ const PopupCreate: React.FC<PopupCreateProps> = ({ tableName, url, titles, handl
         e.preventDefault();
         setOnPageChange(true);
         try {
-            const response = await api.post(`${url}`, formData);
+            await api.post(`${url}`, formData);
             toast({
                 variant: 'default',
                 title: 'Tạo thành công',
