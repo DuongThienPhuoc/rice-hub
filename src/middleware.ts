@@ -2,27 +2,80 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const publicPaths: string[] = ['/', '/login'];
-const customerPaths: string[] = ['/order', '/cart', '/order/history'];
-const adminPaths: string[] = ['/dashboard', 'salary', 'payroll'];
+const publicPaths: string[] = ['/', '/login', '/register', '/forgot-password','/forgot-password/email'];
+const customerStaticPaths: string[] = ['/order', '/cart', '/order/history'];
+const adminStaticPaths: string[] = [
+    '/dashboard',
+    '/salary',
+    '/payroll',
+    '/admin/orders',
+    '/categories',
+    '/products',
+    '/products/create',
+    '/products/update',
+    '/ingredients',
+    '/ingredients/create',
+    '/ingredients/update',
+    '/prices',
+    '/prices/create',
+    '/suppliers',
+    '/employees/create',
+    '/employees/update',
+    '/income',
+    '/expenditures',
+    '/import',
+    '/import/create',
+    '/export',
+    '/export/create',
+    '/inventory',
+    '/inventory/createIngredients',
+    '/inventory/createProducts',
+    '/production',
+    '/production/create',
+    '/production/update',
+    '/admin/orders'
+];
+const adminDynamicPaths: string[] = [
+    '/admin/orders',
+    '/products',
+    '/batches',
+    '/customers',
+    '/employees',
+    '/production',
+];
+const customerDynamicPaths: string[] = ['/order/detail'];
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+
 const isPublicPath = (path: string) => publicPaths.includes(path);
 const isHasCustomerAndAdminPermission = (path: string, role: string) => {
-    if (customerPaths.includes(path)) {
+    if (
+        customerStaticPaths.includes(path) ||
+        handleDynamicPath(path, customerDynamicPaths)
+    ) {
         return role === 'ROLE_CUSTOMER' || role === 'ROLE_ADMIN';
     }
     return false;
 };
 const isHasAdminPermission = (path: string, role: string) => {
-    if(adminPaths.includes(path)){
-        return role === 'ROLE_ADMIN'
+    if (
+        adminStaticPaths.includes(path) ||
+        handleDynamicPath(path, adminDynamicPaths)
+    ) {
+        return role === 'ROLE_ADMIN';
     }
     return false;
-}
+};
+const handleDynamicPath = (path: string, dynamicPaths: string[]) => {
+    for (const dynamicPath of dynamicPaths) {
+        if (path.startsWith(dynamicPath)) {
+            return true;
+        }
+    }
+    return false;
+};
 
 export async function middleware(request: NextRequest) {
     const path: string = request.nextUrl.pathname;
-
     const token = request.cookies.get('token')?.value;
 
     if (isPublicPath(path)) {
