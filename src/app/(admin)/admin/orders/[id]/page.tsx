@@ -7,10 +7,9 @@ import {
     CardHeader,
     CardFooter,
 } from '@/components/ui/card';
-import { Package2, Calendar, DollarSign, User, Truck } from 'lucide-react';
+import { Package2, Calendar, User, Truck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getOrderDetail } from '@/data/order';
 import { Order } from '@/type/order'
@@ -24,7 +23,6 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
-    const searchParams = useSearchParams();
     const [order, setOrder] = useState<Order>();
     async function fetchOrderDetail() {
         try {

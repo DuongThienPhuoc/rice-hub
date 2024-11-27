@@ -8,7 +8,7 @@ import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import firebase from '@/config/firebaseConfig';
 import html2canvas from 'html2canvas';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { jsPDF } from 'jspdf';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ToastAction } from '@radix-ui/react-toast';

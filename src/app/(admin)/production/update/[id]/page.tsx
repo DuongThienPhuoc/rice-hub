@@ -13,7 +13,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Trash2, X } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();

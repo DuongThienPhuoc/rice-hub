@@ -248,7 +248,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 {product.categoryName}
                                             </TableCell>
                                             <TableCell>
-                                                {product.price}
+                                                {product.customerPrice}
                                             </TableCell>
                                             <TableCell className="flex justify-center">
                                                 <OrderPopoverProvider
@@ -274,7 +274,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                                 weightPerUnit: 0,
                                                                 name: product.name,
                                                                 unitPrice:
-                                                                    product.price,
+                                                                    product.customerPrice,
                                                             })
                                                         }
                                                     >

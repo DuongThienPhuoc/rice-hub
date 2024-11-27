@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+
+import React, { Suspense, useEffect, useState } from 'react';
 import Background from '@/components/assets/img/background.jpg'
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,22 @@ import { useRouter } from 'next/navigation';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import { useSearchParams } from 'next/navigation'
+
+const Toast = () => {
+    const { toast } = useToast();
+    const searchParams = useSearchParams()
+    useEffect(() => {
+        const message = searchParams.get('message');
+        if (message) {
+            toast({
+                variant: 'destructive',
+                title: message,
+            })
+        }
+    }, [searchParams, toast]);
+    return <></>
+}
 
 const Page = () => {
     const { toast } = useToast();
@@ -81,6 +98,9 @@ const Page = () => {
 
     return (
         <div className='relative w-full min-h-[100vh] h-auto flex flex-col items-center overflow-y-auto'>
+            <Suspense fallback={<></>}>
+                <Toast />
+            </Suspense>
             <div
                 className='absolute inset-0 bg-cover bg-center'
                 style={{
