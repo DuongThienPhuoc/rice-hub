@@ -1,17 +1,17 @@
 'use client';
 
 import api from '@/config/axiosConfig';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
     Sidebar,
-    SidebarContent,
+    SidebarContent, SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
-    SidebarMenuItem,
+    SidebarMenuItem
 } from '@/components/ui/sidebar';
 import {
     ArrowRightFromLine,
@@ -38,7 +38,9 @@ import {
     UserCog,
     UserPen,
     Users,
-    History
+    History,
+    Bell,
+    Dot
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -62,6 +64,8 @@ import { cn } from '@/lib/utils';
 import { FaChartBar } from 'react-icons/fa';
 import { User as UserInterface } from '@/type/user';
 import { getUserInformation } from '@/data/user';
+import NotificationSheetProvider from '@/components/notification-sheet/sheet';
+import { useNotificationStore } from '@/stores/notification'
 
 type SidebarItem = {
     category: string;
@@ -232,11 +236,10 @@ export default function AppSidebar() {
     const pathName = usePathname();
     const [role, setRole] = React.useState<string>('');
     const [userName, setUserName] = React.useState<string>('');
-    const router = useRouter();
     const [userInformation, setUserInformation] = useState<UserInterface>(
         {} as UserInterface,
     );
-
+    const { hasNewNotification, setHasNewNotification } = useNotificationStore();
     useEffect(() => {
         const role =
             typeof window != 'undefined' ? localStorage.getItem('role') : '';
@@ -300,10 +303,16 @@ export default function AppSidebar() {
                                     <div className="flex items-center gap-2">
                                         <Avatar className="w-6 h-6">
                                             <AvatarImage
-                                                src={userInformation.image || ''}
+                                                src={
+                                                    userInformation.image || ''
+                                                }
                                                 alt="@logo"
                                             />
-                                            <AvatarFallback>{userName?.split('')[0]?.toUpperCase()}</AvatarFallback>
+                                            <AvatarFallback>
+                                                {userName
+                                                    ?.split('')[0]
+                                                    ?.toUpperCase()}
+                                            </AvatarFallback>
                                         </Avatar>
                                         <div>
                                             <span className="font-semibold text-sm">
@@ -388,6 +397,25 @@ export default function AppSidebar() {
                     </Collapsible>
                 ))}
             </SidebarContent>
+            <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <NotificationSheetProvider>
+                            <SidebarMenuButton
+                                className="flex items-center justify-center"
+                                onClick={() => setHasNewNotification(false)}
+                            >
+                                <div className="relative">
+                                    <Bell className="h-5 w-5" />
+                                    {hasNewNotification && (
+                                        <div className="bg-red-500 absolute top-0 right-0 w-2 h-2 rounded-full "></div>
+                                    )}
+                                </div>
+                            </SidebarMenuButton>
+                        </NotificationSheetProvider>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarFooter>
         </Sidebar>
     );
 }
