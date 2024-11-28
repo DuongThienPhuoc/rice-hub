@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const publicPaths: string[] = ['/', '/login', '/register', '/forgot-password','/forgot-password/email'];
+const publicPaths: string[] = ['/', '/login', '/register', '/forgot-password', '/forgot-password/email'];
 const customerStaticPaths: string[] = ['/order', '/cart', '/order/history'];
 const adminStaticPaths: string[] = [
     '/dashboard',
@@ -25,6 +25,7 @@ const adminStaticPaths: string[] = [
     '/expenditures',
     '/import',
     '/import/create',
+    '/import/createFromProduction',
     '/export',
     '/export/create',
     '/inventory',
