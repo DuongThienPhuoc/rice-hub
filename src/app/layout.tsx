@@ -17,6 +17,7 @@ export default function RootLayout({
         <html lang="en">
             <head>
                 <link rel="icon" type="image/png" href="/favicon.ico" />
+                <title>Cám Gạo Thanh Quang</title>
             </head>
             <body>
                 {children}
