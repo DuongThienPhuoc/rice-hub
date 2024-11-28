@@ -30,7 +30,7 @@ import { currencyHandleProvider } from '@/utils/currency-handle';
 import { SidebarTriggerCommon } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
-import { getCategories } from '@/data/category';
+import { getCategories, Category } from '@/data/category';
 
 export default function OrderPage() {
     const router = useRouter();
@@ -41,14 +41,14 @@ export default function OrderPage() {
     const updateProducts = orderStore((state) => state.updateProducts);
     const products = useProductStore((state) => state.products);
     const setProducts = useProductStore((state) => state.setProducts);
-    const [productCategories, setProductCategories] = useState<string[]>([])
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [productCategories, setProductCategories] = useState<Category[]>([])
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     async function getProduct() {
         try {
             const response = await getProductList({
                 pageSize: 10,
                 pageNumber: currentPage + 1,
-                categoryName: selectedCategory,
+                categoryName: selectedCategory?.name,
             });
             setProducts(response.data._embedded?.productDtoList);
             setTotalPages(response.data.page.totalPages);
@@ -62,7 +62,7 @@ export default function OrderPage() {
 
     async function fetchCategories() {
         try {
-            const response = await getCategories<string[]>();
+            const response = await getCategories<Category[]>();
             setProductCategories(response);
         } catch (e) {
             if (e instanceof Error) {
@@ -113,7 +113,7 @@ export default function OrderPage() {
                                                         className="h-4 mx-2"
                                                     />
                                                     <div className="h-auto text-sm font-medium leading-none bg-[#f4f4f5] px-[4px] py-[5px] rounded-md  items-center inline-flex whitespace-nowrap">
-                                                        {selectedCategory}
+                                                        {selectedCategory?.name}
                                                     </div>
                                                 </>
                                             )}
@@ -142,7 +142,7 @@ export default function OrderPage() {
                                                             className="relative flex items-center gap-x-1 hover:bg-gray-100 p-2 rounded-lg hover:cursor-pointer text-sm font-medium"
                                                             onClick={() => {
                                                                 setSelectedCategory(
-                                                                    category,
+                                                                    category
                                                                 );
                                                             }}
                                                         >
@@ -151,7 +151,7 @@ export default function OrderPage() {
                                                                     <Check className="h-4 w-4 absolute left-2" />
                                                                 )}
                                                             <span className="pl-5">
-                                                                {category}
+                                                                {category.name}
                                                             </span>
                                                         </li>
                                                     ),
