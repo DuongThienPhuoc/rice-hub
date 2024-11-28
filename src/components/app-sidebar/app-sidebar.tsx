@@ -38,6 +38,7 @@ import {
     UserCog,
     UserPen,
     Users,
+    History
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -73,14 +74,19 @@ type SidebarItem = {
 };
 const categories: SidebarItem[] = [
     {
-        category: 'Quản lý tài chính',
+        category: 'Quản lý',
         role: ['ROLE_ADMIN'],
         items: [
             {
-                title: 'Thống kê',
+                title: 'Quản lý tài chính',
                 url: '/dashboard',
                 icon: <FaChartBar />,
             },
+            {
+                title: 'Lịch sử hoạt động',
+                url: '/user-activity',
+                icon: <History />,
+            }
         ],
     },
     {
