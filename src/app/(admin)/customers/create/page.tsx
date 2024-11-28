@@ -114,14 +114,18 @@ const Page = () => {
                 title: 'Tạo thất bại',
                 description: (
                     <div>
-                        {messages.map((msg: any, index: any) => (
-                            <div key={index}>{msg}</div>
-                        ))}
+                        {Array.isArray(messages) ? (
+                            messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))
+                        ) : (
+                            <div>{messages}</div>
+                        )}
                     </div>
                 ),
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
-            })
+            });
             setOnPageChange(false);
         }
     };

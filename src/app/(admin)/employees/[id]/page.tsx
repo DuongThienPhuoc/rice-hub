@@ -9,12 +9,17 @@ import { useRouter } from 'next/navigation';
 import CardChip from "../../../../components/assets/img/cardChip.png"
 import Image from "next/image";
 import { Skeleton } from '@mui/material';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useToast } from '@/hooks/use-toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [employee, setEmployee] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [loadingData, setLoadingData] = useState(true);
+    const [onPageChange, setOnPageChange] = useState(false);
+    const { toast } = useToast();
 
     useEffect(() => {
         const getEmployee = async () => {
@@ -23,8 +28,21 @@ const Page = ({ params }: { params: { id: number } }) => {
                 const response = await api.get(url);
                 const data = response.data;
                 setEmployee(data);
-            } catch (error) {
-                console.error("Error fetching employee:", error);
+                if (!data?.id) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Lỗi khi lấy thông tin nhân viên!',
+                        description: 'Xin vui lòng thử lại',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Hệ thống gặp sự cố khi lấy thông tin nhân viên!',
+                    description: 'Xin vui lòng thử lại sau',
+                    duration: 3000
+                })
             } finally {
                 setLoadingData(false);
             }
@@ -230,10 +248,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push(`/employees/update/${params.id}`)} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push(`/employees/update/${params.id}`)
+                                    setOnPageChange(true)
+                                }} className='px-5 mr-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Sửa</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/employees")} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push("/employees")
+                                    setOnPageChange(true)
+                                }} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -241,6 +265,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };

@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function EmployeeTable() {
     const router = useRouter();
@@ -26,6 +27,7 @@ export default function EmployeeTable() {
     const [employees, setEmployees] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
+    const [onPageChange, setOnPageChange] = useState(false);
     const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
         field: '',
         query: ''
@@ -102,7 +104,10 @@ export default function EmployeeTable() {
                                 {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
-                                    <Button onClick={() => router.push("/employees/create")} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                                    <Button onClick={() => {
+                                        router.push("/employees/create")
+                                        setOnPageChange(true)
+                                    }} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
                                         Thêm nhân viên
                                         <PlusIcon />
                                     </Button>
@@ -110,7 +115,7 @@ export default function EmployeeTable() {
                             </div>
                         </div>
                         <div className='overflow-hidden'>
-                            <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" loadingData={loadingData} titles={titles} columns={columns} data={employees} tableName="employees" />
+                            <EmployeeList name="Nhân viên" editUrl="/employees/updateEmployee" loadingData={loadingData} titles={titles} columns={columns} data={employees} tableName="employees" handleClose={() => getEmployees(currentPage, currentSearch)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -122,6 +127,15 @@ export default function EmployeeTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

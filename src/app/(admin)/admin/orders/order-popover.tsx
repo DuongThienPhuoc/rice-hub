@@ -80,7 +80,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                         {unitWeightPairsList.map(
                                             (weightPerUnit, _index) => (
                                                 <SelectItem
-                                                    value={weightPerUnit.weightPerUnit.toString()}
+                                                    value={weightPerUnit?.weightPerUnit?.toString()}
                                                     key={_index}
                                                 >
                                                     {`${weightPerUnit.weightPerUnit} KG`}

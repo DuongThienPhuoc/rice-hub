@@ -250,7 +250,7 @@ export default function AppSidebar() {
         })
     }, [userName]);
 
-    async function fetchUserInformation(){
+    async function fetchUserInformation() {
         try {
             if (!userName) return;
             const data = await getUserInformation<UserInterface>(userName);
@@ -270,7 +270,7 @@ export default function AppSidebar() {
             await api.post(url);
             localStorage.removeItem('role');
             localStorage.removeItem('username');
-            router.push('/login');
+            router.push('/');
         } catch (error) {
             console.error('Đăng xuất thất bại:', error);
         }
@@ -280,9 +280,9 @@ export default function AppSidebar() {
         <Sidebar collapsible="icon">
             {userProfileDialog && (
                 <UserProfileDialog
-                open={userProfileDialog}
-                setOpen={setUserProfileDialog}
-                user={userInformation}
+                    open={userProfileDialog}
+                    setOpen={setUserProfileDialog}
+                    user={userInformation}
                 />
             )}
             <SidebarHeader className="px-1 py-2">

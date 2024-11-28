@@ -54,7 +54,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             const url = `/categories/all`;
             const response = await api.get(url);
             const data = response.data;
-            setCategories(data);
+            setCategories(data.filter((c: any) => c.active === true));
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -70,7 +70,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             const url = `/suppliers/all`;
             const response = await api.get(url);
             const data = response.data;
-            setSuppliers(data);
+            setSuppliers(data.filter((s: any) => s.active === true));
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -260,14 +260,18 @@ const Page = ({ params }: { params: { id: number } }) => {
                 title: 'Cập nhật thất bại',
                 description: (
                     <div>
-                        {messages.map((msg: any, index: any) => (
-                            <div key={index}>{msg}</div>
-                        ))}
+                        {Array.isArray(messages) ? (
+                            messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))
+                        ) : (
+                            <div>{messages}</div>
+                        )}
                     </div>
                 ),
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
-            })
+            });
         }
     };
 

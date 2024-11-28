@@ -23,6 +23,8 @@ export default function CustomerTable() {
         { name: 'email', displayName: 'Email' },
         { name: 'phone', displayName: 'Số điện thoại' },
         { name: 'address', displayName: 'Địa chỉ' },
+        { name: 'createAt', displayName: 'Ngày tạo' },
+        { name: 'updateAt', displayName: 'Ngày sửa' },
         { name: 'active', displayName: 'Trạng thái' },
     ];
     const [loadingData, setLoadingData] = useState(true);

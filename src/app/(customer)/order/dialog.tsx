@@ -52,6 +52,7 @@ export default function OrderPageDialog({
             toast({
                 variant: 'destructive',
                 title: 'Xin hãy nhập đầy đủ thông tin',
+                duration: 3000,
                 action: <ToastAction altText="Try again">OK!</ToastAction>,
             })
         } else {
@@ -62,6 +63,11 @@ export default function OrderPageDialog({
             toast({
                 title: 'Đặt hàng thành công',
                 description: 'Đơn hàng của bạn đã thêm vào giỏ hàng',
+                style: {
+                    backgroundColor: '#4caf50',
+                    color: '#fff',
+                },
+                duration: 3000
             });
             onOpenChange(false);
         }
