@@ -9,6 +9,10 @@ import api from "@/config/axiosConfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '@/config/firebaseConfig';
 import { FormControl, InputLabel, MenuItem, Select, Skeleton, TextField } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@radix-ui/react-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 const Page = () => {
     const router = useRouter();
@@ -16,6 +20,8 @@ const Page = () => {
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
     const [employeeRoles, setEmployeeRoles] = useState<any>([]);
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -70,7 +76,12 @@ const Page = () => {
             const data = response.data;
             setEmployeeRoles(data);
         } catch (error) {
-            console.error("Error fetching employee role:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy thông tin khách hàng!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -82,7 +93,7 @@ const Page = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        setOnPageChange(true);
         try {
             const storage = getStorage(firebase);
             const fileInput = document.getElementById("fileInput") as HTMLInputElement;
@@ -104,14 +115,47 @@ const Page = () => {
 
             const response = await api.post(`/user/create`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Nhân viên đã được thêm thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    description: `Nhân viên đã được tạo thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/employees");
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
+                setOnPageChange(false);
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            setOnPageChange(false);
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: (
+                    <div>
+                        {Array.isArray(messages) ? (
+                            messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))
+                        ) : (
+                            <div>{messages}</div>
+                        )}
+                    </div>
+                ),
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            });
         }
     };
 
@@ -332,7 +376,7 @@ const Page = () => {
                                                 <em>Chọn chức vụ</em>
                                             </MenuItem>
                                             {employeeRoles &&
-                                                employeeRoles.map((role: any) => {
+                                                employeeRoles?.map((role: any) => {
                                                     return (
                                                         <MenuItem key={role.id} value={role.id}>
                                                             {role.roleName === 'DRIVER_EMPLOYEE' && 'Nhân viên giao hàng'}
@@ -409,7 +453,10 @@ const Page = () => {
                                 <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push("/employees")
+                                    setOnPageChange(true);
+                                }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>
@@ -417,6 +464,16 @@ const Page = () => {
                     </div>
                 </div>
             </form>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };

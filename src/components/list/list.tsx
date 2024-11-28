@@ -307,7 +307,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             );
         }
 
-        if ((key.includes('Date') || key.includes('date')) && (Date.parse(cell.toString()))) {
+        if ((key.includes('Date') || key.includes('At') || key.includes('at') || key.includes('date')) && (Date.parse(cell.toString()))) {
             const date = new Date(cell.toString());
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -325,7 +325,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 return formatCurrency(cell);
             }
             if (key === 'active') {
-                return cell ? 'Hoạt động' : 'Không hoạt động';
+                return cell ? 'Hoạt động' : 'Ngưng hoạt động';
             }
         }
         return cell;
@@ -356,7 +356,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         <TableBody>
                             {data && data.length !== 0 ? (
                                 data.map((row, rowIndex) => (
-                                    (row?.active === true) ? (
+                                    ((tableName === 'products' || tableName === 'ingredients') ? row?.active === false : row?.active === true) ? (
                                         <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                             {columns.map((column, cellIndex) => (
                                                 <TableCell
@@ -483,7 +483,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={columns.length}>
+                                    <TableCell colSpan={columns.length + 1}>
                                         <div className="my-10 mx-4 text-center text-gray-500">
                                             Không có dữ liệu
                                         </div>

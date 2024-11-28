@@ -10,6 +10,7 @@ import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useSearchParams } from 'next/navigation'
+import { ArrowLeft } from 'lucide-react';
 
 const Toast = () => {
     const { toast } = useToast();
@@ -128,6 +129,11 @@ const Page = () => {
                     <div className='flex items-center border-b-2 px-2 py-1 text-[16px] border-gray-300'>
                         <FaUser className='text-gray-400 ' />
                         <input
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin();
+                                }
+                            }}
                             className='placeholder:text-[16px] placeholder:font-medium font-semibold w-full px-2 focus:outline-none'
                             type='text' placeholder='Nhập tên tài khoản'
                             onChange={(e) => handleFieldChange('username', e.target.value)}
@@ -137,6 +143,11 @@ const Page = () => {
                     <div className='flex items-center border-b-2 px-2 py-1 border-gray-300'>
                         <FaLock className='text-gray-400 ' />
                         <input
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleLogin();
+                                }
+                            }}
                             className='placeholder:text-[16px] placeholder:font-medium font-semibold w-full px-2 mr-[15px] focus:outline-none'
                             type={showPassword ? 'password' : 'text'} placeholder='Nhập mật khẩu'
                             onChange={(e) => handleFieldChange('password', e.target.value)}
@@ -164,6 +175,12 @@ const Page = () => {
                     </div>
                 </div>
                 <div>
+                    <div className='flex justify-center text-[14px] font-semibold text-gray-400 mb-5'>
+                        <p onClick={() => {
+                            setOnPageChange(true);
+                            router.push('/')
+                        }} className='hover:text-gray-600 hover:cursor-pointer flex items-center space-x-4'><ArrowLeft size={20} />Quay lại trang chủ</p>
+                    </div>
                     <Button
                         onClick={handleLogin}
                         className='rounded-full w-full text-[16px]'

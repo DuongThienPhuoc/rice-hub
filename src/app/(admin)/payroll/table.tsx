@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Ellipsis } from 'lucide-react';
 import { DailyEmployeePayroll, MonthlyEmployeePayroll } from '@/type/employee';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { getDailyEmployeePayroll, getMonthlyPayroll } from '@/data/employee';
 import PayrollTableDropdownProvider from '@/app/(admin)/payroll/dropdown';
 import MonthlyEmployeeDialog from '@/app/(admin)/payroll/monthly-employee-dialog';
@@ -16,6 +16,10 @@ import Swal from 'sweetalert2';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import PayrollTableDropdownProvider2 from './dropdown2';
+import { useToast } from '@/hooks/use-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { ToastAction } from '@radix-ui/react-toast';
 
 const moneyFormat = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -106,6 +110,7 @@ export function PorterPayrollTable({ month, year }: PayrollTableProps) {
                     year={year}
                 />
             )}
+            <FloatingButton />
         </>
     );
 }
@@ -114,7 +119,7 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
     const [monthlyEmployeePayroll, setMonthltEmployeePayroll] = React.useState<MonthlyEmployeePayroll[]>(
         [],
     );
-
+    const { toast } = useToast();
     useEffect(() => {
         getMonthlyPayroll(month + 1, year)
             .then((res) => setMonthltEmployeePayroll(res))
@@ -127,8 +132,7 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
     );
 
     const router = useRouter();
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-    const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<number | null>(null);
+    const [onPageChange, setOnPageChange] = useState(false);
     const handleSubmit = async (id: number) => {
         Swal.fire({
             title: 'Xác nhận xuất',
@@ -139,18 +143,53 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
             cancelButtonText: 'Không, hủy!',
         }).then(async (result) => {
             if (result.isConfirmed && id) {
+                setOnPageChange(true);
                 try {
                     const response = await api.post(`/ExpenseVoucher/payEmployeeSalaryByMonth`, {
                         employeeId: id
                     });
                     if (response.status >= 200 && response.status < 300) {
-                        alert(`Xuất phiếu chi thành công`);
+                        toast({
+                            variant: 'default',
+                            title: 'Xuất phiếu thành công',
+                            description: `Phiếu chi đã được xuất thành công`,
+                            style: {
+                                backgroundColor: '#4caf50',
+                                color: '#fff',
+                            },
+                            duration: 3000
+                        })
                         router.push("/expenditures");
                     } else {
-                        throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                        setOnPageChange(false);
+                        toast({
+                            variant: 'destructive',
+                            title: 'Xuất phiếu thất bại',
+                            description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                            action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                            duration: 3000
+                        })
                     }
-                } catch (error) {
-                    alert('Đã xảy ra lỗi, vui lòng thử lại.');
+                } catch (error: any) {
+                    setOnPageChange(false);
+                    const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+                    toast({
+                        variant: 'destructive',
+                        title: 'Xuất phiếu thất bại',
+                        description: (
+                            <div>
+                                {Array.isArray(messages) ? (
+                                    messages.map((msg: any, index: any) => (
+                                        <div key={index}>{msg}</div>
+                                    ))
+                                ) : (
+                                    <div>{messages}</div>
+                                )}
+                            </div>
+                        ),
+                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                        duration: 3000
+                    });
                 }
             }
         })
@@ -210,6 +249,16 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                     </TableFooter>
                 </Table>
             </TableContainer>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </>
     );
 }

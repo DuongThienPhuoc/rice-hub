@@ -15,6 +15,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@radix-ui/react-toast';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 type MonthlyEmployeeDialogProps = {
     isOpen: boolean;
@@ -46,9 +49,11 @@ export default function MonthlyEmployeeDialog({
     const hasUnaddedDayActive = dayActive.some((day) => !day.spend);
     const [amountByTon, setAmountByTon] = React.useState<any>(12000);
     const [totalAmount, setTotalAmount] = React.useState<any>(0);
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = React.useState(false);
 
     const handleSubmit = async () => {
-        console.log(selectedDayActive);
+        setOnPageChange(true);
         const formattedData = selectedDayActive.map((day: any) => ({
             dayActiveId: day.id,
             amountByTon: amountByTon,
@@ -56,13 +61,47 @@ export default function MonthlyEmployeeDialog({
         try {
             const response = await api.post(`/ExpenseVoucher/payEmployeeSalaryByDate`, formattedData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Xuất phiếu chi thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Xuất phiếu thành công',
+                    description: `Phiếu chi đã được xuất thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/expenditures");
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Xuất phiếu thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
+                setOnPageChange(false);
             }
-        } catch (error) {
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+            toast({
+                variant: 'destructive',
+                title: 'Xuất phiếu thất bại',
+                description: (
+                    <div>
+                        {Array.isArray(messages) ? (
+                            messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))
+                        ) : (
+                            <div>{messages}</div>
+                        )}
+                    </div>
+                ),
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            });
+            setOnPageChange(false);
         }
     }
 
@@ -217,12 +256,12 @@ export default function MonthlyEmployeeDialog({
                                         <Input type="number" value={day.amountPerMass || amountByTon} onChange={(e) => setAmountByTon(e.target.value)} />
                                     </TableCell>
                                     {day.spend === false ? (
-                                        <TableCell className="text-destructive">
-                                            Chưa xuất phiếu chi
+                                        <TableCell>
+                                            <p className='text-red-500'>Chưa xuất phiếu chi</p>
                                         </TableCell>
                                     ) : (
-                                        <TableCell className="text-green-500">
-                                            Đã xuất phiếu chi
+                                        <TableCell>
+                                            <p className="text-green-500">Đã xuất phiếu chi</p>
                                         </TableCell>
                                     )}
 
@@ -244,6 +283,15 @@ export default function MonthlyEmployeeDialog({
                     <Button onClick={handleSubmit}>Xác nhận xuất phiếu chi</Button>
                 </div>
             </DialogContent>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
         </Dialog>
     );
 }

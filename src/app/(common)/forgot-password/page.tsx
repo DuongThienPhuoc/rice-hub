@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Mails, Phone } from 'lucide-react';
+import { ArrowLeft, ArrowRight, DoorOpen, Mails, Phone } from 'lucide-react';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useState } from 'react';
 
@@ -48,6 +48,22 @@ export default function ForgotPasswordPage() {
                                 <Phone className="h-5 w-5" />
                                 <h1 className="font-semibold text-lg">
                                     Khôi phục bằng số điện thoại
+                                </h1>
+                            </div>
+                            <ArrowRight className="h-5 w-5" />
+                        </CardContent>
+                    </Card>
+                    <Card
+                        onClick={() => {
+                            router.push('/login')
+                            setOnPageChange(true);
+                        }}
+                        className="transition duration-150 hover:cursor-pointer hover:scale-105">
+                        <CardContent className="flex items-center justify-between p-3">
+                            <div className="flex items-center gap-2">
+                                <DoorOpen className="h-5 w-5" />
+                                <h1 className="font-semibold text-lg">
+                                    Trở về đăng nhập
                                 </h1>
                             </div>
                             <ArrowRight className="h-5 w-5" />

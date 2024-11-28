@@ -28,7 +28,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getProductList, ProductDtoList } from '@/data/customer-product';
+import { getProductList, getProductListByAdmin, ProductDtoList } from '@/data/customer-product';
 import { Button } from '@/components/ui/button';
 import { ProductOrderRequest } from '@/type/order';
 import { CirclePlus, Search, Trash2 } from 'lucide-react';
@@ -77,7 +77,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
     async function getProduct() {
         try {
-            const response = await getProductList({});
+            const response = await getProductListByAdmin({
+                pageSize: 5,
+                // pageNumber: currentPage + 1,
+                // categoryName: selectedCategory,
+            });
             setProducts(response.data._embedded.productDtoList);
         } catch (e) {
             if (e instanceof Error) {
