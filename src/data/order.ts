@@ -8,7 +8,6 @@ export async function getOrderHistory({ customerID }: { customerID: string }) {
         const response: AxiosResponse<CustomerOrderHistoryResponse> =
             await axiosConfig.get<CustomerOrderHistoryResponse>(
                 `/order/customer/${customerID}`,
-                //TODO: Change the endpoint to '/order/customer'
             );
         return {
             data: response.data,
