@@ -34,7 +34,8 @@ const adminStaticPaths: string[] = [
     '/production',
     '/production/create',
     '/production/update',
-    '/admin/orders'
+    '/admin/orders',
+    '/user-activity',
 ];
 const adminDynamicPaths: string[] = [
     '/admin/orders',
@@ -43,6 +44,7 @@ const adminDynamicPaths: string[] = [
     '/customers',
     '/employees',
     '/production',
+    '/contracts/create'
 ];
 const customerDynamicPaths: string[] = ['/order/detail'];
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
