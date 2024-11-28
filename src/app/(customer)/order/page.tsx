@@ -23,7 +23,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { Check } from 'lucide-react';
-import { getProductList } from '@/data/customer-product';
+import { getProductList, getProductListByAdmin } from '@/data/customer-product';
 import { useProductStore } from '@/stores/productStore';
 import PaginationComponent from '@/components/pagination/pagination';
 import { currencyHandleProvider } from '@/utils/currency-handle';
@@ -41,12 +41,12 @@ export default function OrderPage() {
     const updateProducts = orderStore((state) => state.updateProducts);
     const products = useProductStore((state) => state.products);
     const setProducts = useProductStore((state) => state.setProducts);
-    const [productCategories,setProductCategories] = useState<Category[]>([])
+    const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     async function getProduct() {
         try {
             const response = await getProductList({
-                pageSize: 5,
+                pageSize: 10,
                 pageNumber: currentPage + 1,
                 categoryName: selectedCategory?.name,
             });
@@ -148,8 +148,8 @@ export default function OrderPage() {
                                                         >
                                                             {selectedCategory ===
                                                                 category && (
-                                                                <Check className="h-4 w-4 absolute left-2" />
-                                                            )}
+                                                                    <Check className="h-4 w-4 absolute left-2" />
+                                                                )}
                                                             <span className="pl-5">
                                                                 {category.name}
                                                             </span>

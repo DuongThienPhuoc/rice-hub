@@ -73,3 +73,34 @@ export async function getProductList({
         throw new Error('Something went wrong');
     }
 }
+
+export async function getProductListByAdmin({
+    pageNumber = 1,
+    pageSize = 5,
+    forceFirstAndLastRels = true,
+    categoryName = null,
+    id = null,
+}: {
+    pageNumber?: number;
+    pageSize?: number;
+    forceFirstAndLastRels?: boolean;
+    categoryName?: string | null;
+    id?: number | null;
+}) {
+    try {
+        return axios.get('/products/admin/order/products', {
+            params: {
+                pageNumber,
+                pageSize,
+                categoryName,
+                forceFirstAndLastRels,
+                id
+            },
+        });
+    } catch (e) {
+        if (e instanceof Error) {
+            throw new Error(e.message);
+        }
+        throw new Error('Something went wrong');
+    }
+}

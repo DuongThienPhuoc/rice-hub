@@ -78,14 +78,18 @@ const Page = ({ params }: { params: { id: number } }) => {
                     title: 'Tải thất bại',
                     description: (
                         <div>
-                            {messages.map((msg: any, index: any) => (
-                                <div key={index}>{msg}</div>
-                            ))}
+                            {Array.isArray(messages) ? (
+                                messages.map((msg: any, index: any) => (
+                                    <div key={index}>{msg}</div>
+                                ))
+                            ) : (
+                                <div>{messages}</div>
+                            )}
                         </div>
                     ),
                     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                     duration: 3000
-                })
+                });
             } finally {
                 fileInput.value = "";
                 setOnPageChange(false);
@@ -109,21 +113,12 @@ const Page = ({ params }: { params: { id: number } }) => {
                 })
             }
         } catch (error: any) {
-            if (error.response.status === 404) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Khách hàng không tồn tại!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000
-                })
-            } else {
-                toast({
-                    variant: 'destructive',
-                    title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
-                    description: 'Xin vui lòng thử lại sau',
-                    duration: 3000
-                })
-            }
+            toast({
+                variant: 'destructive',
+                title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                description: 'Xin vui lòng thử lại sau',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }

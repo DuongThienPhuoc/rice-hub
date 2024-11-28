@@ -9,6 +9,10 @@ import { useRouter } from 'next/navigation';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import firebase from '@/config/firebaseConfig';
 import { FormControl, InputLabel, MenuItem, Select, Skeleton, TextField } from '@mui/material';
+import { useToast } from '@/hooks/use-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { ToastAction } from '@radix-ui/react-toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const [employee, setEmployee] = useState<any>(null);
@@ -18,6 +22,8 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
     const [employeeRoles, setEmployeeRoles] = useState<any>([]);
+    const [onPageChange, setOnPageChange] = useState(false);
+    const { toast } = useToast();
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -67,7 +73,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        setOnPageChange(true);
         try {
             const storage = getStorage(firebase);
             const fileInput = document.getElementById("fileInput") as HTMLInputElement;
@@ -89,14 +95,47 @@ const Page = ({ params }: { params: { id: number } }) => {
 
             const response = await api.post(`/employees/updateEmployee`, updatedFormData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Nhân viên đã được cập nhật thành công`);
-                router.push("/employees");
+                toast({
+                    variant: 'default',
+                    title: 'Cập nhật thành công',
+                    description: `Nhân viên đã được cập nhật thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
+                router.push(`/employees/${params.id}`);
             } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Cập nhật thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+        } catch (error: any) {
+            setOnPageChange(false);
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+            toast({
+                variant: 'destructive',
+                title: 'Cập nhật thất bại',
+                description: (
+                    <div>
+                        {Array.isArray(messages) ? (
+                            messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))
+                        ) : (
+                            <div>{messages}</div>
+                        )}
+                    </div>
+                ),
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            });
         }
     };
 
@@ -415,7 +454,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <Button type='submit' className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Cập nhật</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/employees")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push(`/employees/${params.id}`)
+                                    setOnPageChange(true);
+                                }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -423,6 +465,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </form>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };
