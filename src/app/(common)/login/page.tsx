@@ -78,11 +78,11 @@ const Page = () => {
                 },
             });
             if (response.data.userType && response.data.userType == 'ROLE_ADMIN') {
-                router.push('/dashboard');
+                window.location.href = '/dashboard'
             } else if (response.data.userType && response.data.userType == 'ROLE_EMPLOYEE') {
-                router.push('/');
+                window.location.href = '/'
             } else if (response.data.userType && response.data.userType == 'ROLE_CUSTOMER') {
-                router.push('/');
+                window.location.href = '/'
             }
         } catch (error) {
             toast({

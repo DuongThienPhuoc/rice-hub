@@ -276,7 +276,7 @@ export default function AppSidebar() {
             await api.post(url);
             localStorage.removeItem('role');
             localStorage.removeItem('username');
-            router.push('/');
+            window.location.href = '/'
         } catch (error) {
             console.error('Đăng xuất thất bại:', error);
         }
