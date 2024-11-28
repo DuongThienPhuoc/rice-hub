@@ -110,7 +110,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                     },
                     duration: 3000
                 })
-                setOnPageChange(true);
                 router.push(`/customers/${params.id}`);
             } else {
                 toast({
@@ -120,17 +119,28 @@ const Page = ({ params }: { params: { id: number } }) => {
                     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                     duration: 3000
                 })
-                setOnPageChange(true);
+                setOnPageChange(false);
             }
         } catch (error: any) {
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
             toast({
                 variant: 'destructive',
                 title: 'Cập nhật thất bại',
-                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                description: (
+                    <div>
+                        {Array.isArray(messages) ? (
+                            messages.map((msg: any, index: any) => (
+                                <div key={index}>{msg}</div>
+                            ))
+                        ) : (
+                            <div>{messages}</div>
+                        )}
+                    </div>
+                ),
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
-            })
-            setOnPageChange(true);
+            });
+            setOnPageChange(false);
         }
     };
 

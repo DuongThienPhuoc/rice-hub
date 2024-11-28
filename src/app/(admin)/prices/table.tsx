@@ -322,7 +322,7 @@ export default function PriceTable() {
                                                         const matchingProductPrice = currentPrice?.productPrices?.find(
                                                             (pPrice: any) => pPrice?.product?.id === product?.id || pPrice?.product === product?.id
                                                         );
-                                                        if (product.disable === false) {
+                                                        if (product.active === false) {
                                                             return (
                                                                 <TableRow key={rowIndex}>
                                                                     <TableCell onClick={() => router.push(`/products/${product?.id}`)} className="text-blue-500 max-w-[200px] cursor-pointer hover:text-blue-300 font-semibold">
