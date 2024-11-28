@@ -427,7 +427,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             <>
                                                 <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
                                                 <div className='flex justify-end items-center'>
-                                                    <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] hover:bg-green-500'>
+                                                    <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
                                                         <strong>Xóa sản phẩm</strong>
                                                     </Button>
                                                     <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-green-500'>

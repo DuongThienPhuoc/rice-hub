@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import PopupDetail from '../popup/popupDetail';
 import PopupEdit from '../popup/popupEdit';
 import { Paper, Skeleton } from '@mui/material';
-import { Eye, PenBox, RotateCw, Trash2 } from 'lucide-react';
+import { Calendar, DollarSign, Eye, PenBox, RotateCw, Trash2 } from 'lucide-react';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -187,7 +187,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     };
 
     const deleteImportAndExport = (row: any) => {
-        setOnPageChange(true);
         Swal.fire({
             title: 'Xác nhận xóa',
             text: `Bạn có chắc chắn muốn xóa phiếu ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
@@ -198,6 +197,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
+                    setOnPageChange(true);
                     const response = await api.delete(`/WarehouseReceipt/delete/${row.id}`);
                     console.log(response);
                     if (response.status >= 200 && response.status < 300) {
@@ -312,7 +312,14 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+            return (
+                <div className='flex space-x-2'>
+                    <Calendar size={16} color='gray' />
+                    <p>
+                        {`${day}/${month}/${year}`}
+                    </p>
+                </div>
+            );
         }
 
         if (typeof cell === 'object' && cell !== null) {
@@ -413,8 +420,22 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                                     </div>
                                                                 )
                                                             ) : (
-                                                                row?.batchProductDtos?.some((item: any) => item.added === true) ? (
-                                                                    <div className="relative group"></div>
+                                                                row?.batchProductDtos?.some((item: any) => item.isAdded === true) ? (
+                                                                    <div className="relative group">
+                                                                        {tableName === 'import' && row?.isPay === false ? (
+                                                                            <>
+                                                                                <button>
+                                                                                    <DollarSign size={18} />
+                                                                                </button>
+                                                                                <span className="absolute text-center w-[100px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                    Xuất phiếu chi
+                                                                                </span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <></>
+                                                                        )}
+
+                                                                    </div>
                                                                 ) : (
                                                                     <div className="relative group">
                                                                         <button onClick={() => deleteImportAndExport(row)}>
