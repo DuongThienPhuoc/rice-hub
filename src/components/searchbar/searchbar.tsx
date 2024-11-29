@@ -55,7 +55,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, selectOptions, loadingD
                 <>
                     <div ref={dropdownRef} className="relative text-[14px]">
                         <div
-                            className="p-2 bg-[#4ba94d] hover:bg-green-500 flex items-center text-white font-semibold rounded-l-lg cursor-pointer"
+                            className="p-2 bg-[#4ba94d] hover:bg-green-500 flex items-center text-white font-semibold rounded-l-md cursor-pointer"
                             onClick={() => setIsOpen(!isOpen)}
                         >
                             {selected.label} {isOpen ? (<ChevronUp size={20} className='ml-1' />) : (<ChevronDown size={20} className='ml-1' />)}
