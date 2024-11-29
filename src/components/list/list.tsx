@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import PopupDetail from '../popup/popupDetail';
 import PopupEdit from '../popup/popupEdit';
 import { Paper, Skeleton } from '@mui/material';
-import { Eye, PenBox, RotateCw, Trash2 } from 'lucide-react';
+import { Calendar, DollarSign, Eye, PenBox, RotateCw, Trash2 } from 'lucide-react';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -107,6 +107,45 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         }
     }
 
+    const handlePaySupplier = async (row: any) => {
+        Swal.fire({
+            title: 'Xác nhận xuất phiếu chi',
+            text: `Một khi đã xuất phiếu chi thì sẽ không thể thay đổi. Bạn có muốn tiếp tục?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có, xuất!',
+            cancelButtonText: 'Không',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                setOnPageChange(true);
+                try {
+                    await api.post(`/ExpenseVoucher/paySupplier/${row.id}`);
+                    toast({
+                        variant: 'default',
+                        title: 'Xuất phiếu thành công',
+                        description: `Phiếu chi đã được xuất thành công`,
+                        style: {
+                            backgroundColor: '#4caf50',
+                            color: '#fff',
+                        },
+                        duration: 3000
+                    })
+                    setOnPageChange(false);
+                    handleClose?.(true);
+                } catch (error: any) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Xuất phiếu thất bại',
+                        description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                        duration: 3000
+                    })
+                    setOnPageChange(false);
+                }
+            }
+        });
+    }
+
     const handleEnable = async (row: any) => {
         setOnPageChange(true);
         try {
@@ -149,7 +188,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không, hủy!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete(row);
@@ -187,7 +226,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     };
 
     const deleteImportAndExport = (row: any) => {
-        setOnPageChange(true);
         Swal.fire({
             title: 'Xác nhận xóa',
             text: `Bạn có chắc chắn muốn xóa phiếu ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
@@ -198,6 +236,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
+                    setOnPageChange(true);
                     const response = await api.delete(`/WarehouseReceipt/delete/${row.id}`);
                     console.log(response);
                     if (response.status >= 200 && response.status < 300) {
@@ -252,6 +291,33 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             cell = cell?.[k];
         });
 
+        if (tableName === 'import' && key === 'batchCode') {
+            if (row.batchCode === null) {
+                return (
+                    <a
+                        className="text-blue-500 font-semibold hover:text-blue-300 cursor-pointer"
+                        onClick={() => {
+                            router.push(`/admin/orders/${row?.orderId.toString()}`)
+                            setOnPageChange(true)
+                        }}>
+                        {row?.orderCode.toString()}
+                    </a>
+                );
+            } else {
+                return (
+                    <a
+                        className="text-blue-500 font-semibold hover:text-blue-300 cursor-pointer"
+                        onClick={() => {
+                            router.push(`/batches/${cell.toString()}`)
+                            setOnPageChange(true)
+                        }}
+                    >
+                        {cell.toString()}
+                    </a>
+                );
+            }
+        }
+
         if (cell === undefined || cell === null) return '';
 
         if (tableName === 'inventory' && key === 'status') {
@@ -300,7 +366,10 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             return (
                 <a
                     className="text-blue-500 font-semibold hover:text-blue-300 cursor-pointer"
-                    onClick={() => router.push(`/batches/${cell.toString()}`)}
+                    onClick={() => {
+                        router.push(`/batches/${cell.toString()}`)
+                        setOnPageChange(true)
+                    }}
                 >
                     {cell.toString()}
                 </a>
@@ -312,7 +381,14 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
-            return `${day}/${month}/${year}`;
+            return (
+                <div className='flex space-x-2'>
+                    <Calendar size={16} color='gray' />
+                    <p>
+                        {`${day}/${month}/${year}`}
+                    </p>
+                </div>
+            );
         }
 
         if (typeof cell === 'object' && cell !== null) {
@@ -413,17 +489,35 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                                     </div>
                                                                 )
                                                             ) : (
-                                                                row?.batchProductDtos?.some((item: any) => item.added === true) ? (
-                                                                    <div className="relative group"></div>
-                                                                ) : (
+                                                                row?.batchProductDtos?.some((item: any) => item.isAdded === true) ? (
                                                                     <div className="relative group">
-                                                                        <button onClick={() => deleteImportAndExport(row)}>
-                                                                            <Trash2 size={18} />
-                                                                        </button>
-                                                                        <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                            Xóa
-                                                                        </span>
+                                                                        {tableName === 'import' && row?.isPay === false ? (
+                                                                            <>
+                                                                                <button onClick={() => handlePaySupplier(row)}>
+                                                                                    <DollarSign size={18} />
+                                                                                </button>
+                                                                                <span className="absolute text-center w-[100px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                    Xuất phiếu chi
+                                                                                </span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <></>
+                                                                        )}
+
                                                                     </div>
+                                                                ) : (
+                                                                    (tableName === 'import' && row.orderCode ? (
+                                                                        <></>
+                                                                    ) : (
+                                                                        <div className="relative group">
+                                                                            <button onClick={() => deleteImportAndExport(row)}>
+                                                                                <Trash2 size={18} />
+                                                                            </button>
+                                                                            <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                Xóa
+                                                                            </span>
+                                                                        </div>
+                                                                    ))
                                                                 )
                                                             )}
                                                         </div>

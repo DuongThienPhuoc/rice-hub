@@ -13,9 +13,13 @@ import { useRouter } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { DateRange } from 'react-day-picker';
+import { useToast } from '@/hooks/use-toast';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function IncomeTable() {
     const router = useRouter();
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [isEditVisible, setEditVisible] = useState(false);
     const [isDetailVisible, setDetailVisible] = useState(false);
@@ -49,11 +53,25 @@ export default function IncomeTable() {
             const url = `/ReceiptVoucher/all?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
-            setIncome(data._embedded.receiptVoucherDtoList);
-            setTotalPages(data.page.totalPages);
+            if (data?._embedded?.receiptVoucherDtoList) {
+                setIncome(data._embedded.receiptVoucherDtoList);
+                setTotalPages(data.page.totalPages);
+            } else {
+                setIncome([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu thu!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu thu:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu thu!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -140,7 +158,7 @@ export default function IncomeTable() {
                                     onSearch={handleSearch}
                                     loadingData={loadingData}
                                     selectOptions={[
-                                        { value: 'id', label: 'Mã phiếu' }
+                                        { value: 'incomeCode', label: 'Mã phiếu' }
                                     ]}
                                 />
                                 {loadingData ? (
@@ -183,7 +201,10 @@ export default function IncomeTable() {
                                                         <>
                                                             <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                                                 <TableCell>{row.receiptCode}</TableCell>
-                                                                <TableCell onClick={() => router.push(`/admin/orders/${row.orderDto.id}`)} className="text-blue-500 cursor-pointer hover:text-blue-300 font-semibold">
+                                                                <TableCell onClick={() => {
+                                                                    router.push(`/admin/orders/${row.orderDto.id}`)
+                                                                    setOnPageChange(true)
+                                                                }} className="text-blue-500 cursor-pointer hover:text-blue-300 font-semibold">
                                                                     {row.orderDto.orderCode}
                                                                 </TableCell>
                                                                 <TableCell>{formatDate(row.receiptDate)}</TableCell>
@@ -231,9 +252,9 @@ export default function IncomeTable() {
                                                                 row.transactionDtoList.length > 0 ? (
                                                                     <TableRow>
                                                                         <TableCell colSpan={9} align='center' className='p-0'>
-                                                                            <div className="w-full">
-                                                                                <Table aria-label="simple table">
-                                                                                    <TableHead className="bg-[#4ba94d]">
+                                                                            <div className="w-full p-2">
+                                                                                <Table aria-label="simple table" className='border-2 border-[#4ba94d]'>
+                                                                                    <TableHead className="bg-[#4ba94d] text-white">
                                                                                         <TableRow>
                                                                                             <TableCell align='center' className="text-white">STT</TableCell>
                                                                                             <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>
@@ -258,8 +279,8 @@ export default function IncomeTable() {
                                                                 ) : (
                                                                     <TableRow>
                                                                         <TableCell colSpan={9} align='center' className='p-0'>
-                                                                            <div className="w-full">
-                                                                                <Table aria-label="simple table">
+                                                                            <div className="w-full p-2">
+                                                                                <Table aria-label="simple table" className='border-2 border-[#4ba94d]'>
                                                                                     <TableHead className="bg-[#4ba94d] text-white">
                                                                                         <TableRow>
                                                                                             <TableCell align='center' className="text-white">STT</TableCell>
@@ -316,6 +337,15 @@ export default function IncomeTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

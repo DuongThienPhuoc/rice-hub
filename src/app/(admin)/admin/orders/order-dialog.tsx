@@ -385,6 +385,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 <section>
                     <div className="flex gap-2 justify-end">
                         <Button
+                            className='bg-red-600 hover:bg-red-500'
                             onClick={() => {
                                 setError('');
                                 setSelectedProducts([]);
