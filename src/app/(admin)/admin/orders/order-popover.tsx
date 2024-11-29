@@ -23,6 +23,7 @@ type OrderPopoverProviderProps = {
     unitWeightPairsList: UnitWeightPairsList[];
     type: string;
     setType: (type: string) => void;
+    setProductUnit: (productUnit: string) => void;
     quantity: number;
     setQuantity: (quantity: number) => void;
     addProductToOrder: () => void;
@@ -33,6 +34,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
     unitWeightPairsList,
     type,
     setType,
+    setProductUnit,
     quantity,
     setQuantity,
     addProductToOrder,
@@ -70,7 +72,11 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                     <div className="grid gap-2">
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="type">Quy cách đóng goi</Label>
-                            <Select onValueChange={(value) => setType(value)}>
+                            <Select onValueChange={(value) => {
+                                const weightPerUnit: UnitWeightPairsList = JSON.parse(value)
+                                setType(weightPerUnit.weightPerUnit.toString())
+                                setProductUnit(weightPerUnit.productUnit)
+                            }}>
                                 <SelectTrigger id="type" className="w-[165px]">
                                     <SelectValue placeholder="Chọn quy cách" />
                                 </SelectTrigger>
@@ -80,7 +86,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                         {unitWeightPairsList.map(
                                             (weightPerUnit, _index) => (
                                                 <SelectItem
-                                                    value={weightPerUnit?.weightPerUnit?.toString()}
+                                                    value={JSON.stringify(weightPerUnit)}
                                                     key={_index}
                                                 >
                                                     {`${weightPerUnit.weightPerUnit} KG`}

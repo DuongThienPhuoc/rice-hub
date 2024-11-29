@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, DoorOpen, Mails, Phone } from 'lucide-react';
+import { ArrowRight, DoorOpen, Mails, Phone } from 'lucide-react';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useState } from 'react';
 

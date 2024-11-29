@@ -39,8 +39,7 @@ import {
     UserPen,
     Users,
     History,
-    Bell,
-    Dot
+    Bell
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -241,12 +240,9 @@ export default function AppSidebar() {
     );
     const { hasNewNotification, setHasNewNotification } = useNotificationStore();
     useEffect(() => {
-        const role =
-            typeof window != 'undefined' ? localStorage.getItem('role') : '';
-        const userName =
-            typeof window != 'undefined'
-                ? localStorage.getItem('username')
-                : '';
+        if (typeof window === 'undefined') return;
+        const role = localStorage.getItem('role');
+        const userName = localStorage.getItem('username');
         if (role !== null && userName !== null) {
             setRole(role);
             setUserName(userName);

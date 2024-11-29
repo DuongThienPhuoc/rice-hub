@@ -205,6 +205,7 @@ export interface ProductOrderRequest {
     quantity?: number;
     unitPrice?: number
     weightPerUnit?: number;
+    productUnit?: string;
 }
 
 export interface AdminCreateOrderRequest {
