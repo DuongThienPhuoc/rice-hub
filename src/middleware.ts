@@ -44,7 +44,8 @@ const adminDynamicPaths: string[] = [
     '/customers',
     '/employees',
     '/production',
-    '/contracts/create'
+    '/contracts/create',
+    '/document'
 ];
 const customerDynamicPaths: string[] = ['/order/detail'];
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
@@ -86,8 +87,8 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!token) {
-        const loginUrl = new URL('/login', request.nextUrl);
-        loginUrl.searchParams.set('message', 'Get the fuck out of here boyy!');
+        const loginUrl = new URL('/', request.nextUrl);
+        loginUrl.searchParams.set('message', 'Không tìm thấy trang này');
         return NextResponse.redirect(loginUrl);
     }
 
@@ -103,8 +104,8 @@ export async function middleware(request: NextRequest) {
         console.error('Invalid token:', e);
         return NextResponse.redirect(new URL('/login', request.nextUrl));
     }
-    const loginUrl = new URL('/login', request.nextUrl);
-    loginUrl.searchParams.set('message', 'Get the fuck out of here boyy!');
+    const loginUrl = new URL('/', request.nextUrl);
+    loginUrl.searchParams.set('message', 'Không tìm thấy trang này');
     return NextResponse.redirect(loginUrl);
 }
 

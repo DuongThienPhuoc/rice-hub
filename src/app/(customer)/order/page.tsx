@@ -23,7 +23,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { Check } from 'lucide-react';
-import { getProductList, getProductListByAdmin } from '@/data/customer-product';
+import { getProductList } from '@/data/customer-product';
 import { useProductStore } from '@/stores/productStore';
 import PaginationComponent from '@/components/pagination/pagination';
 import { currencyHandleProvider } from '@/utils/currency-handle';

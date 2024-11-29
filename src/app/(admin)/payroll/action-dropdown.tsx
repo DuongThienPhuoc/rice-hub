@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import Swal from 'sweetalert2'
 import { ToastAction } from '@radix-ui/react-toast';
 import api from "@/config/axiosConfig";
+import { AxiosError } from 'axios';
 
 type PayrollTableDropdownProps = {
     children: React.ReactNode;
@@ -23,7 +24,7 @@ export default function ActionDropdownProvider({
     expenseVoucher
 }: PayrollTableDropdownProps) {
     const { toast } = useToast();
-    const handleDelete = async (id: any) => {
+    const handleDelete = async (id: number) => {
         if (!id) {
             toast({
                 variant: 'destructive',
@@ -57,14 +58,16 @@ export default function ActionDropdownProvider({
                         duration: 3000
                     })
 
-                } catch (error: any) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Xóa thất bại',
-                        description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
-                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                        duration: 3000
-                    })
+                } catch (error) {
+                    if(error instanceof AxiosError) {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Xóa thất bại',
+                            description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                            action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                            duration: 3000
+                        })
+                    }
                 }
             }
         })

@@ -28,7 +28,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getProductList, getProductListByAdmin, ProductDtoList } from '@/data/customer-product';
+import { getProductListByAdmin, ProductDtoList } from '@/data/customer-product';
 import { Button } from '@/components/ui/button';
 import { ProductOrderRequest } from '@/type/order';
 import { CirclePlus, Search, Trash2 } from 'lucide-react';
@@ -61,6 +61,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const [selectedProduct, setSelectedProduct] =
         React.useState<ProductOrderRequest>();
     const [type, setType] = React.useState<string>('');
+    const [productUnit, setProductUnit] = React.useState<string>('');
     const [quantity, setQuantity] = React.useState<number>(1);
     const [customers, setCustomers] = React.useState<Customer[]>([]);
     const [filterCustomers, setFilterCustomers] = React.useState<Customer[]>(
@@ -173,6 +174,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
             ...prev,
             quantity: quantity,
             weightPerUnit: parseInt(type),
+            productUnit: productUnit,
         }));
     }, [type, quantity]);
 
@@ -262,6 +264,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                     type={type}
                                                     setType={setType}
                                                     quantity={quantity}
+                                                    setProductUnit={setProductUnit}
                                                     setQuantity={setQuantity}
                                                     addProductToOrder={
                                                         addProductToOrder
