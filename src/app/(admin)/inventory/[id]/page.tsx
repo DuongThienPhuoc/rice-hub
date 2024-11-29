@@ -49,7 +49,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xác nhận',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
@@ -94,8 +94,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                         duration: 3000
                     })
                 }
-            } else {
-                Swal.fire('Đã hủy', 'Phiếu kiểm kho không được xác nhận.', 'info');
             }
         });
     }
@@ -144,12 +142,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không, hủy!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete();
-                } else {
-                    Swal.fire('Đã hủy', `Phiếu kiểm kho không bị xóa.`, 'info');
                 }
             });
         } else {
@@ -159,12 +155,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không, hủy!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete();
-                } else {
-                    Swal.fire('Đã hủy', `Phiếu kiểm kho không bị xóa.`, 'info');
                 }
             });
         }

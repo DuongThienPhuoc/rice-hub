@@ -48,8 +48,8 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
             text: `Bạn có chắc muốn gia hạn cho phiếu thu này.`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Có, lập!',
-            cancelButtonText: 'Không, hủy!',
+            confirmButtonText: 'Có, gia hạn!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
@@ -78,8 +78,6 @@ const PopupExtend: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
                         duration: 3000
                     })
                 }
-            } else {
-                Swal.fire('Đã hủy', `Phiếu thu chưa được gia hạn.`, 'info');
             }
         })
     };

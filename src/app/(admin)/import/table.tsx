@@ -10,17 +10,32 @@ import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import ExcelJS from 'exceljs';
-import { PlusIcon } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import crypto from 'crypto';
-import { Skeleton } from '@mui/material';
+import { ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper, Skeleton } from '@mui/material';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { Separator } from '@/components/ui/separator';
 import SearchBar from '@/components/searchbar/searchbar';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ImportTable() {
     const router = useRouter();
+    const anchorRef = React.useRef<HTMLDivElement>(null);
+    const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const [open, setOpen] = React.useState(false);
+    const options = ['Tạo phiếu nhập từ kho nguyên liệu', 'Tạo phiếu nhập từ nhà cung cấp'];
+    const handleClick = () => {
+        if (options[selectedIndex] === 'Tạo phiếu nhập từ nhà cung cấp') {
+            setOnPageChange(true);
+            router.push("/import/create");
+        } else {
+            setOnPageChange(true);
+            router.push("/import/createFromProduction");
+        }
+    };
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
         { name: 'batchCode', displayName: 'Lô hàng' },
@@ -28,6 +43,7 @@ export default function ImportTable() {
         { name: 'username', displayName: 'Người tạo' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
+    const [onPageChange, setOnPageChange] = useState(false);
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,11 +51,15 @@ export default function ImportTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const { toast } = useToast();
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const processedFileHashes = new Set<string>();
-
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
     const calculateFileHash = async (file: File): Promise<string> => {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
@@ -47,7 +67,30 @@ export default function ImportTable() {
         return hash;
     };
 
-    const getData = async (page?: number, startDate?: any, endDate?: any) => {
+    const handleMenuItemClick = (
+        event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+        index: number,
+    ) => {
+        setSelectedIndex(index);
+        setOpen(false);
+    };
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event: Event) => {
+        if (
+            anchorRef.current &&
+            anchorRef.current.contains(event.target as HTMLElement)
+        ) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    const getData = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -58,27 +101,40 @@ export default function ImportTable() {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
+            }
             params.append("receiptType", 'IMPORT');
             const url = `/WarehouseReceipt/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
             if (data?._embedded?.warehouseReceiptDtoList) {
                 setReceipts(data._embedded.warehouseReceiptDtoList);
                 setTotalPages(data.page.totalPages);
             } else {
                 setReceipts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu nhập kho!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu nhập kho!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
     };
 
     useEffect(() => {
-        getData(currentPage, startDate, endDate);
-    }, [currentPage, startDate, endDate]);
+        getData(currentPage, currentSearch, startDate, endDate);
+    }, [currentPage, currentSearch, startDate, endDate]);
 
     useEffect(() => {
         setStartDate(date?.from || null);
@@ -96,13 +152,11 @@ export default function ImportTable() {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, thêm!',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             fileInput.value = '';
             if (result.isConfirmed) {
                 handleSubmit(data);
-            } else {
-                Swal.fire('Đã hủy', 'Danh sách không được thêm.', 'info');
             }
         });
     };
@@ -239,8 +293,9 @@ export default function ImportTable() {
         }
     };
 
-    const handleSearch = () => {
+    const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
+        setCurrentSearch({ field, query });
     };
 
     const handleSubmit = async (data: any) => {
@@ -284,7 +339,7 @@ export default function ImportTable() {
                                         onSearch={handleSearch}
                                         loadingData={loadingData}
                                         selectOptions={[
-                                            { value: 'id', label: 'Mã phiếu' }
+                                            { value: 'batchCode', label: 'Mã lô hàng' }
                                         ]}
                                     />
                                     {loadingData ? (
@@ -302,13 +357,68 @@ export default function ImportTable() {
                                     </>
                                 ) : (
                                     <>
-                                        <Button
-                                            onClick={() => router.push("/import/create")}
-                                            className="p-3 text-[14px] hover:bg-green-500"
+                                        <ButtonGroup
+                                            variant="contained"
+                                            sx={{
+                                                backgroundColor: '#4ba94d',
+                                                '& .MuiButton-root': {
+                                                    border: 'none',
+                                                    '&:hover': {
+                                                        backgroundColor: '#22c55e',
+                                                    },
+                                                },
+                                            }}
+                                            ref={anchorRef}
                                         >
-                                            Tạo phiếu nhập
-                                            <PlusIcon />
-                                        </Button>
+                                            <Button
+                                                className='hover:bg-green-500'
+                                                onClick={handleClick}>{options[selectedIndex]}</Button>
+                                            <Button
+                                                className='hover:bg-green-500 rounded-r-lg rounded-l-none'
+                                                aria-controls={open ? 'split-button-menu' : undefined}
+                                                aria-expanded={open ? 'true' : undefined}
+                                                aria-label="select merge strategy"
+                                                aria-haspopup="menu"
+                                                onClick={handleToggle}
+                                            >
+                                                <ArrowDropDownIcon />
+                                            </Button>
+                                        </ButtonGroup>
+                                        <Popper
+                                            sx={{ zIndex: 1 }}
+                                            open={open}
+                                            anchorEl={anchorRef.current}
+                                            role={undefined}
+                                            transition
+                                            disablePortal
+                                        >
+                                            {({ TransitionProps, placement }) => (
+                                                <Grow
+                                                    {...TransitionProps}
+                                                    style={{
+                                                        transformOrigin:
+                                                            placement === 'bottom' ? 'center top' : 'center bottom',
+                                                    }}
+                                                >
+                                                    <Paper >
+                                                        <ClickAwayListener onClickAway={handleClose}>
+                                                            <MenuList id="split-button-menu" autoFocusItem>
+                                                                {options.map((option, index) => (
+                                                                    <MenuItem
+                                                                        key={option}
+                                                                        disabled={index === 2}
+                                                                        selected={index === selectedIndex}
+                                                                        onClick={(event) => handleMenuItemClick(event, index)}
+                                                                    >
+                                                                        {option}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </MenuList>
+                                                        </ClickAwayListener>
+                                                    </Paper>
+                                                </Grow>
+                                            )}
+                                        </Popper>
                                         <Button
                                             className="p-3 text-[14px] hover:bg-green-500"
                                             onClick={handleShowDownloadMaterial}
@@ -327,7 +437,7 @@ export default function ImportTable() {
                             </div>
                         </div>
                         <div className='overflow-x-auto'>
-                            <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
+                            <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" handleClose={() => getData(currentPage, currentSearch, startDate, endDate)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -339,6 +449,15 @@ export default function ImportTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );
