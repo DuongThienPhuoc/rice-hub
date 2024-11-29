@@ -52,9 +52,6 @@ const Page = () => {
     const [formData, setFormData] = useState<FormDataItem[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [selectedRow, setSelectedRow] = useState<any>(null);
-    const [typeValidate, setTypeValidate] = useState(true);
-    const [productValidate, setProductValidate] = useState(true);
-    const [quantityValidate, setQuantityValidate] = useState(true);
     const [onPageChange, setOnPageChange] = useState(false);
 
     useEffect(() => {
@@ -95,23 +92,21 @@ const Page = () => {
         }
     };
 
-    let errors = [];
+    const errors: string[] = [];
 
     const handleAddItemToForm = () => {
 
         if (!selectedProduct) {
             errors.push('Vui lòng chọn sản phẩm!');
-            setTypeValidate(false);
         }
 
         if (quantity === 0) {
             errors.push('Số lượng không hợp lệ!');
-            setQuantityValidate(false);
         }
 
         if (!selectedUnit) {
             errors.push('Vui lòng chọn quy cách!');
-            setTypeValidate(false);
+
         }
 
         if (errors.length > 0) {
