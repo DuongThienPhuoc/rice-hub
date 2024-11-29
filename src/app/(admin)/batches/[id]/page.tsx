@@ -158,8 +158,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                             duration: 3000
                         })
                     }
-                } else {
-                    Swal.fire('Đã hủy', `Lô hàng và phiếu ${batch?.receiptType === "IMPORT" ? 'nhập' : 'xuất'} không bị xóa.`, 'info');
                 }
             });
         } else {
@@ -169,7 +167,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không, hủy!',
+                cancelButtonText: 'Không',
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
@@ -206,8 +204,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                             duration: 3000
                         })
                     }
-                } else {
-                    Swal.fire('Đã hủy', 'Sản phẩm không bị xóa khỏi lô hàng.', 'info');
                 }
             });
         }
@@ -232,7 +228,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: type === 'import' ? 'Có, nhập!' : 'Có, xuất',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 const productData = selectedProducts.map((product: any) => ({
@@ -274,12 +270,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                         action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                         duration: 3000
                     })
-                }
-            } else {
-                if (type === 'import') {
-                    Swal.fire('Đã hủy', 'Lô hàng không được nhập.', 'info');
-                } else {
-                    Swal.fire('Đã hủy', 'Lô hàng không được xuất.', 'info');
                 }
             }
         });
@@ -480,7 +470,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                         )}
                                                         <TableCell rowSpan={1} colSpan={2} align="center"><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                         <TableCell rowSpan={2}><p className='font-semibold text-white'>Số lượng</p></TableCell>
-                                                        <TableCell rowSpan={2}><p className='font-semibold text-white w-[150px]'>Mô tả</p></TableCell>
+                                                        <TableCell rowSpan={2} width={250}><p className='font-semibold text-white'>Mô tả</p></TableCell>
                                                         <TableCell rowSpan={2} align='center'><p className='font-semibold text-white'>Hành động</p></TableCell>
                                                     </TableRow>
                                                     <TableRow>

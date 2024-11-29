@@ -17,28 +17,36 @@ import { DateRange } from 'react-day-picker';
 import SearchBar from '@/components/searchbar/searchbar';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 export default function ExportTable() {
     const router = useRouter();
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
-        { name: 'batchCode', displayName: 'Lô hàng' },
+        { name: 'batchCode', displayName: 'Lô / Đơn hàng' },
         { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
         { name: 'username', displayName: 'Người tạo' },
     ];
+    const [onPageChange, setOnPageChange] = useState(false);
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
+    const { toast } = useToast();
     const [loadingData, setLoadingData] = useState(true);
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const processedFileHashes = new Set<string>();
 
-    const getData = async (page?: number, startDate?: any, endDate?: any) => {
+    const getData = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
@@ -48,6 +56,9 @@ export default function ExportTable() {
             if (startDate && endDate) {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
+            }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
             }
             params.append("receiptType", 'EXPORT');
             const url = `/WarehouseReceipt/?${params.toString()}`;
@@ -60,17 +71,28 @@ export default function ExportTable() {
                 setTotalPages(data.page.totalPages);
             } else {
                 setReceipts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu xuất kho!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu xuất kho:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu xuất kho!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
     };
 
     useEffect(() => {
-        getData(currentPage, startDate, endDate);
-    }, [currentPage, startDate, endDate]);
+        getData(currentPage, currentSearch, startDate, endDate);
+    }, [currentPage, currentSearch, startDate, endDate]);
 
     useEffect(() => {
         setStartDate(date?.from || null);
@@ -81,9 +103,9 @@ export default function ExportTable() {
         setCurrentPage(page);
     };
 
-    const handleSearch = () => {
+    const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
-        // setCurrentSearch({ field, query });
+        setCurrentSearch({ field, query });
     };
 
     const showAlert = (data: any, fileInput: HTMLInputElement) => {
@@ -93,13 +115,12 @@ export default function ExportTable() {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, thêm!',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 handleSubmit(data);
             } else {
                 fileInput.value = '';
-                Swal.fire('Đã hủy', 'Danh sách không được thêm.', 'info');
             }
         });
     };
@@ -133,9 +154,6 @@ export default function ExportTable() {
             }
 
             const fileHash = await calculateFileHash(file);
-            console.log(processedFileHashes);
-            console.log(fileHash);
-            console.log(processedFileHashes.has(fileHash));
             if (processedFileHashes.has(fileHash)) {
                 Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
                 return;
@@ -163,7 +181,6 @@ export default function ExportTable() {
             const processedData: Array<any> = [];
 
             const headers = worksheet?.getRow(1).values as string[];
-            console.log(headers);
 
             worksheet?.eachRow({ includeEmpty: true }, (row, rowNumber) => {
                 if (rowNumber === 1) return;
@@ -184,18 +201,25 @@ export default function ExportTable() {
     };
 
     const handleSubmit = async (data: any) => {
-        console.log(data);
+        setOnPageChange(true);
         try {
             const response = await api.post(`/products/export/preview`, data);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
                 Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
+                setOnPageChange(false);
             } else {
+                setOnPageChange(false);
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+            toast({
+                variant: 'destructive',
+                title: 'Không tìm thấy phiếu nhập!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000,
+            })
+            setOnPageChange(false);
         }
     }
 
@@ -226,7 +250,8 @@ export default function ExportTable() {
                                         onSearch={handleSearch}
                                         loadingData={loadingData}
                                         selectOptions={[
-                                            { value: 'id', label: 'Mã phiếu' }
+                                            { value: 'batchCode', label: 'Mã lô hàng' },
+                                            { value: 'orderCode', label: 'Mã đơn hàng' }
                                         ]}
                                     />
                                     {loadingData ? (
@@ -245,7 +270,10 @@ export default function ExportTable() {
                                 ) : (
                                     <>
                                         <Button
-                                            onClick={() => router.push("/export/create")}
+                                            onClick={() => {
+                                                router.push("/export/create")
+                                                setOnPageChange(true)
+                                            }}
                                             className="px-3 py-3 text-[14px] hover:bg-green-500"
                                         >
                                             Tạo phiếu xuất
@@ -269,7 +297,7 @@ export default function ExportTable() {
                             </div>
                         </div>
                         <div className='overflow-x-auto'>
-                            <ReceiptList name="Phiếu xuất" editUrl="/export/updateExport" loadingData={loadingData} titles={titles} columns={columns} data={receipts} tableName="import" />
+                            <ReceiptList name="Phiếu xuất" editUrl="/export/updateExport" loadingData={loadingData} titles={titles} columns={columns} data={receipts} tableName="import" handleClose={() => getData(currentPage, currentSearch, startDate, endDate)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -281,6 +309,15 @@ export default function ExportTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

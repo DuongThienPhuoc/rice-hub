@@ -140,7 +140,7 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xuất!',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed && id) {
                 setOnPageChange(true);

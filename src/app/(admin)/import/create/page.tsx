@@ -293,8 +293,8 @@ const Page = () => {
             return;
         }
 
-        if (!selectedSupplier) {
-            setSupplierValidate(false);
+        if (!selectedWarehouse) {
+            setWarehouseValidate(false);
             toast({
                 variant: 'destructive',
                 title: 'Có lỗi xảy ra!',
@@ -372,41 +372,86 @@ const Page = () => {
                     )}
                     {loadingData ? (
                         <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
-                            <div className="m-5 flex flex-col lg:flex-row items-center w-full">
-                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[200px] w-[100%] rounded-lg' />
-                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[300px] w-[100%] lg:mx-5 my-4 rounded-lg' />
+                            <div className="flex flex-col lg:flex-row items-center w-full">
+                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[400px] w-[100%] rounded-lg' />
+                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[400px] w-[100%] lg:ml-2 rounded-lg' />
                             </div>
                         </div>
                     ) : (
-                        <div className='mt-10 lg:px-10 px-2 lg:flex-row flex-col flex w-full'>
-                            <div className='m-5 flex-1 flex-col lg:flex-row lg:items-center'>
-                                <span className='font-bold flex-[2] pt-4'>Chọn sản phẩm: </span>
+                        <div className='mt-10 lg:px-10 px-2 lg:flex-row flex-col flex w-full lg:space-x-2 lg:space-y-0 space-y-2'>
+                            <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
+                                <p className='text-white font-semibold p-2 rounded-lg'>Tìm kiếm sản phẩm: </p>
                                 <Autocomplete
                                     disablePortal
                                     options={products}
-                                    getOptionLabel={(option) => option.category.name + " " + option.name + " (" + option.supplier.name + ")"}
-                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) =>
+                                        option.category.name + " " + option.name + " (" + option.supplier.name + ")"
+                                    }
+                                    sx={{
+                                        width: 300,
+                                        "& .MuiInputBase-root": {
+                                            backgroundColor: "white",
+                                            borderRadius: "8px",
+                                            paddingRight: "8px",
+                                        },
+                                    }}
                                     value={selectedProduct}
-                                    ListboxProps={{ style: { maxHeight: '200px' } }}
                                     onChange={(event, newValue) => setSelectedProduct(newValue)}
-                                    renderInput={(params) => <TextField {...params} variant='standard' />}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            variant="standard"
+                                            sx={{
+                                                "& .MuiInputBase-root": {
+                                                    paddingX: "10px",
+                                                },
+                                                "& .MuiInput-underline:before": {
+                                                    display: "none",
+                                                },
+                                                "& .MuiInput-underline:after": {
+                                                    display: "none",
+                                                },
+                                            }}
+                                        />
+                                    )}
                                 />
                             </div>
-                            <div className='m-5 flex-1 flex-col lg:flex-row lg:items-center'>
-                                <span className='font-bold flex-[2] pt-4'>Chọn nhà kho: </span>
+                            <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
+                                <p className='text-white font-semibold p-2 rounded-lg'>Chọn nhà kho: </p>
                                 <Autocomplete
-                                    disableClearable
                                     disablePortal
                                     options={warehouses}
                                     value={selectedWarehouse}
-                                    sx={{ width: 300 }}
-                                    ListboxProps={{ style: { maxHeight: '200px' } }}
+                                    sx={{
+                                        width: 300,
+                                        "& .MuiInputBase-root": {
+                                            backgroundColor: "white",
+                                            borderRadius: "8px",
+                                            paddingRight: "8px",
+                                        },
+                                    }}
                                     getOptionLabel={(option) => option.name}
                                     onChange={(event, newValue) => {
                                         setSelectedWarehouse(newValue)
                                         setWarehouseValidate(true)
                                     }}
-                                    renderInput={(params) => <TextField error={!warehouseValidate} {...params} variant='standard' />}
+                                    renderInput={(params) =>
+                                        <TextField
+                                            error={!warehouseValidate}
+                                            {...params}
+                                            variant='standard'
+                                            sx={{
+                                                "& .MuiInputBase-root": {
+                                                    paddingX: "10px",
+                                                },
+                                                "& .MuiInput-underline:before": {
+                                                    display: "none",
+                                                },
+                                                "& .MuiInput-underline:after": {
+                                                    display: "none",
+                                                },
+                                            }}
+                                        />}
                                 />
                             </div>
                         </div>

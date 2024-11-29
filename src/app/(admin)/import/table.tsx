@@ -19,6 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import SearchBar from '@/components/searchbar/searchbar';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ImportTable() {
     const router = useRouter();
@@ -50,6 +51,7 @@ export default function ImportTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const { toast } = useToast();
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
@@ -106,15 +108,25 @@ export default function ImportTable() {
             const url = `/WarehouseReceipt/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
             if (data?._embedded?.warehouseReceiptDtoList) {
                 setReceipts(data._embedded.warehouseReceiptDtoList);
                 setTotalPages(data.page.totalPages);
             } else {
                 setReceipts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu nhập kho!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu nhập kho:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu nhập kho!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -140,13 +152,11 @@ export default function ImportTable() {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, thêm!',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             fileInput.value = '';
             if (result.isConfirmed) {
                 handleSubmit(data);
-            } else {
-                Swal.fire('Đã hủy', 'Danh sách không được thêm.', 'info');
             }
         });
     };
@@ -427,7 +437,7 @@ export default function ImportTable() {
                             </div>
                         </div>
                         <div className='overflow-x-auto'>
-                            <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" />
+                            <ReceiptList name="Phiếu nhập" editUrl="/import/updateImport" titles={titles} loadingData={loadingData} columns={columns} data={receipts} tableName="import" handleClose={() => getData(currentPage, currentSearch, startDate, endDate)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
