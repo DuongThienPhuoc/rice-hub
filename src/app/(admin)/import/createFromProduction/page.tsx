@@ -38,14 +38,11 @@ interface FormDataItem {
 const Page = () => {
     const { toast } = useToast();
     const router = useRouter();
-    const [suppliers, setSuppliers] = useState<RowData[]>([]);
     const [categories, setCategories] = useState<RowData[]>([]);
     const [products, setProducts] = useState<RowData[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [productName, setProductName] = useState('');
     const [productNameValidate, setProductNameValidate] = useState(true);
-    const [importPrice, setImportPrice] = useState(0);
-    const [importPriceValidate, setImportPriceValidate] = useState(true);
     const [quantity, setQuantity] = useState(0);
     const [quantityValidate, setQuantityValidate] = useState(true);
     const [weight, setWeight] = useState(0);
@@ -69,28 +66,11 @@ const Page = () => {
             setProductName(selectedProduct?.name || '');
             const foundCategory = categories.find((category) => category.id === selectedProduct?.category?.id);
             setSelectedCategory(foundCategory || null);
-            const foundSupplier = suppliers.find((supplier) => supplier.id === selectedProduct?.supplier?.id);
         } else {
             setProductName('');
             setSelectedCategory(null);
         }
     }, [selectedProduct])
-
-    const getSuppliers = async () => {
-        try {
-            const url = `/suppliers/all`;
-            const response = await api.get(url);
-            const data = response.data;
-            setSuppliers(data.filter((s: any) => s.active === true));
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
-                description: 'Xin vui lòng thử lại',
-                duration: 3000
-            })
-        }
-    };
 
     const getProducts = async () => {
         try {
@@ -132,7 +112,7 @@ const Page = () => {
         }
     };
 
-    let errors = [];
+    const errors: string[] = [""];
 
     const handleAddItemToForm = () => {
 
@@ -193,7 +173,6 @@ const Page = () => {
         setSelectedCategory(null);
         setType(null);
         setProductName('');
-        setImportPrice(0);
         setQuantity(0);
         setWeight(0);
         setType('');

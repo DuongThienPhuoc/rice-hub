@@ -48,7 +48,6 @@ const Page = () => {
     const [warehouses, setWarehouses] = useState<RowData[]>([]);
     const [products, setProducts] = useState<RowData[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
-    const [isFocused, setIsFocused] = useState(false);
     const [productName, setProductName] = useState('');
     const [productNameValidate, setProductNameValidate] = useState(true);
     const [importPrice, setImportPrice] = useState(0);
@@ -163,7 +162,7 @@ const Page = () => {
         }
     };
 
-    let errors = [];
+    const errors:string[] = [''];
 
     const handleAddItemToForm = () => {
 
@@ -512,8 +511,6 @@ const Page = () => {
                                                         readOnly: selectedProduct !== null,
                                                     }}
                                                     className='w-full'
-                                                    onFocus={() => setIsFocused(true)}
-                                                    onBlur={() => setIsFocused(false)}
                                                     onChange={(e) => {
                                                         setProductName(e.target.value)
                                                         setProductNameValidate(true)
