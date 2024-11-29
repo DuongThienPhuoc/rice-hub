@@ -14,6 +14,10 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@radix-ui/react-toast';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import FloatingButton from '@/components/floating/floatingButton';
 
 interface RowData {
     [key: string]: any;
@@ -36,6 +40,7 @@ interface FormDataItem {
 
 const Page = () => {
     const router = useRouter();
+    const { toast } = useToast();
     const [products, setProducts] = useState<RowData[]>([]);
     const [selectedUnit, setSelectedUnit] = useState<any>(null);
     const [selectedProduct, setSelectedProduct] = useState<RowData | null>(null);
@@ -47,19 +52,18 @@ const Page = () => {
     const [formData, setFormData] = useState<FormDataItem[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [selectedRow, setSelectedRow] = useState<any>(null);
+    const [onPageChange, setOnPageChange] = useState(false);
 
     useEffect(() => {
         getProducts();
     }, []);
 
     useEffect(() => {
-        console.log(selectedProduct);
         if (selectedProduct) {
             setProductName(selectedProduct?.name || '');
             setSelectedCategory(selectedProduct?.category || null);
             setSelectedSupplier(selectedProduct?.supplier || null);
             setSelectedWarehouse(selectedProduct?.productWarehouses[0]?.warehouse || null);
-            setSelectedUnit(selectedProduct?.productWarehouses[0]);
         } else {
             setProductName('');
             setSelectedProduct(null);
@@ -77,37 +81,50 @@ const Page = () => {
             const data = response.data;
             setProducts(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách sản phẩm!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
     };
 
+    const errors: string[] = [];
+
     const handleAddItemToForm = () => {
-        if (productName === '') {
-            alert('Vui lòng nhập tên sản phẩm!');
-            return;
+
+        if (!selectedProduct) {
+            errors.push('Vui lòng chọn sản phẩm!');
         }
 
         if (quantity === 0) {
-            alert('Số lượng không hợp lệ');
+            errors.push('Số lượng không hợp lệ!');
+        }
+
+        if (!selectedUnit) {
+            errors.push('Vui lòng chọn quy cách!');
+
+        }
+
+        if (errors.length > 0) {
+            toast({
+                variant: 'destructive',
+                title: 'Có lỗi xảy ra!',
+                description: (
+                    <ul>
+                        {errors.map((error, index) => (
+                            <li key={index}>{error}</li>
+                        ))}
+                    </ul>
+                ),
+                duration: 3000,
+            });
             return;
         }
 
-        if (!selectedCategory) {
-            alert('Vui lòng chọn danh mục');
-            return;
-        }
-
-        if (!selectedSupplier) {
-            alert('Vui lòng chọn nhà cung cấp');
-            return;
-        }
-
-        if (!selectedWarehouse) {
-            alert('Vui lòng chọn kho');
-            return;
-        }
         const newItem: FormDataItem = {
             productName: productName,
             quantity: quantity,
@@ -133,33 +150,50 @@ const Page = () => {
     }
 
     const handleSubmit = async () => {
-
+        setOnPageChange(true);
         if (formData.length < 1) {
-            alert("Danh sách rỗng! Vui lòng thêm sản phẩm.");
+            toast({
+                variant: 'destructive',
+                title: 'Đã xảy ra lỗi!',
+                description: 'Danh sách rỗng! Vui lòng thêm sản phẩm.',
+                duration: 3000
+            })
+            setOnPageChange(false);
             return;
         }
 
         try {
             const response = await api.post(`/products/export/preview`, formData);
             if (response.status >= 200 && response.status < 300) {
-                alert(`Lô hàng đã được xuất thành công`);
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    description: `Lô hàng đã được tạo thành công`,
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
+                })
                 router.push("/export");
             } else {
                 throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+            setOnPageChange(false);
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     };
 
     const handleDeleteItem = (index: number) => {
         setFormData(prevFormData => prevFormData.filter((_, i) => i !== index));
     };
-
-    useEffect(() => {
-        console.log(formData)
-    }, [formData])
 
     const handleFieldChange = (fieldName: any, fieldValue: any, index: any) => {
         setFormData(prevFormData =>
@@ -193,18 +227,53 @@ const Page = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
-                            <div className='m-5 flex-1 flex flex-col lg:flex-row lg:items-center'>
-                                <span className='font-bold flex-[2] pt-4'>Chọn sản phẩm: </span>
+                        <div className='mt-10 lg:px-10 px-2 lg:flex-row flex-col flex w-full lg:space-x-2 lg:space-y-0 space-y-2'>
+                            <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
+                                <p className='text-white font-semibold p-2 rounded-lg'>Tìm kiếm sản phẩm: </p>
                                 <Autocomplete
-                                    className='flex-[4] lg:mx-5 my-4 lg:my-0 focus:outline-none px-2 border-gray-200 focus:border-black border-b-2'
                                     disablePortal
-                                    options={products}
-                                    getOptionLabel={(option) => option.category.name + " " + option.name + " (" + option.supplier.name + ")"}
-                                    sx={{ width: 300 }}
-                                    ListboxProps={{ style: { maxHeight: '200px' } }}
+                                    options={
+                                        products.filter((product: any) => {
+                                            return (
+                                                product.productWarehouses &&
+                                                product.productWarehouses.some(
+                                                    (warehouse: any) =>
+                                                        warehouse.unit && warehouse.unit.trim() !== '' && warehouse.weightPerUnit > 0
+                                                )
+                                            );
+                                        })
+                                    }
+
+                                    getOptionLabel={(option) =>
+                                        option.category.name + " " + option.name + " (" + option.supplier.name + ")"
+                                    }
+                                    sx={{
+                                        width: 300,
+                                        "& .MuiInputBase-root": {
+                                            backgroundColor: "white",
+                                            borderRadius: "8px",
+                                            paddingRight: "8px",
+                                        },
+                                    }}
+                                    value={selectedProduct}
                                     onChange={(event, newValue) => setSelectedProduct(newValue)}
-                                    renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm sản phẩm" />}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            variant="standard"
+                                            sx={{
+                                                "& .MuiInputBase-root": {
+                                                    paddingX: "10px",
+                                                },
+                                                "& .MuiInput-underline:before": {
+                                                    display: "none",
+                                                },
+                                                "& .MuiInput-underline:after": {
+                                                    display: "none",
+                                                },
+                                            }}
+                                        />
+                                    )}
                                 />
                             </div>
                         </div>
@@ -233,7 +302,12 @@ const Page = () => {
                                             </TableCell>
                                             <TableCell align='center' className={`w-[10%]`}>
                                                 <p className='font-semibold text-white'>
-                                                    Số lượng
+                                                    Danh mục
+                                                </p>
+                                            </TableCell>
+                                            <TableCell align='center' className={`w-[15%]`}>
+                                                <p className='font-semibold text-white'>
+                                                    Nhà cung cấp
                                                 </p>
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%]`}>
@@ -243,12 +317,7 @@ const Page = () => {
                                             </TableCell>
                                             <TableCell align='center' className={`w-[10%]`}>
                                                 <p className='font-semibold text-white'>
-                                                    Danh mục
-                                                </p>
-                                            </TableCell>
-                                            <TableCell align='center' className={`w-[15%]`}>
-                                                <p className='font-semibold text-white'>
-                                                    Nhà cung cấp
+                                                    Số lượng
                                                 </p>
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%]`}>
@@ -273,45 +342,7 @@ const Page = () => {
                                                     }}
                                                     onChange={(e) => setProductName(e.target.value)}
                                                     value={productName}
-                                                    label={'Tên sản phẩm'}
                                                     variant="standard" />
-                                            </TableCell>
-                                            <TableCell className='p-2'>
-                                                <TextField
-                                                    inputProps={{ min: 0 }}
-                                                    type={'number'}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                    className='w-full'
-                                                    onChange={(e) => setQuantity(Number(e.target.value))}
-                                                    value={quantity}
-                                                    label={'Số lượng'}
-                                                    variant="standard" />
-                                            </TableCell>
-                                            <TableCell className='p-2'>
-                                                <Autocomplete
-                                                    className='w-full'
-                                                    options={
-                                                        selectedProduct?.productWarehouses
-                                                            ? selectedProduct.productWarehouses.filter(
-                                                                (item: any, index: any, self: any) =>
-                                                                    index ===
-                                                                    self.findIndex(
-                                                                        (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
-                                                                    )
-                                                            )
-                                                            : []
-                                                    }
-                                                    disablePortal
-                                                    value={selectedUnit}
-                                                    onChange={(event, newValue) => {
-                                                        setSelectedUnit(newValue)
-                                                    }}
-                                                    getOptionLabel={(option: any) => `${option.unit} ${option.weightPerUnit}kg`}
-                                                    renderInput={(params) => <TextField {...params}
-                                                        variant='standard' label="Quy cách" />}
-                                                />
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 {!selectedProduct ? (
@@ -321,7 +352,7 @@ const Page = () => {
                                                         disablePortal
                                                         readOnly
                                                         renderInput={(params) => <TextField {...params}
-                                                            disabled variant='standard' label="Danh mục" />}
+                                                            disabled variant='standard' />}
                                                     />
                                                 ) : (
                                                     <TextField
@@ -334,7 +365,6 @@ const Page = () => {
                                                             shrink: selectedProduct !== null,
                                                         }}
                                                         value={selectedCategory?.name}
-                                                        label={'Danh mục'}
                                                         variant="standard" />
                                                 )}
                                             </TableCell>
@@ -345,7 +375,7 @@ const Page = () => {
                                                         options={[]}
                                                         disablePortal
                                                         readOnly
-                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' label="Nhà cung cấp" />}
+                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' />}
                                                     />
                                                 ) : (
                                                     <TextField
@@ -358,9 +388,54 @@ const Page = () => {
                                                             shrink: selectedProduct !== null,
                                                         }}
                                                         value={selectedSupplier?.name}
-                                                        label={'Nhà cung cấp'}
                                                         variant="standard" />
                                                 )}
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                <Autocomplete
+                                                    disableClearable
+                                                    className='w-full'
+                                                    options={
+                                                        selectedProduct?.productWarehouses
+                                                            ? selectedProduct.productWarehouses.filter((item: any, index: any, self: any) => {
+                                                                const isValid = item.unit !== null && item.weightPerUnit !== 0;
+                                                                const isUnique =
+                                                                    index ===
+                                                                    self.findIndex(
+                                                                        (t: any) => t.unit === item.unit && t.weightPerUnit === item.weightPerUnit
+                                                                    );
+                                                                return isValid && isUnique;
+                                                            })
+                                                            : []
+                                                    }
+
+                                                    disablePortal
+                                                    value={selectedUnit}
+                                                    onChange={(event, newValue) => {
+                                                        setSelectedUnit(newValue)
+                                                    }}
+                                                    getOptionLabel={(option: any) => `${option.unit} ${option.weightPerUnit}kg`}
+                                                    renderInput={(params) => <TextField {...params}
+                                                        variant='standard' />}
+                                                />
+                                            </TableCell>
+                                            <TableCell className='p-2'>
+                                                <TextField
+                                                    type={'text'}
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        const numericValue = Number(value);
+                                                        if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                            setQuantity(Number(value))
+                                                            // setQuantityValidate(true)
+                                                        }
+                                                    }}
+                                                    value={quantity}
+                                                    // error={isNaN(quantity) || !quantityValidate}
+                                                    variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 {!selectedProduct ? (
@@ -369,7 +444,7 @@ const Page = () => {
                                                         disablePortal
                                                         options={[]}
                                                         readOnly
-                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' label="Kho" />}
+                                                        renderInput={(params) => <TextField {...params} disabled variant='standard' />}
                                                     />
                                                 ) : (
                                                     <TextField
@@ -382,7 +457,6 @@ const Page = () => {
                                                             shrink: selectedProduct !== null,
                                                         }}
                                                         value={selectedWarehouse?.name}
-                                                        label={'Kho'}
                                                         variant="standard" />
                                                 )}
                                             </TableCell>
@@ -511,7 +585,10 @@ const Page = () => {
                                 <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/export")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push("/export")
+                                    setOnPageChange(true)
+                                }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>
@@ -519,6 +596,16 @@ const Page = () => {
                     </div>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div>
     );
 };

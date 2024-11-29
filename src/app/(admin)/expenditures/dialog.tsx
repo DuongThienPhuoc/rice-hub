@@ -71,6 +71,11 @@ export default function AddPaymentVoucherDialogProvider({
                     variant: 'success',
                     title: 'Tạo phiếu chi thành công',
                     description: 'Phiếu chi đã được tạo thành công',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
                 });
             }
         } catch (e) {
@@ -163,7 +168,7 @@ export default function AddPaymentVoucherDialogProvider({
                                     <FormLabel>Ghi chú</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="Nhập số tiền"
+                                            placeholder="Nhập ghi chú"
                                             {...field}
                                         />
                                     </FormControl>
@@ -174,6 +179,7 @@ export default function AddPaymentVoucherDialogProvider({
                         <div className="flex justify-end gap-2">
                             <Button
                                 type="button"
+                                className='bg-red-600 hover:bg-red-500'
                                 onClick={() => {
                                     setIsOpen(false);
                                     form.reset();

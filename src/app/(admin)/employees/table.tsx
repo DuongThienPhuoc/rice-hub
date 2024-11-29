@@ -11,8 +11,10 @@ import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useToast } from '@/hooks/use-toast';
 
 export default function EmployeeTable() {
+    const { toast } = useToast();
     const router = useRouter();
     const columns = [
         { name: 'employeeCode', displayName: 'Mã nhân viên' },
@@ -49,10 +51,25 @@ export default function EmployeeTable() {
             const url = `/employees/?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setEmployees(data._embedded.employeeList);
+            if (data.page.totalElements === 0) {
+                setEmployees([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy nhân viên!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            } else {
+                setEmployees(data._embedded.employeeList);
+            }
             setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách nhân viên:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách nhân viên!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -97,7 +114,8 @@ export default function EmployeeTable() {
                                 selectOptions={[
                                     { value: 'employeeCode', label: 'Mã nhân viên' },
                                     { value: 'fullName', label: 'Tên nhân viên' },
-                                    { value: 'phoneNumber', label: 'Số điện thoại' }
+                                    { value: 'phoneNumber', label: 'Số điện thoại' },
+                                    { value: 'email', label: 'Địa chỉ email' }
                                 ]}
                             />
                             <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>

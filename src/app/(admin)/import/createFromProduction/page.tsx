@@ -26,32 +26,23 @@ interface RowData {
 interface FormDataItem {
     name: string;
     description: string;
-    importPrice: number;
     image: string;
     quantity: number;
     weightPerUnit: number;
     unit: string;
     categoryName: string;
     categoryId: string;
-    supplierId: number;
-    supplierName: string;
     unitOfMeasureId: number;
-    warehouseId: number;
-    warehouseName: string;
 }
 
 const Page = () => {
     const { toast } = useToast();
     const router = useRouter();
-    const [suppliers, setSuppliers] = useState<RowData[]>([]);
     const [categories, setCategories] = useState<RowData[]>([]);
-    const [warehouses, setWarehouses] = useState<RowData[]>([]);
     const [products, setProducts] = useState<RowData[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [productName, setProductName] = useState('');
     const [productNameValidate, setProductNameValidate] = useState(true);
-    const [importPrice, setImportPrice] = useState(0);
-    const [importPriceValidate, setImportPriceValidate] = useState(true);
     const [quantity, setQuantity] = useState(0);
     const [quantityValidate, setQuantityValidate] = useState(true);
     const [weight, setWeight] = useState(0);
@@ -60,80 +51,39 @@ const Page = () => {
     const [typeValidate, setTypeValidate] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<RowData | null>(null);
     const [categoryValidate, setCategoryValidate] = useState(true);
-    const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
-    const [supplierValidate, setSupplierValidate] = useState(true);
-    const [selectedWarehouse, setSelectedWarehouse] = useState<RowData | null>(null);
-    const [warehouseValidate, setWarehouseValidate] = useState(true);
     const [formData, setFormData] = useState<FormDataItem[]>([]);
     const [loadingData, setLoadingData] = useState(true);
     const [selectedRow, setSelectedRow] = useState<any>(null);
-    const [totalPrice, setTotalPrice] = useState<number>(0);
     const [onPageChange, setOnPageChange] = useState(false);
 
     useEffect(() => {
-        getSuppliers();
         getProducts();
         getCategories();
-        getWarehouses();
     }, []);
 
     useEffect(() => {
         if (selectedProduct) {
-            setImportPrice(selectedProduct?.importPrice);
             setProductName(selectedProduct?.name || '');
             const foundCategory = categories.find((category) => category.id === selectedProduct?.category?.id);
             setSelectedCategory(foundCategory || null);
-            const foundSupplier = suppliers.find((supplier) => supplier.id === selectedProduct?.supplier?.id);
-            setSelectedSupplier(foundSupplier || null);
-            const foundWarehouse = warehouses.find((warehouse) => warehouse.id === selectedProduct?.productWarehouses[0]?.warehouse.id);
-            setSelectedWarehouse(foundWarehouse || null);
         } else {
-            setImportPrice(0);
             setProductName('');
-            setSelectedSupplier(null);
             setSelectedCategory(null);
-            setSelectedWarehouse(null);
         }
     }, [selectedProduct])
-
-    const getSuppliers = async () => {
-        try {
-            const url = `/suppliers/all`;
-            const response = await api.get(url);
-            const data = response.data;
-            setSuppliers(data.filter((s: any) => s.active === true));
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
-                description: 'Xin vui lòng thử lại',
-                duration: 3000
-            })
-        }
-    };
-
-    const getWarehouses = async () => {
-        try {
-            const url = `/warehouses/all`;
-            const response = await api.get(url);
-            const data = response.data;
-            setWarehouses(data);
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nhà kho!',
-                description: 'Xin vui lòng thử lại',
-                duration: 3000
-            })
-        }
-    };
 
     const getProducts = async () => {
         try {
             const url = `/products/`;
             const response = await api.get(url);
             const data = response.data;
-            setProducts(data.filter((p: any) => p.isDeleted === false));
+            setProducts(
+                data.filter((p: any) =>
+                    p.isDeleted === false &&
+                    p.productWarehouses.length > 0 &&
+                    p.productWarehouses[0].warehouse.id === 2
+                )
+            );
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -162,18 +112,13 @@ const Page = () => {
         }
     };
 
-    const errors:string[] = [''];
+    const errors: string[] = [""];
 
     const handleAddItemToForm = () => {
 
         if (productName === '') {
             errors.push('Tên sản phẩm không được bỏ trống!');
             setProductNameValidate(false);
-        }
-
-        if (importPrice === 0) {
-            errors.push('Giá nhập không hợp lệ!');
-            setImportPriceValidate(false);
         }
 
         if (weight === 0) {
@@ -196,11 +141,6 @@ const Page = () => {
             setCategoryValidate(false);
         }
 
-        if (!selectedSupplier) {
-            errors.push('Vui lòng chọn nhà cung cấp!');
-            setSupplierValidate(false);
-        }
-
         if (errors.length > 0) {
             toast({
                 variant: 'destructive',
@@ -217,47 +157,26 @@ const Page = () => {
             return;
         }
 
-        setTotalPrice(totalPrice + (quantity * importPrice * weight));
-
         const newItem: FormDataItem = {
             name: productName,
             description: 'description',
-            importPrice: importPrice,
             image: "",
             quantity: quantity,
             weightPerUnit: weight,
             unit: type || '',
             categoryName: selectedCategory?.name,
             categoryId: selectedCategory?.id,
-            supplierName: selectedSupplier?.name,
-            supplierId: selectedSupplier?.id,
             unitOfMeasureId: 1,
-            warehouseName: selectedWarehouse?.name,
-            warehouseId: selectedWarehouse?.id
         };
         setFormData(prevFormData => [...prevFormData, newItem]);
         setSelectedProduct(null);
         setSelectedCategory(null);
-        setSelectedSupplier(null);
         setType(null);
         setProductName('');
-        setImportPrice(0);
         setQuantity(0);
         setWeight(0);
         setType('');
     }
-
-    useEffect(() => {
-        if (selectedWarehouse) {
-            setFormData(prevFormData =>
-                prevFormData.map(item => ({
-                    ...item,
-                    warehouseName: selectedWarehouse.name,
-                    warehouseId: selectedWarehouse.id
-                }))
-            );
-        }
-    }, [selectedWarehouse]);
 
     const handleFieldChange = (fieldName: any, fieldValue: any, index: any) => {
         setFormData(prevFormData =>
@@ -268,16 +187,6 @@ const Page = () => {
             )
         );
     };
-
-    useEffect(() => {
-        const total = formData.reduce((sum, item) => {
-            const quantity = item.quantity || 0;
-            const importPrice = item.importPrice || 0;
-            const weight = item.weightPerUnit || 0;
-            return sum + (quantity * weight) * importPrice;
-        }, 0);
-        setTotalPrice(total);
-    }, [formData]);
 
     const handleSubmit = async () => {
         setOnPageChange(true);
@@ -292,20 +201,8 @@ const Page = () => {
             return;
         }
 
-        if (!selectedWarehouse) {
-            setWarehouseValidate(false);
-            toast({
-                variant: 'destructive',
-                title: 'Có lỗi xảy ra!',
-                description: 'Vui lòng chọn kho hàng',
-                duration: 3000,
-            });
-            setOnPageChange(false);
-            return;
-        }
-
         try {
-            const response = await api.post(`/products/import/preview`, formData);
+            const response = await api.post(`/products/import/previewFromProduction`, formData);
             if (response.status >= 200 && response.status < 300) {
                 toast({
                     variant: 'default',
@@ -373,7 +270,6 @@ const Page = () => {
                         <div className='mt-10 lg:px-10 px-2 flex lg:w-[50%] w-full'>
                             <div className="flex flex-col lg:flex-row items-center w-full">
                                 <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[400px] w-[100%] rounded-lg' />
-                                <Skeleton animation="wave" variant="rectangular" height={30} className='lg:w-[400px] w-[100%] lg:ml-2 rounded-lg' />
                             </div>
                         </div>
                     ) : (
@@ -415,44 +311,6 @@ const Page = () => {
                                     )}
                                 />
                             </div>
-                            <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
-                                <p className='text-white font-semibold p-2 rounded-lg'>Chọn nhà kho: </p>
-                                <Autocomplete
-                                    disablePortal
-                                    options={warehouses}
-                                    value={selectedWarehouse}
-                                    sx={{
-                                        width: 300,
-                                        "& .MuiInputBase-root": {
-                                            backgroundColor: "white",
-                                            borderRadius: "8px",
-                                            paddingRight: "8px",
-                                        },
-                                    }}
-                                    getOptionLabel={(option) => option.name}
-                                    onChange={(event, newValue) => {
-                                        setSelectedWarehouse(newValue)
-                                        setWarehouseValidate(true)
-                                    }}
-                                    renderInput={(params) =>
-                                        <TextField
-                                            error={!warehouseValidate}
-                                            {...params}
-                                            variant='standard'
-                                            sx={{
-                                                "& .MuiInputBase-root": {
-                                                    paddingX: "10px",
-                                                },
-                                                "& .MuiInput-underline:before": {
-                                                    display: "none",
-                                                },
-                                                "& .MuiInput-underline:after": {
-                                                    display: "none",
-                                                },
-                                            }}
-                                        />}
-                                />
-                            </div>
                         </div>
                     )}
                     <div className='lg:px-10 mt-5 px-2 w-full'>
@@ -467,37 +325,28 @@ const Page = () => {
                                 <Table sx={{ minWidth: 1000, borderCollapse: 'collapse' }} aria-label="simple table">
                                     <TableHead className='bg-[#0090d9]'>
                                         <TableRow>
-                                            <TableCell rowSpan={2} className={`w-[5%]`}>
+                                            <TableCell rowSpan={2} >
                                                 <p className='font-semibold text-white'>STT</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%]`}>
+                                            <TableCell rowSpan={2} >
                                                 <p className='font-semibold text-white'>Tên sản phẩm</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[15%]`}>
-                                                <p className='font-semibold text-white'>Danh mục</p>
+                                            <TableCell rowSpan={2} >
+                                                <p className='font-semibold text-white min-w-[140px]'>Danh mục</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[15%]`}>
-                                                <p className='font-semibold text-white'>Nhà cung cấp</p>
-                                            </TableCell>
-                                            <TableCell align='center' colSpan={2} className={`w-[20%]`}>
+                                            <TableCell align='center' colSpan={2}>
                                                 <p className='font-semibold text-white'>Quy cách</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%]`}>
-                                                <p className='font-semibold text-white'>Giá nhập (kg)</p>
-                                            </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%]`}>
+                                            <TableCell rowSpan={2}>
                                                 <p className='font-semibold text-white'>Số lượng</p>
                                             </TableCell>
-                                            <TableCell rowSpan={2} className={`w-[10%]`}>
-                                                <p className='font-semibold text-white'>Tổng cộng</p>
-                                            </TableCell>
-                                            <TableCell rowSpan={2} className="w-[10%]"><p className='font-semibold text-white'>Hành động</p></TableCell>
+                                            <TableCell rowSpan={2} ><p className='font-semibold text-white'>Hành động</p></TableCell>
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell align='center' className={`w-[10%] `}>
+                                            <TableCell align='center'>
                                                 <p className='font-semibold text-white'>Loại</p>
                                             </TableCell>
-                                            <TableCell align='center' className={`w-[10%]`}>
+                                            <TableCell align='center'>
                                                 <p className='font-semibold text-white'>Trọng lượng</p>
                                             </TableCell>
                                         </TableRow>
@@ -533,59 +382,41 @@ const Page = () => {
                                                 />
                                             </TableCell>
                                             <TableCell className='p-2'>
-                                                <Autocomplete
-                                                    disablePortal
-                                                    options={suppliers}
-                                                    value={selectedSupplier}
-                                                    getOptionLabel={(option) => option.name}
-                                                    onChange={(event, newValue) => {
-                                                        setSelectedSupplier(newValue)
-                                                        setSupplierValidate(true)
-                                                    }}
-                                                    renderInput={(params) => <TextField error={!supplierValidate} {...params} variant='standard' />}
-                                                />
+                                                <div className='flex justify-center'>
+                                                    <Autocomplete
+                                                        disablePortal
+                                                        value={type ? type : ''}
+                                                        options={['Bao', 'Túi']}
+                                                        sx={{
+                                                            width: 100
+                                                        }}
+                                                        onChange={(event, newValue) => {
+                                                            setType(newValue)
+                                                            setTypeValidate(true)
+                                                        }}
+                                                        renderInput={(params) => <TextField error={!typeValidate} {...params} variant='standard' />}
+                                                    />
+                                                </div>
                                             </TableCell>
                                             <TableCell className='p-2'>
-                                                <Autocomplete
-                                                    disablePortal
-                                                    value={type ? type : ''}
-                                                    options={['Bao', 'Túi']}
-                                                    onChange={(event, newValue) => {
-                                                        setType(newValue)
-                                                        setTypeValidate(true)
-                                                    }}
-                                                    renderInput={(params) => <TextField error={!typeValidate} {...params} variant='standard' />}
-                                                />
-                                            </TableCell>
-                                            <TableCell className='p-2'>
-                                                <TextField
-                                                    type={'text'}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        const numericValue = Number(value);
-                                                        if (!isNaN(numericValue) && Number(value) >= 0) {
-                                                            setWeight(Number(value));
-                                                            setWeightValidate(true)
-                                                        }
-                                                    }}
-                                                    value={weight}
-                                                    error={isNaN(weight) || !weightValidate}
-                                                    variant="standard" />
-                                            </TableCell>
-                                            <TableCell className='p-2'>
-                                                <TextField
-                                                    type={'text'}
-                                                    onChange={(e) => {
-                                                        const value = e.target.value;
-                                                        const numericValue = Number(value);
-                                                        if (!isNaN(numericValue) && Number(value) >= 0) {
-                                                            setImportPrice(Number(value));
-                                                            setImportPriceValidate(true)
-                                                        }
-                                                    }}
-                                                    value={importPrice}
-                                                    error={isNaN(importPrice) || !importPriceValidate}
-                                                    variant="standard" />
+                                                <div className='flex justify-center'>
+                                                    <TextField
+                                                        type={'text'}
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            const numericValue = Number(value);
+                                                            if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                setWeight(Number(value));
+                                                                setWeightValidate(true)
+                                                            }
+                                                        }}
+                                                        sx={{
+                                                            width: 100
+                                                        }}
+                                                        value={weight}
+                                                        error={isNaN(weight) || !weightValidate}
+                                                        variant="standard" />
+                                                </div>
                                             </TableCell>
                                             <TableCell className='p-2'>
                                                 <TextField
@@ -605,8 +436,6 @@ const Page = () => {
                                                     error={isNaN(quantity) || !quantityValidate}
                                                     variant="standard" />
                                             </TableCell>
-                                            <TableCell className='p-2'>
-                                                {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(quantity * importPrice * weight || 0))}</TableCell>
                                             <TableCell align='center' className='p-2'>
                                                 <div className='flex justify-center'>
                                                     <PlusCircle onClick={handleAddItemToForm} className='cursor-pointer hover:text-green-500' />
@@ -638,20 +467,6 @@ const Page = () => {
                                                     </TableCell>
                                                     <TableCell className='p-2'>
                                                         <Autocomplete
-                                                            disableClearable
-                                                            disablePortal
-                                                            options={suppliers}
-                                                            getOptionLabel={(option) => option.name}
-                                                            value={suppliers.find((supplier) => supplier.name === item.supplierName)}
-                                                            onChange={(event, newValue) => {
-                                                                handleFieldChange('supplierId', newValue.name, index)
-                                                                handleFieldChange('supplierName', newValue.name, index)
-                                                            }}
-                                                            renderInput={(params) => <TextField {...params} variant='standard' />}
-                                                        />
-                                                    </TableCell>
-                                                    <TableCell className='p-2'>
-                                                        <Autocomplete
                                                             disablePortal
                                                             options={['Bao', 'Túi']}
                                                             value={item.unit}
@@ -673,28 +488,10 @@ const Page = () => {
                                                     </TableCell>
                                                     <TableCell className='p-2'>
                                                         <TextField
-                                                            type={'text'}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value;
-                                                                const numericValue = Number(value);
-                                                                if (!isNaN(numericValue) && Number(value) >= 0) {
-                                                                    handleFieldChange('importPrice', Number(e.target.value), index)
-                                                                    setImportPriceValidate(true)
-                                                                }
-                                                            }}
-                                                            error={isNaN(item.importPrice) || item.importPrice <= 0}
-                                                            value={item.importPrice}
-                                                            variant="standard" />
-                                                    </TableCell>
-                                                    <TableCell className='p-2'>
-                                                        <TextField
                                                             type={'number'}
                                                             onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
                                                             value={item.quantity}
                                                             variant="standard" />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.quantity * item.importPrice * item.weightPerUnit || 0))}
                                                     </TableCell>
                                                     <TableCell align='center'>
                                                         <div className='flex justify-center items-center space-x-2'>
@@ -724,20 +521,11 @@ const Page = () => {
                                                     <TableCell>
                                                         {item.categoryName}
                                                     </TableCell>
-                                                    <TableCell>
-                                                        {item.supplierName}
-                                                    </TableCell>
                                                     <TableCell colSpan={2} align='center'>
                                                         {item.unit} {item.weightPerUnit}kg
                                                     </TableCell>
                                                     <TableCell>
-                                                        {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.importPrice))}
-                                                    </TableCell>
-                                                    <TableCell>
                                                         {item.quantity}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(item.quantity * item.importPrice * item.weightPerUnit || 0))}
                                                     </TableCell>
                                                     <TableCell>
                                                         <div className='flex justify-center items-center space-x-2'>
@@ -758,17 +546,6 @@ const Page = () => {
                                                 </TableRow>
                                             )
                                         ))}
-                                        <TableRow>
-                                            <TableCell colSpan={7}></TableCell>
-                                            <TableCell colSpan={3} align="center" className='font-bold space-x-2 text-[20px]'>
-                                                <span>
-                                                    Tổng tiền:
-                                                </span>
-                                                <span>
-                                                    {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(totalPrice))}
-                                                </span>
-                                            </TableCell>
-                                        </TableRow>
                                     </TableBody>
                                 </Table>
                             </TableContainer>

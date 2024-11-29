@@ -28,11 +28,11 @@ const PopupPay: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, tạo!',
-            cancelButtonText: 'Không, hủy!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await api.post(`/transaction/createTransaction`, {
+                    await api.post(`/transaction/create`, {
                         receiptVoucherId: data.id,
                         amount: amount,
                         paymentMethod: 'Tiền mặt',
@@ -57,8 +57,6 @@ const PopupPay: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
                         duration: 3000
                     })
                 }
-            } else {
-                Swal.fire('Đã hủy', `Phiếu thu chưa được thanh toán.`, 'info');
             }
         })
     };
@@ -139,15 +137,14 @@ const PopupPay: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
                                     Giá trị bằng số:
                                 </div>
                                 <TextField
-                                    type='number'
+                                    type='text'
                                     onChange={(e) => {
-                                        const value = Number(e.target.value);
-                                        if (value >= 0 && value <= data?.remainAmount) {
-                                            setAmount(value);
-                                        } else if (value > data?.remainAmount) {
-                                            setAmount(data?.remainAmount);
-                                        } else {
-                                            setAmount(0);
+                                        const value = e.target.value;
+                                        const numericValue = Number(value);
+                                        if (!isNaN(numericValue) && Number(value) >= 0 && value <= data?.remainAmount) {
+                                            setAmount(Number(value));
+                                        } else if (!isNaN(numericValue) && value > data?.remainAmount) {
+                                            setAmount(Number(data?.remainAmount));
                                         }
                                     }}
                                     className='flex-[2]'
