@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ToastAction } from '@radix-ui/react-toast';
+import { AxiosError } from 'axios';
 
 const moneyFormat = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -170,26 +171,28 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                             duration: 3000
                         })
                     }
-                } catch (error: any) {
+                } catch (error) {
                     setOnPageChange(false);
-                    const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
-                    toast({
-                        variant: 'destructive',
-                        title: 'Xuất phiếu thất bại',
-                        description: (
-                            <div>
-                                {Array.isArray(messages) ? (
-                                    messages.map((msg: any, index: any) => (
-                                        <div key={index}>{msg}</div>
-                                    ))
-                                ) : (
-                                    <div>{messages}</div>
-                                )}
-                            </div>
-                        ),
-                        action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                        duration: 3000
-                    });
+                    if(error instanceof AxiosError) {
+                        const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+                        toast({
+                            variant: 'destructive',
+                            title: 'Xuất phiếu thất bại',
+                            description: (
+                                <div>
+                                    {Array.isArray(messages) ? (
+                                        messages.map((msg, index) => (
+                                            <div key={index}>{msg}</div>
+                                        ))
+                                    ) : (
+                                        <div>{messages}</div>
+                                    )}
+                                </div>
+                            ),
+                            action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                            duration: 3000
+                        });
+                    }
                 }
             }
         })

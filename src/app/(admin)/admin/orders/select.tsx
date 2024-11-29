@@ -11,7 +11,6 @@ import {
 import { Dot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Order } from '@/type/order';
-import {useToast} from '@/hooks/use-toast';
 
 type SelectComponentProps = {
     setIsAlertOpen: (isOpen: boolean) => void;
@@ -23,52 +22,89 @@ export default function SelectComponent({
     order,
     setOrderUpdatePending,
 }: SelectComponentProps) {
-    const {toast} = useToast();
-    function colorProvider(status: string) {
-        switch (status) {
-            case 'PENDING':
-                return 'text-[#fbef8c]';
-            case 'CANCELED':
-                return 'text-destructive';
-            case 'IN_PROCESS':
-                return 'text-[#3b83f6]';
-            case 'COMPLETED':
-                return 'text-[#23c560]';
-            default:
-                return '';
-        }
+    const colorProvider: Record<string, string> = {
+        PENDING: 'text-yellow-500',
+        COMPLETED: 'text-green-500',
+        CANCELED: 'text-red-500',
+        IN_PROCESS: 'text-blue-500',
+        FAILED: 'text-red-500',
+        CONFIRMED: 'text-blue-500',
+        COMPLETE: 'text-blue-500',
     }
 
-    const status = [
+    const pendingStatus = [
         {
             value: 'PENDING',
             label: 'Chờ xác nhận',
-        },
-        {
-            value: 'COMPLETED',
-            label: 'Hoàn thành',
         },
         {
             value: 'CANCELED',
             label: 'Đã Huỷ',
         },
         {
+            value: 'CONFIRMED',
+            label: 'Đã xác nhận',
+        }
+    ];
+    const inProcessStatus = [
+        {
             value: 'IN_PROCESS',
             label: 'Đang xử lý',
         },
-    ];
-
-    function handleUpdateStatus(value: string) {
-        if(order.status !== 'IN_PROCESS'){
-            setOrderUpdatePending({ ...order, status: value })
-            setIsAlertOpen(true)
-        }else {
-            toast({
-                variant: 'destructive',
-                title: 'Không thể thay đổi trạng thái',
-                description: 'Đơn hàng đang ở trạng thái "Đang xử lý" không thể thay đổi trạng thái'
-            })
+        {
+            value: 'FAILED',
+            label: 'Thất bại',
+        },
+        {
+            value: 'COMPLETE',
+            label: 'Đã nhận hàng',
         }
+    ]
+    const confirmedStatus = [
+        {
+            value: 'CONFIRMED',
+            label: 'Đã xác nhận',
+        },
+        {
+            value: 'IN_PROCESS',
+            label: 'Đang xử lý',
+        }
+    ]
+    const completedStatus = [
+        {
+            value: 'COMPLETED',
+            label: 'Hoàn thành',
+        }
+    ]
+    const canceledStatus = [
+        {
+            value: 'CANCELED',
+            label: 'Đã Huỷ',
+        }
+    ]
+    const completeStatus = [
+        {
+            value: 'COMPLETE',
+            label: 'Đã nhận hàng',
+        }
+    ]
+    const status = (orderStatus: string) => {
+        if (orderStatus === 'PENDING') {
+            return pendingStatus;
+        } else if (orderStatus === 'IN_PROCESS') {
+            return inProcessStatus;
+        } else if (orderStatus === 'CONFIRMED') {
+            return confirmedStatus;
+        } else if (orderStatus === 'COMPLETE') {
+            return completeStatus;
+        }
+        else {
+            return orderStatus === 'COMPLETED' ? completedStatus : canceledStatus;
+        }
+    }
+    function handleUpdateStatus(value: string) {
+        setOrderUpdatePending({ ...order, status: value })
+        setIsAlertOpen(true)
     }
 
     return (
@@ -79,13 +115,14 @@ export default function SelectComponent({
             <SelectContent>
                 <SelectGroup>
                     <SelectLabel>Trạng thái</SelectLabel>
-                    {status.map((item) => (
+
+                    {status(order.status).map((item) => (
                         <SelectItem key={item.value} value={item.value}>
                             <div className="flex items-center font-semibold">
                                 {item.label}
                                 <Dot
                                     size={35}
-                                    className={cn(colorProvider(item.value))}
+                                    className={cn(colorProvider[item.value])}
                                 />
                             </div>
                         </SelectItem>

@@ -12,17 +12,19 @@ import * as React from 'react';
 import { Bell, PackagePlus } from 'lucide-react';
 import { IMessage, Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNotificationStore } from '@/stores/notification';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { getUserInformation } from '@/data/user';
+import { User as UserInterface } from '@/type/user';
 
 interface NotificationSheetProviderProps {
     children: React.ReactNode;
 }
 
-interface Notification {
+export interface Notification {
     id: string;
     message: string;
     timestamp: Date;
@@ -42,19 +44,63 @@ export default function NotificationSheetProvider({
     const { setHasNewNotification } = useNotificationStore();
     const [refresh, setRefresh] = React.useState(false);
     const { toast } = useToast();
+    const [userName, setUserName] = React.useState<string>('');
+    const [userInformation, setUserInformation] = useState<UserInterface>(
+        {} as UserInterface,
+    );
 
-    function setNotificationToLocalStorage(newNotification: Notification) {
-        const getNotificationsFromLocalStorage =
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const userName = localStorage.getItem('username');
+        if (userName !== null) {
+            setUserName(userName);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchUserInformation().catch((error) => {
+            console.error('Error occurred while retrieving user information:', error);
+        })
+    }, [userName]);
+
+
+    useEffect(() => {
+        if(userInformation.userType !== 'ROLE_ADMIN') return;
+        stompClient.connect(
+            {},
+            () => {
+                stompClient.subscribe('/topic/categories', (message) => {
+                    handleNewNotification(message, 'CATEGORY');
+                });
+                stompClient.subscribe('/topic/orders', (message) => {
+                    handleNewNotification(message, 'ORDER');
+                });
+            },
+            (error: never) => {
+                console.error(
+                    'Error connecting to the WebSocket server:',
+                    error,
+                );
+            },
+        );
+        return () => {
+            if (stompClient && stompClient.connected) {
+                stompClient.disconnect(() => {
+                    console.log('Disconnected from the server');
+                });
+            }
+        };
+    }, [userInformation]);
+
+    useEffect(() => {
+        const rawNotification =
             typeof window !== 'undefined' &&
             localStorage.getItem('notifications');
-        const prevNotifications = getNotificationsFromLocalStorage
-            ? JSON.parse(getNotificationsFromLocalStorage)
-            : [];
-        localStorage.setItem(
-            'notifications',
-            JSON.stringify([...prevNotifications, newNotification]),
-        );
-    }
+        if (rawNotification) {
+            const notification: Notification[] = JSON.parse(rawNotification);
+            setNotifications(notification);
+        }
+    }, [refresh]);
 
     function handleNewNotification(
         message: IMessage,
@@ -86,51 +132,35 @@ export default function NotificationSheetProvider({
         });
     }
 
-    useEffect(() => {
-        stompClient.connect(
-            {},
-            () => {
-                stompClient.subscribe('/topic/categories', (message) => {
-                    handleNewNotification(message, 'CATEGORY');
-                });
-                stompClient.subscribe('/topic/orders', (message) => {
-                    handleNewNotification(message, 'ORDER');
-                });
-            },
-            (error: never) => {
-                console.error(
-                    'Error connecting to the WebSocket server:',
-                    error,
-                );
-            },
-        );
-        return () => {
-            if (stompClient && stompClient.connected) {
-                stompClient.disconnect(() => {
-                    console.log('Disconnected from the server');
-                });
-            }
-        };
-    }, []);
+    function setNotificationToLocalStorage(newNotification: Notification) {
+        if (typeof window === 'undefined') return;
 
-    useEffect(() => {
-        const getNotificationsFromLocalStorage =
-            typeof window !== 'undefined' &&
-            localStorage.getItem('notifications');
-        if (getNotificationsFromLocalStorage) {
-            const localStorageLength = JSON.parse(
-                getNotificationsFromLocalStorage,
-            ).length;
-            if (localStorageLength > 10) {
-                localStorage.setItem('notifications', JSON.stringify([]));
-            }
-        }
-        setNotifications(
-            getNotificationsFromLocalStorage
-                ? JSON.parse(getNotificationsFromLocalStorage)
-                : [],
+        const rawNotifications = localStorage.getItem('notifications');
+        const prevNotifications: Notification[] = rawNotifications
+            ? JSON.parse(rawNotifications)
+            : [];
+        const updatedNotifications = [...prevNotifications, newNotification];
+
+        const limitedNotifications =
+            updatedNotifications.length > 10
+                ? updatedNotifications.slice(-10)
+                : updatedNotifications;
+
+        localStorage.setItem(
+            'notifications',
+            JSON.stringify(limitedNotifications),
         );
-    }, [refresh]);
+    }
+
+    async function fetchUserInformation() {
+        try {
+            if (!userName) return;
+            const data = await getUserInformation<UserInterface>(userName);
+            setUserInformation(data);
+        } catch (error) {
+            throw error
+        }
+    }
 
     return (
         <Sheet>
@@ -160,7 +190,7 @@ export default function NotificationSheetProvider({
                         </span>
                     </div>
                     {notifications.length > 0 ? (
-                        <div className="mt-5">
+                        <div className="mt-5 h-full overflow-auto">
                             <NotificationCard
                                 notifications={notifications}
                                 refresh={refresh}
@@ -251,7 +281,7 @@ function NotificationCard({
                                 {notification.message}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                3 hours ago
+                                {notification.timestamp.toLocaleString()}
                             </p>
                         </div>
                     </li>
