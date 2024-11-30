@@ -46,7 +46,8 @@ const adminDynamicPaths: string[] = [
     '/document',
     '/ingredients/update/',
     '/products/update/',
-    '/ingredients/'
+    '/ingredients/',
+    '/inventory/'
 ];
 const customerDynamicPaths: string[] = ['/order/detail'];
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
