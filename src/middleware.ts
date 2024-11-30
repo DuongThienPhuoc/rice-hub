@@ -34,6 +34,7 @@ const adminStaticPaths: string[] = [
     '/production/update',
     '/admin/orders',
     '/user-activity',
+    '/document'
 ];
 const adminDynamicPaths: string[] = [
     '/admin/orders',
@@ -43,7 +44,6 @@ const adminDynamicPaths: string[] = [
     '/employees',
     '/production',
     '/contracts/create/',
-    '/document',
     '/ingredients/update/',
     '/products/update/',
     '/ingredients/',
@@ -113,6 +113,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ttf)$).*)',
     ],
 };

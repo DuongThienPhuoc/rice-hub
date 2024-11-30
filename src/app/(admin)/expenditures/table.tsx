@@ -23,7 +23,7 @@ export default function EmployeeTable() {
     );
     const [loadingData, setLoadingData] = useState(true);
     const [totalPage, setTotalPage] = React.useState<number>(0);
-    const [currentPage, setCurrentPage] = React.useState<number>(0);
+    const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [reFresh, setReFresh] = React.useState(false);
 
@@ -38,7 +38,7 @@ export default function EmployeeTable() {
         getExpenditures({
             startDate: date?.from?.toISOString(),
             endDate: date?.to ? endDate : undefined,
-            pageNumber: currentPage + 1,
+            pageNumber: currentPage,
         })
             .then((data) => {
                 setLoadingData(false);
