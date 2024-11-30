@@ -53,7 +53,7 @@ export default function ProductionTable() {
             const url = `/productionOrder/getWithFilter?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            if (data?.content) {
+            if (data?.totalElements > 0) {
                 setReceipts(data.content);
                 setTotalPages(data.totalPages);
             } else {
