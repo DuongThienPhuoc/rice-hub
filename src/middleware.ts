@@ -12,10 +12,8 @@ const adminStaticPaths: string[] = [
     '/categories',
     '/products',
     '/products/create',
-    '/products/update',
     '/ingredients',
     '/ingredients/create',
-    '/ingredients/update',
     '/prices',
     '/prices/create',
     '/suppliers',
@@ -36,6 +34,7 @@ const adminStaticPaths: string[] = [
     '/production/update',
     '/admin/orders',
     '/user-activity',
+    '/document'
 ];
 const adminDynamicPaths: string[] = [
     '/admin/orders',
@@ -44,8 +43,11 @@ const adminDynamicPaths: string[] = [
     '/customers',
     '/employees',
     '/production',
-    '/contracts/create',
-    '/document'
+    '/contracts/create/',
+    '/ingredients/update/',
+    '/products/update/',
+    '/ingredients/',
+    '/inventory/'
 ];
 const customerDynamicPaths: string[] = ['/order/detail'];
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
@@ -111,6 +113,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ttf)$).*)',
     ],
 };
