@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { AdminOrderResponse, Order } from '@/type/order';
 import { Calendar, Search, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import SelectComponent from '@/app/(admin)/admin/orders/select';
 import AlertChangeStatus from '@/app/(admin)/admin/orders/alert-change-status';
 import { Separator } from '@/components/ui/separator';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import PaginationComponent from '@/components/pagination/pagination';
 
 type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
@@ -16,6 +17,9 @@ type AdminOrdersTableProps = {
     setNewOrder: (newOrder: boolean) => void;
     refreshData: boolean;
     setRefreshData: (refreshData: boolean) => void;
+    currentPage: number;
+    setCurrentPage: Dispatch<SetStateAction<number>>;
+    totalPage: number;
 };
 
 const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
@@ -24,6 +28,9 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     setNewOrder,
     refreshData,
     setRefreshData,
+    currentPage,
+    setCurrentPage,
+    totalPage,
 }) => {
     const router = useRouter();
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
@@ -115,6 +122,11 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                     </TableBody>
                 </Table>
             </TableContainer>
+            <PaginationComponent
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                totalPages={totalPage}
+            />
             <AlertChangeStatus
                 isOpen={isAlertOpen}
                 setIsOpen={setIsAlertOpen}
