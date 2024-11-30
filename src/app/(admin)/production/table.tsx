@@ -14,6 +14,8 @@ import SearchBar from '@/components/searchbar/searchbar';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ProductionTable() {
     const router = useRouter();
@@ -24,6 +26,8 @@ export default function ProductionTable() {
         { name: 'creator.fullName', displayName: 'Người tạo' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -54,9 +58,20 @@ export default function ProductionTable() {
                 setTotalPages(data.totalPages);
             } else {
                 setReceipts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu sản xuất!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu sản xuất:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu sản xuất!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -74,20 +89,6 @@ export default function ProductionTable() {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
-
-    // const fileToBuffer = (file: File): Promise<Buffer> => {
-    //     return new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.onload = () => {
-    //             const arrayBuffer = reader.result as ArrayBuffer;
-    //             resolve(Buffer.from(arrayBuffer));
-    //         };
-    //         reader.onerror = (error) => {
-    //             reject(error);
-    //         };
-    //         reader.readAsArrayBuffer(file);
-    //     });
-    // };
 
     const handleSearch = () => {
         setCurrentPage(1);
@@ -134,7 +135,10 @@ export default function ProductionTable() {
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
                                     <Button
-                                        onClick={() => router.push("/production/create")}
+                                        onClick={() => {
+                                            router.push("/production/create")
+                                            setOnPageChange(true);
+                                        }}
                                         className="p-3 text-[14px] hover:bg-green-500"
                                     >
                                         Tạo phiếu sản xuất
@@ -156,6 +160,15 @@ export default function ProductionTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

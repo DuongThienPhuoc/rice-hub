@@ -14,6 +14,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Trash2 } from 'lucide-react';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 
 interface RowData {
     [key: string]: any;
@@ -28,6 +30,7 @@ const Page = () => {
     const [inputWeight, setInputWeight] = useState<any>('');
     const [outputs, setOutputs] = useState<any>([{ selectedProduct: null, ratio: 0, weight: '' }]);
     const note = ''
+    const [onPageChange, setOnPageChange] = useState(false);
 
     useEffect(() => {
         getProducts();
@@ -159,22 +162,47 @@ const Page = () => {
                         ) : (
                             <>
                                 <div className='flex-1 items-center'>
-                                    <div className='lg:m-10 mx-10 flex lg:justify-between flex-col lg:flex-row'>
-                                        <span className='font-bold lg:pt-5'>Chọn nguyên liệu: </span>
-                                        <Autocomplete
-                                            className='lg:ml-5 mt-2 lg:mt-0'
-                                            disablePortal
-                                            options={ingredients}
-                                            value={selectedIngredient}
-                                            getOptionLabel={(option) => option?.product?.name + ' (' + option?.unit + ' ' + option?.weightPerUnit + ' kg)'}
-                                            sx={{ minWidth: 300 }}
-                                            onChange={(event, newValue) => { setSelectedIngredient(newValue) }}
-                                            renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm nguyên liệu" />}
-                                        />
+                                    <div className='my-5 lg:flex-row flex-col flex w-full lg:space-x-2 lg:space-y-0 space-y-2'>
+                                        <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
+                                            <span className='text-white font-semibold p-2 rounded-lg'>Chọn nguyên liệu: </span>
+                                            <Autocomplete
+                                                className='lg:ml-5 mt-2 lg:mt-0'
+                                                disablePortal
+                                                options={ingredients}
+                                                value={selectedIngredient}
+                                                getOptionLabel={(option) => option?.product?.name + ' (' + option?.unit + ' ' + option?.weightPerUnit + ' kg)'}
+                                                sx={{
+                                                    width: 300,
+                                                    "& .MuiInputBase-root": {
+                                                        backgroundColor: "white",
+                                                        borderRadius: "8px",
+                                                        paddingRight: "8px",
+                                                    },
+                                                }}
+                                                onChange={(event, newValue) => { setSelectedIngredient(newValue) }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        variant="standard"
+                                                        sx={{
+                                                            "& .MuiInputBase-root": {
+                                                                paddingX: "10px",
+                                                            },
+                                                            "& .MuiInput-underline:before": {
+                                                                display: "none",
+                                                            },
+                                                            "& .MuiInput-underline:after": {
+                                                                display: "none",
+                                                            },
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div className='m-10 flex flex-col lg:justify-between lg:flex-row'>
-                                        <span className='font-bold lg:pt-5'>Nhập số lượng sản xuất {selectedIngredient && '(' + selectedIngredient?.unit + ')'}:</span>
+                                    <div className='my-5 flex flex-col lg:flex-row'>
+                                        <span className='font-bold lg:pt-5'>Số lượng sản xuất {selectedIngredient && '(' + selectedIngredient?.unit + ')'}:</span>
                                         <TextField
                                             className='lg:ml-5 mt-2 lg:mt-0'
                                             type={'number'}
@@ -184,10 +212,7 @@ const Page = () => {
                                                 }
                                             }}
                                             value={inputWeight}
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            label={`Số lượng ${selectedIngredient ? '(' + selectedIngredient?.unit + ')' : ''}`}
+                                            label={`Nhập số lượng ${selectedIngredient ? '(' + selectedIngredient?.unit + ')' : ''}`}
                                             variant="standard" />
                                     </div>
                                     {selectedIngredient && inputWeight && (
@@ -236,6 +261,7 @@ const Page = () => {
                                                 <TableCell className='px-2 py-4'>
                                                     <Autocomplete
                                                         disablePortal
+                                                        disableClearable
                                                         options={products.filter((p) => p.productWarehouses[0]?.warehouse.id === 2)}
                                                         value={output?.selectedProduct || null}
                                                         getOptionLabel={(option) => option?.name}
@@ -306,7 +332,10 @@ const Page = () => {
                                 <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Thêm</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push("/production")} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push("/production")
+                                    setOnPageChange(true)
+                                }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>
@@ -314,6 +343,16 @@ const Page = () => {
                     </div>
                 </div >
             </div >
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div >
     );
 };

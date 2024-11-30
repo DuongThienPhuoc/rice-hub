@@ -162,7 +162,7 @@ const Page = () => {
         }
     };
 
-    const errors:string[] = [''];
+    const errors: string[] = [''];
 
     const handleAddItemToForm = () => {
 
@@ -688,8 +688,15 @@ const Page = () => {
                                                     </TableCell>
                                                     <TableCell className='p-2'>
                                                         <TextField
-                                                            type={'number'}
-                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            type={'text'}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                const numericValue = Number(value);
+                                                                if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                    handleFieldChange('quantity', Number(e.target.value), index)
+                                                                    setQuantityValidate(true)
+                                                                }
+                                                            }}
                                                             value={item.quantity}
                                                             variant="standard" />
                                                     </TableCell>
