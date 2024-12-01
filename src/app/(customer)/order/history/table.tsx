@@ -27,6 +27,7 @@ import { CustomerOrderHistoryResponse } from '@/type/customer-order';
 import { getOrderHistory } from '@/data/order';
 import { useEffect, useState } from 'react';
 import { currencyHandleProvider } from '@/utils/currency-handle';
+import { statusProvider } from '@/utils/status-provider';
 
 export default function OrderTable({ userID }: { userID: string }) {
 
@@ -37,34 +38,6 @@ export default function OrderTable({ userID }: { userID: string }) {
             setCustomerOrderHistoryResponse(response.data);
         });
     }, [userID]);
-
-    type OrderStatus = {
-        variant:
-            | 'default'
-            | 'outline'
-            | 'destructive'
-            | 'secondary'
-            | null
-            | undefined;
-        text: string;
-    };
-
-    function getOrderStatus(status: string): OrderStatus {
-        switch (status) {
-            case 'IN_PROCESS':
-                return { variant: 'default', text: 'Đang xử lý' };
-            case 'COMPLETED':
-                return { variant: 'outline', text: 'Hoàn thành' };
-            case 'FAILED':
-                return { variant: 'destructive', text: 'Thất bại' };
-            case 'CANCELED':
-                return { variant: 'destructive', text: 'Đã hủy' };
-            case 'PENDING':
-                return { variant: 'default', text: 'Chờ xử lý' };
-            default:
-                return { variant: 'secondary', text: 'Không xác định' };
-        }
-    }
 
     return (
         <Card>
@@ -101,11 +74,11 @@ export default function OrderTable({ userID }: { userID: string }) {
                                 <TableCell>
                                     <Badge
                                         variant={
-                                            getOrderStatus(order.status)
+                                            statusProvider(order.status)
                                                 ?.variant || 'default'
                                         }
                                     >
-                                        {getOrderStatus(order.status)?.text}
+                                        {statusProvider(order.status)?.text}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
