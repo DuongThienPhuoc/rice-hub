@@ -133,9 +133,9 @@ const Page = () => {
                                 </div>
                             ) : (
                                 <div className="space-y-2 mb-5">
-                                    <div className='font-bold text-[1.25rem]'>Sản phẩm</div>
+                                    <div className='font-bold text-[1.25rem]'>Bán hàng</div>
                                     <p className="text-sm text-muted-foreground">
-                                        Tạo phiếu kiểm kho sản phẩm
+                                        Tạo phiếu kiểm kho bán hàng
                                     </p>
                                 </div>
                             )}
@@ -158,6 +158,7 @@ const Page = () => {
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
+                                                        <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
@@ -171,6 +172,7 @@ const Page = () => {
                                                             key={index}
                                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                         >
+                                                            <TableCell>{index + 1}</TableCell>
                                                             <TableCell onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                 {product?.product?.productCode}
                                                             </TableCell>

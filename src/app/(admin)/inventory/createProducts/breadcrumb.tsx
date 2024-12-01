@@ -27,7 +27,7 @@ export default function CreateInventoryPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage className='text-white'>Thêm phiếu kiểm kho bán hàng</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Thêm phiếu kiểm kho sản phẩm</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

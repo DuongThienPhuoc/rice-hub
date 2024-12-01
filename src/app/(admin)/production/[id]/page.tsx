@@ -56,7 +56,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xác nhận',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
@@ -213,7 +213,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete();
@@ -226,7 +226,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, hủy!',
-                cancelButtonText: 'Không!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleCancel();
@@ -269,7 +269,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có, xác nhận!',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {

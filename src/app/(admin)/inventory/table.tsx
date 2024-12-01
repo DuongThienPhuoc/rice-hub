@@ -34,7 +34,7 @@ export default function InventoryTable() {
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const options = ['Tạo phiếu kiểm kho sản xuất', 'Tạo phiếu kiểm kho nguyên liệu'];
+    const options = ['Tạo phiếu kiểm kho bán hàng', 'Tạo phiếu kiểm kho nguyên liệu'];
     const [loadingData, setLoadingData] = useState(true);
     const [inventory, setInventory] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -53,7 +53,7 @@ export default function InventoryTable() {
 
     const handleClick = () => {
         setOnPageChange(true);
-        if (options[selectedIndex] === 'Tạo phiếu kiểm kho sản xuất') {
+        if (options[selectedIndex] === 'Tạo phiếu kiểm kho bán hàng') {
             router.push("/inventory/createProducts");
         } else {
             router.push("/inventory/createIngredients");

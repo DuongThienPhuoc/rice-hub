@@ -201,7 +201,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete(row);
@@ -217,7 +217,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     //         icon: 'question',
     //         showCancelButton: true,
     //         confirmButtonText: 'Có, khôi phục!',
-    //         cancelButtonText: 'Không!',
+    //         cancelButtonText: 'Không',
     //     }).then((result) => {
     //         if (result.isConfirmed) {
     //             handleEnable(row);
@@ -228,11 +228,11 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     const deleteImportAndExport = (row: any) => {
         Swal.fire({
             title: 'Xác nhận xóa',
-            text: `Bạn có chắc chắn muốn xóa phiếu ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
+            text: `Bạn có chắc chắn muốn xóa ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa!',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {

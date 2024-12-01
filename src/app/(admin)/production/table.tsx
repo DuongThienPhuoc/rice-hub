@@ -19,6 +19,10 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function ProductionTable() {
     const router = useRouter();
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
     const columns = [
         { name: 'productionCode', displayName: 'Mã phiếu' },
         { name: 'productName', displayName: 'Nguyên liệu' },
@@ -39,7 +43,7 @@ export default function ProductionTable() {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
 
-    const getData = async (page?: number, startDate?: any, endDate?: any) => {
+    const getData = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
             params.append("size", "10");
@@ -49,6 +53,9 @@ export default function ProductionTable() {
             if (startDate && endDate) {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
+            }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
             }
             const url = `/productionOrder/getWithFilter?${params.toString()}`;
             const response = await api.get(url);
@@ -78,8 +85,8 @@ export default function ProductionTable() {
     };
 
     useEffect(() => {
-        getData(currentPage, startDate, endDate);
-    }, [currentPage, startDate, endDate]);
+        getData(currentPage, currentSearch, startDate, endDate);
+    }, [currentPage, currentSearch, startDate, endDate]);
 
     useEffect(() => {
         setStartDate(date?.from || null);
@@ -90,8 +97,9 @@ export default function ProductionTable() {
         setCurrentPage(page);
     };
 
-    const handleSearch = () => {
+    const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
+        setCurrentSearch({ field, query });
     };
 
     return (
@@ -120,7 +128,8 @@ export default function ProductionTable() {
                                         onSearch={handleSearch}
                                         loadingData={loadingData}
                                         selectOptions={[
-                                            { value: 'id', label: 'Mã phiếu' }
+                                            { value: 'productionCode', label: 'Mã phiếu' },
+                                            { value: 'ingredientName', label: 'Tên nguyên liệu' }
                                         ]}
                                     />
                                     {loadingData ? (

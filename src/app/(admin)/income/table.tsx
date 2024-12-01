@@ -217,11 +217,11 @@ export default function IncomeTable() {
                                                                     <div className="flex justify-center items-center space-x-3">
                                                                         <div className="relative group">
                                                                             {showTransaction === rowIndex ? (
-                                                                                <button hidden={row.remainAmount === 0} onClick={() => setShowTransaction(null)}>
+                                                                                <button onClick={() => setShowTransaction(null)}>
                                                                                     <EyeOff size={18} />
                                                                                 </button>
                                                                             ) : (
-                                                                                <button hidden={row.remainAmount === 0} onClick={() => setShowTransaction(rowIndex)}>
+                                                                                <button onClick={() => setShowTransaction(rowIndex)}>
                                                                                     <Eye size={18} />
                                                                                 </button>
                                                                             )}
@@ -266,7 +266,7 @@ export default function IncomeTable() {
                                                                                         {row.transactionDtoList.map((transaction: any, index: any) => (
                                                                                             <TableRow key={index}>
                                                                                                 <TableCell align='center'>{index + 1}</TableCell>
-                                                                                                <TableCell align='center'>{transaction.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản' : 'Tiền mặt'}</TableCell>
+                                                                                                <TableCell align='center'>{transaction.paymentMethod}</TableCell>
                                                                                                 <TableCell align='center'>{formatDate(transaction.transactionDate)}</TableCell>
                                                                                                 <TableCell align='center'>{formatCurrency(transaction.amount)}</TableCell>
                                                                                             </TableRow>

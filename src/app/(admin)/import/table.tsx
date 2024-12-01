@@ -27,7 +27,7 @@ export default function ImportTable() {
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [open, setOpen] = React.useState(false);
-    const options = ['Tạo phiếu nhập từ kho nguyên liệu', 'Tạo phiếu nhập từ nhà cung cấp'];
+    const options = ['Tạo phiếu nhập từ sản xuất', 'Tạo phiếu nhập từ nhà cung cấp'];
     const handleClick = () => {
         if (options[selectedIndex] === 'Tạo phiếu nhập từ nhà cung cấp') {
             setOnPageChange(true);
