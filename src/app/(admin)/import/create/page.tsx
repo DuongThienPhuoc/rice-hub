@@ -162,42 +162,42 @@ const Page = () => {
         }
     };
 
-    const errors:string[] = [''];
+    const [errors, setErrors] = useState<string[]>([]);
 
     const handleAddItemToForm = () => {
 
         if (productName === '') {
-            errors.push('Tên sản phẩm không được bỏ trống!');
+            setErrors((prevErrors) => [...prevErrors, 'Tên sản phẩm không được bỏ trống!']);
             setProductNameValidate(false);
         }
 
         if (importPrice === 0) {
-            errors.push('Giá nhập không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Giá nhập không hợp lệ!']);
             setImportPriceValidate(false);
         }
 
         if (weight === 0) {
-            errors.push('Trọng lượng không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Trọng lượng không hợp lệ!']);
             setWeightValidate(false);
         }
 
         if (quantity === 0) {
-            errors.push('Số lượng không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Số lượng không hợp lệ!']);
             setQuantityValidate(false);
         }
 
         if (!type) {
-            errors.push('Vui lòng chọn quy cách!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn quy cách!']);
             setTypeValidate(false);
         }
 
         if (!selectedCategory) {
-            errors.push('Vui lòng chọn danh mục!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn danh mục!']);
             setCategoryValidate(false);
         }
 
         if (!selectedSupplier) {
-            errors.push('Vui lòng chọn nhà cung cấp!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn nhà cung cấp!']);
             setSupplierValidate(false);
         }
 
@@ -284,7 +284,7 @@ const Page = () => {
         if (formData.length < 1) {
             toast({
                 variant: 'destructive',
-                title: 'Đã xảy ra lỗi!',
+                title: 'Không thể tạo phiếu!',
                 description: 'Danh sách rỗng! Vui lòng thêm sản phẩm.',
                 duration: 3000
             })
@@ -296,7 +296,7 @@ const Page = () => {
             setWarehouseValidate(false);
             toast({
                 variant: 'destructive',
-                title: 'Có lỗi xảy ra!',
+                title: 'Không thể tạo phiếu!',
                 description: 'Vui lòng chọn kho hàng',
                 duration: 3000,
             });
@@ -309,7 +309,7 @@ const Page = () => {
             if (response.status >= 200 && response.status < 300) {
                 toast({
                     variant: 'default',
-                    title: 'Tạo thành công',
+                    title: 'Tạo phiếu thành công',
                     description: `Lô hàng đã được tạo thành công`,
                     style: {
                         backgroundColor: '#4caf50',
@@ -688,8 +688,15 @@ const Page = () => {
                                                     </TableCell>
                                                     <TableCell className='p-2'>
                                                         <TextField
-                                                            type={'number'}
-                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            type={'text'}
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                const numericValue = Number(value);
+                                                                if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                    handleFieldChange('quantity', Number(e.target.value), index)
+                                                                    setQuantityValidate(true)
+                                                                }
+                                                            }}
                                                             value={item.quantity}
                                                             variant="standard" />
                                                     </TableCell>
