@@ -30,6 +30,7 @@ import { usePayOS } from "@payos/payos-checkout";
 import { Box, Drawer, TextField } from "@mui/material";
 import api from "@/config/axiosConfig";
 import { ToastAction } from "@/components/ui/toast";
+import { AxiosError } from 'axios';
 
 type PaymentPayload = {
     amount: number;
@@ -56,10 +57,6 @@ export default function OrderDetailPage({
     const [isOpen, setIsOpen] = useState(false);
     const [validateAmount, setValidateAmount] = useState(true);
     const [isCreatingLink, setIsCreatingLink] = useState(false);
-    const statusConverter: Record<string, string> = {
-        BANK_TRANSFER: 'Chuyển khoản ngân hàng',
-        CASH: 'Tiền mặt'
-    }
     const { toast } = useToast();
 
     const handleSubmit = async (totalAmount: number) => {
@@ -87,14 +84,16 @@ export default function OrderDetailPage({
                 setIsOpen(false);
                 setOpenDrawer(false);
             }
-        } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Thanh toán thất bại',
-                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
-                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000
-            })
+        } catch (error) {
+            if(error instanceof AxiosError){
+                toast({
+                    variant: 'destructive',
+                    title: 'Thanh toán thất bại',
+                    description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                })
+            }
         }
     }
 
