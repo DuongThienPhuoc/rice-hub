@@ -132,6 +132,11 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
         0,
     );
 
+    const totalUnpaid = monthlyEmployeePayroll.reduce(
+        (acc, driver) => acc + driver.unpaidSalary,
+        0,
+    );
+
     const router = useRouter();
     const [onPageChange, setOnPageChange] = useState(false);
     const handleSubmit = async (id: number) => {
@@ -173,7 +178,7 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                     }
                 } catch (error) {
                     setOnPageChange(false);
-                    if(error instanceof AxiosError) {
+                    if (error instanceof AxiosError) {
                         const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
                         toast({
                             variant: 'destructive',
@@ -209,6 +214,8 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                             <TableCell><p className='text-white font-semibold'>Lương theo ngày</p></TableCell>
                             <TableCell><p className='text-white font-semibold'>Số ngày đi làm trong tháng</p> </TableCell>
                             <TableCell><p className='text-white font-semibold'>Tạm tính</p></TableCell>
+                            <TableCell><p className='text-white font-semibold'>Đã thanh toán</p></TableCell>
+                            <TableCell><p className='text-white font-semibold'>Còn lại</p></TableCell>
                             <TableCell align='center'><p className='text-white font-semibold'>Hành động</p></TableCell>
                         </TableRow>
                     </TableHead>
@@ -225,6 +232,12 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                                 <TableCell>{employee.dayWorked}</TableCell>
                                 <TableCell className="text-[#22c55e]">
                                     {moneyFormat.format(employee.totalSalary)}
+                                </TableCell>
+                                <TableCell className="text-[#22c55e]">
+                                    {moneyFormat.format(employee.totalSalary - employee.unpaidSalary)}
+                                </TableCell>
+                                <TableCell className="text-[#22c55e]">
+                                    {moneyFormat.format(employee.unpaidSalary)}
                                 </TableCell>
                                 <TableCell align='center'>
                                     <div className='flex justify-center'>
@@ -247,7 +260,12 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                             <TableCell className="text-left">
                                 {moneyFormat.format(total)}
                             </TableCell>
-                            <TableCell></TableCell>
+                            <TableCell>
+                                {moneyFormat.format(total - totalUnpaid)}
+                            </TableCell>
+                            <TableCell>
+                                {moneyFormat.format(totalUnpaid)}
+                            </TableCell>
                         </TableRow>
                     </TableFooter>
                 </Table>

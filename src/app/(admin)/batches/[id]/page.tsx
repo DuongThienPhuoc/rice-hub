@@ -231,15 +231,20 @@ const Page = ({ params }: { params: { id: string } }) => {
             cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
+                console.log(selectedProducts);
                 const productData = selectedProducts.map((product: any) => ({
                     productId: product?.product?.id,
                     unit: product?.unit,
                     weighPerUnit: product?.weightPerUnit,
-                    supplierId: product?.product?.supplier?.id
+                    supplierId: product?.product?.supplier?.id,
+                    productName: product?.product?.name,
+                    quantity: product?.quantity,
+                    categoryId: product?.product?.category?.id,
+                    warehouseId: product?.warehouseId
                 }));
 
                 try {
-                    const url = type === 'import' ? `/products/confirm-add-to-warehouse/${batch?.id}` : `/export/confirm/${batch?.id}`
+                    const url = type === 'import' ? `/products/confirm-add-to-warehouse/${batch?.id}` : `/products/export/confirm/${batch?.id}`
                     const response = await api.post(url, productData);
                     if (response.status >= 200 && response.status < 300) {
                         toast({

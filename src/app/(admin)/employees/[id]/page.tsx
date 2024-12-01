@@ -203,7 +203,7 @@ const Page = ({ params }: { params: { id: number } }) => {
 
                                 {employee?.role?.employeeRole?.roleName !== 'PORTER_EMPLOYEE' && (
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Chức vụ: </span>
+                                        <span className='font-bold flex-1'>Lương ngày: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
                                             {employee?.role?.salaryDetail?.dailyWage ? formatCurrency(employee.role.salaryDetail.dailyWage) : formatCurrency(0)}
                                         </span>

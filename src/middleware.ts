@@ -52,7 +52,6 @@ const adminDynamicPaths: string[] = [
 ];
 const customerDynamicPaths: string[] = ['/order/detail'];
 const secretKey = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
-
 const isPublicPath = (path: string) => publicPaths.includes(path);
 const isHasCustomerAndAdminPermission = (path: string, role: string) => {
     if (

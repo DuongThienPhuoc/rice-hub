@@ -20,13 +20,14 @@ import SearchBar from '@/components/searchbar/searchbar';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@radix-ui/react-toast';
 
 export default function ImportTable() {
     const router = useRouter();
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [open, setOpen] = React.useState(false);
-    const options = ['Tạo phiếu nhập từ kho nguyên liệu', 'Tạo phiếu nhập từ nhà cung cấp'];
+    const options = ['Tạo phiếu nhập từ sản xuất', 'Tạo phiếu nhập từ nhà cung cấp'];
     const handleClick = () => {
         if (options[selectedIndex] === 'Tạo phiếu nhập từ nhà cung cấp') {
             setOnPageChange(true);
@@ -145,7 +146,7 @@ export default function ImportTable() {
         setCurrentPage(page);
     };
 
-    const showAlert = (data: any, fileInput: HTMLInputElement) => {
+    const showAlert = (data: any, fileInput: HTMLInputElement, fileHash: any) => {
         Swal.fire({
             title: 'Xác nhận thêm danh sách sản phẩm',
             text: 'Bạn có chắc chắn muốn thêm danh sách sản phẩm này?',
@@ -156,6 +157,7 @@ export default function ImportTable() {
         }).then(async (result) => {
             fileInput.value = '';
             if (result.isConfirmed) {
+                processedFileHashes.add(fileHash);
                 handleSubmit(data);
             }
         });
@@ -243,9 +245,6 @@ export default function ImportTable() {
             }
 
             const fileHash = await calculateFileHash(file);
-            console.log(processedFileHashes);
-            console.log(fileHash);
-            console.log(processedFileHashes.has(fileHash));
             if (processedFileHashes.has(fileHash)) {
                 Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
                 return;
@@ -285,9 +284,8 @@ export default function ImportTable() {
                 processedData.push(rowData);
             });
             Swal.close();
-            processedFileHashes.add(fileHash);
             const fileInput = event.target;
-            showAlert(processedData, fileInput);
+            showAlert(processedData, fileInput, fileHash);
         } catch (error) {
             Swal.fire('Lỗi khi xử lý file', 'error');
         }
@@ -299,17 +297,40 @@ export default function ImportTable() {
     };
 
     const handleSubmit = async (data: any) => {
+        setOnPageChange(true);
         try {
             const response = await api.post(`/products/import/preview`, data);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
-                Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    description: `Lô hàng đã được tạo thành công`,
+                    duration: 3000,
+                })
+                setOnPageChange(false);
             } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    duration: 3000,
+                })
+                setOnPageChange(false);
             }
         } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000,
+            })
+            setOnPageChange(false);
         }
     }
 

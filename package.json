@@ -16,6 +16,7 @@
     "@mui/icons-material": "^6.1.5",
     "@mui/material": "^6.1.1",
     "@mui/x-data-grid": "^7.22.1",
+    "@payos/payos-checkout": "^1.0.8",
     "@radix-ui/react-accordion": "^1.2.1",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -52,6 +53,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "crypto": "^1.0.1",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.3.0",
@@ -87,6 +89,7 @@
     "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

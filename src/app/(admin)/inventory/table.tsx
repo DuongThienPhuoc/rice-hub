@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import * as React from 'react';
 import InventoryList from "@/components/list/list";
@@ -18,6 +19,8 @@ import MenuList from '@mui/material/MenuList';
 import { Separator } from '@/components/ui/separator';
 import { DateRange } from 'react-day-picker';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useToast } from '@/hooks/use-toast';
 
 export default function InventoryTable() {
     const router = useRouter();
@@ -27,10 +30,11 @@ export default function InventoryTable() {
         { name: 'warehouse.name', displayName: 'Kho' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
+    const [onPageChange, setOnPageChange] = useState(false);
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const options = ['Tạo phiếu kiểm kho sản xuất', 'Tạo phiếu kiểm kho nguyên liệu'];
+    const options = ['Tạo phiếu kiểm kho bán hàng', 'Tạo phiếu kiểm kho nguyên liệu'];
     const [loadingData, setLoadingData] = useState(true);
     const [inventory, setInventory] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -45,9 +49,11 @@ export default function InventoryTable() {
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
+    const { toast } = useToast();
 
     const handleClick = () => {
-        if (options[selectedIndex] === 'Tạo phiếu kiểm kho sản xuất') {
+        setOnPageChange(true);
+        if (options[selectedIndex] === 'Tạo phiếu kiểm kho bán hàng') {
             router.push("/inventory/createProducts");
         } else {
             router.push("/inventory/createIngredients");
@@ -77,12 +83,16 @@ export default function InventoryTable() {
         setOpen(false);
     };
 
-    const getInventory = async (page?: number, search?: { field?: string, query?: string }) => {
+    const getInventory = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
             if (page) {
                 params.append("pageNumber", page.toString());
+            }
+            if (startDate && endDate) {
+                params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
+                params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
@@ -90,24 +100,37 @@ export default function InventoryTable() {
             const url = `/inventory/getAll?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setInventory(data._embedded.inventoryDtoList);
-            setTotalPages(data.page.totalPages);
+            if (data?._embedded?.inventoryDtoList) {
+                setInventory(data._embedded.inventoryDtoList);
+                setTotalPages(data.page.totalPages);
+            } else {
+                setInventory([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu kiểm kho!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu kiểm kho:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu kiểm kho!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
     };
 
     useEffect(() => {
-        getInventory(currentPage, currentSearch);
-    }, [currentPage, currentSearch]);
+        getInventory(currentPage, currentSearch, startDate, endDate);
+    }, [currentPage, currentSearch, startDate, endDate]);
 
     useEffect(() => {
         setStartDate(date?.from || null);
         setEndDate(date?.to || null);
-        console.log(startDate);
-        console.log(endDate);
     }, [date]);
 
     const handleSearch = (field: string, query: string) => {
@@ -138,14 +161,14 @@ export default function InventoryTable() {
                             </div>
                         )}
                         <Separator orientation="horizontal" />
-                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
+                        <div className='flex flex-col xl:flex-row justify-between items-center xl:items-middle my-5'>
                             <div className='flex flex-col lg:flex-row items-center mt-2 lg:mt-0'>
                                 <div className='flex space-x-2 md:items-center space-y-2 md:space-y-0 md:flex-row flex-col'>
                                     <SearchBar
                                         onSearch={handleSearch}
                                         loadingData={loadingData}
                                         selectOptions={[
-                                            { value: 'id', label: 'Mã phiếu' }
+                                            { value: 'inventoryCode', label: 'Mã phiếu' }
                                         ]}
                                     />
                                     {loadingData ? (
@@ -155,7 +178,7 @@ export default function InventoryTable() {
                                     )}
                                 </div>
                             </div>
-                            <div className='flex flex-col lg:flex-row items-center mt-2 lg:mt-0'>
+                            <div className='flex flex-col xl:flex-row items-center mt-2 xl:mt-0'>
                                 {loadingData ? (
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
                                 ) : (
@@ -240,6 +263,15 @@ export default function InventoryTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

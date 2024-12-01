@@ -325,7 +325,7 @@ const Page = () => {
                                                     Kho
                                                 </p>
                                             </TableCell>
-                                            <TableCell align='center' className="w-[5%]"><p className='font-semibold text-white'>#</p></TableCell>
+                                            <TableCell align='center' className="w-[5%]"><p className='font-semibold text-white'>Hành động</p></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -474,24 +474,12 @@ const Page = () => {
                                                 <TableCell align='center'>
                                                     {item.productName}
                                                 </TableCell>
-                                                {index === selectedRow ? (
-                                                    <TableCell className='p-2'>
-                                                        <TextField
-                                                            type={'number'}
-                                                            inputProps={{ min: 1 }}
-                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
-                                                            value={item.quantity}
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                            label={'Số lượng'}
-                                                            variant="standard" />
-                                                    </TableCell>
-                                                ) : (
-                                                    <TableCell align='center'>
-                                                        {item.quantity}
-                                                    </TableCell>
-                                                )}
+                                                <TableCell align='center'>
+                                                    {item.categoryName}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.supplierName}
+                                                </TableCell>
                                                 {index === selectedRow ? (
                                                     <TableCell className='p-2'>
                                                         <Autocomplete
@@ -524,12 +512,24 @@ const Page = () => {
                                                         {item.unit} {item.weightPerUnit}kg
                                                     </TableCell>
                                                 )}
-                                                <TableCell align='center'>
-                                                    {item.categoryName}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.supplierName}
-                                                </TableCell>
+                                                {index === selectedRow ? (
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'number'}
+                                                            inputProps={{ min: 1 }}
+                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            value={item.quantity}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            label={'Số lượng'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell align='center'>
+                                                        {item.quantity}
+                                                    </TableCell>
+                                                )}
                                                 <TableCell align='center'>
                                                     {item.warehouseName}
                                                 </TableCell>

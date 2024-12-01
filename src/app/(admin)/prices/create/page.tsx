@@ -242,7 +242,7 @@ const Page = () => {
             icon: 'error',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa!',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
