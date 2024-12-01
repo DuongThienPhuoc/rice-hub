@@ -18,20 +18,20 @@ Font.register({
     family: 'Tinos',
     fonts: [
         {
-            src: 'fonts/Tinos-Regular.ttf',
+            src: '/fonts/Tinos-Regular.ttf',
             fontWeight: 300,
         },
         {
-            src: 'fonts/Tinos-Bold.ttf',
+            src: '/fonts/Tinos-Bold.ttf',
             fontWeight: 700,
         },
         {
-            src: 'fonts/Tinos-Italic.ttf',
+            src: '/fonts/Tinos-Italic.ttf',
             fontWeight: 300,
             fontStyle: 'italic',
         },
         {
-            src: 'fonts/Tinos-BoldItalic.ttf',
+            src: '/fonts/Tinos-BoldItalic.ttf',
             fontWeight: 700,
             fontStyle: 'italic',
         },

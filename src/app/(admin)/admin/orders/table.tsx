@@ -1,8 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { AdminOrderResponse, Order } from '@/type/order';
-import { Calendar, Search, Plus } from 'lucide-react';
+import { Calendar, Search, Plus, Ellipsis } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import OrderDialogProvider from '@/app/(admin)/admin/orders/order-dialog';
 import SelectComponent from '@/app/(admin)/admin/orders/select';
@@ -10,6 +9,7 @@ import AlertChangeStatus from '@/app/(admin)/admin/orders/alert-change-status';
 import { Separator } from '@/components/ui/separator';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import PaginationComponent from '@/components/pagination/pagination';
+import ActionDropdownProvider from '@/app/(admin)/admin/orders/action-dropdown';
 
 type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
@@ -32,7 +32,6 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     setCurrentPage,
     totalPage,
 }) => {
-    const router = useRouter();
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
     const [orderUpdatePending, setOrderUpdatePending] = React.useState<Order | undefined>();
     return (
@@ -59,23 +58,51 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                         newOrder={newOrder}
                         setNewOrder={setNewOrder}
                     >
-                        <Button className='ml-0 lg:ml-4 mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
+                        <Button className="ml-0 lg:ml-4 mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500">
                             <span>Tạo đơn hàng</span>
                             <Plus />
                         </Button>
                     </OrderDialogProvider>
                 </div>
             </div>
-            <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
-                <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                    <TableHead className='bg-[#0090d9]'>
+            <TableContainer
+                component={Paper}
+                sx={{
+                    border: '1px solid #0090d9',
+                    borderRadius: 2,
+                    overflowX: 'auto',
+                }}
+            >
+                <Table
+                    sx={{ minWidth: 700, borderCollapse: 'collapse' }}
+                    aria-label="simple table"
+                >
+                    <TableHead className="bg-[#0090d9]">
                         <TableRow>
-                            <TableCell><p className='font-semibold text-white'>Mã đơn hàng</p></TableCell>
-                            <TableCell><p className='font-semibold text-white'>Ngày đặt</p></TableCell>
-                            <TableCell><p className='font-semibold text-white'>Người đặt</p></TableCell>
-                            <TableCell><p className='font-semibold text-white'>Trạng thái</p></TableCell>
-                            <TableCell align='center'>
-                                <p className='font-semibold text-white'>Xem chi tiết</p>
+                            <TableCell>
+                                <p className="font-semibold text-white">
+                                    Mã đơn hàng
+                                </p>
+                            </TableCell>
+                            <TableCell>
+                                <p className="font-semibold text-white">
+                                    Ngày đặt
+                                </p>
+                            </TableCell>
+                            <TableCell>
+                                <p className="font-semibold text-white">
+                                    Người đặt
+                                </p>
+                            </TableCell>
+                            <TableCell>
+                                <p className="font-semibold text-white">
+                                    Trạng thái
+                                </p>
+                            </TableCell>
+                            <TableCell align="center">
+                                <p className="font-semibold text-white">
+                                    Xem chi tiết
+                                </p>
                             </TableCell>
                         </TableRow>
                     </TableHead>
@@ -96,24 +123,19 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                                     <TableCell>
                                         <SelectComponent
                                             order={order}
-                                            setOrderUpdatePending={setOrderUpdatePending}
+                                            setOrderUpdatePending={
+                                                setOrderUpdatePending
+                                            }
                                             setIsAlertOpen={setIsAlertOpen}
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <div className="flex justify-center">
-                                            <Button
-                                                className="flex items-center gap-1 border-dashed"
-                                                variant="outline"
-                                                onClick={() => {
-                                                    router.push(
-                                                        `/admin/orders/${order.id}`,
-                                                    );
-                                                }}
-                                            >
-                                                <Search className="w-4 h-4" />
-                                                Xem chi tiết
-                                            </Button>
+                                        <div className='flex justify-center'>
+                                            <ActionDropdownProvider order={order}>
+                                                <div className="flex w-6 h-6 items-center justify-center rounded hover:bg-[#cbd5e1]">
+                                                    <Ellipsis className="w-4 h-4" />
+                                                </div>
+                                            </ActionDropdownProvider>
                                         </div>
                                     </TableCell>
                                 </TableRow>
