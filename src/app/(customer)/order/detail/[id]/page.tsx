@@ -1,4 +1,5 @@
 'use client'
+
 import { generateChecksum, generateOrderCode } from "@/utils/checkSum";
 import {
     Card,
@@ -15,7 +16,7 @@ import {
     TableBody,
     TableHeader,
 } from '@/components/ui/table';
-import { Package2, Calendar, User, Truck, History, ArrowLeft, QrCode } from 'lucide-react';
+import { Package2, Calendar, User, Truck, History, ArrowLeft, QrCode, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
 import React, { useEffect, useState } from 'react';
@@ -530,13 +531,19 @@ export default function OrderDetailPage({
                     </CardContent>
                 </Card >
             </div >
-            <div className="pb-5">
+            <div className="pb-5 flex justify-between">
                 <Button variant='default' onClick={
                     () => router.back()
                 }>
                     <ArrowLeft className='w-4 h-4' />
                     Quay lại
                 </Button>
+                {order?.status === 'CONFIRMED' && (
+                    <Button>
+                        <Check className='w-4 h-4' />
+                        Xác nhận đã nhận hàng
+                    </Button>
+                )}
             </div>
         </section >
     );

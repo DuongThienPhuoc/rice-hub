@@ -115,3 +115,15 @@ export async function adminUpdateOrder(
         throw e;
     }
 }
+
+export async function customerUpdateOrder(order: AdminUpdateOrderRequest) {
+    try {
+        const response = await axiosConfig.post(
+            `/order/customer/UpdateOrder`,
+            order,
+        );
+        return response.data;
+    } catch (e) {
+        throw e;
+    }
+}
