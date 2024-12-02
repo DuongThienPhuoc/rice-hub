@@ -14,6 +14,8 @@ import firebase from '@/config/firebaseConfig';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import FloatingButton from '@/components/floating/floatingButton';
 import { ToastAction } from '@radix-ui/react-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CustomerDetailPageBreadcrumb from '@/app/(admin)/customers/[id]/breadcrumb';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -24,6 +26,14 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [loadingData, setLoadingData] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
+
+    useEffect(() => {
+        setBreadcrumb(<CustomerDetailPageBreadcrumb customerId={params.id.toString()} />);
+        return () => {
+            setBreadcrumb(null);
+        };
+    }, [setBreadcrumb]);
 
     const handleButtonClick = () => {
         if (fileInputRef.current) {

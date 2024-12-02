@@ -1,13 +1,39 @@
 import axiosConfig from '@/config/axiosConfig';
 import axios, { AxiosResponse } from 'axios';
 import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
-import { OrderRequest, CustomerOrderHistoryResponse } from '@/type/customer-order';
+import {
+    CustomerOrderHistoryResponse,
+    CustomerUpdateOrderRequest,
+    OrderRequest,
+} from '@/type/customer-order';
 
-export async function getOrderHistory({ customerID }: { customerID: string }) {
+interface GetOrderHistoryProps {
+    customerId?: string;
+    orderCode?: string;
+    status?: string;
+    pageNumber?: number;
+    pageSize?: number;
+}
+
+export async function getOrderHistory({
+    customerId,
+    orderCode,
+    status,
+    pageSize,
+    pageNumber,
+}: GetOrderHistoryProps) {
     try {
         const response: AxiosResponse<CustomerOrderHistoryResponse> =
             await axiosConfig.get<CustomerOrderHistoryResponse>(
-                `/order/customer/${customerID}`,
+                `/order/customer/${customerId}`,
+                {
+                    params: {
+                        orderCode,
+                        status,
+                        pageNumber,
+                        pageSize,
+                    },
+                },
             );
         return {
             data: response.data,
@@ -96,6 +122,20 @@ export async function adminUpdateOrder(
             order,
         );
         return response.data;
+    } catch (e) {
+        throw e;
+    }
+}
+
+export async function customerUpdateOrder(
+    orderId: number,
+    order: CustomerUpdateOrderRequest,
+) {
+    try {
+        return await axiosConfig.post(
+            `/order/customer/UpdateOrder/${orderId}`,
+            order,
+        );
     } catch (e) {
         throw e;
     }

@@ -6,6 +6,8 @@ export interface CustomerOrderHistoryResponse {
 
 export interface OrderRequest {
     customerId: number;
+    orderPhone: string;
+    orderAddress: string;
     orderDetails: OrderDetail[];
 }
 
@@ -42,4 +44,27 @@ interface Page {
     totalElements: number;
     totalPages: number;
     number: number;
+}
+
+export interface CustomerUpdateOrderRequest {
+    customerId: number
+    status: string
+    totalAmount: number
+    deposit: number
+    remainingAmount: number
+    orderPhone: string
+    orderAddress: string
+    orderDetails: CustomerUpdateOrderRequestOrderDetail[]
+}
+
+interface CustomerUpdateOrderRequestOrderDetail {
+    productId: number
+    name: string
+    description: string
+    quantity: number
+    unitPrice: number
+    weightPerUnit: number
+    productUnit: string
+    discount: number
+    totalPrice: number
 }

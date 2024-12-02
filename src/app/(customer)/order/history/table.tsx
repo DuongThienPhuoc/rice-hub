@@ -14,57 +14,32 @@ import { Calendar, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from '@/components/ui/pagination';
 import { CustomerOrderHistoryResponse } from '@/type/customer-order';
 import { getOrderHistory } from '@/data/order';
 import { useEffect, useState } from 'react';
 import { currencyHandleProvider } from '@/utils/currency-handle';
+import { statusProvider } from '@/utils/status-provider';
+import PaginationComponent from '@/components/pagination/pagination';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import OrderHistoryPageBreadcrumb from '@/app/(customer)/order/history/breadcrumb';
 
 export default function OrderTable({ userID }: { userID: string }) {
-
     const [customerOrderHistoryResponse, setCustomerOrderHistoryResponse] = useState<CustomerOrderHistoryResponse>({} as CustomerOrderHistoryResponse);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPage, setTotalPage] = useState(0);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
     useEffect(() => {
-        getOrderHistory({ customerID: userID }).then((response) => {
+        setBreadcrumb(<OrderHistoryPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
+
+    useEffect(() => {
+        getOrderHistory({ customerId: userID, pageNumber: currentPage + 1, pageSize: 5 }).then((response) => {
             setCustomerOrderHistoryResponse(response.data);
+            setTotalPage(response.data.page.totalPages);
         });
-    }, [userID]);
-
-    type OrderStatus = {
-        variant:
-            | 'default'
-            | 'outline'
-            | 'destructive'
-            | 'secondary'
-            | null
-            | undefined;
-        text: string;
-    };
-
-    function getOrderStatus(status: string): OrderStatus {
-        switch (status) {
-            case 'IN_PROCESS':
-                return { variant: 'default', text: 'Đang xử lý' };
-            case 'COMPLETED':
-                return { variant: 'outline', text: 'Hoàn thành' };
-            case 'FAILED':
-                return { variant: 'destructive', text: 'Thất bại' };
-            case 'CANCELED':
-                return { variant: 'destructive', text: 'Đã hủy' };
-            case 'PENDING':
-                return { variant: 'default', text: 'Chờ xử lý' };
-            default:
-                return { variant: 'secondary', text: 'Không xác định' };
-        }
-    }
+    }, [userID, currentPage]);
 
     return (
         <Card>
@@ -101,11 +76,11 @@ export default function OrderTable({ userID }: { userID: string }) {
                                 <TableCell>
                                     <Badge
                                         variant={
-                                            getOrderStatus(order.status)
+                                            statusProvider(order.status)
                                                 ?.variant || 'default'
                                         }
                                     >
-                                        {getOrderStatus(order.status)?.text}
+                                        {statusProvider(order.status)?.text}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">
@@ -127,34 +102,7 @@ export default function OrderTable({ userID }: { userID: string }) {
                     <TableFooter>
                         <TableRow>
                             <TableCell colSpan={5} className="bg-white">
-                                <Pagination>
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <PaginationPrevious href="#" />
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationLink href="#" isActive>
-                                                1
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationLink href="#">
-                                                2
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationLink href="#">
-                                                3
-                                            </PaginationLink>
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationEllipsis />
-                                        </PaginationItem>
-                                        <PaginationItem>
-                                            <PaginationNext href="#" />
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
+                                <PaginationComponent totalPages={totalPage} currentPage={currentPage} setCurrentPage={setCurrentPage} />
                             </TableCell>
                         </TableRow>
                     </TableFooter>

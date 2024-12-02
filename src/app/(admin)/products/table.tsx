@@ -13,10 +13,13 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ProductPageBreadcrumb from '@/app/(admin)/products/breadcrumb';
 
 export default function ProductTable() {
     const { toast } = useToast();
     const router = useRouter();
+    const { setBreadcrumb } = useBreadcrumbStore();
     const [onPageChange, setOnPageChange] = useState(false);
     const columns = [
         { name: 'productCode', displayName: 'Mã sản phẩm' },
@@ -89,6 +92,11 @@ export default function ProductTable() {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+
+    useEffect(() => {
+        setBreadcrumb(<ProductPageBreadcrumb />)
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     return (
         <div className='mx-5'>

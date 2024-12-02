@@ -11,6 +11,8 @@ import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ProductDetailPageBreadcrumb from '@/app/(admin)/ingredients/[id]/breadcrumb';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -27,7 +29,7 @@ const Page = ({ params }: { params: { id: number } }) => {
         { value: '2', label: 'Lịch sử nhập xuất' }
     ]
     const [selected, setSelected] = useState(selectOptions[0]);
-
+    const { setBreadcrumb } = useBreadcrumbStore()
     useEffect(() => {
         const getProduct = async () => {
             try {
@@ -69,6 +71,11 @@ const Page = ({ params }: { params: { id: number } }) => {
             getProduct();
         }
     }, [params.id]);
+
+    useEffect(() => {
+        setBreadcrumb(<ProductDetailPageBreadcrumb productId={params.id.toString()} />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     const getBatch = async () => {
         try {

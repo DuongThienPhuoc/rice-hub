@@ -11,6 +11,8 @@ import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import SupplierPageBreadcrumb from '@/app/(admin)/suppliers/breadcrumb';
 
 export default function SupplierTable() {
     const { toast } = useToast();
@@ -91,6 +93,12 @@ export default function SupplierTable() {
             setLoadingData(false);
         }
     };
+    const { setBreadcrumb } = useBreadcrumbStore();
+
+    useEffect(() => {
+        setBreadcrumb(<SupplierPageBreadcrumb />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getSuppliers(currentPage, currentSearch);

@@ -9,6 +9,8 @@ import DonutChart from '@/components/chart/PieChart';
 import HorizontalChart from '@/components/chart/HorizontalChart';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import DashboardPageBreadcrumb from '@/app/(admin)/dashboard/breadcrumb';
 
 const Page = () => {
     const { toast } = useToast();
@@ -22,6 +24,7 @@ const Page = () => {
     const [quantityType, setQuantityType] = useState<any>('week');
     const [topProductType, setTopProductType] = useState('month');
     const [topProductReport, setTopProductReport] = useState<any>([]);
+    const { setBreadcrumb } = useBreadcrumbStore()
 
     const getExpenseReport = async (type: string) => {
         try {
@@ -157,6 +160,11 @@ const Page = () => {
     useEffect(() => {
         getDailyReport();
     }, [])
+
+    useEffect(() => {
+        setBreadcrumb(<DashboardPageBreadcrumb />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     return (
         <div>

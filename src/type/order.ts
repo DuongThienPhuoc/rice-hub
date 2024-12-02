@@ -18,6 +18,8 @@ export interface Order {
     orderCode:       string;
     customer:        Customer;
     orderDate:       string;
+    orderPhone:      string;
+    orderAddress:    string;
     totalAmount:     number;
     deposit:         number;
     remainingAmount: number;

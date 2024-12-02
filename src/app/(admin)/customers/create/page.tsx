@@ -13,6 +13,8 @@ import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CreateCustomerPageBreadcrumb from '@/app/(admin)/customers/create/breadcrumb';
 
 const Page = () => {
     const { toast } = useToast();
@@ -21,6 +23,12 @@ const Page = () => {
     const [image, setImage] = useState<string>("");
     const [loadingData, setLoadingData] = useState(true);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<CreateCustomerPageBreadcrumb />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

@@ -22,6 +22,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import PricePageBreadcrumb from '@/app/(admin)/prices/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -30,6 +32,7 @@ interface RowData {
 export default function PriceTable() {
     const { toast } = useToast();
     const router = useRouter();
+    const { setBreadcrumb } = useBreadcrumbStore();
     const [onPageChange, setOnPageChange] = useState(false);
 
     const handleSearch = (field: string, query: string) => {
@@ -110,6 +113,9 @@ export default function PriceTable() {
 
     useEffect(() => {
         getPrices()
+        setBreadcrumb(<PricePageBreadcrumb />)
+
+        return () => setBreadcrumb(null)
     }, []);
 
     useEffect(() => {

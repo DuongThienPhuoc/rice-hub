@@ -21,6 +21,10 @@ export function statusProvider(status: string): StatusProvider {
             return { text: 'Hoàn thành', variant: 'secondary' };
         case 'IN_PROCESS':
             return { text: 'Đang xử lý', variant: 'secondary' };
+        case 'COMPLETE':
+            return { text: 'Đã nhận hàng', variant: 'secondary' };
+        case 'CONFIRMED':
+            return { text: 'Đã xác nhận', variant: 'secondary' };
         default:
             return { text: 'Không xác định', variant: 'default' };
     }
