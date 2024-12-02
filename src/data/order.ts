@@ -3,11 +3,26 @@ import axios, { AxiosResponse } from 'axios';
 import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
 import { OrderRequest, CustomerOrderHistoryResponse } from '@/type/customer-order';
 
-export async function getOrderHistory({ customerID }: { customerID: string }) {
+interface GetOrderHistoryProps {
+    customerId?: string;
+    orderCode?: string;
+    status?: string;
+    pageNumber?: number;
+    pageSize?: number;
+}
+
+export async function getOrderHistory({ customerId, orderCode , status, pageSize, pageNumber }: GetOrderHistoryProps) {
     try {
         const response: AxiosResponse<CustomerOrderHistoryResponse> =
             await axiosConfig.get<CustomerOrderHistoryResponse>(
-                `/order/customer/${customerID}`,
+                `/order/customer/${customerId}`,{
+                    params: {
+                        orderCode,
+                        status,
+                        pageNumber,
+                        pageSize,
+                    }
+                }
             );
         return {
             data: response.data,

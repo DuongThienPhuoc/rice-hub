@@ -32,7 +32,7 @@ import { Separator } from '@/components/ui/separator';
 import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
 import { getCategories, Category } from '@/data/category';
 
-export default function OrderPage() {
+export default function OrderPage(): React.JSX.Element {
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [totalPages, setTotalPages] = useState(0);
