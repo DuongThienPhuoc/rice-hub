@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import FloatingButton from '@/components/floating/floatingButton';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import UpdateProductPageBreadcrumb from '@/app/(admin)/products/update/[id]/breadcrumb';
 
 type UnitWeightPair = {
     productUnit: string;
@@ -35,6 +37,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [selectedSupplier, setSelectedSupplier] = useState<RowData | null>(null);
     const [product, setProduct] = useState<any>(null);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -125,6 +128,9 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         getSuppliers();
         getCategories();
+        setBreadcrumb(<UpdateProductPageBreadcrumb productId={params.id.toString()} />);
+
+        return () => setBreadcrumb(null);
     }, []);
 
     const [formData, setFormData] = useState<{

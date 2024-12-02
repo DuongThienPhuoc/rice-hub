@@ -13,6 +13,8 @@ import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CustomerPageBreadcrumb from '@/app/(admin)/customers/breadcrumb';
 
 export default function CustomerTable() {
     const { toast } = useToast();
@@ -75,6 +77,15 @@ export default function CustomerTable() {
             setLoadingData(false);
         }
     };
+    const { setBreadcrumb } = useBreadcrumbStore();
+
+    useEffect(() => {
+        setBreadcrumb(<CustomerPageBreadcrumb />)
+
+        return () => {
+            setBreadcrumb(null)
+        }
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getCustomers(currentPage, currentSearch);
