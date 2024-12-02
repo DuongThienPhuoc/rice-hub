@@ -112,32 +112,32 @@ const Page = () => {
         }
     };
 
-    const errors: string[] = [""];
+    const [errors, setErrors] = useState<string[]>([]);
 
     const handleAddItemToForm = () => {
 
         if (productName === '') {
-            errors.push('Tên sản phẩm không được bỏ trống!');
+            setErrors((prevErrors) => [...prevErrors, 'Tên sản phẩm không được bỏ trống!']);
             setProductNameValidate(false);
         }
 
         if (weight === 0) {
-            errors.push('Trọng lượng không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Trọng lượng không hợp lệ!']);
             setWeightValidate(false);
         }
 
         if (quantity === 0) {
-            errors.push('Số lượng không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Số lượng không hợp lệ!']);
             setQuantityValidate(false);
         }
 
         if (!type) {
-            errors.push('Vui lòng chọn quy cách!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn quy cách!']);
             setTypeValidate(false);
         }
 
         if (!selectedCategory) {
-            errors.push('Vui lòng chọn danh mục!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn danh mục!']);
             setCategoryValidate(false);
         }
 
@@ -280,7 +280,7 @@ const Page = () => {
                                     disablePortal
                                     options={products}
                                     getOptionLabel={(option) =>
-                                        option.category.name + " " + option.name + " (" + option.supplier.name + ")"
+                                        option.category.name + " - " + option.name + " (" + option.supplier.name + ")"
                                     }
                                     sx={{
                                         width: 300,

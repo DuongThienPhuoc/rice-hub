@@ -44,7 +44,7 @@ const Page = () => {
     };
 
     const handleSubmit = async () => {
-        if (products.some((product: any) => product.checkQuantity === null)) {
+        if (products.some((product: any) => !product.checkQuantity)) {
             toast({
                 variant: 'destructive',
                 title: 'Tạo thất bại',
@@ -121,7 +121,7 @@ const Page = () => {
 
 
     return (
-        <section className="container mx-auto">
+        <section className="container mx-auto mb-20">
             <div className='mx-5'>
                 <section className='col-span-4'>
                     <div className='w-full'>

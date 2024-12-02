@@ -251,7 +251,7 @@ export default function InventoryTable() {
                             </div>
                         </div>
                         <div className='overflow-hidden'>
-                            <InventoryList name="Phiếu kiểm kho" editUrl="/inventory/updateInventory" loadingData={loadingData} titles={titles} columns={columns} data={inventory} tableName="inventory" />
+                            <InventoryList name="Phiếu kiểm kho" editUrl="/inventory/updateInventory" loadingData={loadingData} titles={titles} columns={columns} data={inventory} tableName="inventory" handleClose={() => getInventory(currentPage, currentSearch, startDate, endDate)} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
