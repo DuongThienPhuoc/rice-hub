@@ -7,7 +7,7 @@ import {
     CardHeader,
     CardFooter,
 } from '@/components/ui/card';
-import { Package2, Calendar, User, Truck } from 'lucide-react';
+import { Package2, Calendar, User, Truck, ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,8 @@ import { getOrderDetail } from '@/data/order';
 import { Order } from '@/type/order'
 import { statusProvider } from '@/utils/status-provider';
 import { currencyHandleProvider } from '@/utils/currency-handle';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export default function OrderDetailPage({
     params,
@@ -23,6 +25,7 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
+    const router = useRouter();
     const [order, setOrder] = useState<Order>();
     async function fetchOrderDetail() {
         try {
@@ -49,7 +52,7 @@ export default function OrderDetailPage({
     }
 
     return (
-        <section className="container mx-auto">
+        <section className="container mx-auto space-y-5">
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
@@ -118,7 +121,7 @@ export default function OrderDetailPage({
                     </CardContent>
                 </Card>
             </div>
-            <div className="my-5">
+            <div>
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-1 text-lg">
@@ -144,6 +147,14 @@ export default function OrderDetailPage({
                         </div>
                     </CardFooter>
                 </Card>
+            </div>
+            <div>
+                <Button className='flex items-center' onClick={
+                    () => router.back()
+                }>
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Quay lại</span>
+                </Button>
             </div>
         </section>
     );

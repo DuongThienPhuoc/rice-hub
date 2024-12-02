@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ProductPageBreadcrumb from '@/app/(admin)/ingredients/breadcrumb';
 
 export default function ProductTable() {
     const { toast } = useToast();
@@ -33,6 +35,7 @@ export default function ProductTable() {
         field: '',
         query: ''
     });
+    const { setBreadcrumb } = useBreadcrumbStore();
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
@@ -78,6 +81,11 @@ export default function ProductTable() {
     useEffect(() => {
         getProducts(currentPage, currentSearch);
     }, [currentPage, currentSearch]);
+
+    useEffect(() => {
+        setBreadcrumb(<ProductPageBreadcrumb />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);

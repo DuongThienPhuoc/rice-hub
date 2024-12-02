@@ -34,7 +34,8 @@ const adminStaticPaths: string[] = [
     '/production/update',
     '/admin/orders',
     '/user-activity',
-    '/document'
+    '/document/expenditures',
+    '/document/invoice',
 ];
 const adminDynamicPaths: string[] = [
     '/admin/orders',

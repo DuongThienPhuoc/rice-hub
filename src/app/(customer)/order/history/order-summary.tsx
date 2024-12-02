@@ -13,7 +13,7 @@ export default function OrderSummary({ userID }: { userID: string }) {
             {} as CustomerOrderHistoryResponse,
         );
     useEffect(() => {
-        getOrderHistory({ customerID: userID }).then((response) => {
+        getOrderHistory({ customerId: userID }).then((response) => {
             setCustomerOrderHistoryResponse(response.data);
         });
     }, [userID]);

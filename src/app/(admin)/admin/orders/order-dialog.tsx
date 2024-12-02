@@ -42,6 +42,7 @@ import { adminCreateOrder } from '@/data/order';
 import { useToast } from '@/hooks/use-toast';
 import AlertDelete from '@/app/(admin)/admin/orders/alert-delete';
 import AlertSubmitOrder from '@/app/(admin)/admin/orders/alert-submit-order';
+import PaginationComponent from '@/components/pagination/pagination';
 
 type OrderDialogProps = {
     children: React.ReactNode;
@@ -74,16 +75,19 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const [alertSubmitOrder, setAlertSubmitOrder] =
         React.useState<boolean>(false);
     const [indexItemDelete, setIndexItemDelete] = React.useState<number>(0);
+    const [currentPage, setCurrentPage] = React.useState<number>(0);
+    const [totalPages, setTotalPages] = React.useState<number>(0);
     const { toast } = useToast();
 
     async function getProduct() {
         try {
             const response = await getProductListByAdmin({
                 pageSize: 5,
-                // pageNumber: currentPage + 1,
-                // categoryName: selectedCategory,
+                id: selectedCustomer !== '' ? parseInt(selectedCustomer) : null,
+                pageNumber: currentPage + 1,
             });
             setProducts(response.data._embedded.productDtoList);
+            setTotalPages(response.data.page.totalPages);
         } catch (e) {
             if (e instanceof Error) {
                 throw new Error(
@@ -167,7 +171,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     useEffect(() => {
         getProduct().catch((e) => console.error(e));
         fetchCustomerList().catch((e) => console.error(e));
-    }, []);
+    }, [selectedCustomer, currentPage]);
 
     useEffect(() => {
         setSelectedProduct((prev) => ({
@@ -294,6 +298,9 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                     ))}
                                 </TableBody>
                             </Table>
+                        </div>
+                        <div>
+                            <PaginationComponent currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}/>
                         </div>
                     </div>
                     {selectedProducts.length > 0 && (

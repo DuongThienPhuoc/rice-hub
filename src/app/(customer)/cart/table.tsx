@@ -31,6 +31,12 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from '@/components/ui/input';
+import { User as UserInterface } from '@/type/user';
+import { getUserInformation } from '@/data/user';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CartPageBreadcrumb from '@/app/(customer)/cart/breadcrumb';
 
 export interface CartProduct {
     cartId: number;
@@ -47,6 +53,22 @@ export default function CartTable({ customerID }: { customerID: string }) {
     const { toast } = useToast();
     const [products, setProducts] = useState<CartProduct[]>([]);
     const [refresh, setRefresh] = useState<boolean>(false);
+    const [phone,setPhone] = useState<string>('');
+    const [address,setAddress] = useState<string>('');
+    const [userName, setUserName] = React.useState<string>('');
+    const [userInformation, setUserInformation] = useState<UserInterface>(
+        {} as UserInterface,
+    );
+    const { setBreadcrumb } = useBreadcrumbStore();
+    useEffect(() => {
+        if(typeof window === 'undefined') return;
+        const userName = localStorage.getItem('username');
+        if(userName) {
+            setUserName(userName);
+        }
+        setBreadcrumb(<CartPageBreadcrumb />);
+    }, []);
+
     useEffect(() => {
         const localStorageProducts =
             typeof window !== 'undefined' ? localStorage.getItem('cart') : null;
@@ -55,6 +77,28 @@ export default function CartTable({ customerID }: { customerID: string }) {
             : [];
         setProducts(parsedProducts);
     }, [refresh]);
+
+    useEffect(() => {
+        fetchUserInformation(userName).catch((error) => {
+            console.error('Error occurred while retrieving user information:', error);
+        })
+    }, [userName]);
+
+    useEffect(() => {
+        setPhone(userInformation.phone);
+        setAddress(userInformation.address);
+    }, [userInformation]);
+
+    async function fetchUserInformation(userName:string) {
+        try {
+            if (!userName) return;
+            const data = await getUserInformation<UserInterface>(userName);
+            setUserInformation(data);
+        } catch (error) {
+            throw error
+        }
+    }
+
     const selectedProduct = useProductSelectedStore((state) => state.selected);
     const updateSelectedProduct = useProductSelectedStore(
         (state) => state.handleSelected,
@@ -79,6 +123,8 @@ export default function CartTable({ customerID }: { customerID: string }) {
     async function handleOrder() {
         const orderDetails: OrderRequest = {
             customerId: parseInt(customerID),
+            orderPhone: phone,
+            orderAddress: address,
             orderDetails: selectedProduct.map((product) => {
                 return {
                     productId: product.productID,
@@ -229,8 +275,30 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>Thông báo!</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        Bạn có chắc chắn muốn đặt hàng ?
+                                        Vui lòng xác nhận lại số điện thoại và địa chỉ
                                     </AlertDialogDescription>
+                                    <div className='space-y-4'>
+                                        <div>
+                                            <Label htmlFor='phone'>Số điện thoại</Label>
+                                            <Input
+                                                id='phone'
+                                                className="w-full"
+                                                placeholder="Số điện thoại"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label htmlFor='address'>Địa chỉ</Label>
+                                            <Textarea
+                                                id='address'
+                                                className="w-full"
+                                                placeholder="Địa chỉ"
+                                                value={address}
+                                                onChange={(e) => setAddress(e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>

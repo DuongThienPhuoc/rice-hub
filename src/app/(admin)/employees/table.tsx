@@ -12,6 +12,8 @@ import { Skeleton } from '@mui/material';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import EmployeePageBreadcrumb from '@/app/(admin)/employees/breadcrumb';
 
 export default function EmployeeTable() {
     const { toast } = useToast();
@@ -37,6 +39,12 @@ export default function EmployeeTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<EmployeePageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     const getEmployees = async (page?: number, search?: { field?: string, query?: string }) => {
         try {

@@ -89,7 +89,7 @@ export default function ActionDropdownProvider({
                     className="flex items-center gap-2"
                     onClick={() => {
                         window.open(
-                            `/document?totalAmount=${expenseVoucher.totalAmount}&type=${expenseVoucher.type}&date=${expenseVoucher.expenseDate}`,
+                            `/document/expenditures?totalAmount=${expenseVoucher.totalAmount}&type=${expenseVoucher.type}&date=${expenseVoucher.expenseDate}`,
                             '_blank',
                             'noopener,noreferrer',
                         );
