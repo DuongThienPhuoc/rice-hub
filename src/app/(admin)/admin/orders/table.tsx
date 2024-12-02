@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { AdminOrderResponse, Order } from '@/type/order';
 import { Calendar, Search, Plus, Ellipsis } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import PaginationComponent from '@/components/pagination/pagination';
 import ActionDropdownProvider from '@/app/(admin)/admin/orders/action-dropdown';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import OrderPageBreadcrumb from '@/app/(admin)/admin/orders/breadcrumb';
 
 type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
@@ -34,6 +36,12 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
 }) => {
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
     const [orderUpdatePending, setOrderUpdatePending] = React.useState<Order | undefined>();
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<OrderPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
     return (
         <div className="bg-white p-5 mx-5 rounded-md space-y-4">
             <div className="space-y-2">

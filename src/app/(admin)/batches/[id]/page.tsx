@@ -18,6 +18,8 @@ import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import DetailBatchPageBreadcrumb from '@/app/(admin)/batches/[id]/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -45,6 +47,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                 : [...prevSelected, productCode]
         );
     };
+
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<DetailBatchPageBreadcrumb batchId={params.id.toString()} />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     const handleUpdate = async (product: any, reload: boolean) => {
         setOnPageChange(true);

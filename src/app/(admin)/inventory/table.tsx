@@ -21,6 +21,8 @@ import { DateRange } from 'react-day-picker';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import InventoryPageBreadcrumb from '@/app/(admin)/inventory/breadcrumb';
 
 export default function InventoryTable() {
     const router = useRouter();
@@ -50,6 +52,13 @@ export default function InventoryTable() {
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const { toast } = useToast();
+
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<InventoryPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     const handleClick = () => {
         setOnPageChange(true);

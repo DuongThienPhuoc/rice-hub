@@ -21,12 +21,20 @@ import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ImportPageBreadcrumb from '@/app/(admin)/import/breadcrumb';
 
 export default function ImportTable() {
     const router = useRouter();
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
     const [open, setOpen] = React.useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<ImportPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
     const options = ['Tạo phiếu nhập từ sản xuất', 'Tạo phiếu nhập từ nhà cung cấp'];
     const handleClick = () => {
         if (options[selectedIndex] === 'Tạo phiếu nhập từ nhà cung cấp') {

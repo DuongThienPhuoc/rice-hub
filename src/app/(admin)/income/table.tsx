@@ -15,6 +15,8 @@ import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { useToast } from '@/hooks/use-toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import IncomePageBreadcrumb from '@/app/(admin)/income/breadcrumb';
 
 export default function IncomeTable() {
     const router = useRouter();
@@ -35,6 +37,12 @@ export default function IncomeTable() {
         field: '',
         query: ''
     });
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<IncomePageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     const getIncome = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {

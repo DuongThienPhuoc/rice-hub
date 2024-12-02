@@ -16,6 +16,8 @@ import ActionDropdownProvider from '@/app/(admin)/payroll/action-dropdown';
 import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import SearchBar from '@/components/searchbar/searchbar';
 import Paging from '@/components/paging/paging';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ExpenditurePageBreadcrumb from '@/app/(admin)/expenditures/breadcrumb';
 
 export default function EmployeeTable() {
     const [expenditures, setExpenditures] = React.useState<ExpenseVoucher[]>(
@@ -26,6 +28,13 @@ export default function EmployeeTable() {
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [reFresh, setReFresh] = React.useState(false);
+
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<ExpenditurePageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     const handleSearch = () => {
 

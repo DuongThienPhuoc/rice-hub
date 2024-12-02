@@ -18,6 +18,8 @@ import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import InventoryPageBreadcrumb from '@/app/(admin)/inventory/createIngredients/breadcrumb';
 
 const Page = () => {
     const router = useRouter();
@@ -25,6 +27,12 @@ const Page = () => {
     const [products, setProducts] = useState<any>([]);
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<InventoryPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getProducts();
