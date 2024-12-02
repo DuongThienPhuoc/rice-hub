@@ -18,6 +18,8 @@ import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import FloatingButton from '@/components/floating/floatingButton';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import DetailProductionPageBreadcrumb from '@/app/(admin)/production/[id]/breadcrumb';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
@@ -25,6 +27,13 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [production, setProduction] = useState<any>([]);
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = useState(false);
+
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<DetailProductionPageBreadcrumb productionId={params.id.toString()} />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getProduction();

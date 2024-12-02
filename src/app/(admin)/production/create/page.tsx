@@ -18,6 +18,8 @@ import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ProductionPageBreadcrumb from '@/app/(admin)/production/create/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -35,6 +37,13 @@ const Page = () => {
     const note = ''
     const [onPageChange, setOnPageChange] = useState(false);
     const { toast } = useToast();
+
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<ProductionPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getProducts();

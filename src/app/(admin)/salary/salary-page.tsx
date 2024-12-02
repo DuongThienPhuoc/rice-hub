@@ -9,6 +9,8 @@ import PorterCalendar from '@/app/(admin)/salary/porter-calendar';
 import DriverCalendar from '@/app/(admin)/salary/driver-calendar';
 import UserCardContainer from '@/app/(admin)/salary/user-card';
 import DatePicker from '@/app/(admin)/salary/date-picker';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import SalaryPageBreadcrumb from '@/app/(admin)/salary/breadcrumb';
 
 export default function SalaryPage() {
     const [tab, setTab] = React.useState(0);
@@ -22,6 +24,12 @@ export default function SalaryPage() {
     const [month, setMonth] = React.useState(currentMonth);
     const [year, setYear] = React.useState(currentYear);
     const [activeDays, setActiveDays] = React.useState<DayActive[]>();
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<SalaryPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     async function fetchEmployee(role: 'daily' | 'monthly') {
         startTransition(async () => {

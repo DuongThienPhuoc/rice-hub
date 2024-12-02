@@ -12,6 +12,8 @@ import { isAxiosError } from 'axios';
 import { cn } from '@/lib/utils';
 import PayrollDatePicker from '@/app/(admin)/payroll/date-picker';
 import { Separator } from '@/components/ui/separator';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import PayrollPageBreadcrumb from '@/app/(admin)/payroll/breadcrumb';
 
 export default function PayrollPage() {
     const [tab, setTab] = React.useState<number>(0);
@@ -22,6 +24,12 @@ export default function PayrollPage() {
     const currentYear = new Date().getFullYear();
     const [month, setMonth] = React.useState(currentMonth);
     const [year, setYear] = React.useState(currentYear);
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<PayrollPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         startTransition(async () => {

@@ -18,6 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ToastAction } from '@radix-ui/react-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ImportPageBreadcrumb from '@/app/(admin)/import/createFromProduction/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -55,7 +57,12 @@ const Page = () => {
     const [loadingData, setLoadingData] = useState(true);
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
 
+    useEffect(() => {
+        setBreadcrumb(<ImportPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
     useEffect(() => {
         getProducts();
         getCategories();
@@ -112,32 +119,32 @@ const Page = () => {
         }
     };
 
-    const errors: string[] = [""];
+    const [errors, setErrors] = useState<string[]>([]);
 
     const handleAddItemToForm = () => {
 
         if (productName === '') {
-            errors.push('Tên sản phẩm không được bỏ trống!');
+            setErrors((prevErrors) => [...prevErrors, 'Tên sản phẩm không được bỏ trống!']);
             setProductNameValidate(false);
         }
 
         if (weight === 0) {
-            errors.push('Trọng lượng không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Trọng lượng không hợp lệ!']);
             setWeightValidate(false);
         }
 
         if (quantity === 0) {
-            errors.push('Số lượng không hợp lệ!');
+            setErrors((prevErrors) => [...prevErrors, 'Số lượng không hợp lệ!']);
             setQuantityValidate(false);
         }
 
         if (!type) {
-            errors.push('Vui lòng chọn quy cách!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn quy cách!']);
             setTypeValidate(false);
         }
 
         if (!selectedCategory) {
-            errors.push('Vui lòng chọn danh mục!');
+            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn danh mục!']);
             setCategoryValidate(false);
         }
 
@@ -280,7 +287,7 @@ const Page = () => {
                                     disablePortal
                                     options={products}
                                     getOptionLabel={(option) =>
-                                        option.category.name + " " + option.name + " (" + option.supplier.name + ")"
+                                        option.category.name + " - " + option.name + " (" + option.supplier.name + ")"
                                     }
                                     sx={{
                                         width: 300,

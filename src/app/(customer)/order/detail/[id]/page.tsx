@@ -310,7 +310,7 @@ export default function OrderDetailPage({
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Trạng thái</span>
+                            <span className="font-semibold">Trạng thái:</span>
                             <span>
                                 <Badge variant={statusProvider(order.status).variant}>
                                     {statusProvider(order?.status).text}
@@ -318,7 +318,7 @@ export default function OrderDetailPage({
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Tổng tiền</span>
+                            <span className="font-semibold">Tổng tiền:</span>
                             <span className="flex gap-1 items-center">
                                 <span className='font-semibold'>{currencyHandleProvider(order.totalAmount)}</span>
                             </span>

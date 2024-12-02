@@ -18,6 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import UpdateProductionPageBreadcrumb from '@/app/(admin)/production/update/[id]/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -36,11 +38,13 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [production, setProduction] = useState<any>([]);
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
     useEffect(() => {
         const fetchData = async () => {
             await Promise.all([getProducts(), getIngredients(), getProduction()]);
         };
+        setBreadcrumb(<UpdateProductionPageBreadcrumb productionId={params.id.toString()} />);
         fetchData();
     }, [params]);
 

@@ -436,6 +436,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                         <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                             {columns.map((column, cellIndex) => (
                                                 <TableCell
+                                                    className='max-w-[200px]'
                                                     key={cellIndex}
                                                 >
                                                     {renderCell(column.name, row)}

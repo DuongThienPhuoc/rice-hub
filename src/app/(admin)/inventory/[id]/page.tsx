@@ -16,6 +16,10 @@ import { CheckSquare, CircleX, PenSquare, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import InventoryDetailPageBreadcrumb from '@/app/(admin)/inventory/[id]/breadcrumb';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
@@ -23,6 +27,13 @@ const Page = ({ params }: { params: { id: number } }) => {
     const [loadingData, setLoadingData] = useState(true);
     const [inventory, setInventory] = useState<any>([]);
     const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
+
+    useEffect(() => {
+        setBreadcrumb(<InventoryDetailPageBreadcrumb inventoryId={params.id.toString()} />)
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getInventory();
@@ -52,6 +63,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
+                setOnPageChange(true);
                 try {
                     const updatedInventoryDetails = inventory?.inventoryDetails?.map((item: any) => ({
                         ...item,
@@ -65,6 +77,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         inventoryDetails: updatedInventoryDetails,
                     });
                     if (response.status >= 200 && response.status < 300) {
+                        setOnPageChange(false);
                         toast({
                             variant: 'default',
                             title: 'Xác nhận thành công',
@@ -77,6 +90,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         })
                         router.push("/inventory");
                     } else {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: 'Xác nhận phiếu kiểm kho thất bại',
@@ -86,6 +100,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         })
                     }
                 } catch (error: any) {
+                    setOnPageChange(false);
                     toast({
                         variant: 'destructive',
                         title: 'Xác nhận phiếu kiểm kho thất bại',
@@ -110,8 +125,10 @@ const Page = ({ params }: { params: { id: number } }) => {
     };
 
     const handleDelete = async () => {
+        setOnPageChange(true);
         try {
             await api.delete(`/inventory/delete/${params.id}`);
+            setOnPageChange(false);
             toast({
                 variant: 'default',
                 title: 'Xóa thành công',
@@ -124,6 +141,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             })
             getInventory();
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Xóa thất bại',
@@ -268,23 +286,9 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <div className='flex justify-between lg:flex-row flex-col-reverse items-center mb-5'>
                                         <>
                                             <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
-                                            <div className='flex justify-end items-center'>
-                                                {(inventory?.status === 'PENDING' || inventory?.status === 'CANCELED') && (
-                                                    <Button onClick={() => showAlert()} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
-                                                        {inventory?.status === 'CANCELED' ? 'Xóa phiếu' : 'Hủy phiếu'}
-                                                        <CircleX />
-                                                    </Button>
-                                                )}
-                                                {inventory?.status === 'PENDING' && (
-                                                    <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                        Xác nhận phiếu
-                                                        <CheckSquare />
-                                                    </Button>
-                                                )}
-                                            </div>
                                         </>
                                     </div>
-                                    <div className='overflow-x-auto max-h-[400px]'>
+                                    <div className='overflow-x-auto max-h-[500px]'>
                                         <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead className='bg-[#0090d9]'>
@@ -398,18 +402,35 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             </Table>
                                         </TableContainer>
                                     </div>
+                                    <div className='flex justify-end items-center mt-10'>
+                                        {(inventory?.status === 'PENDING' || inventory?.status === 'CANCELED') && (
+                                            <Button onClick={() => showAlert()} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
+                                                {inventory?.status === 'CANCELED' ? 'Xóa phiếu' : 'Hủy phiếu'}
+                                                <CircleX />
+                                            </Button>
+                                        )}
+                                        {inventory?.status === 'PENDING' && (
+                                            <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                                Xác nhận phiếu
+                                                <CheckSquare />
+                                            </Button>
+                                        )}
+                                    </div>
                                 </>
                             )}
                         </div>
                     </div>
-                    <div className='w-full flex justify-center items-center my-10'>
+                    <div className='w-full flex justify-center items-center my-5'>
                         {loadingData ? (
                             <>
                                 <Skeleton animation="wave" variant="rectangular" height={35} width={80} className='rounded-lg px-5 py-3' />
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push('/inventory')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push('/inventory')
+                                    setOnPageChange(true);
+                                }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -417,6 +438,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div >
     );
 };

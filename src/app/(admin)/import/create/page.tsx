@@ -18,6 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ToastAction } from '@radix-ui/react-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ImportPageBreadcrumb from '@/app/(admin)/import/create/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -69,7 +71,12 @@ const Page = () => {
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
 
+    useEffect(() => {
+        setBreadcrumb(<ImportPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
     useEffect(() => {
         getSuppliers();
         getProducts();
@@ -85,16 +92,19 @@ const Page = () => {
             setSelectedCategory(foundCategory || null);
             const foundSupplier = suppliers.find((supplier) => supplier.id === selectedProduct?.supplier?.id);
             setSelectedSupplier(foundSupplier || null);
-            const foundWarehouse = warehouses.find((warehouse) => warehouse.id === selectedProduct?.productWarehouses[0]?.warehouse.id);
-            setSelectedWarehouse(foundWarehouse || null);
         } else {
             setImportPrice(0);
             setProductName('');
             setSelectedSupplier(null);
             setSelectedCategory(null);
-            setSelectedWarehouse(null);
         }
     }, [selectedProduct])
+
+    useEffect(() => {
+        if (!selectedWarehouse) {
+            setSelectedProduct(null);
+        }
+    }, [selectedWarehouse])
 
     const getSuppliers = async () => {
         try {
@@ -379,43 +389,6 @@ const Page = () => {
                     ) : (
                         <div className='mt-10 lg:px-10 px-2 lg:flex-row flex-col flex w-full lg:space-x-2 lg:space-y-0 space-y-2'>
                             <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
-                                <p className='text-white font-semibold p-2 rounded-lg'>Tìm kiếm sản phẩm: </p>
-                                <Autocomplete
-                                    disablePortal
-                                    options={products}
-                                    getOptionLabel={(option) =>
-                                        option.category.name + " " + option.name + " (" + option.supplier.name + ")"
-                                    }
-                                    sx={{
-                                        width: 300,
-                                        "& .MuiInputBase-root": {
-                                            backgroundColor: "white",
-                                            borderRadius: "8px",
-                                            paddingRight: "8px",
-                                        },
-                                    }}
-                                    value={selectedProduct}
-                                    onChange={(event, newValue) => setSelectedProduct(newValue)}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            variant="standard"
-                                            sx={{
-                                                "& .MuiInputBase-root": {
-                                                    paddingX: "10px",
-                                                },
-                                                "& .MuiInput-underline:before": {
-                                                    display: "none",
-                                                },
-                                                "& .MuiInput-underline:after": {
-                                                    display: "none",
-                                                },
-                                            }}
-                                        />
-                                    )}
-                                />
-                            </div>
-                            <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
                                 <p className='text-white font-semibold p-2 rounded-lg'>Chọn nhà kho: </p>
                                 <Autocomplete
                                     disablePortal
@@ -453,6 +426,45 @@ const Page = () => {
                                         />}
                                 />
                             </div>
+                            {selectedWarehouse && (
+                                <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
+                                    <p className='text-white font-semibold p-2 rounded-lg'>Tìm kiếm sản phẩm: </p>
+                                    <Autocomplete
+                                        disablePortal
+                                        options={products.filter((p: RowData) => p.productWarehouses[0].warehouse.id === selectedWarehouse.id)}
+                                        getOptionLabel={(option) =>
+                                            option.category.name + " - " + option.name + " (" + option.supplier.name + ")"
+                                        }
+                                        sx={{
+                                            width: 300,
+                                            "& .MuiInputBase-root": {
+                                                backgroundColor: "white",
+                                                borderRadius: "8px",
+                                                paddingRight: "8px",
+                                            },
+                                        }}
+                                        value={selectedProduct}
+                                        onChange={(event, newValue) => setSelectedProduct(newValue)}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                variant="standard"
+                                                sx={{
+                                                    "& .MuiInputBase-root": {
+                                                        paddingX: "10px",
+                                                    },
+                                                    "& .MuiInput-underline:before": {
+                                                        display: "none",
+                                                    },
+                                                    "& .MuiInput-underline:after": {
+                                                        display: "none",
+                                                    },
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                            )}
                         </div>
                     )}
                     <div className='lg:px-10 mt-5 px-2 w-full'>

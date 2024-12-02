@@ -16,6 +16,10 @@ import { PenSquare, Upload, X } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import DetailBatchPageBreadcrumb from '@/app/(admin)/batches/[id]/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -34,6 +38,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [tempUnit, setTempUnit] = useState<any>(null);
     const [tempPrice, setTempPrice] = useState<any>(null);
     const [tempWeightPerUnit, setTempWeightPerUnit] = useState<any>(null);
+    const [onPageChange, setOnPageChange] = useState(false);
 
     const handleSelectProduct = (productCode: any) => {
         setSelectedProducts((prevSelected: any) =>
@@ -43,7 +48,15 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
     };
 
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<DetailBatchPageBreadcrumb batchId={params.id.toString()} />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
+
     const handleUpdate = async (product: any, reload: boolean) => {
+        setOnPageChange(true);
         try {
             const response = await api.put(`/batchproducts/update/${product.id}`, {
                 quantity: tempQuantity ? tempQuantity : product.quantity,
@@ -53,6 +66,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 description: tempDescription ? tempDescription : product.description,
             });
             if (response.status >= 200 && response.status < 300) {
+                setOnPageChange(false);
                 if (reload === true) {
                     toast({
                         variant: 'default',
@@ -68,6 +82,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     getProducts();
                 }
             } else {
+                setOnPageChange(false);
                 toast({
                     variant: 'destructive',
                     title: 'Cập nhật thất bại',
@@ -77,6 +92,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 })
             }
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Cập nhật thất bại',
@@ -121,10 +137,11 @@ const Page = ({ params }: { params: { id: string } }) => {
                 cancelButtonText: 'Không',
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    setOnPageChange(true);
                     try {
                         const response = await api.delete(`/WarehouseReceipt/delete/${batch.warehouseReceipt.id}`);
-                        console.log(response);
                         if (response.status >= 200 && response.status < 300) {
+                            setOnPageChange(false);
                             toast({
                                 variant: 'default',
                                 title: 'Xóa thành công',
@@ -141,6 +158,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 router.push("/export");
                             }
                         } else {
+                            setOnPageChange(false);
                             toast({
                                 variant: 'destructive',
                                 title: 'Xóa thất bại',
@@ -150,6 +168,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             })
                         }
                     } catch (error: any) {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: 'Xóa thất bại',
@@ -170,10 +189,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                 cancelButtonText: 'Không',
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    setOnPageChange(true);
                     try {
                         const url = `/batchproducts/deleteMany`
                         const response = await api.delete(url, { data: productData });
                         if (response.status >= 200 && response.status < 300) {
+                            setOnPageChange(false);
                             toast({
                                 variant: 'default',
                                 title: 'Xóa thành công',
@@ -187,6 +208,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             getBatch();
                             getProducts();
                         } else {
+                            setOnPageChange(false);
                             toast({
                                 variant: 'destructive',
                                 title: 'Xóa thất bại',
@@ -196,6 +218,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             })
                         }
                     } catch (error: any) {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: 'Xóa thất bại',
@@ -231,11 +254,12 @@ const Page = ({ params }: { params: { id: string } }) => {
             cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
-                console.log(selectedProducts);
+                setOnPageChange(true);
                 const productData = selectedProducts.map((product: any) => ({
                     productId: product?.product?.id,
                     unit: product?.unit,
                     weighPerUnit: product?.weightPerUnit,
+                    weightPerUnit: product?.weightPerUnit,
                     supplierId: product?.product?.supplier?.id,
                     productName: product?.product?.name,
                     quantity: product?.quantity,
@@ -247,6 +271,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     const url = type === 'import' ? `/products/confirm-add-to-warehouse/${batch?.id}` : `/products/export/confirm/${batch?.id}`
                     const response = await api.post(url, productData);
                     if (response.status >= 200 && response.status < 300) {
+                        setOnPageChange(false);
                         toast({
                             variant: 'default',
                             title: type === 'import' ? 'Nhập kho thành công' : 'Xuất kho thành công',
@@ -259,6 +284,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         })
                         router.push("/products");
                     } else {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: type === 'import' ? 'Nhập kho thất bại' : 'Xuất kho thất bại',
@@ -268,6 +294,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         })
                     }
                 } catch (error: any) {
+                    setOnPageChange(false);
                     toast({
                         variant: 'destructive',
                         title: type === 'import' ? 'Nhập kho thất bại' : 'Xuất kho thất bại',
@@ -663,7 +690,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                             </>
                         ) : (
                             <>
-                                <Button type='button' onClick={() => router.push(`${batch?.receiptType === "IMPORT" ? '/import' : '/export'}`)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push(`${batch?.receiptType === "IMPORT" ? '/import' : '/export'}`)
+                                    setOnPageChange(true)
+                                }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -671,6 +701,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                     </div>
                 </div>
             </div>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div >
     );
 };

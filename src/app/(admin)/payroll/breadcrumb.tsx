@@ -16,7 +16,7 @@ export default function PayrollPageBreadcrumb() {
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink className='text-white hover:text-white hover:font-bold' onClick={() => router.push('/dashboard')}>
-                        Trang Quản lý
+                        Trang quản lý
                     </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className='text-white' />
