@@ -1,7 +1,11 @@
 import axiosConfig from '@/config/axiosConfig';
 import axios, { AxiosResponse } from 'axios';
 import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
-import { OrderRequest, CustomerOrderHistoryResponse } from '@/type/customer-order';
+import {
+    CustomerOrderHistoryResponse,
+    CustomerUpdateOrderRequest,
+    OrderRequest,
+} from '@/type/customer-order';
 
 interface GetOrderHistoryProps {
     customerId?: string;
@@ -11,18 +15,25 @@ interface GetOrderHistoryProps {
     pageSize?: number;
 }
 
-export async function getOrderHistory({ customerId, orderCode , status, pageSize, pageNumber }: GetOrderHistoryProps) {
+export async function getOrderHistory({
+    customerId,
+    orderCode,
+    status,
+    pageSize,
+    pageNumber,
+}: GetOrderHistoryProps) {
     try {
         const response: AxiosResponse<CustomerOrderHistoryResponse> =
             await axiosConfig.get<CustomerOrderHistoryResponse>(
-                `/order/customer/${customerId}`,{
+                `/order/customer/${customerId}`,
+                {
                     params: {
                         orderCode,
                         status,
                         pageNumber,
                         pageSize,
-                    }
-                }
+                    },
+                },
             );
         return {
             data: response.data,
@@ -116,13 +127,15 @@ export async function adminUpdateOrder(
     }
 }
 
-export async function customerUpdateOrder(order: AdminUpdateOrderRequest) {
+export async function customerUpdateOrder(
+    orderId: number,
+    order: CustomerUpdateOrderRequest,
+) {
     try {
-        const response = await axiosConfig.post(
-            `/order/customer/UpdateOrder`,
+        return await axiosConfig.post(
+            `/order/customer/UpdateOrder/${orderId}`,
             order,
         );
-        return response.data;
     } catch (e) {
         throw e;
     }

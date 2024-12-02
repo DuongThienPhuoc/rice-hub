@@ -20,7 +20,7 @@ import { Package2, Calendar, User, Truck, History, ArrowLeft, QrCode, Check } fr
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
 import React, { useEffect, useState } from 'react';
-import { getOrderDetail } from '@/data/order';
+import { customerUpdateOrder, getOrderDetail } from '@/data/order';
 import { Order } from '@/type/order'
 import { statusProvider } from '@/utils/status-provider';
 import { currencyHandleProvider } from '@/utils/currency-handle';
@@ -32,6 +32,7 @@ import { Box, Drawer, TextField } from "@mui/material";
 import api from "@/config/axiosConfig";
 import { ToastAction } from "@/components/ui/toast";
 import { AxiosError } from 'axios';
+import { CustomerUpdateOrderRequest } from '@/type/customer-order';
 
 type PaymentPayload = {
     amount: number;
@@ -59,6 +60,35 @@ export default function OrderDetailPage({
     const [validateAmount, setValidateAmount] = useState(true);
     const [isCreatingLink, setIsCreatingLink] = useState(false);
     const { toast } = useToast();
+
+    async function confirmReceived() {
+        if (!order) return;
+        const requestBody: CustomerUpdateOrderRequest = {
+            customerId: order.customer.id,
+            status: 'COMPLETE',
+            totalAmount: order.totalAmount,
+            deposit: order.deposit,
+            remainingAmount: order.remainingAmount,
+            orderPhone: order.orderPhone,
+            orderAddress: order.orderAddress,
+            orderDetails: order.orderDetails.map((orderDetail) => ({
+                productId: orderDetail.productId,
+                name: orderDetail.name,
+                description: orderDetail.description,
+                quantity: orderDetail.quantity,
+                productUnit: orderDetail.productUnit,
+                unitPrice: orderDetail.unitPrice,
+                discount: orderDetail.discount,
+                totalPrice: orderDetail.totalPrice,
+                weightPerUnit: orderDetail.weightPerUnit,
+            })),
+        }
+        const response = await customerUpdateOrder(order.id,requestBody);
+        const status = response.status;
+        if (status >= 200 && status < 300) {
+            fetchOrderDetail().catch((e) => console.error(e));
+        }
+    }
 
     const handleSubmit = async (totalAmount: number) => {
         try {
@@ -539,7 +569,7 @@ export default function OrderDetailPage({
                     Quay lại
                 </Button>
                 {order?.status === 'CONFIRMED' && (
-                    <Button>
+                    <Button onClick={confirmReceived}>
                         <Check className='w-4 h-4' />
                         Xác nhận đã nhận hàng
                     </Button>
