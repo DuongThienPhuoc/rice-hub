@@ -35,6 +35,8 @@ import { User as UserInterface } from '@/type/user';
 import { getUserInformation } from '@/data/user';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CartPageBreadcrumb from '@/app/(customer)/cart/breadcrumb';
 
 export interface CartProduct {
     cartId: number;
@@ -57,13 +59,14 @@ export default function CartTable({ customerID }: { customerID: string }) {
     const [userInformation, setUserInformation] = useState<UserInterface>(
         {} as UserInterface,
     );
-
+    const { setBreadcrumb } = useBreadcrumbStore();
     useEffect(() => {
         if(typeof window === 'undefined') return;
         const userName = localStorage.getItem('username');
         if(userName) {
             setUserName(userName);
         }
+        setBreadcrumb(<CartPageBreadcrumb />);
     }, []);
 
     useEffect(() => {

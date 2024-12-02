@@ -27,10 +27,10 @@ import { getProductList } from '@/data/customer-product';
 import { useProductStore } from '@/stores/productStore';
 import PaginationComponent from '@/components/pagination/pagination';
 import { currencyHandleProvider } from '@/utils/currency-handle';
-import { SidebarTriggerCommon } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import OrderPageBreadcrumb from '@/app/(customer)/order/breadcrumb';
 import { getCategories, Category } from '@/data/category';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
 
 export default function OrderPage(): React.JSX.Element {
     const router = useRouter();
@@ -43,6 +43,7 @@ export default function OrderPage(): React.JSX.Element {
     const setProducts = useProductStore((state) => state.setProducts);
     const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const { setBreadcrumb } = useBreadcrumbStore();
     async function getProduct() {
         try {
             const response = await getProductList({
@@ -75,6 +76,7 @@ export default function OrderPage(): React.JSX.Element {
     useEffect(() => {
         fetchCategories()
             .catch((e) => console.error(e));
+        setBreadcrumb(<OrderPageBreadcrumb />);
     }, []);
 
     useEffect(() => {
@@ -84,11 +86,6 @@ export default function OrderPage(): React.JSX.Element {
 
     return (
         <>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 mb-5">
-                <SidebarTriggerCommon />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <OrderPageBreadcrumb />
-            </header>
             <section className="container mx-auto">
                 <div>
                     <section className="col-span-4">

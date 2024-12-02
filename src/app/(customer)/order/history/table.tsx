@@ -20,11 +20,19 @@ import { useEffect, useState } from 'react';
 import { currencyHandleProvider } from '@/utils/currency-handle';
 import { statusProvider } from '@/utils/status-provider';
 import PaginationComponent from '@/components/pagination/pagination';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import OrderHistoryPageBreadcrumb from '@/app/(customer)/order/history/breadcrumb';
 
 export default function OrderTable({ userID }: { userID: string }) {
     const [customerOrderHistoryResponse, setCustomerOrderHistoryResponse] = useState<CustomerOrderHistoryResponse>({} as CustomerOrderHistoryResponse);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPage, setTotalPage] = useState(0);
+    const { setBreadcrumb } = useBreadcrumbStore();
+
+    useEffect(() => {
+        setBreadcrumb(<OrderHistoryPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getOrderHistory({ customerId: userID, pageNumber: currentPage + 1, pageSize: 5 }).then((response) => {

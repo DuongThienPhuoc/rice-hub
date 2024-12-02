@@ -4,8 +4,7 @@ import api from '@/config/axiosConfig';
 import { usePathname } from 'next/navigation';
 import {
     Sidebar,
-    SidebarContent, SidebarFooter,
-    SidebarGroup,
+    SidebarContent, SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarHeader,
@@ -38,8 +37,7 @@ import {
     UserCog,
     UserPen,
     Users,
-    History,
-    Bell
+    History
 } from 'lucide-react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -63,8 +61,6 @@ import { cn } from '@/lib/utils';
 import { FaChartBar } from 'react-icons/fa';
 import { User as UserInterface } from '@/type/user';
 import { getUserInformation } from '@/data/user';
-import NotificationSheetProvider from '@/components/notification-sheet/sheet';
-import { useNotificationStore } from '@/stores/notification'
 
 type SidebarItem = {
     category: string;
@@ -238,7 +234,6 @@ export default function AppSidebar() {
     const [userInformation, setUserInformation] = useState<UserInterface>(
         {} as UserInterface,
     );
-    const { hasNewNotification, setHasNewNotification } = useNotificationStore();
     useEffect(() => {
         if (typeof window === 'undefined') return;
         const role = localStorage.getItem('role');
@@ -393,25 +388,6 @@ export default function AppSidebar() {
                     </Collapsible>
                 ))}
             </SidebarContent>
-            <SidebarFooter>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <NotificationSheetProvider>
-                            <SidebarMenuButton
-                                className="flex items-center justify-center"
-                                onClick={() => setHasNewNotification(false)}
-                            >
-                                <div className="relative">
-                                    <Bell className="h-5 w-5" />
-                                    {hasNewNotification && (
-                                        <div className="bg-red-500 absolute top-0 right-0 w-2 h-2 rounded-full "></div>
-                                    )}
-                                </div>
-                            </SidebarMenuButton>
-                        </NotificationSheetProvider>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
         </Sidebar>
     );
 }
