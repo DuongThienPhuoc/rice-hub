@@ -283,6 +283,7 @@ export default function AppSidebar() {
                     open={userProfileDialog}
                     setOpen={setUserProfileDialog}
                     user={userInformation}
+                    fetchUserInformation={fetchUserInformation}
                 />
             )}
             <SidebarHeader className="px-1 py-2">

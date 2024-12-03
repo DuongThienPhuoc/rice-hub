@@ -576,7 +576,7 @@ export default function OrderDetailPage({
                     <ArrowLeft className='w-4 h-4' />
                     Quay lại
                 </Button>
-                {order?.status === 'CONFIRMED' && (
+                {order?.status === 'IN_PROCESS' && (
                     <Button onClick={confirmReceived}>
                         <Check className='w-4 h-4' />
                         Xác nhận đã nhận hàng
