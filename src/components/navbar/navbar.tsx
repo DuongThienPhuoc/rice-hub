@@ -8,32 +8,45 @@ import { useEffect, useState } from 'react';
 
 export default function Navbar() {
     const [userName, setUserName] = useState<string>('');
+    const [role, setRole] = useState<string>('');
     const category = [
         {
             name: 'Trang chủ',
+            role: ['ROLE_ADMIN', 'ROLE_CUSTOMER', 'ROLE_EMPLOYEE', 'ROLE_ANONYMOUS'],
             link: '/',
         },
         {
             name: 'Đặt hàng',
+            role: ['ROLE_CUSTOMER'],
             link: '/order',
         },
         {
+            name: 'Quản lý đơn hàng',
+            role: ['ROLE_ADMIN', 'ROLE_EMPLOYEE'],
+            link: '/admin/orders',
+        },
+        {
             name: 'Giới thiệu',
+            role: ['ROLE_ADMIN', 'ROLE_CUSTOMER', 'ROLE_EMPLOYEE', 'ROLE_ANONYMOUS'],
             link: '/about',
         },
         {
             name: 'Đăng nhập',
+            role: ['ROLE_ANONYMOUS'],
             link: '/login',
         },
     ];
 
     useEffect(() => {
-        const localStorageUserName =
-            typeof window !== 'undefined' ? localStorage.getItem('username') : null;
-        const parsedProducts: string = localStorageUserName
-            ? localStorageUserName
-            : '';
-        setUserName(parsedProducts);
+        if(typeof window === 'undefined') return;
+        const rawUserName = localStorage.getItem('username');
+        const rawRole = localStorage.getItem('role');
+        if (rawUserName && rawRole) {
+            setUserName(rawUserName);
+            setRole(rawRole);
+        }else {
+            setRole('ROLE_ANONYMOUS');
+        }
     }, []);
 
     const router = useRouter();
@@ -56,14 +69,13 @@ export default function Navbar() {
                             <div
                                 key={index}
                                 className={cn(
-                                    'relative flex h-[99%] items-center px-2.5 hover:cursor-pointer',
+                                    'relative  h-[99%] items-center px-2.5 hover:cursor-pointer hidden',
                                     item.name === 'Trang chủ' &&
                                         'border-b-4 border-[#3e603b]',
                                     item.name !== 'Trang chủ' &&
                                         style.category_container,
-                                    userName &&
-                                        item.name === 'Đăng nhập' &&
-                                        'hidden',
+                                    item.role.includes(role) && 'flex',
+
                                 )}
                                 onClick={() => router.push(item.link)}
                             >
