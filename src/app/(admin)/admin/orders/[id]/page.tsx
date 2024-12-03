@@ -17,6 +17,8 @@ import { statusProvider } from '@/utils/status-provider';
 import { currencyHandleProvider } from '@/utils/currency-handle';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import OrderDetailPageBreadcrumb from '@/app/(admin)/admin/orders/[id]/breadcrumb';
 
 export default function OrderDetailPage({
     params,
@@ -27,6 +29,7 @@ export default function OrderDetailPage({
 }) {
     const router = useRouter();
     const [order, setOrder] = useState<Order>();
+    const { setBreadcrumb } = useBreadcrumbStore()
     async function fetchOrderDetail() {
         try {
             const response = await getOrderDetail(params.id);
@@ -44,6 +47,8 @@ export default function OrderDetailPage({
 
     useEffect(() => {
         fetchOrderDetail().catch((e) => console.error(e));
+        setBreadcrumb(<OrderDetailPageBreadcrumb orderID={params.id} />);
+        return () => setBreadcrumb(null);
     }, []);
 
     if (!order) {
