@@ -101,9 +101,7 @@ const Page = () => {
     }, [selectedProduct])
 
     useEffect(() => {
-        if (!selectedWarehouse) {
-            setSelectedProduct(null);
-        }
+        setSelectedProduct(null);
     }, [selectedWarehouse])
 
     const getSuppliers = async () => {
