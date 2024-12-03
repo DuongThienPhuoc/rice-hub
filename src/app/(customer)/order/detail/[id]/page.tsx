@@ -83,7 +83,7 @@ export default function OrderDetailPage({
                 weightPerUnit: orderDetail.weightPerUnit,
             })),
         }
-        const response = await customerUpdateOrder(order.id,requestBody);
+        const response = await customerUpdateOrder(order.id, requestBody);
         const status = response.status;
         if (status >= 200 && status < 300) {
             fetchOrderDetail().catch((e) => console.error(e));
@@ -116,7 +116,7 @@ export default function OrderDetailPage({
                 setOpenDrawer(false);
             }
         } catch (error) {
-            if(error instanceof AxiosError){
+            if (error instanceof AxiosError) {
                 toast({
                     variant: 'destructive',
                     title: 'Thanh toán thất bại',
@@ -419,10 +419,10 @@ export default function OrderDetailPage({
                                                 onChange={(e) => {
                                                     const value = e.target.value;
                                                     const numericValue = Number(value);
-                                                    if (!isNaN(numericValue) && Number(value) >= 0 && Number(value) <= order?.remainingAmount) {
+                                                    if (!isNaN(numericValue) && Number(value) >= 0 && Number(value) <= order?.receiptVoucher?.remainAmount) {
                                                         setAmount(Number(value));
-                                                    } else if (!isNaN(numericValue) && Number(value) > order?.remainingAmount) {
-                                                        setAmount(order?.remainingAmount);
+                                                    } else if (!isNaN(numericValue) && Number(value) > order?.receiptVoucher?.remainAmount) {
+                                                        setAmount(order?.receiptVoucher?.remainAmount);
                                                     }
                                                     setValidateAmount(true);
                                                 }}

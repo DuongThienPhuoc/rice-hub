@@ -253,7 +253,7 @@ const Page = () => {
                                     }
 
                                     getOptionLabel={(option) =>
-                                        option.category.name + " " + option.name + " (" + option.supplier.name + ")"
+                                        option.category.name + " - " + option.name + " (" + option.supplier.name + ")"
                                     }
                                     sx={{
                                         width: 300,
