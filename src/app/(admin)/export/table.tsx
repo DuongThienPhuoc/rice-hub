@@ -74,7 +74,6 @@ export default function ExportTable() {
             console.log(url);
             const response = await api.get(url);
             const data = response.data;
-            console.log(data);
             if (data?._embedded?.warehouseReceiptDtoList) {
                 setReceipts(data._embedded.warehouseReceiptDtoList);
                 setTotalPages(data.page.totalPages);

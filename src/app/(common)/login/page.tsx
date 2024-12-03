@@ -63,6 +63,9 @@ const Page = () => {
                     "Content-Type": "application/json",
                 },
             });
+            if(response.data.userType === 'ROLE_EMPLOYEE'){
+                localStorage.setItem("employeeRole", response.data.employeeRole);
+            }
             localStorage.setItem("role", response.data.userType);
             localStorage.setItem("username", response.data.username);
             document.cookie = `userID=${response.data.userId}; path=/; expires=${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toUTCString()}`;
