@@ -33,6 +33,8 @@ import api from "@/config/axiosConfig";
 import { ToastAction } from "@/components/ui/toast";
 import { AxiosError } from 'axios';
 import { CustomerUpdateOrderRequest } from '@/type/customer-order';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import OrderDetailPageBreadcrumb from '@/app/(customer)/order/detail/[id]/breadcrumb';
 
 type PaymentPayload = {
     amount: number;
@@ -59,7 +61,13 @@ export default function OrderDetailPage({
     const [isOpen, setIsOpen] = useState(false);
     const [validateAmount, setValidateAmount] = useState(true);
     const [isCreatingLink, setIsCreatingLink] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
     const { toast } = useToast();
+
+    useEffect(() => {
+        setBreadcrumb(<OrderDetailPageBreadcrumb orderID={params.id} />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     async function confirmReceived() {
         if (!order) return;

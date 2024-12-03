@@ -132,7 +132,7 @@ export default function OrderPage(): React.JSX.Element {
                                         </div>
                                         <div className="p-2">
                                             <ul>
-                                                {productCategories.map(
+                                                {productCategories?.map(
                                                     (category, index) => (
                                                         <li
                                                             key={index}
