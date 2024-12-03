@@ -7,7 +7,7 @@ import {
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { userProfileFormSchema } from '@/schema/user-profile';
+import { UserProfileFormSchema } from '@/schema/user-profile';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
     Form,
@@ -20,33 +20,61 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { User, Phone, Lock } from 'lucide-react';
 import { User as UserInterface } from '@/type/user';
+import { Textarea } from '@/components/ui/textarea';
+import { updateUserInformation } from '@/data/user';
+import { User as UserType } from '@/type/user';
 
 export default function UserProfileDialog({
     open,
     setOpen,
-    user
+    user,
+    fetchUserInformation,
 }: {
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
-    user: UserInterface
+    user: UserInterface;
+    fetchUserInformation: () => Promise<void>;
 }) {
     const [isEdit, setIsEdit] = useState<boolean>(false);
 
-    const form = useForm<z.infer<typeof userProfileFormSchema>>({
-        resolver: zodResolver(userProfileFormSchema),
+    const form = useForm<z.infer<typeof UserProfileFormSchema>>({
+        resolver: zodResolver(UserProfileFormSchema),
         defaultValues: {
             fullName: user.name,
             phoneNumber: user.phone,
             userName: user.username,
             email: user.email,
+            address: user.address,
         },
     });
     function handleEdit() {
         setIsEdit(!isEdit);
     }
 
-    function handleSave(values: z.infer<typeof userProfileFormSchema>) {
-        console.log(values); // TODO: Save to server
+    async function handleSave(values: z.infer<typeof UserProfileFormSchema>) {
+        const userBody: UserType = {
+            id: user.id,
+            userType: user.userType,
+            image: user.image,
+            createdAt: user.createdAt,
+            password: user.password,
+            name: values.fullName,
+            phone: values.phoneNumber,
+            username: values.userName,
+            email: values.email,
+            address: values.address,
+        }
+        try {
+            const response = await updateUserInformation(userBody);
+            if (response.status === 200){
+                setIsEdit(false);
+                await fetchUserInformation();
+            }else {
+                console.error(response.data);
+            }
+        }catch (e) {
+            console.error(e);
+        }
     }
 
 
@@ -112,6 +140,23 @@ export default function UserProfileDialog({
                                                 {...field}
                                                 disabled={!isEdit}
                                                 className="pl-8"
+                                            />
+                                        </FormControl>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="address"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Địa chỉ</FormLabel>
+                                    <div>
+                                        <FormControl>
+                                            <Textarea
+                                                {...field}
+                                                disabled={!isEdit}
                                             />
                                         </FormControl>
                                     </div>
