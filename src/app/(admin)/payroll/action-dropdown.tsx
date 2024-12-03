@@ -38,7 +38,7 @@ export default function ActionDropdownProvider({
 
         Swal.fire({
             title: 'Xác nhận xóa',
-            text: `Bạn có chắc muốn xóa phiếu chi này.`,
+            text: `Bạn có chắc muốn xóa phiếu chi này?`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa!',
@@ -59,7 +59,7 @@ export default function ActionDropdownProvider({
                     })
 
                 } catch (error) {
-                    if(error instanceof AxiosError) {
+                    if (error instanceof AxiosError) {
                         toast({
                             variant: 'destructive',
                             title: 'Xóa thất bại',
@@ -89,7 +89,7 @@ export default function ActionDropdownProvider({
                     className="flex items-center gap-2"
                     onClick={() => {
                         window.open(
-                            `/document?totalAmount=${expenseVoucher.totalAmount}&type=${expenseVoucher.type}&date=${expenseVoucher.expenseDate}`,
+                            `/document/expenditures?totalAmount=${expenseVoucher.totalAmount}&type=${expenseVoucher.type}&date=${expenseVoucher.expenseDate}`,
                             '_blank',
                             'noopener,noreferrer',
                         );

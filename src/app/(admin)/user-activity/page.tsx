@@ -27,6 +27,8 @@ import { vi } from 'date-fns/locale';
 import { mappingActivity } from '@/utils/mapping';
 import { Input } from '@/components/ui/input';
 import PaginationComponent from '@/components/pagination/pagination';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import UserActivityPageBreadcrumb from '@/app/(admin)/user-activity/breadcrumb';
 
 export default function UserActivityPage() {
     const [userActivity, setUserActivity] =
@@ -52,10 +54,17 @@ export default function UserActivityPage() {
             throw e;
         }
     }, [currentPage, date, search]);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
     useEffect(() => {
         fetchUserActivity().catch((e) => console.error(e));
     }, [currentPage,search,date]);
+
+    useEffect(() => {
+        setBreadcrumb(<UserActivityPageBreadcrumb />);
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
+
     return (
         <div className="bg-white p-5 mx-5 rounded-lg space-y-4">
             <div className="space-y-2 mb-5">

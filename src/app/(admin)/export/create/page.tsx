@@ -18,6 +18,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import FloatingButton from '@/components/floating/floatingButton';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ExportPageBreadcrumb from '@/app/(admin)/export/create/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -53,6 +55,12 @@ const Page = () => {
     const [loadingData, setLoadingData] = useState(true);
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<ExportPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getProducts();
@@ -325,7 +333,7 @@ const Page = () => {
                                                     Kho
                                                 </p>
                                             </TableCell>
-                                            <TableCell align='center' className="w-[5%]"><p className='font-semibold text-white'>#</p></TableCell>
+                                            <TableCell align='center' className="w-[5%]"><p className='font-semibold text-white'>Hành động</p></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -474,24 +482,12 @@ const Page = () => {
                                                 <TableCell align='center'>
                                                     {item.productName}
                                                 </TableCell>
-                                                {index === selectedRow ? (
-                                                    <TableCell className='p-2'>
-                                                        <TextField
-                                                            type={'number'}
-                                                            inputProps={{ min: 1 }}
-                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
-                                                            value={item.quantity}
-                                                            InputLabelProps={{
-                                                                shrink: true,
-                                                            }}
-                                                            label={'Số lượng'}
-                                                            variant="standard" />
-                                                    </TableCell>
-                                                ) : (
-                                                    <TableCell align='center'>
-                                                        {item.quantity}
-                                                    </TableCell>
-                                                )}
+                                                <TableCell align='center'>
+                                                    {item.categoryName}
+                                                </TableCell>
+                                                <TableCell align='center'>
+                                                    {item.supplierName}
+                                                </TableCell>
                                                 {index === selectedRow ? (
                                                     <TableCell className='p-2'>
                                                         <Autocomplete
@@ -524,12 +520,24 @@ const Page = () => {
                                                         {item.unit} {item.weightPerUnit}kg
                                                     </TableCell>
                                                 )}
-                                                <TableCell align='center'>
-                                                    {item.categoryName}
-                                                </TableCell>
-                                                <TableCell align='center'>
-                                                    {item.supplierName}
-                                                </TableCell>
+                                                {index === selectedRow ? (
+                                                    <TableCell className='p-2'>
+                                                        <TextField
+                                                            type={'number'}
+                                                            inputProps={{ min: 1 }}
+                                                            onChange={(e) => handleFieldChange('quantity', Number(e.target.value), index)}
+                                                            value={item.quantity}
+                                                            InputLabelProps={{
+                                                                shrink: true,
+                                                            }}
+                                                            label={'Số lượng'}
+                                                            variant="standard" />
+                                                    </TableCell>
+                                                ) : (
+                                                    <TableCell align='center'>
+                                                        {item.quantity}
+                                                    </TableCell>
+                                                )}
                                                 <TableCell align='center'>
                                                     {item.warehouseName}
                                                 </TableCell>

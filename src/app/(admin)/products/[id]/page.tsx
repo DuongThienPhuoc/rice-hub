@@ -11,6 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ProductDetailPageBreadcrumb from '@/app/(admin)/products/[id]/breadcrumb';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -27,7 +29,12 @@ const Page = ({ params }: { params: { id: number } }) => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const [loadingData, setLoadingData] = useState(true);
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
+    useEffect(() => {
+        setBreadcrumb(<ProductDetailPageBreadcrumb productId={params.id.toString()} />)
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         if (params.id) {

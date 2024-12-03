@@ -7,7 +7,7 @@ import {
     CardHeader,
     CardFooter,
 } from '@/components/ui/card';
-import { Package2, Calendar, User, Truck } from 'lucide-react';
+import { Package2, Calendar, User, Truck, ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
 import { useEffect, useState } from 'react';
@@ -15,6 +15,10 @@ import { getOrderDetail } from '@/data/order';
 import { Order } from '@/type/order'
 import { statusProvider } from '@/utils/status-provider';
 import { currencyHandleProvider } from '@/utils/currency-handle';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import OrderDetailPageBreadcrumb from '@/app/(admin)/admin/orders/[id]/breadcrumb';
 
 export default function OrderDetailPage({
     params,
@@ -23,7 +27,9 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
+    const router = useRouter();
     const [order, setOrder] = useState<Order>();
+    const { setBreadcrumb } = useBreadcrumbStore()
     async function fetchOrderDetail() {
         try {
             const response = await getOrderDetail(params.id);
@@ -41,6 +47,8 @@ export default function OrderDetailPage({
 
     useEffect(() => {
         fetchOrderDetail().catch((e) => console.error(e));
+        setBreadcrumb(<OrderDetailPageBreadcrumb orderID={params.id} />);
+        return () => setBreadcrumb(null);
     }, []);
 
     if (!order) {
@@ -49,7 +57,7 @@ export default function OrderDetailPage({
     }
 
     return (
-        <section className="container mx-auto">
+        <section className="container mx-auto space-y-5">
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
@@ -71,7 +79,7 @@ export default function OrderDetailPage({
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Trạng thái</span>
+                            <span className="font-semibold">Trạng thái:</span>
                             <span>
                                 <Badge className='bg-[#4ba94d] hover:bg-green-500 text-white' variant={statusProvider(order.status).variant}>
                                     {statusProvider(order?.status).text}
@@ -79,7 +87,7 @@ export default function OrderDetailPage({
                             </span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Tổng tiền</span>
+                            <span className="font-semibold">Tổng tiền:</span>
                             <span className="flex gap-1 items-center">
                                 <span className='font-semibold'>{currencyHandleProvider(order.totalAmount)}</span>
                             </span>
@@ -118,7 +126,7 @@ export default function OrderDetailPage({
                     </CardContent>
                 </Card>
             </div>
-            <div className="my-5">
+            <div>
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-1 text-lg">
@@ -144,6 +152,14 @@ export default function OrderDetailPage({
                         </div>
                     </CardFooter>
                 </Card>
+            </div>
+            <div>
+                <Button className='flex items-center' onClick={
+                    () => router.back()
+                }>
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Quay lại</span>
+                </Button>
             </div>
         </section>
     );

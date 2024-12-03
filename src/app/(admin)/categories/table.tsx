@@ -12,8 +12,11 @@ import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CategoryPageBreadcrumb from '@/app/(admin)/categories/breadcrumb';
 
 export default function CategoryTable() {
+    const { setBreadcrumb } = useBreadcrumbStore();
     const { toast } = useToast();
     const [loadingData, setLoadingData] = useState(true);
     const columns = [
@@ -90,6 +93,11 @@ export default function CategoryTable() {
     useEffect(() => {
         getCategories(currentPage, currentSearch);
     }, [currentPage, currentSearch]);
+
+    useEffect(() => {
+        setBreadcrumb(<CategoryPageBreadcrumb />)
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);

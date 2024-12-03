@@ -76,4 +76,5 @@ export interface MonthlyEmployeePayroll {
     dailyWage: number;
     dayWorked: number;
     totalSalary: number;
+    unpaidSalary: number;
 }

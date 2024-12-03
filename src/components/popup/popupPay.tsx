@@ -23,7 +23,7 @@ const PopupPay: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
         e.preventDefault();
 
         Swal.fire({
-            title: 'Xác nhận giao dịch',
+            title: 'Xác nhận thanh toán',
             text: `Hệ thống ghi nhận số tiền vừa nhập bằng là: ${formatCurrency(amount)} (${capitalizeFirstLetter(numberToWords(amount))} đồng). Bạn có chắc chắn muốn tạo giao dịch với số tiền này.`,
             icon: 'question',
             showCancelButton: true,
@@ -39,7 +39,7 @@ const PopupPay: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
                     });
                     toast({
                         variant: 'default',
-                        title: 'Giao dịch thành công',
+                        title: 'Thanh toán thành công',
                         description: `Hệ thống ghi nhận phiếu thu ${data?.receiptCode} đã được thanh toán số tiền ${formatCurrency(amount)} (${capitalizeFirstLetter(numberToWords(amount))} đồng)`,
                         style: {
                             backgroundColor: '#4caf50',

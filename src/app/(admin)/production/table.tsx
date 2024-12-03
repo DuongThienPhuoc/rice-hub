@@ -14,9 +14,17 @@ import SearchBar from '@/components/searchbar/searchbar';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { Separator } from '@/components/ui/separator';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useToast } from '@/hooks/use-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ProductionPageBreadcrumb from '@/app/(admin)/production/breadcrumb';
 
 export default function ProductionTable() {
     const router = useRouter();
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
     const columns = [
         { name: 'productionCode', displayName: 'Mã phiếu' },
         { name: 'productName', displayName: 'Nguyên liệu' },
@@ -24,6 +32,8 @@ export default function ProductionTable() {
         { name: 'creator.fullName', displayName: 'Người tạo' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
     const [receipts, setReceipts] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
@@ -34,8 +44,14 @@ export default function ProductionTable() {
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+    const { setBreadcrumb } = useBreadcrumbStore()
 
-    const getData = async (page?: number, startDate?: any, endDate?: any) => {
+    useEffect(() => {
+        setBreadcrumb(<ProductionPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
+
+    const getData = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
             const params = new URLSearchParams();
             params.append("size", "10");
@@ -46,25 +62,39 @@ export default function ProductionTable() {
                 params.append("startDate", new Date(new Date(startDate).setDate(new Date(startDate).getDate())).toISOString());
                 params.append("endDate", new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1)).toISOString());
             }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
+            }
             const url = `/productionOrder/getWithFilter?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            if (data?.content) {
+            if (data?.totalElements > 0) {
                 setReceipts(data.content);
                 setTotalPages(data.totalPages);
             } else {
                 setReceipts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy phiếu sản xuất!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
             }
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách phiếu sản xuất:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách phiếu sản xuất!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
     };
 
     useEffect(() => {
-        getData(currentPage, startDate, endDate);
-    }, [currentPage, startDate, endDate]);
+        getData(currentPage, currentSearch, startDate, endDate);
+    }, [currentPage, currentSearch, startDate, endDate]);
 
     useEffect(() => {
         setStartDate(date?.from || null);
@@ -75,22 +105,9 @@ export default function ProductionTable() {
         setCurrentPage(page);
     };
 
-    // const fileToBuffer = (file: File): Promise<Buffer> => {
-    //     return new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.onload = () => {
-    //             const arrayBuffer = reader.result as ArrayBuffer;
-    //             resolve(Buffer.from(arrayBuffer));
-    //         };
-    //         reader.onerror = (error) => {
-    //             reject(error);
-    //         };
-    //         reader.readAsArrayBuffer(file);
-    //     });
-    // };
-
-    const handleSearch = () => {
+    const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
+        setCurrentSearch({ field, query });
     };
 
     return (
@@ -119,7 +136,8 @@ export default function ProductionTable() {
                                         onSearch={handleSearch}
                                         loadingData={loadingData}
                                         selectOptions={[
-                                            { value: 'id', label: 'Mã phiếu' }
+                                            { value: 'productionCode', label: 'Mã phiếu' },
+                                            { value: 'ingredientName', label: 'Tên nguyên liệu' }
                                         ]}
                                     />
                                     {loadingData ? (
@@ -134,7 +152,10 @@ export default function ProductionTable() {
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
                                     <Button
-                                        onClick={() => router.push("/production/create")}
+                                        onClick={() => {
+                                            router.push("/production/create")
+                                            setOnPageChange(true);
+                                        }}
                                         className="p-3 text-[14px] hover:bg-green-500"
                                     >
                                         Tạo phiếu sản xuất
@@ -156,6 +177,15 @@ export default function ProductionTable() {
                     </div>
                 </div>
             </section>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
             <FloatingButton />
         </div>
     );

@@ -13,6 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CreateEmployeePageBreadcrumb from '@/app/(admin)/employees/create/breadcrumb';
 
 const Page = () => {
     const router = useRouter();
@@ -22,6 +24,12 @@ const Page = () => {
     const [employeeRoles, setEmployeeRoles] = useState<any>([]);
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
+
+    useEffect(() => {
+        setBreadcrumb(<CreateEmployeePageBreadcrumb />)
+        return () => setBreadcrumb(null);
+    }, [setBreadcrumb]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

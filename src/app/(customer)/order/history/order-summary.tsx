@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, Package } from 'lucide-react';
+import { Banknote, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CustomerOrderHistoryResponse } from '@/type/customer-order';
 import { getOrderHistory } from '@/data/order';
@@ -13,7 +13,7 @@ export default function OrderSummary({ userID }: { userID: string }) {
             {} as CustomerOrderHistoryResponse,
         );
     useEffect(() => {
-        getOrderHistory({ customerID: userID }).then((response) => {
+        getOrderHistory({ customerId: userID }).then((response) => {
             setCustomerOrderHistoryResponse(response.data);
         });
     }, [userID]);
@@ -43,7 +43,7 @@ export default function OrderSummary({ userID }: { userID: string }) {
                     <CardTitle className="text-sm font-medium">
                         Số tiền đã chi
                     </CardTitle>
-                    <DollarSign className="w-5 h-5 text-muted-foreground" />
+                    <Banknote className="w-5 h-5 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">

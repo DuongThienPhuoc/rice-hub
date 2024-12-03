@@ -13,6 +13,8 @@ import { ToastAction } from '@/components/ui/toast';
 import Swal from 'sweetalert2';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import CreatePricePageBreadcrumb from '@/app/(admin)/prices/create/breadcrumb';
 
 interface RowData {
     [key: string]: any;
@@ -41,6 +43,7 @@ const Page = () => {
 
     const [customerName, setCustomerName] = React.useState<string[]>([]);
     const [ids, setIds] = React.useState<string[]>([]);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
     const handleChange = (event: SelectChangeEvent<typeof customerName>) => {
         const {
@@ -87,6 +90,8 @@ const Page = () => {
     useEffect(() => {
         getCustomers();
         getPrices();
+        setBreadcrumb(<CreatePricePageBreadcrumb />);
+        return () => setBreadcrumb(null);
     }, []);
 
     const getCustomers = async () => {
@@ -242,7 +247,7 @@ const Page = () => {
             icon: 'error',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa!',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {

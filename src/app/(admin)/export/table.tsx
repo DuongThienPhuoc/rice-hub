@@ -19,6 +19,9 @@ import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { ToastAction } from '@radix-ui/react-toast';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import ExportPageBreadcrumb from '@/app/(admin)/export/breadcrumb';
 
 export default function ExportTable() {
     const router = useRouter();
@@ -45,6 +48,12 @@ export default function ExportTable() {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const processedFileHashes = new Set<string>();
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<ExportPageBreadcrumb />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     const getData = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
@@ -206,17 +215,32 @@ export default function ExportTable() {
             const response = await api.post(`/products/export/preview`, data);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
-                Swal.fire('Đã thêm!', 'Danh sách đã được thêm.', 'success');
+                toast({
+                    variant: 'default',
+                    title: 'Xuất thành công!',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    description: 'Danh sách sản phẩm đã được xuất thành công.',
+                    duration: 3000,
+                })
                 setOnPageChange(false);
             } else {
                 setOnPageChange(false);
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    duration: 3000,
+                })
             }
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Không tìm thấy phiếu nhập!',
-                description: 'Xin vui lòng thử lại',
+                title: 'Tạo thất bại',
+                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000,
             })
             setOnPageChange(false);

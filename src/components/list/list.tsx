@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 import PopupDetail from '../popup/popupDetail';
 import PopupEdit from '../popup/popupEdit';
 import { Paper, Skeleton } from '@mui/material';
-import { Calendar, DollarSign, Eye, PenBox, RotateCw, Trash2 } from 'lucide-react';
+import { Calendar, DollarSign, Eye, PenBox, Trash2 } from 'lucide-react';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@/components/ui/toast';
@@ -146,39 +146,39 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         });
     }
 
-    const handleEnable = async (row: any) => {
-        setOnPageChange(true);
-        try {
-            if (tableName === 'ingredients') {
-                await api.post(`/products/enable/${row.id}`);
-            } else if (tableName === 'customers') {
-                await api.post(`/customer/enable/${row.id}`);
-            } else {
-                await api.post(`/${tableName}/enable/${row.id}`);
-            }
-            toast({
-                variant: 'default',
-                title: 'Khôi phục thành công',
-                description: `${name} đã được khôi phục thành công`,
-                style: {
-                    backgroundColor: '#4caf50',
-                    color: '#fff',
-                },
-                duration: 3000
-            })
-            setOnPageChange(false);
-            handleClose?.(true);
-        } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Khôi phục thất bại',
-                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
-                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000
-            })
-            setOnPageChange(false);
-        }
-    }
+    // const handleEnable = async (row: any) => {
+    //     setOnPageChange(true);
+    //     try {
+    //         if (tableName === 'ingredients') {
+    //             await api.post(`/products/enable/${row.id}`);
+    //         } else if (tableName === 'customers') {
+    //             await api.post(`/customer/enable/${row.id}`);
+    //         } else {
+    //             await api.post(`/${tableName}/enable/${row.id}`);
+    //         }
+    //         toast({
+    //             variant: 'default',
+    //             title: 'Khôi phục thành công',
+    //             description: `${name} đã được khôi phục thành công`,
+    //             style: {
+    //                 backgroundColor: '#4caf50',
+    //                 color: '#fff',
+    //             },
+    //             duration: 3000
+    //         })
+    //         setOnPageChange(false);
+    //         handleClose?.(true);
+    //     } catch (error: any) {
+    //         toast({
+    //             variant: 'destructive',
+    //             title: 'Khôi phục thất bại',
+    //             description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+    //             action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+    //             duration: 3000
+    //         })
+    //         setOnPageChange(false);
+    //     }
+    // }
 
     const showAlert = async (row: any) => {
         if (row.status === 'CANCELED') {
@@ -201,7 +201,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete(row);
@@ -210,29 +210,29 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         }
     };
 
-    const enable = async (row: any) => {
-        Swal.fire({
-            title: 'Xác nhận khôi phục',
-            text: `Bạn có chắc chắn muốn khôi phục ${name?.toLocaleLowerCase()} này?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Có, khôi phục!',
-            cancelButtonText: 'Không!',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                handleEnable(row);
-            }
-        });
-    };
+    // const enable = async (row: any) => {
+    //     Swal.fire({
+    //         title: 'Xác nhận khôi phục',
+    //         text: `Bạn có chắc chắn muốn khôi phục ${name?.toLocaleLowerCase()} này?`,
+    //         icon: 'question',
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Có, khôi phục!',
+    //         cancelButtonText: 'Không',
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             handleEnable(row);
+    //         }
+    //     });
+    // };
 
     const deleteImportAndExport = (row: any) => {
         Swal.fire({
             title: 'Xác nhận xóa',
-            text: `Bạn có chắc chắn muốn xóa phiếu ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
+            text: `Bạn có chắc chắn muốn xóa ${name?.toLocaleLowerCase()} và lô hàng này không, một khi đã xóa sẽ không thể khôi phục nữa.`,
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa!',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
@@ -432,10 +432,11 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         <TableBody>
                             {data && data.length !== 0 ? (
                                 data.map((row, rowIndex) => (
-                                    ((tableName === 'products' || tableName === 'ingredients') ? row?.active === false : row?.active === true) ? (
+                                    ((tableName === 'products' || tableName === 'ingredients') ? row?.active === false : row?.active === true) && (
                                         <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                             {columns.map((column, cellIndex) => (
                                                 <TableCell
+                                                    className='max-w-[200px]'
                                                     key={cellIndex}
                                                 >
                                                     {renderCell(column.name, row)}
@@ -552,26 +553,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                     )}
                                                 </TableCell>
                                             )}
-                                        </TableRow>
-                                    ) : (
-                                        <TableRow key={rowIndex}>
-                                            {columns.map((column, cellIndex) => (
-                                                <TableCell className='opacity-40 pointer-events-none' key={cellIndex}>
-                                                    {renderCell(column.name, row)}
-                                                </TableCell>
-                                            ))}
-                                            <TableCell>
-                                                <div className="flex justify-center space-x-3 pointer-events-auto">
-                                                    <div className="relative group">
-                                                        <button onClick={() => enable(row)}>
-                                                            <RotateCw size={18} />
-                                                        </button>
-                                                        <span className="absolute text-center w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                            Khôi phục
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
                                         </TableRow>
                                     )
                                 ))

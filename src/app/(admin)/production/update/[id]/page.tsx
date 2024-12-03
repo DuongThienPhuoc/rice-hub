@@ -14,29 +14,45 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Trash2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { ToastAction } from '@radix-ui/react-toast';
+import FloatingButton from '@/components/floating/floatingButton';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import UpdateProductionPageBreadcrumb from '@/app/(admin)/production/update/[id]/breadcrumb';
+
+interface RowData {
+    [key: string]: any;
+}
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
     const [ingredients, setIngredients] = useState<any>([]);
     const [products, setProducts] = useState<any>([]);
     const [selectedIngredient, setSelectedIngredient] = useState<any>(null);
+    const [selectedType, setSelectedType] = useState<RowData | null>(null);
     const [loadingData, setLoadingData] = useState(true);
     const [inputWeight, setInputWeight] = useState<any>('');
     const [outputs, setOutputs] = useState<any>([]);
     const [note, setNote] = useState<any>('');
     const [production, setProduction] = useState<any>([]);
+    const { toast } = useToast();
+    const [onPageChange, setOnPageChange] = useState(false);
+    const { setBreadcrumb } = useBreadcrumbStore();
 
     useEffect(() => {
         const fetchData = async () => {
             await Promise.all([getProducts(), getIngredients(), getProduction()]);
         };
+        setBreadcrumb(<UpdateProductionPageBreadcrumb productionId={params.id.toString()} />);
         fetchData();
     }, [params]);
 
     useEffect(() => {
         if (production?.productId) {
-            const ingredient = ingredients.find((i: any) => i.id === production.productId);
-            setSelectedIngredient(ingredient);
+            const type = ingredients?.find((i: RowData) => i.id === production.productId);
+            setSelectedType(type);
+            setSelectedIngredient(products?.find((p: RowData) => p?.id === type?.product?.id));
             setInputWeight(production.quantity);
             setNote(production.note);
 
@@ -59,7 +75,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             setProducts(data);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách sản phẩm!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -72,7 +93,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             setProduction(data);
         } catch (error) {
-            console.error("Lỗi khi lấy phiếu sản xuất:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy thông tin phiếu sản xuất!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -86,7 +112,12 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             setIngredients(data.filter((p: any) => p.unit !== '' && p.weightPerUnit > 0));
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách nguyên liệu:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách nguyên liệu!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -96,17 +127,17 @@ const Page = ({ params }: { params: { id: number } }) => {
         const newOutputs = [...outputs];
         newOutputs[index][field] = value;
 
-        if (field === 'ratio' && selectedIngredient) {
-            newOutputs[index].weight = parseFloat(((value / 100) * (inputWeight * selectedIngredient.weightPerUnit)).toFixed(2));
+        if (field === 'ratio' && selectedType) {
+            newOutputs[index].weight = parseFloat(((value / 100) * (inputWeight * selectedType.weightPerUnit)).toFixed(2));
         }
         setOutputs(newOutputs);
     };
 
     useEffect(() => {
-        if (selectedIngredient && inputWeight) {
+        if (selectedType && inputWeight) {
             const updatedOutputs = outputs.map((output: any) => ({
                 ...output,
-                weight: parseFloat(((output.ratio / 100) * (inputWeight * selectedIngredient.weightPerUnit)).toFixed(2)),
+                weight: parseFloat(((output.ratio / 100) * (inputWeight * selectedType.weightPerUnit)).toFixed(2)),
             }));
             setOutputs(updatedOutputs);
         }
@@ -121,13 +152,19 @@ const Page = ({ params }: { params: { id: number } }) => {
     };
 
     const handleSubmit = async () => {
+
         if (outputs.length < 1) {
-            alert("Danh sách rỗng! Vui lòng thêm sản phẩm.");
+            toast({
+                variant: 'destructive',
+                title: 'Không thể tạo phiếu!',
+                description: 'Danh sách rỗng! Vui lòng thêm thành phẩm!',
+                duration: 3000
+            })
+            setOnPageChange(false)
             return;
         }
 
-        for (let index = 0; index < outputs.length; index++) {
-            const output = outputs[index];
+        const isValid = outputs && outputs.some((output: any, index: number) => {
             if (
                 output.selectedProduct === '' ||
                 output.ratio === '' ||
@@ -135,35 +172,82 @@ const Page = ({ params }: { params: { id: number } }) => {
                 output.weight === '' ||
                 output.weight === 0
             ) {
-                alert(`Thông tin của sản phẩm thứ ${index + 1} không hợp lệ!`);
-                return;
+                toast({
+                    variant: 'destructive',
+                    title: 'Không thể sửa phiếu!',
+                    description: `Vui lòng xem lại thành phẩm ở dòng số ${index + 1}!`,
+                    duration: 3000
+                });
+                setOnPageChange(false);
+                return true;
             }
-        }
+            return false;
+        });
 
-        try {
-            const response = await api.post(`/productionOrder/update/${params.id}`, {
-                description: note,
-                quantity: inputWeight,
-                productWarehouseId: selectedIngredient?.id || 0,
-                finishedProductDtoList: outputs.map((output: any) => {
-                    return {
-                        productId: output.selectedProduct.id,
-                        proportion: output.ratio,
-                        quantity: output.weight
-                    }
-                })
-            });
-            if (response.status >= 200 && response.status < 300) {
-                alert(`Phiếu sản xuất đã được cập nhật thành công`);
-                router.push(`/production/${params.id}`);
-            } else {
-                throw new Error('Đã xảy ra lỗi, vui lòng thử lại.');
+        if (!isValid) {
+            try {
+                const response = await api.post(`/productionOrder/update/${params.id}`, {
+                    description: note,
+                    quantity: inputWeight,
+                    productWarehouseId: selectedType?.id || 0,
+                    finishedProductDtoList: outputs.map((output: any) => {
+                        return {
+                            productId: output.selectedProduct.id,
+                            proportion: output.ratio,
+                            quantity: output.weight
+                        }
+                    })
+                });
+                if (response.status >= 200 && response.status < 300) {
+                    setOnPageChange(false)
+                    toast({
+                        variant: 'default',
+                        title: 'Sửa phiếu thành công',
+                        description: `Phiếu sản xuất đã được cập nhập thành công`,
+                        style: {
+                            backgroundColor: '#4caf50',
+                            color: '#fff',
+                        },
+                        duration: 3000
+                    })
+                    router.push(`/production/${params.id}`);
+                } else {
+                    setOnPageChange(false)
+                    toast({
+                        variant: 'destructive',
+                        title: 'Sửa phiếu thất bại',
+                        description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                        duration: 3000
+                    })
+                }
+            } catch (error: any) {
+                const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
+                toast({
+                    variant: 'destructive',
+                    title: 'Sửa phiếu thất bại',
+                    description: (
+                        <div>
+                            {Array.isArray(messages) ? (
+                                messages.map((msg: any, index: any) => (
+                                    <div key={index}>{msg}</div>
+                                ))
+                            ) : (
+                                <div>{messages}</div>
+                            )}
+                        </div>
+                    ),
+                    action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                    duration: 3000
+                });
             }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            alert('Đã xảy ra lỗi, vui lòng thử lại.');
         }
     };
+
+    useEffect(() => {
+        if (!selectedIngredient) {
+            setSelectedType(null);
+        }
+    }, [selectedIngredient])
 
     return (
         <div>
@@ -195,45 +279,110 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                         ) : (
                             <>
-                                <div className='flex-1 items-center'>
-                                    <div className='lg:m-10 mx-10 flex lg:justify-between flex-col lg:flex-row'>
-                                        <span className='font-bold lg:pt-5'>Chọn nguyên liệu: </span>
-                                        <Autocomplete
-                                            className='lg:ml-5 mt-2 lg:mt-0'
-                                            disablePortal
-                                            options={ingredients}
-                                            value={selectedIngredient}
-                                            getOptionLabel={(option) => option?.product?.name + ' (' + option?.unit + ' ' + option?.weightPerUnit + ' kg)'}
-                                            sx={{ minWidth: 300 }}
-                                            onChange={(event, newValue) => { setSelectedIngredient(newValue) }}
-                                            renderInput={(params) => <TextField {...params} variant='standard' label="Tìm kiếm nguyên liệu" />}
-                                        />
+                                <div className='flex-1 items-center px-2 w-full'>
+                                    <div className='my-5 xl:flex-row flex-col flex w-full xl:space-x-2 xl:space-y-0 space-y-2'>
+                                        <div className='flex space-x-2 pr-1 w-fit bg-[#4ba94d] items-center rounded-lg '>
+                                            <span className='text-white font-semibold p-2 rounded-lg'>Nguyên liệu: </span>
+                                            <Autocomplete
+                                                disablePortal
+                                                options={products.filter(
+                                                    (p: RowData) =>
+                                                        p.productWarehouses.some(
+                                                            (pw: RowData) => pw?.warehouse.id === 1 && pw?.weightPerUnit > 0
+                                                        )
+                                                )}
+                                                value={selectedIngredient}
+                                                getOptionLabel={(option) => option?.category?.name + " " + option?.name + ' (' + option?.supplier?.name + ')'}
+                                                sx={{
+                                                    width: 300,
+                                                    "& .MuiInputBase-root": {
+                                                        backgroundColor: "white",
+                                                        borderRadius: "8px",
+                                                        paddingRight: "8px",
+                                                    },
+                                                }}
+                                                onChange={(event, newValue) => { setSelectedIngredient(newValue) }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        placeholder='Chọn nguyên liệu'
+                                                        {...params}
+                                                        variant="standard"
+                                                        sx={{
+                                                            "& .MuiInputBase-root": {
+                                                                paddingX: "10px",
+                                                            },
+                                                            "& .MuiInput-underline:before": {
+                                                                display: "none",
+                                                            },
+                                                            "& .MuiInput-underline:after": {
+                                                                display: "none",
+                                                            },
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
+                                        {selectedIngredient && (
+                                            <div className='flex space-x-2 pr-1 w-fit bg-[#4ba94d] items-center rounded-lg '>
+                                                <span className='text-white font-semibold p-2 rounded-lg'>Quy cách: </span>
+                                                <Autocomplete
+                                                    disablePortal
+                                                    options={ingredients.filter((i: RowData) => i.product.id === selectedIngredient.id)}
+                                                    value={selectedType}
+                                                    getOptionLabel={(option) => option?.unit + ' ' + option?.weightPerUnit + ' kg'}
+                                                    sx={{
+                                                        width: 200,
+                                                        "& .MuiInputBase-root": {
+                                                            backgroundColor: "white",
+                                                            borderRadius: "8px",
+                                                            paddingRight: "8px",
+                                                        },
+                                                    }}
+                                                    onChange={(event, newValue) => { setSelectedType(newValue) }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            placeholder='Chọn quy cách'
+                                                            variant="standard"
+                                                            sx={{
+                                                                "& .MuiInputBase-root": {
+                                                                    paddingX: "10px",
+                                                                },
+                                                                "& .MuiInput-underline:before": {
+                                                                    display: "none",
+                                                                },
+                                                                "& .MuiInput-underline:after": {
+                                                                    display: "none",
+                                                                },
+                                                            }}
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div className='m-10 flex flex-col lg:justify-between lg:flex-row'>
-                                        <span className='font-bold lg:pt-5'>Nhập số lượng sản xuất {selectedIngredient && '(' + selectedIngredient?.unit + ')'}:</span>
+                                    <div className='my-5 flex flex-col lg:flex-row'>
+                                        <span className='font-bold lg:pt-5'>Số lượng sản xuất {selectedType && '(' + selectedType?.unit + ')'}:</span>
                                         <TextField
                                             className='lg:ml-5 mt-2 lg:mt-0'
-                                            type={'number'}
+                                            type={'text'}
                                             onChange={(e) => {
-                                                if (Number(e.target.value) >= 0) {
-                                                    setInputWeight(e.target.value);
+                                                const value = e.target.value;
+                                                const numericValue = Number(value);
+                                                if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                    setInputWeight(Number(value));
                                                 }
                                             }}
                                             value={inputWeight}
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            label={`Số lượng ${selectedIngredient ? '(' + selectedIngredient?.unit + ')' : ''}`}
+                                            label={`Nhập số lượng ${selectedType ? '(' + selectedType?.unit + ')' : ''}`}
                                             variant="standard" />
                                     </div>
-                                    {selectedIngredient && inputWeight && (
-                                        <div className='m-10 flex flex-col lg:justify-between lg:flex-row'>
-                                            <span className='font-bold lg:pt-5'>Quy đổi thành: {inputWeight * selectedIngredient.weightPerUnit} kg</span>
+                                    {selectedType && inputWeight && (
+                                        <div className='my-5 flex flex-col lg:justify-between lg:flex-row'>
+                                            <span className='font-bold lg:pt-5'>Quy đổi thành: {inputWeight * selectedType.weightPerUnit} kg</span>
                                         </div>
                                     )}
-                                </div>
-                                <div className='flex-1'>
                                 </div>
                             </>
                         )}
@@ -273,41 +422,42 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                 <TableCell className='px-2 py-4'>
                                                     <Autocomplete
                                                         disablePortal
+                                                        disableClearable
                                                         options={products.filter(
                                                             (p: any) =>
                                                                 p.productWarehouses[0]?.warehouse.id === 2 &&
                                                                 !outputs.some((output: any) => output.selectedProduct?.id === p.id)
                                                         )}
                                                         value={output?.selectedProduct || null}
-                                                        getOptionLabel={(option) => option?.name || ''}
+                                                        getOptionLabel={(option) => option?.category?.name + " " + option?.name + " (" + option?.supplier?.name + ")"}
                                                         onChange={(event, newValue) => {
-                                                            handleOutputChange(index, 'selectedProduct', newValue);
+                                                            handleOutputChange(index, 'selectedProduct', newValue)
                                                         }}
-                                                        renderInput={(params) => (
-                                                            <TextField {...params} variant="standard" label="Chọn sản phẩm" />
-                                                        )}
+                                                        renderInput={(params) => <TextField {...params} variant='standard' />}
                                                     />
                                                 </TableCell>
                                                 <TableCell className='max-w-[100px] '>
                                                     <TextField
-                                                        type={'number'}
+                                                        type={'text'}
                                                         onChange={(e) => {
                                                             const newRatio = Number(e.target.value);
                                                             const updatedRatios = outputs.map((item: any, idx: any) =>
                                                                 idx === index ? newRatio : item.ratio
                                                             );
                                                             const total = updatedRatios.reduce((sum: any, r: any) => sum + r, 0);
-                                                            if (newRatio >= 0 && newRatio <= 100 && total <= 100) {
-                                                                handleOutputChange(index, 'ratio', newRatio);
-                                                            } else {
-                                                                alert('Tổng của tất cả tỉ lệ không được vượt quá 100');
+
+                                                            if (!isNaN(newRatio) && newRatio >= 0) {
+                                                                if (total > 100) {
+                                                                    const maxRatio = Math.max(
+                                                                        ...outputs.map((item: any, idx: any) => (idx === index ? 0 : item.ratio))
+                                                                    );
+                                                                    handleOutputChange(index, 'ratio', 100 - maxRatio);
+                                                                } else {
+                                                                    handleOutputChange(index, 'ratio', newRatio);
+                                                                }
                                                             }
                                                         }}
                                                         value={output?.ratio}
-                                                        InputLabelProps={{
-                                                            shrink: true,
-                                                        }}
-                                                        label={'Tỉ lệ'}
                                                         variant="standard" />
                                                 </TableCell>
                                                 <TableCell>{output?.weight || '0'} kg</TableCell>
@@ -349,7 +499,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <Button onClick={handleSubmit} className='mr-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Cập nhật</strong>
                                 </Button>
-                                <Button type='button' onClick={() => router.push(`/production/${params.id}`)} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push(`/production/${params.id}`)
+                                    setOnPageChange(true)
+                                }} className='ml-2 px-5 py-3 text-[14px] bg-red-600 hover:bg-red-500'>
                                     <strong>Hủy</strong>
                                 </Button>
                             </>
@@ -357,6 +510,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div >
             </div >
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
+                        </div>
+                    </div>
+                </div>
+            )}
+            <FloatingButton />
         </div >
     );
 };

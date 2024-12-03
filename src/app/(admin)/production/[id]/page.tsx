@@ -12,17 +12,28 @@ import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import { Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
-import { CheckSquare, CircleX, Upload, X } from 'lucide-react';
+import { CheckSquare, CircleX, Upload } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
+import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
+import FloatingButton from '@/components/floating/floatingButton';
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
+import DetailProductionPageBreadcrumb from '@/app/(admin)/production/[id]/breadcrumb';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const router = useRouter();
     const [loadingData, setLoadingData] = useState(true);
     const [production, setProduction] = useState<any>([]);
     const { toast } = useToast();
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [onPageChange, setOnPageChange] = useState(false);
+
+    const { setBreadcrumb } = useBreadcrumbStore()
+
+    useEffect(() => {
+        setBreadcrumb(<DetailProductionPageBreadcrumb productionId={params.id.toString()} />)
+        return () => setBreadcrumb(null)
+    }, [setBreadcrumb]);
 
     useEffect(() => {
         getProduction();
@@ -34,8 +45,14 @@ const Page = ({ params }: { params: { id: number } }) => {
             const response = await api.get(url);
             const data = response.data;
             setProduction(data);
-        } catch (error) {
-            console.error("Lỗi khi lấy phiếu sản xuất:", error);
+        } catch (error: any) {
+            console.log(error);
+            toast({
+                variant: 'destructive',
+                title: `${error?.response?.data?.message || 'Hệ thống gặp sự cố khi lấy thông tin phiếu sản xuất!'} `,
+                description: 'Xin vui lòng thử lại sau',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
@@ -48,13 +65,15 @@ const Page = ({ params }: { params: { id: number } }) => {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Có, xác nhận',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
+                    setOnPageChange(true);
                     const url = `/productionOrder/confirm/${params.id}`
                     const response = await api.post(url);
                     if (response.status >= 200 && response.status < 300) {
+                        setOnPageChange(false);
                         toast({
                             variant: 'default',
                             title: 'Xác nhận thành công',
@@ -67,6 +86,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         })
                         router.push("/production");
                     } else {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: 'Xác nhận phiếu sản xuất thất bại',
@@ -76,6 +96,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         })
                     }
                 } catch (error: any) {
+                    setOnPageChange(false);
                     toast({
                         variant: 'destructive',
                         title: 'Xác nhận phiếu sản xuất thất bại',
@@ -89,6 +110,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     }
 
     const handleFinish = async () => {
+        setOnPageChange(true);
         try {
             const url = `/productionOrder/finishProduction/${params.id}`
             const response = await api.post(url,
@@ -102,6 +124,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                 })
             );
             if (response.status >= 200 && response.status < 300) {
+                setOnPageChange(false);
+                router.push("/production");
                 toast({
                     variant: 'default',
                     title: 'Cập nhật thành phẩm thành công',
@@ -112,8 +136,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                     },
                     duration: 3000
                 })
-                router.push("/production");
             } else {
+                setOnPageChange(false);
                 toast({
                     variant: 'destructive',
                     title: 'Cập nhật thành phẩm thất bại',
@@ -123,6 +147,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 })
             }
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Cập nhật thành phẩm thất bại',
@@ -134,8 +159,10 @@ const Page = ({ params }: { params: { id: number } }) => {
     }
 
     const handleCancel = async () => {
+        setOnPageChange(true);
         try {
             await api.post(`/productionOrder/cancel/${params.id}`);
+            setOnPageChange(false);
             toast({
                 variant: 'default',
                 title: 'Hủy thành công',
@@ -148,6 +175,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             })
             getProduction();
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Hủy thất bại',
@@ -159,8 +187,10 @@ const Page = ({ params }: { params: { id: number } }) => {
     }
 
     const handleDelete = async () => {
+        setOnPageChange(true);
         try {
             await api.post(`/productionOrder/delete?id=${params.id}`);
+            setOnPageChange(false);
             toast({
                 variant: 'default',
                 title: 'Xóa thành công',
@@ -171,8 +201,9 @@ const Page = ({ params }: { params: { id: number } }) => {
                 },
                 duration: 3000
             })
-            getProduction();
+            router.push("/production")
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Xóa thất bại',
@@ -191,7 +222,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, xóa!',
-                cancelButtonText: 'Không!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleDelete();
@@ -204,7 +235,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Có, hủy!',
-                cancelButtonText: 'Không!',
+                cancelButtonText: 'Không',
             }).then((result) => {
                 if (result.isConfirmed) {
                     handleCancel();
@@ -247,10 +278,11 @@ const Page = ({ params }: { params: { id: number } }) => {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có, xác nhận!',
-            cancelButtonText: 'Không!',
+            cancelButtonText: 'Không',
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
+                    setOnPageChange(true);
                     const url = `/productionOrder/confirm-done/${params.id}`
                     const response = await api.post(url,
                         production?.finishedProducts?.flatMap((fp: any) => {
@@ -264,6 +296,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                     );
 
                     if (response.status >= 200 && response.status < 300) {
+                        router.push("/production");
+                        setOnPageChange(false);
                         toast({
                             variant: 'default',
                             title: 'Cập nhật thành phẩm thành công',
@@ -274,8 +308,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                             },
                             duration: 3000
                         })
-                        router.push("/production");
                     } else {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: 'Cập nhật thành phẩm thất bại',
@@ -285,6 +319,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         })
                     }
                 } catch (error: any) {
+                    setOnPageChange(false);
                     toast({
                         variant: 'destructive',
                         title: 'Cập nhật thành phẩm thất bại',
@@ -296,102 +331,6 @@ const Page = ({ params }: { params: { id: number } }) => {
             }
         });
     }
-
-    const handleFieldChange2 = (
-        index: number,
-        subIndex: number,
-        field: string,
-        value: any
-    ) => {
-        setProduction((prevProduction: any) => {
-            const updatedFinishedProducts = [...prevProduction.finishedProducts];
-
-            const updatedProductWarehouses = [...updatedFinishedProducts[index].productWarehouses];
-
-            const weightPerUnit = updatedProductWarehouses[subIndex].weightPerUnit || 1;
-            const currentValue = updatedProductWarehouses[subIndex][field] || 0;
-
-            const newRealQuantity =
-                updatedFinishedProducts[index].realQuantity -
-                weightPerUnit * (value - currentValue);
-
-            if (newRealQuantity < 0) {
-                return prevProduction;
-            }
-
-            updatedProductWarehouses[subIndex] = {
-                ...updatedProductWarehouses[subIndex],
-                [field]: value,
-            };
-
-            updatedFinishedProducts[index] = {
-                ...updatedFinishedProducts[index],
-                productWarehouses: updatedProductWarehouses,
-                realQuantity: newRealQuantity,
-            };
-
-            return {
-                ...prevProduction,
-                finishedProducts: updatedFinishedProducts,
-            };
-        });
-    };
-
-    // const removePackaging = (productIndex: number, packagingIndex: number) => {
-    //     setProduction((prevProduction: any) => {
-    //         const updatedFinishedProducts = prevProduction.finishedProducts.map((product: any, i: number) => {
-    //             if (i === productIndex) {
-    //                 const updatedProductWarehouses = [...product.productWarehouses];
-    //                 updatedProductWarehouses.splice(packagingIndex, 1);
-    //                 return {
-    //                     ...product,
-    //                     productWarehouses: updatedProductWarehouses,
-    //                 };
-    //             }
-    //             return product;
-    //         });
-
-    //         return {
-    //             ...prevProduction,
-    //             finishedProducts: updatedFinishedProducts,
-    //         };
-    //     });
-    // };
-
-
-    // const addPackaging = (index: number) => {
-    //     setProduction((prevProduction: any) => {
-    //         const updatedFinishedProducts = prevProduction.finishedProducts.map((product: any, i: number) => {
-    //             if (i === index) {
-    //                 const isDuplicate = product.productWarehouses.some((warehouse: any) =>
-    //                     warehouse.unit?.toLowerCase() === product.tempUnit?.toLowerCase() &&
-    //                     warehouse.weightPerUnit === product.tempWeightPerUnit
-    //                 );
-
-    //                 if (isDuplicate) {
-    //                     alert("Quy cách và trọng lượng này đã tồn tại!");
-    //                     return product;
-    //                 }
-
-    //                 return {
-    //                     ...product,
-    //                     productWarehouses: [
-    //                         ...product.productWarehouses,
-    //                         { unit: product.tempUnit, weightPerUnit: product.tempWeightPerUnit }
-    //                     ],
-    //                     tempUnit: '',
-    //                     tempWeightPerUnit: ''
-    //                 };
-    //             }
-    //             return product;
-    //         });
-
-    //         return {
-    //             ...prevProduction,
-    //             finishedProducts: updatedFinishedProducts,
-    //         };
-    //     });
-    // };
 
     return (
         <div>
@@ -602,7 +541,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </Button>
                             )}
                             {production?.status === 'COMPLETED' && (
-                                <Button onClick={() => setIsPopupOpen(true)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button onClick={handleConfirm} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     Xác nhận hoàn thành
                                     <CheckSquare />
                                 </Button>
@@ -618,11 +557,17 @@ const Page = ({ params }: { params: { id: number } }) => {
                         ) : (
                             <>
                                 {(production?.status === 'PENDING' || production?.status === 'CANCELED') && (
-                                    <Button type='button' onClick={() => router.push(`/production/update/${params.id}`)} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                    <Button type='button' onClick={() => {
+                                        router.push(`/production/update/${params.id}`)
+                                        setOnPageChange(true)
+                                    }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Sửa</strong>
                                     </Button>
                                 )}
-                                <Button type='button' onClick={() => router.push('/production')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                <Button type='button' onClick={() => {
+                                    router.push('/production')
+                                    setOnPageChange(true)
+                                }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
                                 </Button>
                             </>
@@ -630,91 +575,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                     </div>
                 </div>
             </div>
-            {isPopupOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                    <div className="bg-white p-5 md:rounded-lg shadow-lg md:w-[700px] w-full">
-                        <div className="flex justify-between mb-4">
-                            <h2 className="text-xl font-bold">Xác nhận</h2>
-                            <button onClick={() => setIsPopupOpen(false)} className="text-gray-500 hover:text-gray-800">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <p className="mb-4">Vui lòng chọn quy cách đóng gói cho từng thành phẩm:</p>
-
-                        <div className="space-y-4">
-                            {production?.finishedProducts.map((product: any, index: any) => (
-                                <div key={index} className="border p-4 rounded-lg">
-                                    <div className="mb-2">
-                                        <h3 className="font-semibold">{product.productName} - ({product.realQuantity}kg)</h3>
-                                    </div>
-
-                                    {product.productWarehouses.map((pack: any, packIndex: any) => (
-                                        <div key={packIndex} className="flex items-center gap-5 mb-2">
-                                            <p className='mt-3'>{packIndex + 1 + '. '} {pack.unit ? pack.unit + ' ' + pack.weightPerUnit + ' kg' : 'Chưa đóng gói'}</p>
-                                            <TextField
-                                                type={'number'}
-                                                value={pack?.packQuantity}
-                                                onChange={(e) => {
-                                                    if (Number(e.target.value) >= 0) {
-                                                        handleFieldChange2(index, packIndex, 'packQuantity', e.target.value);
-                                                    }
-                                                }}
-                                                label="Nhập số lượng"
-                                                InputLabelProps={{
-                                                    shrink: true,
-                                                }}
-                                                variant="standard" />
-                                            {/* <button
-                                                onClick={() => removePackaging(index, packIndex)}
-                                                className="text-red-500 hover:text-red-700 mt-4"
-                                            >
-                                                Xóa
-                                            </button> */}
-                                        </div>
-                                    ))}
-
-                                    {/* <div className='flex lg:flex-row flex-col lg:justify-between'>
-                                        <div className='flex space-x-5'>
-                                            <TextField
-                                                type={'text'}
-                                                value={product?.tempUnit}
-                                                onChange={(e) => {
-                                                    handleFieldChange(index, 'tempUnit', e.target.value);
-                                                }}
-                                                label="Nhập loại quy cách"
-                                                variant="standard" />
-                                            <TextField
-                                                type={'number'}
-                                                value={product?.tempWeightPerUnit}
-                                                onChange={(e) => {
-                                                    handleFieldChange(index, 'tempWeightPerUnit', e.target.value);
-                                                }}
-                                                label="Nhập trọng lượng"
-                                                variant="standard" />
-                                        </div>
-                                        <button
-                                            onClick={() => addPackaging(index)}
-                                            className="mt-4 md:mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Thêm quy cách
-                                        </button>
-                                    </div> */}
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                            <Button
-                                onClick={handleConfirm}
-                                className="px-4 py-2 text-white hover:bg-green-500"
-                            >
-                                Xác nhận
-                            </Button>
+            {onPageChange === true && (
+                <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>
+                    <div className='flex'>
+                        <div className='w-full h-[100vh]'>
+                            <LinearIndeterminate />
                         </div>
                     </div>
                 </div>
             )}
+            <FloatingButton />
         </div >
     );
 };
