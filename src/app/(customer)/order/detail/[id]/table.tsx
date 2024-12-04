@@ -16,8 +16,8 @@ export default function OrderDetailTable({
     setOrder,
 }: {
     order: Order;
-    editMode: boolean;
-    setOrder: (order: Order) => void;
+    editMode?: boolean;
+    setOrder?: (order: Order) => void;
 }) {
     const formater = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -51,7 +51,7 @@ export default function OrderDetailTable({
                             {item.name}
                         </TableCell>
                         <TableCell>{`${item.weightPerUnit} KG`}</TableCell>
-                        {editMode ? (
+                        {editMode && setOrder ? (
                             <TableCell>
                                 <Input
                                     className='w-20'
