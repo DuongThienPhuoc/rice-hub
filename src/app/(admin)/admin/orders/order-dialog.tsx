@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -31,7 +31,7 @@ import {
 import { getProductListByAdmin, ProductDtoList } from '@/data/customer-product';
 import { Button } from '@/components/ui/button';
 import { ProductOrderRequest } from '@/type/order';
-import { CirclePlus, Search, Trash2 } from 'lucide-react';
+import { Check, CirclePlus, Search, Trash2, X } from 'lucide-react';
 import OrderPopoverProvider from '@/app/(admin)/admin/orders/order-popover';
 import { currencyHandleProvider } from '@/utils/currency-handle';
 import { CustomerResponse, Customer } from '@/type/customer';
@@ -43,6 +43,8 @@ import { useToast } from '@/hooks/use-toast';
 import AlertDelete from '@/app/(admin)/admin/orders/alert-delete';
 import AlertSubmitOrder from '@/app/(admin)/admin/orders/alert-submit-order';
 import PaginationComponent from '@/components/pagination/pagination';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Category, getCategories } from '@/data/category';
 
 type OrderDialogProps = {
     children: React.ReactNode;
@@ -77,7 +79,23 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const [indexItemDelete, setIndexItemDelete] = React.useState<number>(0);
     const [currentPage, setCurrentPage] = React.useState<number>(0);
     const [totalPages, setTotalPages] = React.useState<number>(0);
+    const [phoneNumber, setPhoneNumber] = React.useState<string>('');
+    const [address, setAddress] = React.useState<string>('');
     const { toast } = useToast();
+    const [productCategories, setProductCategories] = useState<Category[]>([])
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+
+    async function fetchCategories() {
+        try {
+            const response = await getCategories<Category[]>();
+            setProductCategories(response);
+        } catch (e) {
+            if (e instanceof Error) {
+                throw new Error(`An error occurred while fetching categories: ${e.message}`)
+            }
+            throw new Error('An error occurred while fetching categories')
+        }
+    }
 
     async function getProduct() {
         try {
@@ -85,8 +103,9 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 pageSize: 5,
                 id: selectedCustomer !== '' ? parseInt(selectedCustomer) : null,
                 pageNumber: currentPage + 1,
+                categoryName: selectedCategory?.name,
             });
-            setProducts(response.data._embedded.productDtoList);
+            setProducts(response.data._embedded?.productDtoList || []);
             setTotalPages(response.data.page.totalPages);
         } catch (e) {
             if (e instanceof Error) {
@@ -126,6 +145,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
         } else {
             const orderRequest: AdminCreateOrderRequest = {
                 customerId: parseInt(selectedCustomer),
+                orderPhone: phoneNumber,
+                orderAddress: address,
                 orderDetails: selectedProducts,
             };
             try {
@@ -171,7 +192,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     useEffect(() => {
         getProduct().catch((e) => console.error(e));
         fetchCustomerList().catch((e) => console.error(e));
-    }, [selectedCustomer, currentPage]);
+    }, [selectedCustomer, currentPage, selectedCategory]);
 
     useEffect(() => {
         setSelectedProduct((prev) => ({
@@ -181,6 +202,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
             productUnit: productUnit,
         }));
     }, [type, quantity]);
+
+    useEffect(() => {
+        fetchCategories().catch((e) => console.error(e))
+    }, [])
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -198,9 +223,27 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
                         <Select
                             value={selectedCustomer}
-                            onValueChange={(e) => setSelectedCustomer(e)}
+                            onValueChange={(e) => {
+                                setSelectedCustomer(e);
+                                setAddress(
+                                    customers.find(
+                                        (customer) =>
+                                            customer.id.toString() === e,
+                                    )?.address || '',
+                                );
+                                setPhoneNumber(
+                                    customers.find(
+                                        (customer) =>
+                                            customer.id.toString() === e,
+                                    )?.phone || '',
+                                );
+                                setSelectedProducts([]);
+                            }}
                         >
-                            <SelectTrigger id="customer" className="w-[280px] bg-[#4ba94d] text-white">
+                            <SelectTrigger
+                                id="customer"
+                                className="w-[280px] bg-[#4ba94d] text-white"
+                            >
                                 <SelectValue placeholder="Chọn khách hàng" />
                             </SelectTrigger>
                             <SelectContent>
@@ -236,15 +279,106 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
                             Sản phẩm
                         </h1>
+                        <div className="flex gap-1">
+                            <Input
+                                type="text"
+                                className="bg-white w-52"
+                                placeholder="Lọc tên hàng hoá"
+                            />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <div className="h-[36px] px-5 bg-white rounded-md border border-dashed flex items-center gap-1 hover:cursor-pointer">
+                                        <CirclePlus className="h-4 w-4" />
+                                        <span className="text-sm font-semibold">
+                                            Loại
+                                        </span>
+                                        {selectedCategory !== null && (
+                                            <>
+                                                <Separator
+                                                    orientation="vertical"
+                                                    className="h-4 mx-2"
+                                                />
+                                                <div className="h-auto text-sm font-medium leading-none bg-[#f4f4f5] px-[4px] py-[5px] rounded-md  items-center inline-flex whitespace-nowrap">
+                                                    {selectedCategory?.name}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    align="start"
+                                    className="p-0 w-50"
+                                >
+                                    <div className="p-2 border-b">
+                                        <div className="relative">
+                                            <Search className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <input
+                                                type="text"
+                                                className="pl-6 h-full rounded outline-0 focus:outline-0"
+                                                placeholder="Loại"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="p-2">
+                                        <ul>
+                                            {productCategories?.map(
+                                                (category, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className="relative flex items-center gap-x-1 hover:bg-gray-100 p-2 rounded-lg hover:cursor-pointer text-sm font-medium"
+                                                        onClick={() => {
+                                                            setSelectedCategory(
+                                                                category,
+                                                            );
+                                                        }}
+                                                    >
+                                                        {selectedCategory ===
+                                                            category && (
+                                                            <Check className="h-4 w-4 absolute left-2" />
+                                                        )}
+                                                        <span className="pl-5">
+                                                            {category.name}
+                                                        </span>
+                                                    </li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            {selectedCategory !== null && (
+                                <div
+                                    className="whitespace-nowrap text-sm font-medium leading-none flex items-center gap-1 hover:cursor-pointer hover:bg-white px-4 rounded-md"
+                                    onClick={() => setSelectedCategory(null)}
+                                >
+                                    <span>Bỏ lọc</span>
+                                    <X className="h-4 w-4" />
+                                </div>
+                            )}
+                        </div>
                         <div className="border rounded-md">
                             <Table>
-                                <TableHeader className='bg-[#0090d9]'>
+                                <TableHeader className="bg-[#0090d9]">
                                     <TableRow>
-                                        <TableHead><p className='text-white font-semibold'>Tên hàng hoá</p></TableHead>
-                                        <TableHead><p className='text-white font-semibold'>Danh mục</p></TableHead>
-                                        <TableHead><p className='text-white font-semibold'>Đơn giá (kg)</p></TableHead>
+                                        <TableHead>
+                                            <p className="text-white font-semibold">
+                                                Tên hàng hoá
+                                            </p>
+                                        </TableHead>
+                                        <TableHead>
+                                            <p className="text-white font-semibold">
+                                                Danh mục
+                                            </p>
+                                        </TableHead>
+                                        <TableHead>
+                                            <p className="text-white font-semibold">
+                                                Đơn giá (kg)
+                                            </p>
+                                        </TableHead>
                                         <TableHead className="text-center">
-                                            <p className='text-white font-semibold'>Thêm</p>
+                                            <p className="text-white font-semibold">
+                                                Thêm
+                                            </p>
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -268,7 +402,9 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                     type={type}
                                                     setType={setType}
                                                     quantity={quantity}
-                                                    setProductUnit={setProductUnit}
+                                                    setProductUnit={
+                                                        setProductUnit
+                                                    }
                                                     setQuantity={setQuantity}
                                                     addProductToOrder={
                                                         addProductToOrder
@@ -300,7 +436,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             </Table>
                         </div>
                         <div>
-                            <PaginationComponent currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages}/>
+                            <PaginationComponent
+                                currentPage={currentPage}
+                                setCurrentPage={setCurrentPage}
+                                totalPages={totalPages}
+                            />
                         </div>
                     </div>
                     {selectedProducts.length > 0 && (
@@ -315,22 +455,32 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 </h1>
                                 <div className="border rounded-md">
                                     <Table>
-                                        <TableHeader className='bg-[#0090d9]'>
+                                        <TableHeader className="bg-[#0090d9]">
                                             <TableRow>
                                                 <TableHead>
-                                                    <p className='font-semibold text-white'>Tên hàng hoá</p>
+                                                    <p className="font-semibold text-white">
+                                                        Tên hàng hoá
+                                                    </p>
                                                 </TableHead>
                                                 <TableHead>
-                                                    <p className='font-semibold text-white'>Loại</p>
+                                                    <p className="font-semibold text-white">
+                                                        Loại
+                                                    </p>
                                                 </TableHead>
                                                 <TableHead>
-                                                    <p className='font-semibold text-white'>Số lượng (Bao)</p>
+                                                    <p className="font-semibold text-white">
+                                                        Số lượng (Bao)
+                                                    </p>
                                                 </TableHead>
                                                 <TableHead>
-                                                    <p className='font-semibold text-white'>Đơn giá</p>
+                                                    <p className="font-semibold text-white">
+                                                        Đơn giá
+                                                    </p>
                                                 </TableHead>
                                                 <TableHead className="text-center">
-                                                    <p className='font-semibold text-white'>Xoá</p>
+                                                    <p className="font-semibold text-white">
+                                                        Xoá
+                                                    </p>
                                                 </TableHead>
                                             </TableRow>
                                         </TableHeader>
@@ -352,7 +502,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <TableCell>
                                                             {currencyHandleProvider(
                                                                 product.unitPrice ||
-                                                                0,
+                                                                    0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="flex justify-center">
@@ -392,7 +542,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 <section>
                     <div className="flex gap-2 justify-end">
                         <Button
-                            className='bg-red-600 hover:bg-red-500'
+                            className="bg-red-600 hover:bg-red-500"
                             onClick={() => {
                                 setError('');
                                 setSelectedProducts([]);
@@ -416,6 +566,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     isOpen={alertSubmitOrder}
                     setIsOpen={setAlertSubmitOrder}
                     createOrder={createOrder}
+                    phoneNumber={phoneNumber}
+                    setPhone={setPhoneNumber}
+                    address={address}
+                    setAddress={setAddress}
                 />
             </DialogContent>
         </Dialog>

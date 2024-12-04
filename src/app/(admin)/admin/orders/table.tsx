@@ -124,7 +124,7 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                                             <Calendar className="text-muted-foreground w-4 h-4" />
                                             {new Date(
                                                 order.orderDate,
-                                            ).toLocaleDateString()}
+                                            ).toLocaleDateString('vi-VN')}
                                         </div>
                                     </TableCell>
                                     <TableCell>{order.customer.name}</TableCell>

@@ -70,7 +70,7 @@ export default function OrderTable({ userID }: { userID: string }) {
                                         <Calendar className="mr-2 w-4 h-4 text-muted-foreground" />
                                         {new Date(
                                             order.orderDate,
-                                        ).toLocaleDateString()}
+                                        ).toLocaleDateString('vi-VN')}
                                     </div>
                                 </TableCell>
                                 <TableCell>

@@ -10,6 +10,8 @@ export interface AdminUpdateOrderRequest {
     totalAmount:     number;
     deposit:         number;
     remainingAmount: number;
+    orderPhone?:     string;
+    orderAddress?:   string;
     orderDetails:    OrderDetail[];
 }
 
@@ -212,5 +214,7 @@ export interface ProductOrderRequest {
 
 export interface AdminCreateOrderRequest {
     customerId: number;
+    orderPhone?: string;
+    orderAddress?: string;
     orderDetails: ProductOrderRequest[];
 }
