@@ -77,6 +77,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const [indexItemDelete, setIndexItemDelete] = React.useState<number>(0);
     const [currentPage, setCurrentPage] = React.useState<number>(0);
     const [totalPages, setTotalPages] = React.useState<number>(0);
+    const [phoneNumber, setPhoneNumber] = React.useState<string>('');
+    const [address, setAddress] = React.useState<string>('');
     const { toast } = useToast();
 
     async function getProduct() {
@@ -126,6 +128,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
         } else {
             const orderRequest: AdminCreateOrderRequest = {
                 customerId: parseInt(selectedCustomer),
+                orderPhone: phoneNumber,
+                orderAddress: address,
                 orderDetails: selectedProducts,
             };
             try {
@@ -198,7 +202,12 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
                         <Select
                             value={selectedCustomer}
-                            onValueChange={(e) => setSelectedCustomer(e)}
+                            onValueChange={(e) => {
+                                setSelectedCustomer(e)
+                                setAddress(customers.find((customer) => customer.id.toString() === e)?.address || '')
+                                setPhoneNumber(customers.find((customer) => customer.id.toString() === e)?.phone || '')
+                                setSelectedProducts([])
+                            }}
                         >
                             <SelectTrigger id="customer" className="w-[280px] bg-[#4ba94d] text-white">
                                 <SelectValue placeholder="Chọn khách hàng" />
@@ -416,6 +425,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     isOpen={alertSubmitOrder}
                     setIsOpen={setAlertSubmitOrder}
                     createOrder={createOrder}
+                    phoneNumber={phoneNumber}
+                    setPhone={setPhoneNumber}
+                    address={address}
+                    setAddress={setAddress}
                 />
             </DialogContent>
         </Dialog>

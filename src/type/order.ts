@@ -214,5 +214,7 @@ export interface ProductOrderRequest {
 
 export interface AdminCreateOrderRequest {
     customerId: number;
+    orderPhone?: string;
+    orderAddress?: string;
     orderDetails: ProductOrderRequest[];
 }
