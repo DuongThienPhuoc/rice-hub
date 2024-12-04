@@ -222,7 +222,7 @@ export default function IncomeTable() {
                                                                 <TableCell>{formatCurrency(row.remainAmount)}</TableCell>
                                                                 <TableCell>{formatDate(row.dueDate)}</TableCell>
                                                                 <TableCell className="text-center px-4 py-3">
-                                                                    <div className="flex justify-center items-center space-x-3">
+                                                                    <div className="flex justify-center items-center">
                                                                         <div className="relative group">
                                                                             {showTransaction === rowIndex ? (
                                                                                 <button onClick={() => setShowTransaction(null)}>
@@ -238,7 +238,7 @@ export default function IncomeTable() {
                                                                             </span>
                                                                         </div>
                                                                         <div className="relative group">
-                                                                            <button hidden={row?.remainAmount === 0} onClick={() => openDetailPopup(row)}>
+                                                                            <button className='mx-1' hidden={row?.remainAmount === 0} onClick={() => openDetailPopup(row)}>
                                                                                 <DollarSign size={18} />
                                                                             </button>
                                                                             <span className="absolute w-[80px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">

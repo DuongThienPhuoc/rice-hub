@@ -67,7 +67,8 @@ const MultipleBarChartComponent: React.FC<{ chartName: string; color1: string; c
                             Giá trị: {new Intl.NumberFormat('vi-VN', {
                                 style: 'currency',
                                 currency: 'VND',
-                                maximumSignificantDigits: 2,
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2,
                             }).format(payload[1]?.value * revenueScale)}
                         </span>
                     </p>
