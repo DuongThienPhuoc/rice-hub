@@ -68,6 +68,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                     const updatedInventoryDetails = inventory?.inventoryDetails?.map((item: any) => ({
                         ...item,
                         productId: item.product.id,
+                        quantity_discrepancy: item?.quantity - item?.systemQuantity
                     }));
 
                     const url = `/inventory/confirm-add-to-inventory/${params.id}`
@@ -346,7 +347,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                         label={'Số lượng'}
                                                                         variant="standard" />
                                                                 </TableCell>
-                                                                <TableCell>{product?.quantity_discrepancy}</TableCell>
+                                                                <TableCell>{product?.quantity - product?.systemQuantity}</TableCell>
                                                                 <TableCell>
                                                                     <TextField
                                                                         type={'text'}
@@ -381,7 +382,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell align='center' colSpan={2}>{product?.unit} {product?.weightPerUnit} kg</TableCell>
                                                                 <TableCell>{product?.systemQuantity}</TableCell>
                                                                 <TableCell>{product?.quantity}</TableCell>
-                                                                <TableCell>{product?.quantity_discrepancy}</TableCell>
+                                                                <TableCell>{product?.quantity - product?.systemQuantity}</TableCell>
                                                                 <TableCell>{product?.description || 'N/A'}</TableCell>
                                                                 {inventory?.status !== 'CANCELED' && (
                                                                     <TableCell align="center">

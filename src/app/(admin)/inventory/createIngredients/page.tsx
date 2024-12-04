@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import FloatingButton from '@/components/floating/floatingButton';
 import { Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
-import { Plus, Printer } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -240,10 +240,10 @@ const Page = () => {
                                             }} className='px-4 py-3 text-[14px] bg-red-600 hover:bg-red-500'>
                                                 Trở về
                                             </Button>
-                                            <Button className='px-3 py-3 text-[14px] bg-[#0090d9] hover:bg-blue-400'>
+                                            {/* <Button className='px-3 py-3 text-[14px] bg-[#0090d9] hover:bg-blue-400'>
                                                 In phiếu
                                                 <Printer />
-                                            </Button>
+                                            </Button> */}
                                             <Button onClick={() => handleSubmit()} className='px-3 py-3 text-[14px] hover:bg-green-500'>
                                                 Tạo phiếu
                                                 <Plus />

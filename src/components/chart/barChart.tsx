@@ -261,7 +261,8 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                                         ? `${new Intl.NumberFormat('vi-VN', {
                                             style: 'currency',
                                             currency: 'VND',
-                                            maximumSignificantDigits: 2,
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 2,
                                         }).format(value)}`
                                         : `${value} kg`
                                 }
