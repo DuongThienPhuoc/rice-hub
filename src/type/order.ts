@@ -10,6 +10,8 @@ export interface AdminUpdateOrderRequest {
     totalAmount:     number;
     deposit:         number;
     remainingAmount: number;
+    orderPhone?:     string;
+    orderAddress?:   string;
     orderDetails:    OrderDetail[];
 }
 

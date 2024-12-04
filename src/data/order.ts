@@ -140,3 +140,17 @@ export async function customerUpdateOrder(
         throw e;
     }
 }
+
+export async function adminUpdateOrderQuantity(
+    order: AdminUpdateOrderRequest,
+    orderId: number,
+) {
+    try {
+        return await axiosConfig.post(
+            `/order/admin/UpdateOrderDetail/${orderId}`,
+            order,
+        );
+    } catch (e) {
+        throw e;
+    }
+}
