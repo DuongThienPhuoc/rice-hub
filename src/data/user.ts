@@ -1,5 +1,6 @@
 import axios from '@/config/axiosConfig';
 import { AxiosResponse } from 'axios';
+import { User } from '@/type/user';
 
 export async function getUserInformation<T>(userName: string): Promise<T> {
     try {
@@ -7,6 +8,14 @@ export async function getUserInformation<T>(userName: string): Promise<T> {
             `/user/get/${userName}`,
         );
         return response.data;
+    } catch (e) {
+        throw e;
+    }
+}
+
+export async function updateUserInformation(user: User) {
+    try {
+        return await axios.put(`/user/edit/${user.username}`, user);
     } catch (e) {
         throw e;
     }

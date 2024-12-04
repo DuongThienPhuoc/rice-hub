@@ -69,6 +69,7 @@ type SidebarItem = {
         title: string;
         url: string;
         icon: React.ReactElement;
+        role: string[];
     }[];
 };
 const categories: SidebarItem[] = [
@@ -80,11 +81,13 @@ const categories: SidebarItem[] = [
                 title: 'Quản lý tài chính',
                 url: '/dashboard',
                 icon: <FaChartBar />,
+                role: ['ROLE_ADMIN'],
             },
             {
                 title: 'Lịch sử hoạt động',
                 url: '/user-activity',
                 icon: <History />,
+                role: ['ROLE_ADMIN'],
             }
         ],
     },
@@ -96,47 +99,55 @@ const categories: SidebarItem[] = [
                 title: 'Trang chủ',
                 url: '/',
                 icon: <Home />,
+                role: ['ROLE_CUSTOMER'],
             },
             {
                 title: 'Đặt hàng',
                 url: '/order',
                 icon: <Logs />,
+                role: ['ROLE_CUSTOMER'],
             },
             {
                 title: 'Giỏ hàng',
                 url: '/cart',
                 icon: <ShoppingCart />,
+                role: ['ROLE_CUSTOMER'],
             },
             {
                 title: 'Lịch sử đơn hàng',
                 url: '/order/history',
                 icon: <ScrollText />,
+                role: ['ROLE_CUSTOMER']
             },
         ],
     },
     {
         category: 'Hàng hoá',
-        role: ['ROLE_ADMIN'],
+        role: ['ROLE_ADMIN',"WAREHOUSE_MANAGER"],
         items: [
             {
                 title: 'Danh mục',
                 url: '/categories',
                 icon: <Library />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
             {
                 title: 'Sản phẩm',
                 url: '/products',
                 icon: <Package />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
             {
                 title: 'Nguyên liệu',
                 url: '/ingredients',
                 icon: <SquareArrowRight />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
             {
                 title: 'Bảng giá',
                 url: '/prices',
                 icon: <DollarSign />,
+                role: ['ROLE_ADMIN'],
             },
         ],
     },
@@ -148,11 +159,13 @@ const categories: SidebarItem[] = [
                 title: 'Khách hàng',
                 url: '/customers',
                 icon: <Users />,
+                role: ['ROLE_ADMIN',],
             },
             {
                 title: 'Nhà cung cấp',
                 url: '/suppliers',
                 icon: <UserPen />,
+                role: ['ROLE_ADMIN'],
             },
         ],
     },
@@ -164,63 +177,73 @@ const categories: SidebarItem[] = [
                 title: 'Nhân viên',
                 url: '/employees',
                 icon: <UserCog />,
+                role: ['ROLE_ADMIN'],
             },
             {
                 title: 'Chấm công',
                 url: '/salary',
                 icon: <MonitorCheck />,
+                role: ['ROLE_ADMIN'],
             },
             {
                 title: 'Bảng lương',
                 url: '/payroll',
                 icon: <BadgeDollarSign />,
+                role: ['ROLE_ADMIN'],
             },
         ],
     },
     {
         category: 'Giao dịch',
-        role: ['ROLE_ADMIN'],
+        role: ['ROLE_ADMIN','WAREHOUSE_MANAGER'],
         items: [
             {
                 title: 'Thu',
                 url: '/income',
                 icon: <Import />,
+                role: ['ROLE_ADMIN'],
             },
             {
                 title: 'Chi',
                 url: '/expenditures',
                 icon: <ArrowRightFromLine />,
+                role: ['ROLE_ADMIN'],
             },
             {
                 title: 'Đơn hàng',
                 url: '/admin/orders',
                 icon: <PackageCheck />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
         ],
     },
     {
         category: 'Nhập xuất',
-        role: ['ROLE_ADMIN'],
+        role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
         items: [
             {
                 title: 'Nhập kho',
                 url: '/import',
                 icon: <PackagePlus />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
             {
                 title: 'Xuất kho',
                 url: '/export',
                 icon: <PackageMinus />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
             {
                 title: 'Kiểm kho',
                 url: '/inventory',
                 icon: <PenBox />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
             {
                 title: 'Sản xuất',
                 url: '/production',
                 icon: <Factory />,
+                role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
             },
         ],
     },
@@ -230,6 +253,7 @@ export default function AppSidebar() {
     const [userProfileDialog, setUserProfileDialog] = useState(false);
     const pathName = usePathname();
     const [role, setRole] = React.useState<string>('');
+    const [employeeRole, setEmployeeRole] = React.useState<string>('');
     const [userName, setUserName] = React.useState<string>('');
     const [userInformation, setUserInformation] = useState<UserInterface>(
         {} as UserInterface,
@@ -238,9 +262,13 @@ export default function AppSidebar() {
         if (typeof window === 'undefined') return;
         const role = localStorage.getItem('role');
         const userName = localStorage.getItem('username');
+        const employeeRole = localStorage.getItem('employeeRole');
         if (role !== null && userName !== null) {
             setRole(role);
             setUserName(userName);
+        }
+        if(employeeRole !== null) {
+            setEmployeeRole(employeeRole);
         }
     }, []);
 
@@ -260,8 +288,19 @@ export default function AppSidebar() {
         }
     }
 
-    function isHidden(category: SidebarItem) {
-        return !category.role.includes(role);
+    function isHiddenCategory(category: SidebarItem) {
+        if (role !== 'ROLE_EMPLOYEE') {
+            return !category.role.includes(role);
+        } else {
+            return !category.role.includes(employeeRole);
+        }
+    }
+    function isHiddenItem(item: string[]) {
+        if (role !== 'ROLE_EMPLOYEE') {
+            return !item.includes(role);
+        } else {
+            return !item.includes(employeeRole);
+        }
     }
 
     const handleLogout = async () => {
@@ -283,6 +322,7 @@ export default function AppSidebar() {
                     open={userProfileDialog}
                     setOpen={setUserProfileDialog}
                     user={userInformation}
+                    fetchUserInformation={fetchUserInformation}
                 />
             )}
             <SidebarHeader className="px-1 py-2">
@@ -353,7 +393,7 @@ export default function AppSidebar() {
                         key={category.category}
                     >
                         <SidebarGroup
-                            className={cn(isHidden(category) ? 'hidden' : '')}
+                            className={cn(isHiddenCategory(category) ? 'hidden' : '')}
                         >
                             <SidebarGroupLabel asChild>
                                 <CollapsibleTrigger>
@@ -365,7 +405,7 @@ export default function AppSidebar() {
                                 <SidebarGroupContent>
                                     <SidebarMenu>
                                         {category.items.map((item) => (
-                                            <SidebarMenuItem key={item.title}>
+                                            <SidebarMenuItem key={item.title} className={cn(isHiddenItem(item.role) ? 'hidden' : '')}>
                                                 <SidebarMenuButton
                                                     asChild
                                                     isActive={

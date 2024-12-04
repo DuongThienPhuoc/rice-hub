@@ -4,6 +4,16 @@ import { jwtVerify } from 'jose';
 
 const publicPaths: string[] = ['/', '/login', '/register', '/forgot-password', '/forgot-password/email'];
 const customerStaticPaths: string[] = ['/order', '/cart', '/order/history'];
+const warehouseManagerStaticPaths: string[] = [
+    '/categories',
+    '/products',
+    '/ingredients',
+    '/admin/orders',
+    '/import',
+    '/export',
+    '/inventory',
+    '/production',
+];
 const adminStaticPaths: string[] = [
     '/dashboard',
     '/salary',
@@ -62,6 +72,17 @@ const isHasCustomerAndAdminPermission = (path: string, role: string) => {
     }
     return false;
 };
+
+const isHasWarehouseManagerAndAdminPermission = (path: string, role: string) => {
+    if (
+        warehouseManagerStaticPaths.includes(path) ||
+        handleDynamicPath(path, adminDynamicPaths)
+    ) {
+        return role === 'ROLE_EMPLOYEE' || role === 'ROLE_ADMIN';
+    }
+    return false;
+}
+
 const isHasAdminPermission = (path: string, role: string) => {
     if (
         adminStaticPaths.includes(path) ||
@@ -100,6 +121,9 @@ export async function middleware(request: NextRequest) {
             return NextResponse.next();
         }
         if (isHasAdminPermission(path, payload.role as string)) {
+            return NextResponse.next();
+        }
+        if (isHasWarehouseManagerAndAdminPermission(path, payload.role as string)) {
             return NextResponse.next();
         }
     } catch (e) {
