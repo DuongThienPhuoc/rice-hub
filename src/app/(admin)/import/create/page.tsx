@@ -425,11 +425,12 @@ const Page = () => {
                                 />
                             </div>
                             {selectedWarehouse && (
+                                console.log(products),
                                 <div className='flex space-x-2 w-fit bg-[#4ba94d] items-center rounded-lg pr-1'>
                                     <p className='text-white font-semibold p-2 rounded-lg'>Tìm kiếm sản phẩm: </p>
                                     <Autocomplete
                                         disablePortal
-                                        options={products.filter((p: RowData) => p.productWarehouses[0].warehouse.id === selectedWarehouse.id)}
+                                        options={products.filter((p: RowData) => p.productWarehouses.length > 0 && p.productWarehouses[0].warehouse.id === selectedWarehouse.id)}
                                         getOptionLabel={(option) =>
                                             option.category.name + " - " + option.name + " (" + option.supplier.name + ")"
                                         }
