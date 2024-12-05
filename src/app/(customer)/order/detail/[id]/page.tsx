@@ -547,8 +547,8 @@ export default function OrderDetailPage({
                                         <>
                                             {order.receiptVoucher?.transactions?.map((transaction) => (
                                                 <TableRow key={transaction.id}>
-                                                    <TableCell>{currencyHandleProvider(transaction.amount)}</TableCell>
-                                                    <TableCell>{new Date(transaction.transactionDate).toLocaleDateString()}</TableCell>
+                                                    <TableCell>{currencyHandleProvider(transaction.amount || 0)}</TableCell>
+                                                    <TableCell>{new Date(transaction.transactionDate || '').toLocaleDateString()}</TableCell>
                                                     <TableCell>{transaction.paymentMethod}</TableCell>
                                                     <TableCell align='right'>
                                                         <Badge variant={statusProvider(transaction.status).variant}>
