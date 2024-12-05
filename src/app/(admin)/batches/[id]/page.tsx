@@ -58,7 +58,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     const handleUpdate = async (product: any, reload: boolean) => {
         setOnPageChange(true);
         try {
-            const response = await api.put(`/batchproducts/update/${product.id}`, {
+            const response = await api.put(`/batchproducts/update/${product.productId}`, {
                 quantity: tempQuantity ? tempQuantity : product.quantity,
                 weightPerUnit: tempWeightPerUnit ? tempWeightPerUnit : product.weightPerUnit,
                 unit: tempUnit ? tempUnit : product.unit,
@@ -124,7 +124,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
 
         const productData = {
-            batProductId: selectedProducts.map((product: any) => product?.id)
+            batProductId: selectedProducts.map((product: any) => product?.productId)
         };
 
         if (areArraysEqual(selectedProducts, products)) {
@@ -256,14 +256,14 @@ const Page = ({ params }: { params: { id: string } }) => {
             if (result.isConfirmed) {
                 setOnPageChange(true);
                 const productData = selectedProducts.map((product: any) => ({
-                    productId: product?.product?.id,
+                    productId: product?.productId,
                     unit: product?.unit,
                     weighPerUnit: product?.weightPerUnit,
                     weightPerUnit: product?.weightPerUnit,
-                    supplierId: product?.product?.supplier?.id,
-                    productName: product?.product?.name,
+                    supplierId: product?.supplierId,
+                    productName: product?.name,
                     quantity: product?.quantity,
-                    categoryId: product?.product?.category?.id,
+                    categoryId: product?.categoryId,
                     warehouseId: product?.warehouseId
                 }));
 
@@ -417,13 +417,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Người nhập: </span>
+                                        <span className='font-bold flex-1'>Người tạo phiếu: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{batch?.batchCreator.fullName}</span>
                                     </div>
                                 </div>
                                 <div className='flex-1'>
                                     <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Ngày nhập: </span>
+                                        <span className='font-bold flex-1'>Ngày tạo phiếu: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(batch?.importDate)}</span>
                                     </div>
                                 </div>
@@ -486,6 +486,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                     indeterminate={selectedProducts.length > 0 && selectedProducts.length < products.filter((product) => !product.added).length}
                                                                     checked={selectedProducts.length === products.filter((product) => !product.added).length}
                                                                     onChange={(e) => {
+                                                                        console.log(products);
                                                                         if (e.target.checked) {
                                                                             setSelectedProducts(products.filter((product) => product.added === false));
                                                                         } else {
@@ -535,10 +536,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         />
                                                                     </TableCell>
                                                                 )}
-                                                                <TableCell onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
-                                                                    {product.product.productCode}
+                                                                <TableCell onClick={() => router.push(`/products/${product.productId}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                    {product.productCode}
                                                                 </TableCell>
-                                                                <TableCell>{product.product.name}</TableCell>
+                                                                <TableCell>{product.name}</TableCell>
                                                                 {batch?.receiptType === 'IMPORT' && (
                                                                     <TableCell>
                                                                         <TextField
@@ -650,10 +651,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                         />
                                                                     </TableCell>
                                                                 )}
-                                                                <TableCell onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
-                                                                    {product.product.productCode}
+                                                                <TableCell onClick={() => router.push(`/products/${product.productId}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                    {product.productCode}
                                                                 </TableCell>
-                                                                <TableCell>{product.product.name}</TableCell>
+                                                                <TableCell>{product.productName}</TableCell>
                                                                 {batch?.receiptType === 'IMPORT' && (
                                                                     <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
                                                                 )}

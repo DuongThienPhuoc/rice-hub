@@ -398,9 +398,9 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                 employeeRoles.map((role: any) => {
                                                     return (
                                                         <MenuItem key={role.id} value={role.id}>
-                                                            {role.roleName === 'PORTER_EMPLOYEE' && 'Nhân viên bốc/dỡ hàng'}
-                                                            {role.roleName === 'DRIVER_EMPLOYEE' && 'Nhân viên giao hàng'}
-                                                            {role.roleName === 'STOCK_EMPLOYEE' && 'Nhân viên quản kho'}
+                                                            {role.roleName === 'DRIVER' && 'Nhân viên giao hàng'}
+                                                            {role.roleName === 'PORTER' && 'Nhân viên bốc/dỡ hàng'}
+                                                            {role.roleName === 'WAREHOUSE_MANAGER' && 'Nhân viên quản kho'}
                                                         </MenuItem>
                                                     );
                                                 })
