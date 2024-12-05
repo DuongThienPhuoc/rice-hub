@@ -158,6 +158,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     toast({
                         title: 'Tạo đơn hàng thành công',
                         description: 'Đơn hàng đã được tạo thành công',
+                        style: {
+                            backgroundColor: '#4caf50',
+                            color: '#fff',
+                        },
+                        duration: 3000
                     });
                     setIsOpen(false);
                     setNewOrder(!newOrder);
@@ -334,8 +339,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                     >
                                                         {selectedCategory ===
                                                             category && (
-                                                            <Check className="h-4 w-4 absolute left-2" />
-                                                        )}
+                                                                <Check className="h-4 w-4 absolute left-2" />
+                                                            )}
                                                         <span className="pl-5">
                                                             {category.name}
                                                         </span>
@@ -502,7 +507,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <TableCell>
                                                             {currencyHandleProvider(
                                                                 product.unitPrice ||
-                                                                    0,
+                                                                0,
                                                             )}
                                                         </TableCell>
                                                         <TableCell className="flex justify-center">

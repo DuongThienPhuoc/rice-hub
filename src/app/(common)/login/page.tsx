@@ -21,6 +21,7 @@ const Toast = () => {
             toast({
                 variant: 'destructive',
                 title: message,
+                duration: 3000
             })
         }
     }, [searchParams, toast]);
@@ -63,7 +64,7 @@ const Page = () => {
                     "Content-Type": "application/json",
                 },
             });
-            if(response.data.userType === 'ROLE_EMPLOYEE'){
+            if (response.data.userType === 'ROLE_EMPLOYEE') {
                 localStorage.setItem("employeeRole", response.data.employeeRole);
             }
             localStorage.setItem("role", response.data.userType);

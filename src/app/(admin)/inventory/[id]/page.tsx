@@ -251,7 +251,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
                                 <div className='flex-1'>
                                     <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Ngày nhập: </span>
+                                        <span className='font-bold flex-1'>Ngày tạo phiếu: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(inventory?.inventoryDate)}</span>
                                     </div>
                                     <div className='m-10 flex flex-col lg:flex-row'>
@@ -294,8 +294,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
-                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell rowSpan={2} ><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
+                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell rowSpan={1} align="center" colSpan={2}><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                         <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng trong hệ thống</p></TableCell>
                                                         <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng thực tế</p></TableCell>

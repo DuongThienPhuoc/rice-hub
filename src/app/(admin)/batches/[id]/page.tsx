@@ -417,13 +417,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     </div>
 
                                     <div className='m-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Người nhập: </span>
+                                        <span className='font-bold flex-1'>Người tạo phiếu: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{batch?.batchCreator.fullName}</span>
                                     </div>
                                 </div>
                                 <div className='flex-1'>
                                     <div className='lg:m-10 mx-10 flex flex-col lg:flex-row'>
-                                        <span className='font-bold flex-1'>Ngày nhập: </span>
+                                        <span className='font-bold flex-1'>Ngày tạo phiếu: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(batch?.importDate)}</span>
                                     </div>
                                 </div>

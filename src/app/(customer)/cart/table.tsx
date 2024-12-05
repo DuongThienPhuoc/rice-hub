@@ -53,17 +53,17 @@ export default function CartTable({ customerID }: { customerID: string }) {
     const { toast } = useToast();
     const [products, setProducts] = useState<CartProduct[]>([]);
     const [refresh, setRefresh] = useState<boolean>(false);
-    const [phone,setPhone] = useState<string>('');
-    const [address,setAddress] = useState<string>('');
+    const [phone, setPhone] = useState<string>('');
+    const [address, setAddress] = useState<string>('');
     const [userName, setUserName] = React.useState<string>('');
     const [userInformation, setUserInformation] = useState<UserInterface>(
         {} as UserInterface,
     );
     const { setBreadcrumb } = useBreadcrumbStore();
     useEffect(() => {
-        if(typeof window === 'undefined') return;
+        if (typeof window === 'undefined') return;
         const userName = localStorage.getItem('username');
-        if(userName) {
+        if (userName) {
             setUserName(userName);
         }
         setBreadcrumb(<CartPageBreadcrumb />);
@@ -89,7 +89,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
         setAddress(userInformation.address);
     }, [userInformation]);
 
-    async function fetchUserInformation(userName:string) {
+    async function fetchUserInformation(userName: string) {
         try {
             if (!userName) return;
             const data = await getUserInformation<UserInterface>(userName);
@@ -150,6 +150,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                     title: 'Xin hãy chọn sản phẩm',
                     description: 'Vui lòng chọn sản phẩm trước khi đặt hàng',
                     action: <ToastAction altText="Try again">OK!</ToastAction>,
+                    duration: 3000
                 });
             }
         } catch (error) {
@@ -227,9 +228,9 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                     <TableCell>
                                         <Input
                                             defaultValue={product.quantity}
-                                            onChange={(e) => handleChangeProductQuantity(e,product.cartId)}
+                                            onChange={(e) => handleChangeProductQuantity(e, product.cartId)}
                                             className='w-fit'
-                                            type='number'/>
+                                            type='number' />
                                     </TableCell>
                                     <TableCell>{`${product.quantity * product.type}kg`}</TableCell>
                                     <TableCell>{currencyHandleProvider(product.price)}</TableCell>
@@ -315,6 +316,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                                             Xác nhận!
                                                         </ToastAction>
                                                     ),
+                                                    duration: 3000
                                                 });
                                                 console.error(
                                                     `Error occurred in CartPage: ${error.message}`,

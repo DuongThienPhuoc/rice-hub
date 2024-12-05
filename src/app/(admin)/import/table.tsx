@@ -9,7 +9,6 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-import ExcelJS from 'exceljs';
 import * as XLSX from 'xlsx';
 import crypto from 'crypto';
 import { ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper, Skeleton } from '@mui/material';
@@ -154,7 +153,7 @@ export default function ImportTable() {
         setCurrentPage(page);
     };
 
-    const showAlert = (data: any, fileInput: HTMLInputElement, fileHash: any) => {
+    const showAlert = (file: File, fileHash: string, fileInput: HTMLInputElement) => {
         Swal.fire({
             title: 'Xác nhận thêm danh sách sản phẩm',
             text: 'Bạn có chắc chắn muốn thêm danh sách sản phẩm này?',
@@ -163,25 +162,11 @@ export default function ImportTable() {
             confirmButtonText: 'Có, thêm!',
             cancelButtonText: 'Không',
         }).then(async (result) => {
-            fileInput.value = '';
             if (result.isConfirmed) {
-                processedFileHashes.add(fileHash);
-                handleSubmit(data);
+                handleSubmit(file, fileHash, fileInput);
+            } else {
+                fileInput.value = '';
             }
-        });
-    };
-
-    const fileToBuffer = (file: File): Promise<Buffer> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const arrayBuffer = reader.result as ArrayBuffer;
-                resolve(Buffer.from(arrayBuffer));
-            };
-            reader.onerror = (error) => {
-                reject(error);
-            };
-            reader.readAsArrayBuffer(file);
         });
     };
 
@@ -204,43 +189,14 @@ export default function ImportTable() {
 
     const downloadTemplateExcel = () => {
         const data = [
-            { name: "Sản phẩm mới", importPrice: 100, quantity: 10, weightPerUnit: 10, unit: "bao", categoryId: 1, supplierId: 1, unitOfMeasureId: 2, warehouseId: 1 },
-            { name: "Sản phẩm mới 2", importPrice: 200, quantity: 20, weightPerUnit: 25, unit: "bao", categoryId: 2, supplierId: 2, unitOfMeasureId: 1, warehouseId: 1 },
-            { name: "Sản phẩm mới 3", importPrice: 300, quantity: 30, weightPerUnit: 70, unit: "bao", categoryId: 3, supplierId: 3, unitOfMeasureId: 3, warehouseId: 2 }
-        ];
-
-        const categories = [
-            { id: 1, categoryName: "Category 1" },
-            { id: 2, categoryName: "Category 2" },
-            { id: 3, categoryName: "Category 3" }
-        ];
-        const suppliers = [
-            { id: 1, supplierName: "Supplier 1" },
-            { id: 2, supplierName: "Supplier 2" },
-            { id: 3, supplierName: "Supplier 3" }
-        ];
-        const unitsOfMeasure = [
-            { id: 1, measureName: "Measure 1" },
-            { id: 2, measureName: "Measure 2" },
-            { id: 3, measureName: "Measure 3" }
-        ];
-        const warehouses = [
-            { id: 1, warehouseName: "Warehouse 1" },
-            { id: 2, warehouseName: "Warehouse 2" }
+            { 'Tên sản phẩm': "Sản phẩm mới", 'Giá nhập': 100, 'Số lượng': 10, 'Trọng lượng': 10, 'Đơn vị': "Bao", 'Danh mục': 'Gạo', 'Nhà cung cấp': 'Default Supplier', 'Nhà kho': 'Kho Nguyên Liệu' },
+            { 'Tên sản phẩm': "Sản phẩm mới 2", 'Giá nhập': 200, 'Số lượng': 20, 'Trọng lượng': 25, 'Đơn vị': "Bao", 'Danh mục': 'Cám', 'Nhà cung cấp': 'Default Supplier', 'Nhà kho': 'Kho Sản Phẩm' },
+            { 'Tên sản phẩm': "Sản phẩm mới 3", 'Giá nhập': 300, 'Số lượng': 30, 'Trọng lượng': 70, 'Đơn vị': "Túi", 'Danh mục': 'Thóc', 'Nhà cung cấp': 'Default Supplier', 'Nhà kho': 'Kho Sản Phẩm' }
         ];
 
         const dataSheet = XLSX.utils.json_to_sheet(data);
-        const categorySheet = XLSX.utils.json_to_sheet(categories);
-        const supplierSheet = XLSX.utils.json_to_sheet(suppliers);
-        const measureSheet = XLSX.utils.json_to_sheet(unitsOfMeasure);
-        const warehouseSheet = XLSX.utils.json_to_sheet(warehouses);
-
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, dataSheet, "Products");
-        XLSX.utils.book_append_sheet(workbook, categorySheet, "Categories");
-        XLSX.utils.book_append_sheet(workbook, supplierSheet, "Suppliers");
-        XLSX.utils.book_append_sheet(workbook, measureSheet, "UnitsOfMeasure");
-        XLSX.utils.book_append_sheet(workbook, warehouseSheet, "Warehouses");
+        XLSX.utils.book_append_sheet(workbook, dataSheet, "Sản phẩm");
 
         XLSX.writeFile(workbook, 'template.xlsx');
     };
@@ -266,34 +222,7 @@ export default function ImportTable() {
                     Swal.showLoading();
                 }
             });
-
-            const workbook = new ExcelJS.Workbook();
-            const fileBuffer = await fileToBuffer(file);
-            await workbook.xlsx.load(fileBuffer);
-            const worksheet = workbook.getWorksheet(1);
-
-            const rows = worksheet?.rowCount;
-            if (rows === 0) {
-                throw new Error("File rỗng");
-            }
-
-            const processedData: Array<any> = [];
-
-            const headers = worksheet?.getRow(1).values as string[];
-            console.log(headers);
-
-            worksheet?.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-                if (rowNumber === 1) return;
-
-                const rowData: { [key: string]: any } = {};
-                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    rowData[headers[colNumber]] = cell.value;
-                });
-                processedData.push(rowData);
-            });
-            Swal.close();
-            const fileInput = event.target;
-            showAlert(processedData, fileInput, fileHash);
+            showAlert(file, fileHash, event.target);
         } catch (error) {
             Swal.fire('Lỗi khi xử lý file', 'error');
         }
@@ -304,10 +233,12 @@ export default function ImportTable() {
         setCurrentSearch({ field, query });
     };
 
-    const handleSubmit = async (data: any) => {
+    const handleSubmit = async (data: File, fileHash: string, fileInput: HTMLInputElement) => {
         setOnPageChange(true);
         try {
-            const response = await api.post(`/products/import/preview`, data);
+            const formData = new FormData();
+            formData.append("file", data);
+            const response = await api.post(`/products/import/excel`, formData);
             if (response.status >= 200 && response.status < 300) {
                 getData(currentPage);
                 toast({
@@ -320,7 +251,9 @@ export default function ImportTable() {
                     description: `Lô hàng đã được tạo thành công`,
                     duration: 3000,
                 })
+                processedFileHashes.add(fileHash);
                 setOnPageChange(false);
+                fileInput.value = '';
             } else {
                 toast({
                     variant: 'destructive',
@@ -329,6 +262,7 @@ export default function ImportTable() {
                     duration: 3000,
                 })
                 setOnPageChange(false);
+                fileInput.value = '';
             }
         } catch (error) {
             toast({
@@ -339,6 +273,7 @@ export default function ImportTable() {
                 duration: 3000,
             })
             setOnPageChange(false);
+            fileInput.value = '';
         }
     }
 
