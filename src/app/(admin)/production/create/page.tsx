@@ -181,6 +181,7 @@ const Page = () => {
                     })
                 }
             } catch (error: any) {
+                setOnPageChange(false);
                 const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
                 toast({
                     variant: 'destructive',
