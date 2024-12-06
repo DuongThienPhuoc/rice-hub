@@ -203,5 +203,17 @@ export const mappingActivity: Record<string, ActivityInfor> = {
         text: 'Xóa phiếu thu',
         color: 'text-[#f87171]',
     },
+    CREATE_RECEIPT: {
+        text: 'Tạo phiếu thu',
+        color: 'text-[#4ade80]',
+    },
+    UPDATE_BATCH_PRODUCT: {
+        text: 'Cập nhật lô sản phẩm',
+        color: 'text-[#60a5fa]',
+    },
+    'UPDATE_ADMIN_ORDER-DETAILS':{
+        text: 'Cập nhật chi tiết đơn hàng',
+        color: 'text-[#60a5fa]',
+    }
 };
 
