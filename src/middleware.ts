@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-const publicPaths: string[] = ['/', '/login', '/register', '/forgot-password', '/forgot-password/email'];
+const publicPaths: string[] = ['/', '/login', '/register', '/forgot-password', '/forgot-password/email', '/not-found', '/error'];
 const customerStaticPaths: string[] = ['/order', '/cart', '/order/history'];
 const adminStaticPaths: string[] = [
     '/dashboard',
@@ -89,8 +89,8 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!token) {
-        const loginUrl = new URL('/', request.nextUrl);
-        loginUrl.searchParams.set('message', 'Không tìm thấy trang này');
+        const loginUrl = new URL('/login', request.nextUrl);
+        loginUrl.searchParams.set('message', 'Vui lòng đăng nhập');
         return NextResponse.redirect(loginUrl);
     }
 
@@ -106,7 +106,7 @@ export async function middleware(request: NextRequest) {
         console.error('Invalid token:', e);
         return NextResponse.redirect(new URL('/login', request.nextUrl));
     }
-    const loginUrl = new URL('/', request.nextUrl);
+    const loginUrl = new URL('/not-found', request.nextUrl);
     loginUrl.searchParams.set('message', 'Không tìm thấy trang này');
     return NextResponse.redirect(loginUrl);
 }
