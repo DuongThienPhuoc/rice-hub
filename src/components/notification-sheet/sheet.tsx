@@ -65,7 +65,7 @@ export default function NotificationSheetProvider({
 
 
     useEffect(() => {
-        if(userInformation.userType !== 'ROLE_ADMIN') return;
+        if (userInformation.userType !== 'ROLE_ADMIN') return;
         stompClient.connect(
             {},
             () => {
@@ -121,7 +121,7 @@ export default function NotificationSheetProvider({
             variant: 'success',
             title: 'Thông báo mới',
             description: message.body,
-            duration: 5000,
+            duration: 3000,
         });
         setNotificationToLocalStorage({
             id: new Date().getTime().toString(),
@@ -272,7 +272,7 @@ function NotificationCard({
                         <div className="bg-primary/10 rounded-full p-2">
                             {
                                 iconMapping[
-                                    notification.type ? notification.type : ''
+                                notification.type ? notification.type : ''
                                 ]
                             }
                         </div>

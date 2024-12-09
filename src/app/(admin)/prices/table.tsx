@@ -56,7 +56,7 @@ export default function PriceTable() {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
             if (page) {
-                params.append("pageNumber", page.toString());
+                params.append("pageNumber", (page - 1).toString());
             }
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
@@ -408,30 +408,6 @@ export default function PriceTable() {
                                                                     </TableCell>
                                                                 </TableRow>
                                                             );
-                                                        } else {
-                                                            return (
-                                                                <TableRow key={rowIndex}>
-                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
-                                                                        {product?.productCode}
-                                                                    </TableCell>
-                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
-                                                                        {product?.productName}
-                                                                    </TableCell>
-                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
-                                                                        {product?.categoryName}
-                                                                    </TableCell>
-                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
-                                                                        {product?.supplierName}
-                                                                    </TableCell>
-                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
-                                                                        {formatCurrency(product?.price || 0)}
-                                                                    </TableCell>
-                                                                    <TableCell className="max-w-[200px] opacity-40 pointer-events-none">
-                                                                        {formatCurrency(matchingProductPrice?.unit_price || 0)}
-                                                                    </TableCell>
-                                                                    <TableCell className='opacity-40 pointer-events-none'></TableCell>
-                                                                </TableRow>
-                                                            )
                                                         }
                                                     })
                                                 ) : (

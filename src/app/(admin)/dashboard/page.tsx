@@ -24,6 +24,8 @@ const Page = () => {
     const [quantityType, setQuantityType] = useState<any>('week');
     const [topProductType, setTopProductType] = useState('month');
     const [topProductReport, setTopProductReport] = useState<any>([]);
+    const [topCategoryReport, setTopCategoryReport] = useState<any>([]);
+    const [orderReport, setOrderReport] = useState<any>([]);
     const { setBreadcrumb } = useBreadcrumbStore()
 
     const getExpenseReport = async (type: string) => {
@@ -40,6 +42,24 @@ const Page = () => {
             toast({
                 variant: 'destructive',
                 title: 'Lỗi khi lấy báo cáo chi tiêu!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
+    const getOrderReport = async () => {
+        try {
+            const url = `/order/invoiceSummary`;
+            const response = await api.get(url);
+            const data = response.data;
+            setOrderReport(data);
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy báo cáo hóa đơn!',
                 description: 'Xin vui lòng thử lại',
                 duration: 3000
             })
@@ -97,7 +117,25 @@ const Page = () => {
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Lỗi khi lấy báo cáo phiếu thu!',
+                title: 'Lỗi khi lấy báo cáo sản phẩm bán chạy!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
+    const getTopCategoryReport = async () => {
+        try {
+            const url = `/categories/top5`;
+            const response = await api.get(url);
+            const data = response.data;
+            setTopCategoryReport(data);
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy báo cáo nguồn thu!',
                 description: 'Xin vui lòng thử lại',
                 duration: 3000
             })
@@ -159,6 +197,8 @@ const Page = () => {
 
     useEffect(() => {
         getDailyReport();
+        getTopCategoryReport();
+        getOrderReport();
     }, [])
 
     useEffect(() => {
@@ -177,27 +217,27 @@ const Page = () => {
                                 <MultipleBarChart data={dailyReport} loading={loadingData} chartName='Đơn hàng' color1='#0090d9' color2='#e23670' />
                             </div>
                             <div className='flex-1 mx-2'>
-                                <StackBarChart chartName='Hóa đơn' color1='#2eb88a' color2='#e88c30' />
+                                <StackBarChart chartName='Hóa đơn' color1='#2eb88a' loading={loadingData} data={orderReport} color2='#e88c30' />
                             </div>
                             <div className='flex-1 ml-2'>
-                                <DonutChart chartName='Nguồn thu' />
+                                <DonutChart chartName='Nguồn thu' data={topCategoryReport} />
                             </div>
                         </div>
 
                         <h1 className='text-black text-[20px] font-bold mt-10'>Báo cáo định kỳ</h1>
                         <div className='flex flex-col xl:flex-row mb-3'>
-                            <div className='flex-1 mx-2'>
+                            <div className='flex-1 mr-2'>
                                 <BarChart loading={loadingData} chartName='Doanh thu' color='#0090d9' data={incomeReport?.details} setType={setIncomeType} />
                             </div>
-                            <div className='flex-1 mx-2'>
+                            <div className='flex-1 ml-2'>
                                 <BarChart loading={loadingData} chartName='Doanh số' color='#2eb88a' data={quantityReport?.details} setType={setQuantityType} />
                             </div>
                         </div>
                         <div className='flex flex-col xl:flex-row mb-3 mt-7'>
-                            <div className='flex-1 mx-2'>
+                            <div className='flex-1 mr-2'>
                                 <BarChart loading={loadingData} chartName='Chi tiêu' color='#e23670' data={expenseReport} setType={setExpenseType} />
                             </div>
-                            <div className='flex-1 mx-2'>
+                            <div className='flex-1 ml-2'>
                                 <HorizontalChart chartName='Sản phẩm' data={topProductReport} setType={setTopProductType} loading={loadingData} />
                             </div>
                         </div>

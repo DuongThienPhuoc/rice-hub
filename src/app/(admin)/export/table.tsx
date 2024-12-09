@@ -8,18 +8,14 @@ import React, { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
-import ExcelJS from 'exceljs';
 import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
-import crypto from 'crypto';
 import { DateRange } from 'react-day-picker';
 import SearchBar from '@/components/searchbar/searchbar';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
-import { ToastAction } from '@radix-ui/react-toast';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import ExportPageBreadcrumb from '@/app/(admin)/export/breadcrumb';
 
@@ -47,7 +43,6 @@ export default function ExportTable() {
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const processedFileHashes = new Set<string>();
     const { setBreadcrumb } = useBreadcrumbStore()
 
     useEffect(() => {
@@ -116,136 +111,6 @@ export default function ExportTable() {
         setCurrentSearch({ field, query });
     };
 
-    const showAlert = (data: any, fileInput: HTMLInputElement) => {
-        Swal.fire({
-            title: 'Xác nhận thêm danh sách sản phẩm',
-            text: 'Bạn có chắc chắn muốn thêm danh sách sản phẩm này?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Có, thêm!',
-            cancelButtonText: 'Không',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                handleSubmit(data);
-            } else {
-                fileInput.value = '';
-            }
-        });
-    };
-
-    const fileToBuffer = (file: File): Promise<Buffer> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const arrayBuffer = reader.result as ArrayBuffer;
-                resolve(Buffer.from(arrayBuffer));
-            };
-            reader.onerror = (error) => {
-                reject(error);
-            };
-            reader.readAsArrayBuffer(file);
-        });
-    };
-
-    const calculateFileHash = async (file: File): Promise<string> => {
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const hash = crypto.createHash('sha256').update(buffer).digest('hex');
-        return hash;
-    };
-
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        try {
-            const file = event.target.files?.[0];
-            if (!file) {
-                throw new Error("Chưa có file nào được chọn");
-            }
-
-            const fileHash = await calculateFileHash(file);
-            if (processedFileHashes.has(fileHash)) {
-                Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
-                return;
-            }
-
-            Swal.fire({
-                title: 'Đang xử lý...',
-                text: 'Vui lòng chờ, dữ liệu đang được xử lí.',
-                allowOutsideClick: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const workbook = new ExcelJS.Workbook();
-            const fileBuffer = await fileToBuffer(file);
-            await workbook.xlsx.load(fileBuffer);
-            const worksheet = workbook.getWorksheet(1);
-
-            const rows = worksheet?.rowCount;
-            if (rows === 0) {
-                throw new Error("File rỗng");
-            }
-
-            const processedData: Array<any> = [];
-
-            const headers = worksheet?.getRow(1).values as string[];
-
-            worksheet?.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-                if (rowNumber === 1) return;
-
-                const rowData: { [key: string]: any } = {};
-                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    rowData[headers[colNumber]] = cell.value;
-                });
-                processedData.push(rowData);
-            });
-            Swal.close();
-            processedFileHashes.add(fileHash);
-            const fileInput = event.target;
-            showAlert(processedData, fileInput);
-        } catch (error) {
-            Swal.fire('Lỗi khi xử lý file', 'error');
-        }
-    };
-
-    const handleSubmit = async (data: any) => {
-        setOnPageChange(true);
-        try {
-            const response = await api.post(`/products/export/preview`, data);
-            if (response.status >= 200 && response.status < 300) {
-                getData(currentPage);
-                toast({
-                    variant: 'default',
-                    title: 'Xuất thành công!',
-                    style: {
-                        backgroundColor: '#4caf50',
-                        color: '#fff',
-                    },
-                    description: 'Danh sách sản phẩm đã được xuất thành công.',
-                    duration: 3000,
-                })
-                setOnPageChange(false);
-            } else {
-                setOnPageChange(false);
-                toast({
-                    variant: 'destructive',
-                    title: 'Tạo thất bại',
-                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
-                    duration: 3000,
-                })
-            }
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Tạo thất bại',
-                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
-                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000,
-            })
-            setOnPageChange(false);
-        }
-    }
-
     return (
         <div className='mx-5'>
             <section className='col-span-4'>
@@ -302,21 +167,21 @@ export default function ExportTable() {
                                             Tạo phiếu xuất
                                             <PlusIcon />
                                         </Button>
-                                        <Button
+                                        {/* <Button
                                             className="px-3 py-3 text-[14px] hover:bg-green-500"
                                             onClick={() => document.getElementById('fileInput')?.click()}
                                         >
                                             Import
-                                        </Button>
+                                        </Button> */}
                                     </>
                                 )}
-                                <input
+                                {/* <input
                                     type="file"
                                     id="fileInput"
                                     accept=".xlsx, .xls"
                                     style={{ display: 'none' }}
                                     onChange={handleFileUpload}
-                                />
+                                /> */}
                             </div>
                         </div>
                         <div className='overflow-x-auto'>

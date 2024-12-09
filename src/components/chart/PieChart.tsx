@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import * as React from "react"
@@ -30,7 +31,7 @@ function formatCurrency(value: number) {
     return `${(value / 1_000_000_000).toFixed(0)} tỷ VNĐ`;
 }
 
-const DonutChartComponent: React.FC<{ chartName: string }> = ({ chartName }) => {
+const DonutChartComponent: React.FC<{ chartName: string, data: any }> = ({ chartName }) => {
     const totalRevenue = React.useMemo(() => {
         return chartData.reduce((acc, curr) => acc + curr.revenue, 0)
     }, [])

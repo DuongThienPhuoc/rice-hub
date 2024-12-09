@@ -21,6 +21,7 @@ const Toast = () => {
             toast({
                 variant: 'destructive',
                 title: message,
+                duration: 3000
             })
         }
     }, [searchParams, toast]);

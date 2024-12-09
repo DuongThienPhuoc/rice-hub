@@ -57,6 +57,11 @@ export default function OrderDetailPage({
                     variant: 'success',
                     title: 'Cập nhật thành công',
                     description: 'Đơn hàng đã được cập nhật thành công',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    duration: 3000
                 });
             }
         } catch (e) {
@@ -201,7 +206,8 @@ export default function OrderDetailPage({
                                                             toast({
                                                                 variant: 'destructive',
                                                                 title: 'Cập nhật thất bại',
-                                                                description: 'Có lỗi xảy ra khi cập nhật số lượng đơn hàng'
+                                                                description: 'Có lỗi xảy ra khi cập nhật số lượng đơn hàng',
+                                                                duration: 3000
                                                             })
                                                             console.error('Error updating order quantity: ', e);
                                                         });

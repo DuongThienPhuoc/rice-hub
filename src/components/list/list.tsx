@@ -83,6 +83,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             } else {
                 await api.delete(`/${tableName}/delete/${row.id}`);
             }
+            setOnPageChange(false);
             toast({
                 variant: 'default',
                 title: 'Xóa thành công',
@@ -93,9 +94,9 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 },
                 duration: 3000
             })
-            setOnPageChange(false);
             handleClose?.(true);
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Xóa thất bại',
@@ -103,7 +104,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
-            setOnPageChange(false);
         }
     }
 
@@ -120,6 +120,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 setOnPageChange(true);
                 try {
                     await api.post(`/ExpenseVoucher/paySupplier/${row.id}`);
+                    setOnPageChange(false);
                     toast({
                         variant: 'default',
                         title: 'Xuất phiếu thành công',
@@ -130,9 +131,9 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         },
                         duration: 3000
                     })
-                    setOnPageChange(false);
                     handleClose?.(true);
                 } catch (error: any) {
+                    setOnPageChange(false);
                     toast({
                         variant: 'destructive',
                         title: 'Xuất phiếu thất bại',
@@ -140,7 +141,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                         duration: 3000
                     })
-                    setOnPageChange(false);
                 }
             }
         });
@@ -238,8 +238,8 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                 try {
                     setOnPageChange(true);
                     const response = await api.delete(`/WarehouseReceipt/delete/${row.id}`);
-                    console.log(response);
                     if (response.status >= 200 && response.status < 300) {
+                        setOnPageChange(false);
                         toast({
                             variant: 'default',
                             title: 'Xóa thành công',
@@ -250,12 +250,9 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                             },
                             duration: 3000
                         })
-                        if (tableName === "import") {
-                            router.push("/import")
-                        } else {
-                            router.push("/export");
-                        }
+                        handleClose?.(true);
                     } else {
+                        setOnPageChange(false);
                         toast({
                             variant: 'destructive',
                             title: 'Xóa thất bại',
@@ -263,9 +260,9 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                             action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                             duration: 3000
                         })
-                        setOnPageChange(false);
                     }
                 } catch (error: any) {
+                    setOnPageChange(false);
                     toast({
                         variant: 'destructive',
                         title: 'Xóa thất bại',
@@ -273,7 +270,6 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                         action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                         duration: 3000
                     })
-                    setOnPageChange(false);
                 }
             }
         });

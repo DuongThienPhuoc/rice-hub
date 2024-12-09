@@ -344,7 +344,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <div
                                                 className="w-20 h-20 flex items-center justify-center cursor-pointer border-[3px] border-black"
                                             >
-                                                <span className="text-gray-500 font-bold">{selectedImageIndex - 1}</span>
+                                                <span className="text-gray-500 font-bold">+{selectedImageIndex - 1}</span>
                                             </div>
                                         )}
 
@@ -363,7 +363,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <div
                                                 className="w-20 h-20 flex items-center justify-center cursor-pointer border-[3px] border-black"
                                             >
-                                                <span className="text-gray-500 font-bold">{customer?.contracts?.length - selectedImageIndex - 2}</span>
+                                                <span className="text-gray-500 font-bold">+{customer?.contracts?.length - selectedImageIndex - 2}</span>
                                             </div>
                                         )}
                                     </div>
