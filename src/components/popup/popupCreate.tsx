@@ -16,6 +16,7 @@ interface PopupCreateProps {
     titles: {
         name: string;
         displayName: string;
+        required: boolean;
         type: string;
     }[];
     handleClose: (reload?: boolean) => void;

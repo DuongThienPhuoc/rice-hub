@@ -282,7 +282,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             },
                             duration: 3000
                         })
-                        router.push("/products");
+                        router.push("/import");
                     } else {
                         setOnPageChange(false);
                         toast({

@@ -220,7 +220,7 @@ const Page = () => {
                                 <StackBarChart chartName='Hóa đơn' color1='#2eb88a' loading={loadingData} data={orderReport} color2='#e88c30' />
                             </div>
                             <div className='flex-1 ml-2'>
-                                <DonutChart chartName='Nguồn thu' data={topCategoryReport} />
+                                <DonutChart chartName='Nguồn thu' data={topCategoryReport} loading={loadingData} />
                             </div>
                         </div>
 
