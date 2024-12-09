@@ -365,7 +365,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             </div>
                             <div className='flex-1'>
                                 <div className='mx-10 mt-5 mb-10 mt-0 lg:m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'><span className='text-red-500 mr-2'>*</span>Tên sản phẩm: </span>
+                                    <span className='font-bold flex-1 pt-4'>Tên sản phẩm: </span>
                                     <TextField
                                         type={'text'}
                                         className='flex-[2]'
@@ -376,7 +376,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'><span className='text-red-500 mr-2'>*</span>Danh mục: </span>
+                                    <span className='font-bold flex-1 pt-4'>Danh mục: </span>
                                     <Autocomplete
                                         className='flex-[2]'
                                         disablePortal
@@ -389,7 +389,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'><span className='text-red-500 mr-2'>*</span>Nhà cung cấp: </span>
+                                    <span className='font-bold flex-1 pt-4'>Nhà cung cấp: </span>
                                     <Autocomplete
                                         className='flex-[2]'
                                         disablePortal
@@ -427,7 +427,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <strong>Cập nhật</strong>
                                 </Button>
                                 <Button type='button' onClick={() => {
-                                    window.history.back()
+                                    router.push(`/products/${params.id}`)
                                     setOnPageChange(true)
                                 }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
