@@ -1,21 +1,19 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { TextField, Autocomplete } from '@mui/material';
 import React from 'react';
 
 interface InputFieldProps {
-    titles: { name: string, displayName: string, type: string }[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    titles: { name: string, displayName: string, required: boolean, type: string }[];
     data?: any;
     onFieldChange: (field: string, value: string | number | boolean) => void;
 }
 
 const InputField: React.FC<InputFieldProps> = ({ titles, data, onFieldChange }) => {
     const displayData = data || {};
-
     const handleChange = (name: string, value: string | number | boolean) => {
         onFieldChange(name, value);
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formatDate = (isoDate: any) => {
         const date = new Date(isoDate);
         const day = String(date.getDate()).padStart(2, '0');
@@ -26,10 +24,10 @@ const InputField: React.FC<InputFieldProps> = ({ titles, data, onFieldChange }) 
 
     return (
         <div className='w-full'>
-            {titles.map(({ name, displayName, type }, index) => (
+            {titles.map(({ name, displayName, required, type }, index) => (
                 <div className='w-full flex flex-col sm:flex-row py-2' key={index}>
                     {type !== 'hidden' && (
-                        <div className='flex-[2] mr-3 font-bold pt-4'> {displayName}:</div>
+                        <div className='flex-[2] flex mr-3 font-bold pt-4'>{required && <p className="text-red-500 mr-2">* </p>}{displayName}:</div>
                     )}
                     {type !== 'hidden' ? (
                         type !== 'readOnly' ? (

@@ -59,7 +59,8 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                         const matchingData = data?.find((item: any) => {
                             const date = new Date(item.timePeriod);
                             const day = date.getDate();
-                            return targetDate.date() === day;
+                            console.log(startOfWeek)
+                            return targetDate.date() === day - 1;
                         });
 
                         if (chartName !== 'Doanh thu') {

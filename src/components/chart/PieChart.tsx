@@ -11,18 +11,13 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { Skeleton } from "@mui/material";
 
-const generateRandomData = () => {
-    return Math.floor(Math.random() * (10000000 - 1000000) + 1000000);
-};
+interface RowData {
+    [key: string]: any;
+}
 
-const chartData = [
-    { category: "Gạo", revenue: generateRandomData(), fill: "#e23670" },
-    { category: "Thóc", revenue: generateRandomData(), fill: "#0090d9" },
-    { category: "Ngô", revenue: generateRandomData(), fill: "#2eb88a" },
-    { category: "Cám", revenue: generateRandomData(), fill: "#af57db" },
-    { category: "Thức ăn chăn nuôi", revenue: generateRandomData(), fill: "#e88c30" },
-]
+const colors = ["#e23670", "#0090d9", "#2eb88a", "#af57db", "#e88c30"];
 
 function formatCurrency(value: number) {
     if (value < 1_000) return `${value} VNĐ`;
@@ -31,80 +26,108 @@ function formatCurrency(value: number) {
     return `${(value / 1_000_000_000).toFixed(0)} tỷ VNĐ`;
 }
 
-const DonutChartComponent: React.FC<{ chartName: string, data: any }> = ({ chartName }) => {
-    const totalRevenue = React.useMemo(() => {
-        return chartData.reduce((acc, curr) => acc + curr.revenue, 0)
-    }, [])
+const DonutChartComponent: React.FC<{ chartName: string, data: any, loading: boolean }> = ({ chartName, data, loading }) => {
+    const chartData = data?.topCategories?.map((item: RowData, index: number) => {
+        return {
+            category: item.categoryName,
+            revenue: item.totalQuantity,
+            fill: colors[index % colors.length]
+        }
+    })
+
+    const topCategory = data?.topCategories?.reduce((maxItem: RowData | null, currentItem: RowData) => {
+        return maxItem === null || currentItem.quantity > maxItem.quantity ? currentItem : maxItem;
+    }, null);
 
     return (
         <Card className='mt-10'>
             <CardHeader>
-                <CardTitle>{chartName}</CardTitle>
-                <CardDescription>{chartName} của 5 tháng gần nhất:</CardDescription>
+                {loading === true ? (
+                    <div className='space-y-2'>
+                        <Skeleton variant="rectangular" animation="wave" width="100px" height={20} />
+                        <Skeleton variant="rectangular" animation="wave" width="150px" height={16} />
+                    </div>
+                ) : (
+                    <>
+                        <CardTitle>{chartName}</CardTitle>
+                        <CardDescription>{chartName} của 5 tháng gần nhất:</CardDescription>
+                    </>
+                )}
             </CardHeader>
             <CardContent className="flex-1 pb-0">
-                <ResponsiveContainer width="100%" height={300}>
-                    <PieChart >
-                        <Tooltip
-                            formatter={(value: number) =>
-                                `${new Intl.NumberFormat('vi-VN', {
-                                    style: 'currency',
-                                    currency: 'VND',
-                                    maximumSignificantDigits: 2,
-                                }).format(value)}`
-                            }
-                        />
-                        <Pie
-                            data={chartData}
-                            dataKey="revenue"
-                            nameKey="category"
-                            className="focus:border-none focus:outline-none"
-                            innerRadius={60}
-                            outerRadius={110}
-                            fill="#82ca9d"
-                            strokeWidth={5}
-                        >
-                            <Label
-                                position="center"
-                                content={({ viewBox }) => {
-                                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                        return (
-                                            <text
-                                                x={viewBox.cx}
-                                                y={viewBox.cy}
-                                                textAnchor="middle"
-                                                dominantBaseline="middle"
-                                            >
-                                                <tspan
+                {loading ? (
+                    <Skeleton variant="rectangular" animation="wave" width="100%" height={300} />
+                ) : (
+                    <ResponsiveContainer width="100%" height={300}>
+                        <PieChart >
+                            <Tooltip
+                                formatter={(value: number) =>
+                                    `${value} kg`
+                                }
+                            />
+                            <Pie
+                                data={chartData}
+                                dataKey="revenue"
+                                nameKey="category"
+                                className="focus:border-none focus:outline-none"
+                                innerRadius={60}
+                                outerRadius={110}
+                                fill="#82ca9d"
+                                strokeWidth={5}
+                            >
+                                <Label
+                                    position="center"
+                                    content={({ viewBox }) => {
+                                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                            return (
+                                                <text
                                                     x={viewBox.cx}
                                                     y={viewBox.cy}
-                                                    className="fill-foreground text-lg font-bold"
+                                                    textAnchor="middle"
+                                                    dominantBaseline="middle"
                                                 >
-                                                    {formatCurrency(totalRevenue)}
-                                                </tspan>
-                                                <tspan
-                                                    x={viewBox.cx}
-                                                    y={(viewBox.cy || 0) + 24}
-                                                    className="fill-muted-foreground text-[14px]"
-                                                >
-                                                    Tổng doanh thu
-                                                </tspan>
-                                            </text>
-                                        )
-                                    }
-                                }}
-                            />
-                        </Pie>
-                    </PieChart>
-                </ResponsiveContainer>
+                                                    <tspan
+                                                        x={viewBox.cx}
+                                                        y={viewBox.cy}
+                                                        className="fill-foreground text-lg font-bold"
+                                                    >
+                                                        {formatCurrency(data?.totalAmount)}
+                                                    </tspan>
+                                                    <tspan
+                                                        x={viewBox.cx}
+                                                        y={(viewBox.cy || 0) + 24}
+                                                        className="fill-muted-foreground text-[14px]"
+                                                    >
+                                                        Tổng doanh thu
+                                                    </tspan>
+                                                </text>
+                                            )
+                                        }
+                                    }}
+                                />
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                )}
             </CardContent>
             <CardFooter className="flex-col gap-2 text-sm">
-                <div className="flex items-center gap-2 font-medium leading-none">
-                    Nguồn thu chủ yếu đến từ
-                </div>
-                <div className="leading-none text-muted-foreground">
-                    Hiển thị tỉ lệ nguồn thu của 5 tháng gần nhất
-                </div>
+                {loading ? (
+                    <>
+                        <Skeleton variant="rectangular" animation="wave" width="150px" height={16} />
+                        <Skeleton variant="rectangular" animation="wave" width="300px" height={16} />
+                    </>
+                ) : (
+                    <>
+                        <div className="flex items-center gap-2 font-medium leading-none">
+                            {topCategory
+                                ? `Nguồn thu chủ yếu đến từ "${topCategory.categoryName}"`
+                                : "Không có dữ liệu về nguồn thu chủ yếu."}
+                        </div>
+                        <div className="leading-none text-muted-foreground">
+                            Hiển thị tỉ lệ nguồn thu của 5 tháng gần nhất
+                        </div>
+                    </>
+                )}
             </CardFooter>
         </Card>
     )
