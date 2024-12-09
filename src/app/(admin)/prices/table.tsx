@@ -56,7 +56,7 @@ export default function PriceTable() {
             const params = new URLSearchParams();
             params.append("pageSize", "10");
             if (page) {
-                params.append("pageNumber", page.toString());
+                params.append("pageNumber", (page - 1).toString());
             }
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
@@ -412,7 +412,7 @@ export default function PriceTable() {
                                                     })
                                                 ) : (
                                                     <TableRow>
-                                                        <TableCell colSpan={7}>
+                                                        <TableCell colSpan={5}>
                                                             <div className="my-10 mx-4 text-center text-gray-500">
                                                                 Không có dữ liệu
                                                             </div>

@@ -45,7 +45,7 @@ export default function ProductTable() {
     const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
         try {
             const params = new URLSearchParams();
-            params.append("pageSize", "2");
+            params.append("pageSize", "10");
             if (page) {
                 params.append("pageNumber", page.toString());
             }
