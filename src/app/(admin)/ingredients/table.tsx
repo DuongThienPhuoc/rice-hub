@@ -22,6 +22,7 @@ export default function ProductTable() {
     const columns = [
         { name: 'productCode', displayName: 'Mã nguyên liệu' },
         { name: 'productName', displayName: 'Tên nguyên liệu' },
+        { name: 'categoryName', displayName: 'Danh mục' },
         { name: 'price', displayName: 'Giá nhập (kg)' },
         { name: 'importDate', displayName: 'Ngày nhập' },
         { name: 'supplierName', displayName: 'Nhà cung cấp' },

@@ -305,7 +305,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Hình thức</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Trạng thái</p></TableCell>
                                                             </TableRow>
                                                         ) : (
                                                             <TableRow>
@@ -321,22 +320,21 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                             batchProducts && batchProducts.length !== 0 ? (
                                                                 batchProducts.map((row: any, rowIndex: any) => (
                                                                     <TableRow key={rowIndex} className={`font-semibold bg-white`}>
-                                                                        <TableCell className='font-semibold text-blue-500 hover:text-blue-300 cursor-pointer' onClick={() => router.push(`/batches/${row?.batch?.batchCode}`)}>
-                                                                            {row?.batch?.batchCode}
+                                                                        <TableCell className='font-semibold text-blue-500 hover:text-blue-300 cursor-pointer' onClick={() => router.push(`/batches/${row?.batchCode}`)}>
+                                                                            {row?.batchCode}
                                                                         </TableCell>
                                                                         <TableCell>
                                                                             {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.price))}
                                                                         </TableCell>
                                                                         <TableCell>{row?.unit + ' ' + row?.weightPerUnit} kg</TableCell>
                                                                         <TableCell>{row?.quantity || 0} {row?.unit || 'kg'}</TableCell>
-                                                                        <TableCell>{row?.batch?.receiptType === 'IMPORT' ? 'Nhập kho' : 'Xuất kho'}</TableCell>
+                                                                        <TableCell>{row?.receiptType === 'IMPORT' ? 'Nhập kho' : 'Xuất kho'}</TableCell>
                                                                         <TableCell>{row?.description || 'N/A'}</TableCell>
-                                                                        <TableCell>{row?.added ? 'Hoàn thành' : 'Chờ xác nhận'}</TableCell>
                                                                     </TableRow>
                                                                 ))
                                                             ) : (
                                                                 <TableRow>
-                                                                    <TableCell colSpan={7}>
+                                                                    <TableCell colSpan={6}>
                                                                         <div className="my-10 mx-4 text-center text-gray-500">
                                                                             Không có dữ liệu
                                                                         </div>

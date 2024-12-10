@@ -160,7 +160,7 @@ const Page = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
+                                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, maxHeight: 500, overflow: 'auto' }}>
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>

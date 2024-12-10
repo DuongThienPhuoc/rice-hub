@@ -22,6 +22,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import ImportPageBreadcrumb from '@/app/(admin)/import/breadcrumb';
+import { FileUp } from 'lucide-react';
 
 export default function ImportTable() {
     const router = useRouter();
@@ -48,6 +49,7 @@ export default function ImportTable() {
         { name: 'id', displayName: 'Mã phiếu' },
         { name: 'batchCode', displayName: 'Lô hàng' },
         { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
+        { name: 'receiptReason', displayName: 'Lý do nhập' },
         { name: 'username', displayName: 'Người tạo' },
         { name: 'status', displayName: 'Trạng thái' },
     ];
@@ -387,7 +389,7 @@ export default function ImportTable() {
                                             className="p-3 text-[14px] hover:bg-green-500"
                                             onClick={handleShowDownloadMaterial}
                                         >
-                                            Import
+                                            Nhập từ file <FileUp />
                                         </Button>
                                     </>
                                 )}
