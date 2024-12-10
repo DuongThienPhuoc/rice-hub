@@ -34,12 +34,12 @@ export default function SupplierTable() {
         query: ''
     });
     const titles = [
-        { name: 'id', displayName: 'Mã', required: true, type: 'hidden' },
-        { name: 'name', displayName: 'Tên', required: true, type: 'text' },
-        { name: 'contactPerson', displayName: 'Người liên hệ', required: true, type: 'text' },
-        { name: 'email', displayName: 'Email', required: true, type: 'text' },
-        { name: 'phoneNumber', displayName: 'Số điện thoại', required: true, type: 'text' },
-        { name: 'address', displayName: 'Địa chỉ', required: false, type: 'text' },
+        { name: 'id', displayName: 'Mã', type: 'hidden' },
+        { name: 'name', displayName: 'Tên', type: 'text' },
+        { name: 'contactPerson', displayName: 'Người liên hệ', type: 'text' },
+        { name: 'email', displayName: 'Email', type: 'text' },
+        { name: 'phoneNumber', displayName: 'Số điện thoại', type: 'text' },
+        { name: 'address', displayName: 'Địa chỉ', type: 'text' },
     ];
 
     const openPopup = () => setPopupVisible(true);

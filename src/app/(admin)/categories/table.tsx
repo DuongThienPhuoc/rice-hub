@@ -33,9 +33,9 @@ export default function CategoryTable() {
     });
     const [isPopupVisible, setPopupVisible] = useState(false);
     const titles = [
-        { name: 'id', displayName: 'Mã danh mục', type: 'hidden', required: true },
-        { name: 'name', displayName: 'Tên danh mục', type: 'text', required: true },
-        { name: 'description', displayName: 'Mô tả chi tiết', type: 'textArea', required: false },
+        { name: 'id', displayName: 'Mã danh mục', type: 'hidden' },
+        { name: 'name', displayName: 'Tên danh mục', type: 'text' },
+        { name: 'description', displayName: 'Mô tả chi tiết', type: 'textArea' },
     ];
 
     const openPopup = () => setPopupVisible(true);
