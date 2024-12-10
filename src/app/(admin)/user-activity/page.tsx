@@ -157,10 +157,9 @@ export default function UserActivityPage() {
                                     <TableCell>{activity.username}</TableCell>
                                     <TableCell>{activity.object}</TableCell>
                                     <TableCell
-                                        className={cn(
-                                            mappingActivity[activity.activity]
-                                                .color,
-                                        )}
+                                        style={{
+                                            color: mappingActivity[activity.activity].color
+                                        }}
                                     >
                                         {
                                             mappingActivity[activity.activity]
