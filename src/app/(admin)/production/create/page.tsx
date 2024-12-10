@@ -253,7 +253,7 @@ const Page = () => {
                                                         )
                                                 )}
                                                 value={selectedIngredient}
-                                                getOptionLabel={(option) => option?.category?.name + " " + option?.name + ' (' + option?.supplier?.name + ')'}
+                                                getOptionLabel={(option) => option?.category?.name + " - " + option?.name + ' (' + option?.supplier?.name + ')'}
                                                 sx={{
                                                     width: 300,
                                                     "& .MuiInputBase-root": {

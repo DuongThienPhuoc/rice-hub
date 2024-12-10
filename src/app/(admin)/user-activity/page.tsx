@@ -58,7 +58,7 @@ export default function UserActivityPage() {
 
     useEffect(() => {
         fetchUserActivity().catch((e) => console.error(e));
-    }, [currentPage,search,date]);
+    }, [currentPage, search, date]);
 
     useEffect(() => {
         setBreadcrumb(<UserActivityPageBreadcrumb />);
