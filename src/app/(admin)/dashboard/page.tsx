@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import React, { useEffect, useState } from 'react';
-import BarChart from '@/components/chart/barChart';
+import BarChart from '@/components/chart/BarChart';
 import MultipleBarChart from '@/components/chart/MultipleBarChart';
 import StackBarChart from '@/components/chart/StackBarChart';
 import FloatingButton from '@/components/floating/floatingButton';
@@ -220,7 +220,7 @@ const Page = () => {
                                 <StackBarChart chartName='Hóa đơn' color1='#2eb88a' loading={loadingData} data={orderReport} color2='#e88c30' />
                             </div>
                             <div className='flex-1 ml-2'>
-                                <DonutChart chartName='Nguồn thu' data={topCategoryReport} />
+                                <DonutChart chartName='Nguồn thu' data={topCategoryReport} loading={loadingData} />
                             </div>
                         </div>
 

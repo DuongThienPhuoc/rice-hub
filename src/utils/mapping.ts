@@ -211,8 +211,16 @@ export const mappingActivity: Record<string, ActivityInfor> = {
         text: 'Cập nhật lô sản phẩm',
         color: 'text-[#60a5fa]',
     },
-    'UPDATE_ADMIN_ORDER-DETAILS':{
+    'UPDATE_ADMIN_ORDER-DETAILS': {
         text: 'Cập nhật chi tiết đơn hàng',
+        color: 'text-[#60a5fa]',
+    },
+    IMPORT_PRODUCT_EXCEL: {
+        text: 'Nhập sản phẩm bằng excel',
+        color: 'text-[#60a5fa]',
+    },
+    EXPORT_PRODUCT_EXCEL: {
+        text: 'Xuất sản phẩm bằng excel',
         color: 'text-[#60a5fa]',
     }
 };

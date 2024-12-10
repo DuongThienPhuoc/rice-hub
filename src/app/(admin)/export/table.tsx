@@ -25,7 +25,9 @@ export default function ExportTable() {
         { name: 'id', displayName: 'Mã phiếu' },
         { name: 'batchCode', displayName: 'Lô / Đơn hàng' },
         { name: 'receiptDate', displayName: 'Ngày tạo phiếu' },
+        { name: 'receiptReason', displayName: 'Lý do xuất' },
         { name: 'username', displayName: 'Người tạo' },
+        { name: 'status', displayName: 'Trạng thái' },
     ];
     const [onPageChange, setOnPageChange] = useState(false);
     const [receipts, setReceipts] = useState([]);
