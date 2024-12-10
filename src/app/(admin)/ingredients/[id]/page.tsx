@@ -311,7 +311,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Giá nhập (kg)</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Giá nhập hiện tại(kg)</p></TableCell>
                                                             </TableRow>
                                                         )}
                                                     </TableHead>
