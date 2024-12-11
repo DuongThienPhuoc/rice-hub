@@ -67,7 +67,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 try {
                     const updatedInventoryDetails = inventory?.inventoryDetails?.map((item: any) => ({
                         ...item,
-                        productId: item.product.id,
+                        productId: item.productDto.id,
                         quantity_discrepancy: item?.quantity - item?.systemQuantity
                     }));
 
@@ -325,10 +325,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                <TableCell onClick={() => router.push(`/products/${product.product.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
-                                                                    {product.product.productCode}
+                                                                <TableCell onClick={() => router.push(`/products/${product.productDto.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                    {product.productDto.productCode}
                                                                 </TableCell>
-                                                                <TableCell>{product.product.name}</TableCell>
+                                                                <TableCell>{product.productDto.name}</TableCell>
                                                                 <TableCell>{product?.unit}</TableCell>
                                                                 <TableCell>{product?.weightPerUnit} kg</TableCell>
                                                                 <TableCell>{product?.systemQuantity}</TableCell>
@@ -375,10 +375,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                <TableCell onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
-                                                                    {product?.product?.productCode}
+                                                                <TableCell onClick={() => router.push(`/products/${product?.productDto?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
+                                                                    {product?.productDto?.productCode}
                                                                 </TableCell>
-                                                                <TableCell>{product?.product?.name}</TableCell>
+                                                                <TableCell>{product?.productDto?.name}</TableCell>
                                                                 <TableCell align='center' colSpan={2}>{product?.unit} {product?.weightPerUnit} kg</TableCell>
                                                                 <TableCell>{product?.systemQuantity}</TableCell>
                                                                 <TableCell>{product?.quantity}</TableCell>

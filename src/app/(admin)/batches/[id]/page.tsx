@@ -56,9 +56,11 @@ const Page = ({ params }: { params: { id: string } }) => {
     }, [setBreadcrumb]);
 
     const handleUpdate = async (product: any, reload: boolean) => {
-        setOnPageChange(true);
+        console.log(product);
+        console.log(batch);
         try {
-            const response = await api.put(`/batchproducts/update/${product.productId}`, {
+            setOnPageChange(true);
+            const response = await api.put(`/batchproducts/update/${product.id}`, {
                 quantity: tempQuantity ? tempQuantity : product.quantity,
                 weightPerUnit: tempWeightPerUnit ? tempWeightPerUnit : product.weightPerUnit,
                 unit: tempUnit ? tempUnit : product.unit,
@@ -124,7 +126,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
 
         const productData = {
-            batProductId: selectedProducts.map((product: any) => product?.productId)
+            batProductId: selectedProducts.map((product: any) => product?.id)
         };
 
         if (areArraysEqual(selectedProducts, products)) {
@@ -261,7 +263,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     weighPerUnit: product?.weightPerUnit,
                     weightPerUnit: product?.weightPerUnit,
                     supplierId: product?.supplierId,
-                    productName: product?.name,
+                    productName: product?.name || product?.productName,
                     quantity: product?.quantity,
                     categoryId: product?.categoryId,
                     warehouseId: product?.warehouseId

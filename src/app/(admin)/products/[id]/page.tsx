@@ -325,7 +325,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Giá nhập (kg)</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Giá nhập hiện tại (kg)</p></TableCell>
                                                             </TableRow>
                                                         )}
                                                     </TableHead>
@@ -360,8 +360,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 product?.productWarehouses.map((row: any, rowIndex: any) => (
                                                                     <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                                                         <TableCell>{rowIndex + 1}</TableCell>
-                                                                        <TableCell>{(row.weightPerUnit !== 0 && row.unit) ? row.unit + " " + row.weightPerUnit + " kg" : 'Chưa đóng gói'}</TableCell>
-                                                                        <TableCell>{row?.quantity || 0} {row?.unit || 'kg'}</TableCell>
+                                                                        <TableCell>{(row.weightPerUnit > 1 && row.unit) ? row.unit + " " + row.weightPerUnit + " kg" : 'Chưa đóng gói'}</TableCell>
+                                                                        <TableCell>{row?.quantity > 0 && row?.quantity} {row?.unit || 'kg'}</TableCell>
                                                                         <TableCell>
                                                                             {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.importPrice || 0))}
                                                                         </TableCell>
