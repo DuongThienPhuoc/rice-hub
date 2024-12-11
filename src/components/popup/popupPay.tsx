@@ -148,7 +148,7 @@ const PopupPay: React.FC<PopupCreateProps> = ({ data, handleClose }) => {
                                         }
                                     }}
                                     className='flex-[2]'
-                                    value={amount}
+                                    value={amount || ''}
                                     variant="standard"
                                     inputProps={{
                                         style: { textAlign: 'center' }

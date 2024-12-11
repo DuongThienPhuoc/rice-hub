@@ -141,9 +141,9 @@ const Page = () => {
                                 </div>
                             ) : (
                                 <div className="space-y-2 mb-5">
-                                    <div className='font-bold text-[1.25rem]'>Bán hàng</div>
+                                    <div className='font-bold text-[1.25rem]'>Sản phẩm</div>
                                     <p className="text-sm text-muted-foreground">
-                                        Tạo phiếu kiểm kho bán hàng
+                                        Tạo phiếu kiểm kho sản phẩm
                                     </p>
                                 </div>
                             )}
@@ -197,7 +197,7 @@ const Page = () => {
                                                                             handleFieldChange('checkQuantity', Number(e.target.value), index)
                                                                         }
                                                                     }}
-                                                                    value={product?.checkQuantity}
+                                                                    value={product?.checkQuantity || ''}
                                                                     variant="standard" />
                                                             </TableCell>
                                                             <TableCell>

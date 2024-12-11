@@ -462,12 +462,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <>
                                                                     <TableCell className='max-w-[50px] '>
                                                                         <TextField
-                                                                            type={'number'}
-                                                                            value={product?.realQuantity || 0}
+                                                                            type={'text'}
+                                                                            value={product?.realQuantity || ''}
                                                                             onChange={(e) => {
-                                                                                const realQuantity = Number(e.target.value);
-                                                                                if (realQuantity >= 0) {
-                                                                                    handleFieldChange(index, 'realQuantity', realQuantity);
+                                                                                const value = e.target.value;
+                                                                                const numericValue = Number(value);
+                                                                                if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                                    handleFieldChange(index, 'realQuantity', Number(value));
                                                                                 }
                                                                             }}
                                                                             InputLabelProps={{
@@ -477,12 +478,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                     </TableCell>
                                                                     <TableCell className='max-w-[50px] '>
                                                                         <TextField
-                                                                            type={'number'}
-                                                                            value={product?.defectQuantity || 0}
+                                                                            type={'text'}
+                                                                            value={product?.defectQuantity || ''}
                                                                             onChange={(e) => {
-                                                                                const defectQuantity = Number(e.target.value);
-                                                                                if (defectQuantity >= 0) {
-                                                                                    handleFieldChange(index, 'defectQuantity', defectQuantity);
+                                                                                const value = e.target.value;
+                                                                                const numericValue = Number(value);
+                                                                                if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                                    handleFieldChange(index, 'defectQuantity', Number(value));
                                                                                 }
                                                                             }}
                                                                             InputLabelProps={{

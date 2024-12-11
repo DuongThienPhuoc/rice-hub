@@ -195,7 +195,7 @@ const Page = () => {
                                                                             handleFieldChange('checkQuantity', Number(value), index)
                                                                         }
                                                                     }}
-                                                                    value={product?.checkQuantity}
+                                                                    value={product?.checkQuantity || ''}
                                                                     variant="standard" />
                                                             </TableCell>
                                                             <TableCell>
