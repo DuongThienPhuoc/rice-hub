@@ -120,8 +120,8 @@ export default function EmployeeTable() {
                                 onSearch={handleSearch}
                                 loadingData={loadingData}
                                 selectOptions={[
-                                    { value: 'employeeCode', label: 'Mã nhân viên' },
                                     { value: 'fullName', label: 'Tên nhân viên' },
+                                    { value: 'employeeCode', label: 'Mã nhân viên' },
                                     { value: 'phoneNumber', label: 'Số điện thoại' },
                                     { value: 'email', label: 'Địa chỉ email' }
                                 ]}

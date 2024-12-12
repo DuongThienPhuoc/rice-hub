@@ -294,28 +294,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
-                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
-                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
-                                                        <TableCell rowSpan={1} align="center" colSpan={2}><p className='font-semibold text-white'>Quy cách</p></TableCell>
-                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng trong hệ thống</p></TableCell>
-                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng thực tế</p></TableCell>
-                                                        <TableCell rowSpan={2} ><p className='font-semibold text-white'>Số lượng chênh lệch</p></TableCell>
-                                                        <TableCell rowSpan={2} className='w-[150px]'><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Số lượng trong hệ thống</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Số lượng thực tế</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Số lượng chênh lệch</p></TableCell>
+                                                        <TableCell className='w-[150px]'><p className='font-semibold text-white'>Mô tả</p></TableCell>
                                                         {inventory?.status !== 'CANCELED' && (
-                                                            <TableCell rowSpan={2} align="center"><p className='font-semibold text-white'>Hành động</p></TableCell>
+                                                            <TableCell align="center"><p className='font-semibold text-white'>Hành động</p></TableCell>
                                                         )}
-                                                    </TableRow>
-                                                    <TableRow>
-                                                        <TableCell align="center">
-                                                            <p className='font-semibold text-white'>
-                                                                Loại
-                                                            </p>
-                                                        </TableCell>
-                                                        <TableCell align="center">
-                                                            <p className='font-semibold text-white'>
-                                                                Trọng lượng
-                                                            </p>
-                                                        </TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
@@ -329,25 +317,27 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                     {product.productDto.productCode}
                                                                 </TableCell>
                                                                 <TableCell>{product.productDto.name}</TableCell>
-                                                                <TableCell>{product?.unit}</TableCell>
-                                                                <TableCell>{product?.weightPerUnit} kg</TableCell>
-                                                                <TableCell>{product?.systemQuantity}</TableCell>
+                                                                <TableCell>{product?.unit} {product?.weightPerUnit} kg</TableCell>
+                                                                <TableCell>{product?.systemQuantity} {product?.unit}</TableCell>
                                                                 <TableCell>
                                                                     <TextField
-                                                                        type={'number'}
+                                                                        type={'text'}
                                                                         className='w-[100px]'
-                                                                        inputProps={{ min: 0 }}
                                                                         onChange={(e) => {
-                                                                            handleFieldChange('quantity', Number(e.target.value), index)
+                                                                            const value = e.target.value;
+                                                                            const numericValue = Number(value);
+                                                                            if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                                handleFieldChange('quantity', Number(e.target.value), index)
+                                                                            }
                                                                         }}
-                                                                        value={product?.quantity}
-                                                                        InputLabelProps={{
-                                                                            shrink: true,
-                                                                        }}
-                                                                        label={'Số lượng'}
+                                                                        value={product?.quantity || ''}
                                                                         variant="standard" />
                                                                 </TableCell>
-                                                                <TableCell>{product?.quantity - product?.systemQuantity}</TableCell>
+                                                                <TableCell>
+                                                                    {(product?.quantity - product?.systemQuantity) < 0 && <p className='text-red-500 font-semibold'>{`Thiếu ${Math.abs(product?.quantity - product?.systemQuantity)} ${product?.unit}`}</p>}
+                                                                    {(product?.quantity - product?.systemQuantity) == 0 && <p className='text-green-500 font-semibold'>{`Đủ số lượng`}</p>}
+                                                                    {(product?.quantity - product?.systemQuantity) > 0 && <p className='text-blue-500 font-semibold'>{`Thừa ${Math.abs(product?.quantity - product?.systemQuantity)} ${product?.unit}`}</p>}
+                                                                </TableCell>
                                                                 <TableCell>
                                                                     <TextField
                                                                         type={'text'}
@@ -356,7 +346,6 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                             handleFieldChange('description', e.target.value, index)
                                                                         }}
                                                                         value={product?.description}
-                                                                        label={'Mô tả'}
                                                                         variant="standard" />
                                                                 </TableCell>
                                                                 <TableCell align="center">
@@ -379,10 +368,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                     {product?.productDto?.productCode}
                                                                 </TableCell>
                                                                 <TableCell>{product?.productDto?.name}</TableCell>
-                                                                <TableCell align='center' colSpan={2}>{product?.unit} {product?.weightPerUnit} kg</TableCell>
-                                                                <TableCell>{product?.systemQuantity}</TableCell>
-                                                                <TableCell>{product?.quantity}</TableCell>
-                                                                <TableCell>{product?.quantity - product?.systemQuantity}</TableCell>
+                                                                <TableCell>{product?.unit} {product?.weightPerUnit} kg</TableCell>
+                                                                <TableCell>{product?.systemQuantity} {product?.unit}</TableCell>
+                                                                <TableCell>{product?.quantity} {product?.unit}</TableCell>
+                                                                <TableCell>
+                                                                    {(product?.quantity - product?.systemQuantity) < 0 && <p className='text-red-500 font-semibold'>{`Thiếu ${Math.abs(product?.quantity - product?.systemQuantity)} ${product?.unit}`}</p>}
+                                                                    {(product?.quantity - product?.systemQuantity) == 0 && <p className='text-green-500 font-semibold'>{`Đủ số lượng`}</p>}
+                                                                    {(product?.quantity - product?.systemQuantity) > 0 && <p className='text-blue-500 font-semibold'>{`Thừa ${Math.abs(product?.quantity - product?.systemQuantity)} ${product?.unit}`}</p>}
+                                                                </TableCell>
                                                                 <TableCell>{product?.description || 'N/A'}</TableCell>
                                                                 {inventory?.status !== 'CANCELED' && (
                                                                     <TableCell align="center">

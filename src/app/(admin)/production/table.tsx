@@ -136,8 +136,8 @@ export default function ProductionTable() {
                                         onSearch={handleSearch}
                                         loadingData={loadingData}
                                         selectOptions={[
+                                            { value: 'ingredientName', label: 'Tên nguyên liệu' },
                                             { value: 'productionCode', label: 'Mã phiếu' },
-                                            { value: 'ingredientName', label: 'Tên nguyên liệu' }
                                         ]}
                                     />
                                     {loadingData ? (

@@ -137,7 +137,7 @@ export default function SupplierTable() {
                                 onSearch={handleSearch}
                                 loadingData={loadingData}
                                 selectOptions={[
-                                    { value: 'name', label: 'Nhà cung cấp' },
+                                    { value: 'name', label: 'Tên nhà cung cấp' },
                                     { value: 'email', label: 'Email' },
                                     { value: 'phoneNumber', label: 'Số điện thoại' }
                                 ]}

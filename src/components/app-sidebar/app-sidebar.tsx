@@ -123,7 +123,7 @@ const categories: SidebarItem[] = [
     },
     {
         category: 'Hàng hoá',
-        role: ['ROLE_ADMIN',"WAREHOUSE_MANAGER"],
+        role: ['ROLE_ADMIN', "WAREHOUSE_MANAGER"],
         items: [
             {
                 title: 'Danh mục',
@@ -195,7 +195,7 @@ const categories: SidebarItem[] = [
     },
     {
         category: 'Giao dịch',
-        role: ['ROLE_ADMIN','WAREHOUSE_MANAGER'],
+        role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
         items: [
             {
                 title: 'Thu',
@@ -218,7 +218,7 @@ const categories: SidebarItem[] = [
         ],
     },
     {
-        category: 'Nhập xuất',
+        category: 'Quản lý kho',
         role: ['ROLE_ADMIN', 'WAREHOUSE_MANAGER'],
         items: [
             {
@@ -267,7 +267,7 @@ export default function AppSidebar() {
             setRole(role);
             setUserName(userName);
         }
-        if(employeeRole !== null) {
+        if (employeeRole !== null) {
             setEmployeeRole(employeeRole);
         }
     }, []);

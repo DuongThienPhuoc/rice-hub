@@ -11,59 +11,100 @@ import TableRow from '@mui/material/TableRow';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import FloatingButton from '@/components/floating/floatingButton';
-import { Paper, Skeleton, TextField } from '@mui/material';
+import { Checkbox, Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { CircleMinus, Plus } from 'lucide-react';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import InventoryPageBreadcrumb from '@/app/(admin)/inventory/createProducts/breadcrumb';
+import Paging from '@/components/paging/paging';
+import SearchBar from '@/components/searchbar/searchbar';
+
+interface RowData {
+    [key: string]: any;
+}
 
 const Page = () => {
     const router = useRouter();
     const [loadingData, setLoadingData] = useState(true);
-    const [products, setProducts] = useState<any>([]);
+    const [products, setProducts] = useState<RowData[]>([]);
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = useState(false);
     const { setBreadcrumb } = useBreadcrumbStore()
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedProducts, setSelectedProducts] = useState<RowData[]>([]);
+    const [totalPages, setTotalPages] = useState(0);
+    const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
+        field: '',
+        query: ''
+    });
     useEffect(() => {
         setBreadcrumb(<InventoryPageBreadcrumb />)
         return () => setBreadcrumb(null)
     }, [setBreadcrumb]);
 
     useEffect(() => {
-        getProducts();
-    }, []);
+        getProducts(currentPage, currentSearch);
+    }, [currentPage, currentSearch]);
 
-    const getProducts = async () => {
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
+    const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
         try {
-            const url = `/productwarehouse/getAllProducts`;
+            const params = new URLSearchParams();
+            params.append("pageSize", "10");
+            if (page) {
+                params.append("pageNumber", page.toString());
+            }
+            if (search?.field && search?.query) {
+                params.append(search.field, search.query);
+            }
+            params.append("warehouseId", '2');
+            const url = `/productwarehouse/getAllProductsWarehouse?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
-            setProducts(data?.filter((p: any) => p?.quantity > 0));
+            if (data.page.totalElements === 0) {
+                setProducts([]);
+                toast({
+                    variant: 'destructive',
+                    title: 'Không tìm thấy sản phẩm!',
+                    description: 'Xin vui lòng thử lại',
+                    duration: 3000,
+                })
+            } else {
+                setProducts(data._embedded.productWarehouseDtoList);
+            }
+            setTotalPages(data.page.totalPages);
         } catch (error) {
-            console.error("Lỗi khi lấy danh sách sản phẩm:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Lỗi khi lấy danh sách nguyên liệu!',
+                description: 'Xin vui lòng thử lại',
+                duration: 3000
+            })
         } finally {
             setLoadingData(false);
         }
     };
 
-    const handleSubmit = async () => {
-        if (products.some((product: any) => !product.checkQuantity)) {
-            toast({
-                variant: 'destructive',
-                title: 'Tạo thất bại',
-                description: 'Vui lòng nhập đầy đủ số lượng cho từng sản phẩm. Vui lòng kiểm tra lại.',
-                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000
-            });
-            return;
-        }
+    const handleRemoveProduct = (index: number) => {
+        setSelectedProducts((prevData: RowData[]) =>
+            prevData.filter((_, i) => i !== index)
+        );
+    };
 
-        const productData = products.map((product: any) => ({
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
+    };
+
+    const handleSubmit = async () => {
+        const productData = selectedProducts.map((product: any) => ({
             weightPerUnit: product.weightPerUnit,
             productId: product.product.id,
             description: product.checkDescription || '',
@@ -75,9 +116,7 @@ const Page = () => {
 
         try {
             const url = `/inventory/createInventory`
-
             const response = await api.post(url, {
-                username: localStorage.getItem("username"),
                 warehouseId: 2,
                 inventoryDetails: productData,
             });
@@ -114,7 +153,7 @@ const Page = () => {
     }
 
     const handleFieldChange = (fieldName: any, value: any, index: any) => {
-        setProducts((prevData: any) => {
+        setSelectedProducts((prevData: any) => {
             return prevData.map((item: any, i: any) => {
                 if (i === index) {
                     return {
@@ -148,7 +187,15 @@ const Page = () => {
                                 </div>
                             )}
                             <Separator orientation="horizontal" />
-                            <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle my-5'>
+                            <div className='flex flex-col lg:flex-row items-center lg:items-middle my-5'>
+                                <SearchBar
+                                    onSearch={handleSearch}
+                                    loadingData={loadingData}
+                                    selectOptions={[
+                                        { value: 'productName', label: 'Tên sản phẩm' },
+                                        { value: 'productCode', label: 'Mã sản phẩm' },
+                                    ]}
+                                />
                             </div>
                             <div className='overflow-hidden'>
                                 <div className='w-full overflow-x-auto'>
@@ -166,12 +213,12 @@ const Page = () => {
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
                                                 <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
-                                                        <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Danh mục</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                        <TableCell align='center'><p className='font-semibold text-white'>Thêm vào danh sách</p></TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
@@ -180,35 +227,26 @@ const Page = () => {
                                                             key={index}
                                                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                         >
-                                                            <TableCell>{index + 1}</TableCell>
                                                             <TableCell onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                 {product?.product?.productCode}
                                                             </TableCell>
                                                             <TableCell>{product?.product?.name}</TableCell>
+                                                            <TableCell>{product?.product?.categoryName}</TableCell>
+                                                            <TableCell>{product?.product?.supplierName}</TableCell>
                                                             <TableCell>{product?.unit} {product?.weightPerUnit} kg</TableCell>
-                                                            <TableCell>
-                                                                <TextField
-                                                                    type={'text'}
-                                                                    className='w-[100px]'
+                                                            <TableCell align="center">
+                                                                <Checkbox
+                                                                    checked={selectedProducts.some((p) => p.id === product.id)}
                                                                     onChange={(e) => {
-                                                                        const value = e.target.value;
-                                                                        const numericValue = Number(value);
-                                                                        if (!isNaN(numericValue) && Number(value) >= 0) {
-                                                                            handleFieldChange('checkQuantity', Number(e.target.value), index)
+                                                                        if (e.target.checked) {
+                                                                            setSelectedProducts([...selectedProducts, product]);
+                                                                        } else {
+                                                                            setSelectedProducts(
+                                                                                selectedProducts.filter((p) => p.id !== product.id)
+                                                                            );
                                                                         }
                                                                     }}
-                                                                    value={product?.checkQuantity}
-                                                                    variant="standard" />
-                                                            </TableCell>
-                                                            <TableCell>
-                                                                <TextField
-                                                                    type={'text'}
-                                                                    className='w-[250px]'
-                                                                    onChange={(e) => {
-                                                                        handleFieldChange('checkDescription', e.target.value, index)
-                                                                    }}
-                                                                    value={product?.checkDescription}
-                                                                    variant="standard" />
+                                                                />
                                                             </TableCell>
                                                         </TableRow>
                                                     )) : (
@@ -216,6 +254,95 @@ const Page = () => {
                                                             <TableCell colSpan={6}>
                                                                 <div className="my-10 mx-4 text-center text-gray-500">
                                                                     Không có dữ liệu
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    )}
+                                </div>
+                            </div>
+                            {totalPages > 1 && (
+                                <Paging
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                />
+                            )}
+                            <div className='overflow-hidden mt-5'>
+                                <div className='w-full overflow-x-auto'>
+                                    {loadingData ? (
+                                        <div className="w-full">
+                                            <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                            {Array.from({ length: 10 }).map((_, rowIndex) => (
+                                                <div key={rowIndex} className="flex mt-2">
+                                                    <Skeleton animation="wave" variant="rectangular" height={40} width={'100%'} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, maxHeight: 500, overflow: 'auto' }}>
+                                            <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
+                                                <TableHead className='bg-[#0090d9]'>
+                                                    <TableRow>
+                                                        <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Danh mục</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                        <TableCell align='center'><p className='font-semibold text-white'>Xóa khỏi danh sách</p></TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {selectedProducts && selectedProducts.length > 0 ? selectedProducts.map((product: any, index: any) => (
+                                                        <TableRow
+                                                            key={index}
+                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                        >
+                                                            <TableCell>{index + 1}</TableCell>
+                                                            <TableCell>{product?.product?.name}</TableCell>
+                                                            <TableCell>{product?.product?.categoryName}</TableCell>
+                                                            <TableCell>{product?.product?.supplierName}</TableCell>
+                                                            <TableCell>{product?.unit} {product?.weightPerUnit} kg</TableCell>
+                                                            <TableCell>
+                                                                <TextField
+                                                                    type={'text'}
+                                                                    className='w-[100px]'
+                                                                    onChange={(e) => {
+                                                                        const value = e.target.value;
+                                                                        const numericValue = Number(value)
+                                                                        if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                            handleFieldChange('checkQuantity', Number(value), index)
+                                                                        }
+                                                                    }}
+                                                                    value={product?.checkQuantity || ''}
+                                                                    variant="standard" />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <TextField
+                                                                    type={'text'}
+                                                                    className='w-full'
+                                                                    onChange={(e) => {
+                                                                        handleFieldChange('checkDescription', e.target.value, index)
+                                                                    }}
+                                                                    value={product?.checkDescription}
+                                                                    variant="standard" />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <div onClick={() => handleRemoveProduct(index)} className='w-full cursor-pointer justify-center flex'>
+                                                                    <CircleMinus size={20} />
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )) : (
+                                                        <TableRow>
+                                                            <TableCell colSpan={8}>
+                                                                <div className="my-10 mx-4 text-center text-gray-500">
+                                                                    Chưa có sản phẩm, vui lòng chọn sản phẩm
                                                                 </div>
                                                             </TableCell>
                                                         </TableRow>
