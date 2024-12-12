@@ -397,7 +397,7 @@ const Page = () => {
                                         </Select>
                                     </FormControl>
                                 </div>
-                                {formData?.employeeRoleId !== '' && formData?.employeeRoleId !== 2 && (
+                                {formData?.employeeRoleId !== '' && formData?.employeeRoleId !== 1 && (
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1 pt-4'>Lương ngày: </span>
                                         <TextField
@@ -410,7 +410,7 @@ const Page = () => {
                                                     handleFieldChange('dailyWage', Number(e.target.value))
                                                 }
                                             }}
-                                            value={formData.dailyWage.toString()}
+                                            value={formData.dailyWage || ''}
                                             label={'Nhập lương ngày'}
                                             variant="standard" />
                                     </div>

@@ -579,7 +579,7 @@ const Page = () => {
                                                             setWeightValidate(true)
                                                         }
                                                     }}
-                                                    value={weight}
+                                                    value={weight || ''}
                                                     error={isNaN(weight) || !weightValidate}
                                                     variant="standard" />
                                             </TableCell>
@@ -594,7 +594,7 @@ const Page = () => {
                                                             setImportPriceValidate(true)
                                                         }
                                                     }}
-                                                    value={importPrice}
+                                                    value={importPrice || ''}
                                                     error={isNaN(importPrice) || !importPriceValidate}
                                                     variant="standard" />
                                             </TableCell>
@@ -612,7 +612,7 @@ const Page = () => {
                                                             setQuantityValidate(true)
                                                         }
                                                     }}
-                                                    value={quantity}
+                                                    value={quantity || ''}
                                                     error={isNaN(quantity) || !quantityValidate}
                                                     variant="standard" />
                                             </TableCell>

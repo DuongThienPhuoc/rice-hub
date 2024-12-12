@@ -66,6 +66,13 @@ const styles = StyleSheet.create({
         padding: 5,
     },
     header: {
+        fontSize: 13,
+        marginBottom: 10,
+        textAlign: 'center',
+        color: 'black',
+        fontFamily: 'Tinos',
+    },
+    header_2: {
         fontSize: 15,
         marginBottom: 10,
         textAlign: 'center',
@@ -122,10 +129,11 @@ const InvoiceDocument = ({ order }: { order: Order }) => {
     return (
         <Document language={'utf8'}>
             <Page size={{ width: 226.77 }} style={styles.page}>
-                <Text style={styles.headerText}>Ngày: 21/07/2024</Text>
+                <Text style={styles.headerText}>{`Ngày: ${new Date(order.orderDate).toLocaleDateString('vi-VN')}`}</Text>
                 <Text style={styles.headerText}>
                     {`Số hóa đơn: ${order.orderCode}`}
                 </Text>
+                <Text style={styles.header_2}>Kho Thanh Quang</Text>
                 <Text style={styles.header}>Hoá đơn thanh toán</Text>
                 <View>
                     <View
@@ -225,15 +233,41 @@ const InvoiceDocument = ({ order }: { order: Order }) => {
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                         marginTop: 10,
-                        borderBottomWidth: 1,
-                        borderBottomColor: '#000',
                     }}
                 >
                     <Text style={styles.textBoldSecond}>Thành tiền: </Text>
                     <Text style={styles.headerText}>
                         {currencyHandleProvider(
-                            order.receiptVoucher.totalAmount,
+                            order.totalAmount,
                         )}
+                    </Text>
+                </View>
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 5,
+                    }}
+                >
+                    <Text style={styles.textBoldSecond}>Giảm giá: </Text>
+                    <Text style={styles.headerText}>
+                        {currencyHandleProvider(0)}
+                    </Text>
+                </View>
+                <View
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        marginTop: 5,
+                        borderBottomWidth: 1,
+                        borderBottomColor: '#000',
+                    }}
+                >
+                    <Text style={styles.textBoldSecond}>VAT: </Text>
+                    <Text style={styles.headerText}>
+                        {currencyHandleProvider(0)}
                     </Text>
                 </View>
                 <View
@@ -246,7 +280,7 @@ const InvoiceDocument = ({ order }: { order: Order }) => {
                 >
                     <Text style={styles.textBold}>Tổng tiền: </Text>
                     <Text style={styles.headerText}>{currencyHandleProvider(
-                        order.receiptVoucher.totalAmount,
+                        order.totalAmount,
                     )}</Text>
                 </View>
                 {/*Footer*/}

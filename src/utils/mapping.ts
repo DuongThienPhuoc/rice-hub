@@ -115,6 +115,10 @@ export const mappingActivity: Record<string, ActivityInfor> = {
         text: 'Chuẩn bị xuất sản phẩm',
         color: '#60a5fa',
     },
+    DELETE_BATCH_PRODUCT: {
+        text: 'Xóa sản phẩm trong lô hàng',
+        color: '#f87171',
+    },
     CONFIRM_EXPORT_PRODUCT: {
         text: 'Xác nhận xuất sản phẩm',
         color: '#34d399',

@@ -335,7 +335,7 @@ const Page = () => {
                                                     setInputWeight(Number(value));
                                                 }
                                             }}
-                                            value={inputWeight}
+                                            value={inputWeight || ''}
                                             label={`Nhập số lượng ${selectedType ? '(' + selectedType?.unit + ')' : ''}`}
                                             variant="standard" />
                                     </div>
@@ -418,7 +418,7 @@ const Page = () => {
                                                                 }
                                                             }
                                                         }}
-                                                        value={output?.ratio}
+                                                        value={output?.ratio || ''}
                                                         variant="standard" />
                                                 </TableCell>
                                                 <TableCell>{output?.weight || '0'} kg</TableCell>
