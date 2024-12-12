@@ -43,6 +43,7 @@ export default function OrderPage(): React.JSX.Element {
     const setProducts = useProductStore((state) => state.setProducts);
     const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [search, setSearch] = useState<string>('');
     const { setBreadcrumb } = useBreadcrumbStore();
     async function getProduct() {
         try {
@@ -50,6 +51,7 @@ export default function OrderPage(): React.JSX.Element {
                 pageSize: 10,
                 pageNumber: currentPage + 1,
                 categoryName: selectedCategory?.name,
+                name: search,
             });
             setProducts(response.data._embedded?.productDtoList);
             setTotalPages(response.data.page.totalPages);
@@ -82,7 +84,7 @@ export default function OrderPage(): React.JSX.Element {
     useEffect(() => {
         getProduct()
             .catch((e) => console.error(e));
-    }, [currentPage, selectedCategory]);
+    }, [currentPage, selectedCategory, search]);
 
     return (
         <>
@@ -92,6 +94,8 @@ export default function OrderPage(): React.JSX.Element {
                         <section className="mb-2 flex justify-between">
                             <div className="flex gap-1">
                                 <Input
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
                                     type="text"
                                     className="bg-white"
                                     placeholder="Lọc tên hàng hoá"

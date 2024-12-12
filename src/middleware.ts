@@ -78,7 +78,7 @@ const isHasWarehouseManagerAndAdminPermission = (path: string, role: string) => 
         warehouseManagerStaticPaths.includes(path) ||
         handleDynamicPath(path, adminDynamicPaths)
     ) {
-        return role === 'ROLE_EMPLOYEE' || role === 'ROLE_ADMIN';
+        return role === 'WAREHOUSE_MANAGER' || role === 'ROLE_ADMIN';
     }
     return false;
 }
