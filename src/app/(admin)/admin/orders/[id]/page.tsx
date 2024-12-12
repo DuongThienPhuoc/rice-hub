@@ -245,10 +245,10 @@ export default function OrderDetailPage({
                                 {currencyHandleProvider(order?.totalAmount)}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Phụ phí: $0.00
+                                {`Phụ phí: ${currencyHandleProvider(0)}`}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Thuế: $0.00
+                                {`Thuế: ${currencyHandleProvider(0)}`}
                             </p>
                             <p className="mt-2 font-bold">{`Tổng tiền: ${currencyHandleProvider(order?.totalAmount)}`}</p>
                         </div>

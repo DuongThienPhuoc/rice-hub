@@ -51,11 +51,13 @@ export async function getProductList({
     pageSize = 5,
     forceFirstAndLastRels = true,
     categoryName = null,
+    name
 }: {
     pageNumber?: number;
     pageSize?: number;
     forceFirstAndLastRels?: boolean;
     categoryName?: string | null;
+    name?: string | null;
 }) {
     try {
         return axios.get('/products/customer/products', {
@@ -64,6 +66,7 @@ export async function getProductList({
                 pageSize,
                 categoryName,
                 forceFirstAndLastRels,
+                name
             },
         });
     } catch (e) {
