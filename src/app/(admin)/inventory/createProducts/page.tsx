@@ -11,9 +11,9 @@ import TableRow from '@mui/material/TableRow';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import FloatingButton from '@/components/floating/floatingButton';
-import { Paper, Skeleton, TextField } from '@mui/material';
+import { Checkbox, Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
-import { CircleMinus, CirclePlus, Plus } from 'lucide-react';
+import { CircleMinus, Plus } from 'lucide-react';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -21,6 +21,7 @@ import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import InventoryPageBreadcrumb from '@/app/(admin)/inventory/createProducts/breadcrumb';
 import Paging from '@/components/paging/paging';
+import SearchBar from '@/components/searchbar/searchbar';
 
 interface RowData {
     [key: string]: any;
@@ -91,21 +92,15 @@ const Page = () => {
         }
     };
 
-    const handleAddProduct = (product: RowData) => {
-        setSelectedProducts((prevData: RowData[]) => [...prevData, product]);
-    };
-
     const handleRemoveProduct = (index: number) => {
         setSelectedProducts((prevData: RowData[]) =>
             prevData.filter((_, i) => i !== index)
         );
     };
 
-    const handleDeleteProduct = (product: RowData) => {
-        console.log(product);
-        setSelectedProducts((prevData: RowData[]) =>
-            prevData.filter((data: RowData) => data.id !== product.id)
-        );
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
     };
 
     const handleSubmit = async () => {
@@ -192,7 +187,16 @@ const Page = () => {
                                 </div>
                             )}
                             <Separator orientation="horizontal" />
-                            <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle my-5'></div>
+                            <div className='flex flex-col lg:flex-row items-center lg:items-middle my-5'>
+                                <SearchBar
+                                    onSearch={handleSearch}
+                                    loadingData={loadingData}
+                                    selectOptions={[
+                                        { value: 'productName', label: 'Tên sản phẩm' },
+                                        { value: 'productCode', label: 'Mã sản phẩm' },
+                                    ]}
+                                />
+                            </div>
                             <div className='overflow-hidden'>
                                 <div className='w-full overflow-x-auto'>
                                     {loadingData ? (
@@ -230,16 +234,19 @@ const Page = () => {
                                                             <TableCell>{product?.product?.categoryName}</TableCell>
                                                             <TableCell>{product?.product?.supplierName}</TableCell>
                                                             <TableCell>{product?.unit} {product?.weightPerUnit} kg</TableCell>
-                                                            <TableCell>
-                                                                {!selectedProducts.some((p) => p.id === product.id) ? (
-                                                                    <div onClick={() => handleAddProduct(product)} className="w-full cursor-pointer justify-center flex">
-                                                                        <CirclePlus size={20} />
-                                                                    </div>
-                                                                ) : (
-                                                                    <div onClick={() => handleDeleteProduct(product)} className="w-full cursor-pointer justify-center flex">
-                                                                        <CircleMinus size={20} />
-                                                                    </div>
-                                                                )}
+                                                            <TableCell align="center">
+                                                                <Checkbox
+                                                                    checked={selectedProducts.some((p) => p.id === product.id)}
+                                                                    onChange={(e) => {
+                                                                        if (e.target.checked) {
+                                                                            setSelectedProducts([...selectedProducts, product]);
+                                                                        } else {
+                                                                            setSelectedProducts(
+                                                                                selectedProducts.filter((p) => p.id !== product.id)
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                />
                                                             </TableCell>
                                                         </TableRow>
                                                     )) : (

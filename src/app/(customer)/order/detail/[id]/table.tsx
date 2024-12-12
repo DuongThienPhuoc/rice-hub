@@ -68,10 +68,10 @@ export default function OrderDetailTable({
                             <TableCell>{`${item.quantity} BAO`}</TableCell>
                         )}
                         <TableCell>
-                            {currencyHandleProvider(item.unitPrice)}
+                            {currencyHandleProvider(item.unitPrice || 0)}
                         </TableCell>
                         <TableCell className="flex items-center justify-end">
-                            {formater.format(item.totalPrice)}
+                            {formater.format(item.totalPrice || 0)}
                         </TableCell>
                     </TableRow>
                 ))}

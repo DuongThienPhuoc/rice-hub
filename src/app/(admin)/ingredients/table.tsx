@@ -121,8 +121,8 @@ export default function ProductTable() {
                                 onSearch={handleSearch}
                                 loadingData={loadingData}
                                 selectOptions={[
+                                    { value: 'productName', label: 'Tên nguyên liệu' },
                                     { value: 'productCode', label: 'Mã nguyên liệu' },
-                                    { value: 'productName', label: 'Tên nguyên liệu' }
                                 ]}
                             />
                             <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>

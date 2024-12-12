@@ -381,16 +381,16 @@ export default function OrderDetailPage({
                     <CardFooter className="flex justify-end">
                         <div className="text-right space-y-2">
                             <p className="font-bold">
-                                Tổng cộng: {currencyHandleProvider(order?.totalAmount)}
+                                Tổng cộng: {currencyHandleProvider(order?.totalAmount || 0)}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Đã thanh toán: {currencyHandleProvider(order?.receiptVoucher?.paidAmount)}
+                                Đã thanh toán: {currencyHandleProvider(order?.receiptVoucher?.paidAmount || 0)}
                             </p>
-                            <p className="mt-2 font-bold">{`Số tiền còn lại phải trả: ${currencyHandleProvider(order?.receiptVoucher?.remainAmount)}`}</p>
+                            <p className="mt-2 font-bold">{`Số tiền còn lại phải trả: ${currencyHandleProvider(order?.receiptVoucher?.remainAmount || 0)}`}</p>
                             <p className="mt-2 font-bold flex justify-end items-center">
                                 Hạn thanh toán:
                                 <Calendar className="w-4 h-4 mx-2" />
-                                {new Date(order?.receiptVoucher?.dueDate || '').toLocaleDateString()}
+                                {order?.receiptVoucher?.dueDate ? new Date(order?.receiptVoucher?.dueDate || '').toLocaleDateString() : 'N/A'}
                             </p>
                         </div>
                     </CardFooter>

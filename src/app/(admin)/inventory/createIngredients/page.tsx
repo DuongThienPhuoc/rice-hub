@@ -11,9 +11,9 @@ import TableRow from '@mui/material/TableRow';
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import FloatingButton from '@/components/floating/floatingButton';
-import { Paper, Skeleton, TextField } from '@mui/material';
+import { Checkbox, Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
-import { CircleMinus, CirclePlus, Plus } from 'lucide-react';
+import { CircleMinus, Plus } from 'lucide-react';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -21,6 +21,7 @@ import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import InventoryPageBreadcrumb from '@/app/(admin)/inventory/createIngredients/breadcrumb';
 import Paging from '@/components/paging/paging';
+import SearchBar from '@/components/searchbar/searchbar';
 
 interface RowData {
     [key: string]: any;
@@ -49,6 +50,11 @@ const Page = () => {
         getProducts(currentPage, currentSearch);
     }, [currentPage, currentSearch]);
 
+    const handleSearch = (field: string, query: string) => {
+        setCurrentPage(1);
+        setCurrentSearch({ field, query });
+    };
+
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
@@ -56,7 +62,7 @@ const Page = () => {
     const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
         try {
             const params = new URLSearchParams();
-            params.append("pageSize", "10");
+            params.append("pageSize", "5");
             if (page) {
                 params.append("pageNumber", page.toString());
             }
@@ -91,20 +97,9 @@ const Page = () => {
         }
     };
 
-    const handleAddProduct = (product: RowData) => {
-        setSelectedProducts((prevData: RowData[]) => [...prevData, product]);
-    };
-
     const handleRemoveProduct = (index: number) => {
         setSelectedProducts((prevData: RowData[]) =>
             prevData.filter((_, i) => i !== index)
-        );
-    };
-
-    const handleDeleteProduct = (product: RowData) => {
-        console.log(product);
-        setSelectedProducts((prevData: RowData[]) =>
-            prevData.filter((data: RowData) => data.id !== product.id)
         );
     };
 
@@ -192,7 +187,16 @@ const Page = () => {
                                 </div>
                             )}
                             <Separator orientation="horizontal" />
-                            <div className='flex flex-col lg:flex-row justify-end items-center lg:items-middle my-5'></div>
+                            <div className='flex flex-col lg:flex-row items-center lg:items-middle my-5'>
+                                <SearchBar
+                                    onSearch={handleSearch}
+                                    loadingData={loadingData}
+                                    selectOptions={[
+                                        { value: 'productName', label: 'Tên sản phẩm' },
+                                        { value: 'productCode', label: 'Mã sản phẩm' },
+                                    ]}
+                                />
+                            </div>
                             <div className='overflow-hidden'>
                                 <div className='w-full overflow-x-auto'>
                                     {loadingData ? (
@@ -205,44 +209,71 @@ const Page = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, maxHeight: 500, overflow: 'auto' }}>
+                                        <TableContainer
+                                            component={Paper}
+                                            sx={{ border: '1px solid #0090d9', borderRadius: 2, maxHeight: 500, overflow: 'auto' }}
+                                        >
                                             <Table sx={{ minWidth: 700, borderCollapse: 'collapse' }} aria-label="simple table">
-                                                <TableHead className='bg-[#0090d9]'>
+                                                <TableHead className="bg-[#0090d9]">
                                                     <TableRow>
-                                                        <TableCell><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Danh mục</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
-                                                        <TableCell align='center'><p className='font-semibold text-white'>Thêm vào danh sách</p></TableCell>
+                                                        <TableCell>
+                                                            <p className="font-semibold text-white">Mã sản phẩm</p>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <p className="font-semibold text-white">Tên sản phẩm</p>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <p className="font-semibold text-white">Danh mục</p>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <p className="font-semibold text-white">Nhà cung cấp</p>
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            <p className="font-semibold text-white">Quy cách</p>
+                                                        </TableCell>
+                                                        <TableCell align="center">
+                                                            <p className="font-semibold text-white">Thêm vào danh sách</p>
+                                                        </TableCell>
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
-                                                    {products && products.length > 0 ? products.map((product: any, index: any) => (
-                                                        <TableRow
-                                                            key={index}
-                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                                        >
-                                                            <TableCell onClick={() => router.push(`/products/${product?.product?.id}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
-                                                                {product?.product?.productCode}
-                                                            </TableCell>
-                                                            <TableCell>{product?.product?.name}</TableCell>
-                                                            <TableCell>{product?.product?.categoryName}</TableCell>
-                                                            <TableCell>{product?.product?.supplierName}</TableCell>
-                                                            <TableCell>{product?.unit} {product?.weightPerUnit} kg</TableCell>
-                                                            <TableCell>
-                                                                {!selectedProducts.some((p) => p.id === product.id) ? (
-                                                                    <div onClick={() => handleAddProduct(product)} className="w-full cursor-pointer justify-center flex">
-                                                                        <CirclePlus size={20} />
-                                                                    </div>
-                                                                ) : (
-                                                                    <div onClick={() => handleDeleteProduct(product)} className="w-full cursor-pointer justify-center flex">
-                                                                        <CircleMinus size={20} />
-                                                                    </div>
-                                                                )}
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    )) : (
+                                                    {products && products.length > 0 ? (
+                                                        products.map((product: any, index: any) => (
+                                                            <TableRow
+                                                                key={index}
+                                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                                            >
+                                                                <TableCell
+                                                                    onClick={() => router.push(`/products/${product?.product?.id}`)}
+                                                                    component="th"
+                                                                    scope="row"
+                                                                    className="text-blue-500 font-semibold hover:text-blue-300 cursor-pointer"
+                                                                >
+                                                                    {product?.product?.productCode}
+                                                                </TableCell>
+                                                                <TableCell>{product?.product?.name}</TableCell>
+                                                                <TableCell>{product?.product?.categoryName}</TableCell>
+                                                                <TableCell>{product?.product?.supplierName}</TableCell>
+                                                                <TableCell>
+                                                                    {product?.unit} {product?.weightPerUnit} kg
+                                                                </TableCell>
+                                                                <TableCell align="center">
+                                                                    <Checkbox
+                                                                        checked={selectedProducts.some((p) => p.id === product.id)}
+                                                                        onChange={(e) => {
+                                                                            if (e.target.checked) {
+                                                                                setSelectedProducts([...selectedProducts, product]);
+                                                                            } else {
+                                                                                setSelectedProducts(
+                                                                                    selectedProducts.filter((p) => p.id !== product.id)
+                                                                                );
+                                                                            }
+                                                                        }}
+                                                                    />
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))
+                                                    ) : (
                                                         <TableRow>
                                                             <TableCell colSpan={6}>
                                                                 <div className="my-10 mx-4 text-center text-gray-500">
