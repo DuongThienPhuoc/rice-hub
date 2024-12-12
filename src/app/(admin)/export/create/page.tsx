@@ -441,7 +441,7 @@ const Page = () => {
                                                             // setQuantityValidate(true)
                                                         }
                                                     }}
-                                                    value={quantity}
+                                                    value={quantity || ''}
                                                     // error={isNaN(quantity) || !quantityValidate}
                                                     variant="standard" />
                                             </TableCell>

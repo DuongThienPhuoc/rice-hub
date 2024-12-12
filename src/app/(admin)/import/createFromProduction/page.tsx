@@ -34,6 +34,7 @@ interface FormDataItem {
     unit: string;
     categoryName: string;
     categoryId: string;
+    supplierId: number;
     unitOfMeasureId: number;
 }
 
@@ -171,6 +172,7 @@ const Page = () => {
             quantity: quantity,
             weightPerUnit: weight,
             unit: type || '',
+            supplierId: 1,
             categoryName: selectedCategory?.name,
             categoryId: selectedCategory?.id,
             unitOfMeasureId: 1,
@@ -420,7 +422,7 @@ const Page = () => {
                                                         sx={{
                                                             width: 100
                                                         }}
-                                                        value={weight}
+                                                        value={weight || ''}
                                                         error={isNaN(weight) || !weightValidate}
                                                         variant="standard" />
                                                 </div>
@@ -428,9 +430,6 @@ const Page = () => {
                                             <TableCell className='p-2'>
                                                 <TextField
                                                     type={'text'}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
                                                     onChange={(e) => {
                                                         const value = e.target.value;
                                                         const numericValue = Number(value);
@@ -439,7 +438,7 @@ const Page = () => {
                                                             setQuantityValidate(true)
                                                         }
                                                     }}
-                                                    value={quantity}
+                                                    value={quantity || ''}
                                                     error={isNaN(quantity) || !quantityValidate}
                                                     variant="standard" />
                                             </TableCell>

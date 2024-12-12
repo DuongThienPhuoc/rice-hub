@@ -447,26 +447,32 @@ const Page = ({ params }: { params: { id: string } }) => {
                             ) : (
                                 <>
                                     <div className='flex justify-between lg:flex-row flex-col-reverse items-center mb-5'>
-                                        {batch?.receiptType === 'IMPORT' ? (
-                                            <>
-                                                <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
-                                                <div className='flex justify-end items-center'>
-                                                    <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
-                                                        <strong>Xóa sản phẩm</strong>
-                                                    </Button>
-                                                    <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                        <strong>Xác nhận nhập kho</strong>
-                                                    </Button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <p className='font-bold lg:mt-0 mt-5'>Danh sách nguyên liệu: </p>
-                                                <Button type='button' onClick={() => handleSubmit('export')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                    <strong>Xác nhận xuất kho</strong>
-                                                </Button>
-                                            </>
-                                        )}
+                                        {hasUnaddedProducts && (
+                                            batch?.receiptType === 'IMPORT' ? (
+                                                <>
+                                                    <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
+                                                    <div className='flex justify-end items-center'>
+                                                        <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
+                                                            <strong>Xóa sản phẩm</strong>
+                                                        </Button>
+                                                        <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                                            <strong>Xác nhận nhập kho</strong>
+                                                        </Button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p className='font-bold lg:mt-0 mt-5'>Danh sách nguyên liệu: </p>
+                                                    <div className='flex justify-end items-center'>
+                                                        <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
+                                                            <strong>Xóa sản phẩm</strong>
+                                                        </Button>
+                                                        <Button type='button' onClick={() => handleSubmit('export')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                                            <strong>Xác nhận xuất kho</strong>
+                                                        </Button>
+                                                    </div>
+                                                </>
+                                            ))}
                                     </div>
                                     <div className='overflow-x-auto max-h-[400px]'>
                                         <TableContainer component={Paper} sx={{ border: '1px solid #0090d9', borderRadius: 2, overflowX: 'auto' }}>
