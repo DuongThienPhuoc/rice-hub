@@ -21,17 +21,12 @@ import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { ToastAction } from '@radix-ui/react-toast';
 import { AxiosError } from 'axios';
+import { mappingRole } from '@/utils/mapping';
 
 const moneyFormat = new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND',
 });
-
-const roleProvider: Record<string, string> = {
-    PORTER_EMPLOYEE: "Nhân viên bốc/dỡ hàng",
-    DRIVER_EMPLOYEE: "Nhân viên giao hàng",
-    STOCK_EMPLOYEE: "Nhân viên quản kho",
-}
 
 type PayrollTableProps = {
     month: number;
@@ -74,7 +69,7 @@ export function PorterPayrollTable({ month, year }: PayrollTableProps) {
                                 <TableCell className="text-md font-semibold">
                                     {employee.fullName}
                                 </TableCell>
-                                <TableCell>{roleProvider[employee.employeeRole]}</TableCell>
+                                <TableCell>{mappingRole[employee.employeeRole]}</TableCell>
                                 <TableCell>{employee.dayWorked}</TableCell>
                                 <TableCell>{employee.totalMass}</TableCell>
                                 <TableCell align='center'>
@@ -225,7 +220,7 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                                 <TableCell className="text-md font-semibold">
                                     {employee.fullName}
                                 </TableCell>
-                                <TableCell>{roleProvider[employee.employeeRole]}</TableCell>
+                                <TableCell>{mappingRole[employee.employeeRole]}</TableCell>
                                 <TableCell>
                                     {moneyFormat.format(employee.dailyWage)}
                                 </TableCell>
