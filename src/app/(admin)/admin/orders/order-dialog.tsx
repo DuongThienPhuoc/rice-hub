@@ -84,6 +84,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const { toast } = useToast();
     const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [search, setSearch] = useState<string>('');
     let updated = false;
     async function fetchCategories() {
         try {
@@ -104,6 +105,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 id: selectedCustomer !== '' ? parseInt(selectedCustomer) : null,
                 pageNumber: currentPage + 1,
                 categoryName: selectedCategory?.name,
+                name: search,
             });
             setProducts(response.data._embedded?.productDtoList || []);
             setTotalPages(response.data.page.totalPages);
@@ -209,7 +211,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     useEffect(() => {
         getProduct().catch((e) => console.error(e));
         fetchCustomerList().catch((e) => console.error(e));
-    }, [selectedCustomer, currentPage, selectedCategory]);
+    }, [selectedCustomer, currentPage, selectedCategory, search]);
 
     useEffect(() => {
         setSelectedProduct((prev) => ({
@@ -298,6 +300,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         </h1>
                         <div className="flex gap-1">
                             <Input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                                 type="text"
                                 className="bg-white w-52"
                                 placeholder="Lọc tên hàng hoá"
