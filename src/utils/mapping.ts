@@ -226,6 +226,12 @@ export const mappingActivity: Record<string, ActivityInfor> = {
     EXPORT_PRODUCT_EXCEL: {
         text: 'Xuất sản phẩm bằng excel',
         color: '#60a5fa',
-    }
+    },
+};
+
+export const mappingRole: Record<string, string> = {
+    DRIVER: 'Lái xe',
+    PORTER: 'Nhân viên bốc/dỡ hàng',
+    WAREHOUSE_MANAGER: 'Nhân viên quản kho',
 };
 

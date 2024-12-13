@@ -2,6 +2,7 @@ import { Employee } from '@/type/employee';
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { UserCardSkeleton } from '@/app/(admin)/payroll/skeleton';
+import { mappingRole } from '@/utils/mapping';
 
 type UserCardContainerProps = {
     employees: Employee[];
@@ -78,11 +79,6 @@ const UserCard: React.FC<UserCardProps> = ({
     setEmployee,
     selectedEmployee,
 }) => {
-    const roleProvider: Record<string, string> = {
-        DRIVER_EMPLOYEE: 'Nhân viên giao hàng',
-        PORTER_EMPLOYEE: 'Nhân viên bốc/dỡ hàng',
-        STOCK_EMPLOYEE: 'Nhân viên quản kho',
-    }
     return (
         <div
             className={cn(
@@ -95,7 +91,7 @@ const UserCard: React.FC<UserCardProps> = ({
                 <h1 className="text-[16px] font-bold">{employee.fullName}</h1>
                 <p className='text-sm text-muted-foreground'>{employee.phone}</p>
                 <p className="text-sm text-muted-foreground">
-                    {roleProvider[employee.employeeRole]}
+                    {mappingRole[employee.employeeRole]}
                 </p>
             </div>
         </div>

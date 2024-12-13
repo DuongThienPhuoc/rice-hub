@@ -39,6 +39,7 @@ export default function OrderPageDialog({
     const [productUnit,setProductUnit] = useState<string>('')
 
     function handleSubmitOrder() {
+        let updated = false;
         const getOrderId = JSON.parse(localStorage.getItem('cart') || '[]').length;
         const order = {
             cartId: getOrderId + 1,
@@ -60,8 +61,28 @@ export default function OrderPageDialog({
         } else {
             setType(0);
             setQuantity(1);
-            const preOrder = JSON.parse(localStorage.getItem('cart') || '[]');
-            localStorage.setItem('cart', JSON.stringify([...preOrder, order]));
+            const localStorageOrder = JSON.parse(
+                localStorage.getItem('cart') || '[]',
+            );
+            localStorageOrder.forEach(
+                (item: {
+                    productID: number;
+                    quantity: number;
+                    type: number;
+                }) => {
+                    if (
+                        item.productID === order.productID &&
+                        item.type === order.type
+                    ) {
+                        item.quantity += order.quantity;
+                        updated = true;
+                    }
+                },
+            );
+            if (!updated) {
+                localStorageOrder.push(order);
+            }
+            localStorage.setItem('cart', JSON.stringify(localStorageOrder));
             toast({
                 title: 'Đặt hàng thành công',
                 description: 'Đơn hàng của bạn đã thêm vào giỏ hàng',
@@ -69,7 +90,7 @@ export default function OrderPageDialog({
                     backgroundColor: '#4caf50',
                     color: '#fff',
                 },
-                duration: 3000
+                duration: 3000,
             });
             onOpenChange(false);
         }
