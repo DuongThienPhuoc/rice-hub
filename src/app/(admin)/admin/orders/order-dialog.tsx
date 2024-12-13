@@ -84,7 +84,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const { toast } = useToast();
     const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-
+    let updated = false;
     async function fetchCategories() {
         try {
             const response = await getCategories<Category[]>();
@@ -132,7 +132,19 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     }
 
     function addProductToOrder() {
-        setSelectedProducts((prev) => [...prev, selectedProduct || {}]);
+        const prevProduct = [...selectedProducts];
+        prevProduct.forEach((product) => {
+            if(!product.quantity) product.quantity = 0;
+            if (product.productId === selectedProduct?.productId && product.weightPerUnit === selectedProduct?.weightPerUnit) {
+                product.quantity += selectedProduct?.quantity || 0;
+                updated = true;
+            }
+        })
+        if (!updated) {
+            setSelectedProducts((prev) => [...prev, selectedProduct as ProductOrderRequest]);
+        } else {
+            setSelectedProducts(prevProduct);
+        }
     }
 
     async function createOrder() {
