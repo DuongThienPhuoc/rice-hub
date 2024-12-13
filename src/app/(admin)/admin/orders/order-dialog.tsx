@@ -84,7 +84,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const { toast } = useToast();
     const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-
+    const [search, setSearch] = useState<string>('');
+    let updated = false;
     async function fetchCategories() {
         try {
             const response = await getCategories<Category[]>();
@@ -104,6 +105,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 id: selectedCustomer !== '' ? parseInt(selectedCustomer) : null,
                 pageNumber: currentPage + 1,
                 categoryName: selectedCategory?.name,
+                name: search,
             });
             setProducts(response.data._embedded?.productDtoList || []);
             setTotalPages(response.data.page.totalPages);
@@ -132,7 +134,19 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     }
 
     function addProductToOrder() {
-        setSelectedProducts((prev) => [...prev, selectedProduct || {}]);
+        const prevProduct = [...selectedProducts];
+        prevProduct.forEach((product) => {
+            if(!product.quantity) product.quantity = 0;
+            if (product.productId === selectedProduct?.productId && product.weightPerUnit === selectedProduct?.weightPerUnit) {
+                product.quantity += selectedProduct?.quantity || 0;
+                updated = true;
+            }
+        })
+        if (!updated) {
+            setSelectedProducts((prev) => [...prev, selectedProduct as ProductOrderRequest]);
+        } else {
+            setSelectedProducts(prevProduct);
+        }
     }
 
     async function createOrder() {
@@ -197,7 +211,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     useEffect(() => {
         getProduct().catch((e) => console.error(e));
         fetchCustomerList().catch((e) => console.error(e));
-    }, [selectedCustomer, currentPage, selectedCategory]);
+    }, [selectedCustomer, currentPage, selectedCategory, search]);
 
     useEffect(() => {
         setSelectedProduct((prev) => ({
@@ -286,6 +300,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         </h1>
                         <div className="flex gap-1">
                             <Input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                                 type="text"
                                 className="bg-white w-52"
                                 placeholder="Lọc tên hàng hoá"

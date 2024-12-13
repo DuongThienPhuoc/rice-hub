@@ -83,12 +83,14 @@ export async function getProductListByAdmin({
     forceFirstAndLastRels = true,
     categoryName = null,
     id = null,
+    name
 }: {
     pageNumber?: number;
     pageSize?: number;
     forceFirstAndLastRels?: boolean;
     categoryName?: string | null;
     id?: number | null;
+    name?: string | null;
 }) {
     try {
         return axios.get('/products/admin/order/products', {
@@ -97,7 +99,8 @@ export async function getProductListByAdmin({
                 pageSize,
                 categoryName,
                 forceFirstAndLastRels,
-                id
+                id,
+                name
             },
         });
     } catch (e) {
