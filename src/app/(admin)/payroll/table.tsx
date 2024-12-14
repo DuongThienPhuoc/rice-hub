@@ -90,8 +90,8 @@ export function PorterPayrollTable({ month, year }: PayrollTableProps) {
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell colSpan={3}>Tổng</TableCell>
-                            <TableCell className="text-left">{`${totalMass} Tấn`}</TableCell>
+                            <TableCell className='text-base font-bold text-black' colSpan={3}>Tổng</TableCell>
+                            <TableCell className="text-left text-base font-bold text-black">{`${totalMass} Tấn`}</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableFooter>
@@ -251,14 +251,14 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell colSpan={4}>Tổng</TableCell>
-                            <TableCell className="text-left">
+                            <TableCell className='text-base font-bold text-black' colSpan={4}>Tổng</TableCell>
+                            <TableCell className="text-left text-base font-bold text-black">
                                 {moneyFormat.format(total)}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-base font-bold text-black">
                                 {moneyFormat.format(total - totalUnpaid)}
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-base font-bold text-black">
                                 {moneyFormat.format(totalUnpaid)}
                             </TableCell>
                         </TableRow>
