@@ -347,11 +347,11 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
         }
 
         if (key === 'role.employeeRole.roleName') {
-            if (cell.toString() === 'DRIVER_EMPLOYEE') {
+            if (cell.toString() === 'DRIVER') {
                 return 'Nhân viên giao hàng'
-            } else if (cell.toString() === 'PORTER_EMPLOYEE') {
+            } else if (cell.toString() === 'PORTER') {
                 return 'Nhân viên bốc/dỡ hàng'
-            } else if (cell.toString() === 'STOCK_EMPLOYEE') {
+            } else if (cell.toString() === 'WAREHOUSE_MANAGER') {
                 return 'Nhân viên quản kho'
             } else {
                 return 'N/A'
