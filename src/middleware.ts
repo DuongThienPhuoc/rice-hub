@@ -13,6 +13,9 @@ const warehouseManagerStaticPaths: string[] = [
     '/export',
     '/inventory',
     '/production',
+    '/import/create',
+    '/import/createFromProduction',
+    '/export/create',
 ];
 const adminStaticPaths: string[] = [
     '/dashboard',

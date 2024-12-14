@@ -90,8 +90,12 @@ export function PorterPayrollTable({ month, year }: PayrollTableProps) {
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell className='text-base font-bold text-black' colSpan={3}>Tổng</TableCell>
-                            <TableCell className="text-left text-base font-bold text-black">{`${totalMass} Tấn`}</TableCell>
+                            <TableCell colSpan={3}>
+                                <span className='text-base font-bold text-black'>Tổng</span>
+                            </TableCell>
+                            <TableCell className='text-left'>
+                                <span className='text-base font-bold text-black'>{`${totalMass} Tấn`}</span>
+                            </TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableFooter>
@@ -251,15 +255,25 @@ export function DriverPayrollTable({ month, year }: PayrollTableProps) {
                     </TableBody>
                     <TableFooter>
                         <TableRow>
-                            <TableCell className='text-base font-bold text-black' colSpan={4}>Tổng</TableCell>
-                            <TableCell className="text-left text-base font-bold text-black">
-                                {moneyFormat.format(total)}
+                            <TableCell colSpan={4}>
+                                <span className='text-base font-bold text-black'>
+                                    Tổng
+                                </span>
                             </TableCell>
-                            <TableCell className="text-base font-bold text-black">
-                                {moneyFormat.format(total - totalUnpaid)}
+                            <TableCell className="text-left">
+                                <span className='text-base font-bold text-black'>
+                                    {moneyFormat.format(total)}
+                                </span>
                             </TableCell>
-                            <TableCell className="text-base font-bold text-black">
-                                {moneyFormat.format(totalUnpaid)}
+                            <TableCell className="text-base">
+                                <span className="text-base font-bold text-black">
+                                    {moneyFormat.format(total - totalUnpaid)}
+                                </span>
+                            </TableCell>
+                            <TableCell className="text-base">
+                                <span className='text-base font-bold text-black'>
+                                    {moneyFormat.format(totalUnpaid)}
+                                </span>
                             </TableCell>
                         </TableRow>
                     </TableFooter>
