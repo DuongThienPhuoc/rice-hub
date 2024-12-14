@@ -343,23 +343,23 @@ export default function OrderDetailPage({
                     <CardContent className="space-y-4">
                         <div className="flex justify-between">
                             <span className="font-semibold">Tên:</span>
-                            <span>{order.customer.name}</span>
+                            <span>{order.customer?.name}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">
                                 Số điện thoại:
                             </span>
-                            <span>{order.customer.phone}</span>
+                            <span>{order.customer?.phone}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Email:</span>
-                            <span>{order.customer.email}</span>
+                            <span>{order.customer?.email}</span>
                         </div>
                         <div>
                             <span className="font-semibold">Địa chỉ:</span>
                             <br />
                             <span className="text-sm">
-                                {order.customer.address}
+                                {order.customer?.address}
                             </span>
                         </div>
                     </CardContent>

@@ -9,7 +9,6 @@ import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-import * as XLSX from 'xlsx';
 import crypto from 'crypto';
 import { ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper, Skeleton } from '@mui/material';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
@@ -70,10 +69,11 @@ export default function ImportTable() {
         field: '',
         query: ''
     });
+
     const calculateFileHash = async (file: File): Promise<string> => {
         const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const hash = crypto.createHash('sha256').update(buffer).digest('hex');
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const hash = crypto.createHash('sha256').update(uint8Array).digest('hex');
         return hash;
     };
 
@@ -174,12 +174,12 @@ export default function ImportTable() {
 
     const handleShowDownloadMaterial = () => {
         Swal.fire({
-            title: 'Bạn đã có mẫu file import chưa?',
+            title: 'Bạn đã có mẫu file excel chưa?',
             text: "Nếu chưa, bạn có thể tải xuống ở bên dưới.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Tải xuống mẫu',
-            cancelButtonText: 'Tôi có rồi',
+            cancelButtonText: 'Không',
         }).then((result) => {
             if (result.isConfirmed) {
                 downloadTemplateExcel();
@@ -189,18 +189,30 @@ export default function ImportTable() {
         });
     };
 
-    const downloadTemplateExcel = () => {
-        const data = [
-            { 'Tên sản phẩm': "Sản phẩm mới", 'Giá nhập': 100, 'Số lượng': 10, 'Trọng lượng': 10, 'Đơn vị': "Bao", 'Danh mục': 'Gạo', 'Nhà cung cấp': 'Default Supplier', 'Nhà kho': 'Kho Nguyên Liệu' },
-            { 'Tên sản phẩm': "Sản phẩm mới 2", 'Giá nhập': 200, 'Số lượng': 20, 'Trọng lượng': 25, 'Đơn vị': "Bao", 'Danh mục': 'Cám', 'Nhà cung cấp': 'Default Supplier', 'Nhà kho': 'Kho Sản Phẩm' },
-            { 'Tên sản phẩm': "Sản phẩm mới 3", 'Giá nhập': 300, 'Số lượng': 30, 'Trọng lượng': 70, 'Đơn vị': "Túi", 'Danh mục': 'Thóc', 'Nhà cung cấp': 'Default Supplier', 'Nhà kho': 'Kho Sản Phẩm' }
-        ];
+    const downloadTemplateExcel = async () => {
+        try {
+            const response = await api.get('/products/generateTemplate', {
+                responseType: 'blob',
+            });
 
-        const dataSheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, dataSheet, "Sản phẩm");
-
-        XLSX.writeFile(workbook, 'template.xlsx');
+            const blob = new Blob([response.data], {
+                type: response.headers['content-type'],
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const contentDisposition = response.headers['content-disposition'];
+            const filename = contentDisposition
+                ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+                : 'template.xlsx';
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading the template:', error);
+        }
     };
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -298,8 +310,8 @@ export default function ImportTable() {
                             </div>
                         )}
                         <Separator orientation="horizontal" />
-                        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
-                            <div className='flex flex-col lg:flex-row items-center mt-4 lg:mt-0'>
+                        <div className='flex flex-col xl:flex-row justify-between items-center xl:items-middle my-5'>
+                            <div className='flex flex-col lg:flex-row items-center mt-4 xl:mt-0'>
                                 <div className='flex space-x-2 md:items-center space-y-2 md:space-y-0 md:flex-row flex-col'>
                                     <SearchBar
                                         onSearch={handleSearch}
@@ -315,7 +327,7 @@ export default function ImportTable() {
                                     )}
                                 </div>
                             </div>
-                            <div className='flex flex-row items-center space-x-2 mt-2 lg:mt-0'>
+                            <div className='flex lg:flex-row flex-col items-center space-x-2 mt-2 xl:mt-0'>
                                 {loadingData ? (
                                     <>
                                         <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
@@ -386,7 +398,7 @@ export default function ImportTable() {
                                             )}
                                         </Popper>
                                         <Button
-                                            className="p-3 text-[14px] hover:bg-green-500"
+                                            className="p-3 text-[14px] hover:bg-green-500 lg:mt-0 mt-2"
                                             onClick={handleShowDownloadMaterial}
                                         >
                                             Nhập từ file <FileUp />

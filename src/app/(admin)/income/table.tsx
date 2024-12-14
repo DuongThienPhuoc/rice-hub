@@ -264,10 +264,10 @@ export default function IncomeTable() {
                                                                                 <Table aria-label="simple table" className='border-2 border-[#4ba94d]'>
                                                                                     <TableHead className="bg-[#4ba94d] text-white">
                                                                                         <TableRow>
-                                                                                            <TableCell align='center' className="text-white">STT</TableCell>
-                                                                                            <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>
-                                                                                            <TableCell align='center' className="text-white">Ngày giao dịch</TableCell>
-                                                                                            <TableCell align='center' className="text-white">Giá trị</TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>STT</p></TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>Phương thức thanh toán</p></TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>Ngày giao dịch</p></TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>Giá trị</p></TableCell>
                                                                                         </TableRow>
                                                                                     </TableHead>
                                                                                     <TableBody>
@@ -291,10 +291,10 @@ export default function IncomeTable() {
                                                                                 <Table aria-label="simple table" className='border-2 border-[#4ba94d]'>
                                                                                     <TableHead className="bg-[#4ba94d] text-white">
                                                                                         <TableRow>
-                                                                                            <TableCell align='center' className="text-white">STT</TableCell>
-                                                                                            <TableCell align='center' className="text-white">Phương thức thanh toán</TableCell>
-                                                                                            <TableCell align='center' className="text-white">Ngày giao dịch</TableCell>
-                                                                                            <TableCell align='center' className="text-white">Giá trị</TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>STT</p></TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>Phương thức thanh toán</p></TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>Ngày giao dịch</p></TableCell>
+                                                                                            <TableCell align='center'><p className='text-white'>Giá trị</p></TableCell>
                                                                                         </TableRow>
                                                                                     </TableHead>
                                                                                     <TableBody>

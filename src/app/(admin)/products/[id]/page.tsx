@@ -401,7 +401,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <strong>Sửa</strong>
                                 </Button>
                                 <Button type='button' onClick={() => {
-                                    router.push("/products")
+                                    window.history.back();
                                     setOnPageChange(true)
                                 }} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>

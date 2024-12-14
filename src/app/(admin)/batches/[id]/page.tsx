@@ -39,6 +39,8 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [tempPrice, setTempPrice] = useState<any>(null);
     const [tempWeightPerUnit, setTempWeightPerUnit] = useState<any>(null);
     const [onPageChange, setOnPageChange] = useState(false);
+    const [role, setRole] = useState<string>('');
+    const ALLOW_ROLE = 'ROLE_ADMIN';
 
     const handleSelectProduct = (productCode: any) => {
         setSelectedProducts((prevSelected: any) =>
@@ -49,6 +51,16 @@ const Page = ({ params }: { params: { id: string } }) => {
     };
 
     const { setBreadcrumb } = useBreadcrumbStore()
+
+    function getRoleFromLocalStorage() {
+        if(typeof window === 'undefined') return;
+        const rawRole = localStorage.getItem('role');
+        setRole(rawRole || '');
+    }
+
+    useEffect(() => {
+        getRoleFromLocalStorage();
+    }, [role]);
 
     useEffect(() => {
         setBreadcrumb(<DetailBatchPageBreadcrumb batchId={params.id.toString()} />)
@@ -451,26 +463,30 @@ const Page = ({ params }: { params: { id: string } }) => {
                                             batch?.receiptType === 'IMPORT' ? (
                                                 <>
                                                     <p className='font-bold lg:mt-0 mt-5'>Danh sách sản phẩm: </p>
-                                                    <div className='flex justify-end items-center'>
-                                                        <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
-                                                            <strong>Xóa sản phẩm</strong>
-                                                        </Button>
-                                                        <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                            <strong>Xác nhận nhập kho</strong>
-                                                        </Button>
-                                                    </div>
+                                                    {role === ALLOW_ROLE && (
+                                                        <div className='flex justify-end items-center'>
+                                                            <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
+                                                                <strong>Xóa sản phẩm</strong>
+                                                            </Button>
+                                                            <Button type='button' onClick={() => handleSubmit('import')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                                                <strong>Xác nhận nhập kho</strong>
+                                                            </Button>
+                                                        </div>
+                                                    )}
                                                 </>
                                             ) : (
                                                 <>
                                                     <p className='font-bold lg:mt-0 mt-5'>Danh sách nguyên liệu: </p>
-                                                    <div className='flex justify-end items-center'>
-                                                        <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
-                                                            <strong>Xóa sản phẩm</strong>
-                                                        </Button>
-                                                        <Button type='button' onClick={() => handleSubmit('export')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
-                                                            <strong>Xác nhận xuất kho</strong>
-                                                        </Button>
-                                                    </div>
+                                                    {role === ALLOW_ROLE && (
+                                                        <div className='flex justify-end items-center'>
+                                                            <Button type='button' onClick={handleDelete} className='px-5 py-3 mr-2 text-[14px] bg-red-600 hover:bg-red-500'>
+                                                                <strong>Xóa sản phẩm</strong>
+                                                            </Button>
+                                                            <Button type='button' onClick={() => handleSubmit('export')} className='px-5 py-3 text-[14px] hover:bg-green-500'>
+                                                                <strong>Xác nhận xuất kho</strong>
+                                                            </Button>
+                                                        </div>
+                                                    )}
                                                 </>
                                             ))}
                                     </div>
@@ -700,7 +716,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         ) : (
                             <>
                                 <Button type='button' onClick={() => {
-                                    router.push(`${batch?.receiptType === "IMPORT" ? '/import' : '/export'}`)
+                                    window.history.back();
                                     setOnPageChange(true)
                                 }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>

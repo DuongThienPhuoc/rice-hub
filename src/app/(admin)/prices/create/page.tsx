@@ -4,7 +4,6 @@
 
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import api from "@/config/axiosConfig";
 import { Trash2, X } from 'lucide-react';
 import { Autocomplete, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, Skeleton, TextField } from '@mui/material';
@@ -22,7 +21,6 @@ interface RowData {
 
 const Page = () => {
     const { toast } = useToast();
-    const router = useRouter();
     const [prices, setPrices] = useState<RowData[]>([]);
     const [customers, setCustomers] = useState<RowData[]>([]);
     const [priceName, setPriceName] = useState('');
@@ -541,7 +539,7 @@ const Page = () => {
                             <Skeleton animation="wave" variant="rectangular" height={40} className='w-[80px] px-5 py-3 rounded-lg' />
                         ) : (
                             <Button type='button' onClick={() => {
-                                router.push("/prices")
+                                window.history.back();
                                 setOnPageChange(true);
                             }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                 <strong>Trở về</strong>
