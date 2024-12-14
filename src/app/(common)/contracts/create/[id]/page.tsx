@@ -554,7 +554,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                 <div className='flex justify-end space-x-5'>
                     <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold", hiddenButton && 'hidden')}
                         onClick={() => {
-                            router.push(`/customers/${params.id}`);
+                            window.history.back();
                             setOnPageChange(true)
                         }}>Trở về
                     </button>

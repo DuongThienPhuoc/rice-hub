@@ -120,7 +120,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     useEffect(() => {
         getSuppliers();
         getCategories();
-        setBreadcrumb(<UpdateProductPageBreadcrumb productId={params.id.toString()} /> );
+        setBreadcrumb(<UpdateProductPageBreadcrumb productId={params.id.toString()} />);
 
         return () => setBreadcrumb(null)
     }, []);
@@ -419,7 +419,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <strong>Cập nhật</strong>
                                 </Button>
                                 <Button type='button' onClick={() => {
-                                    router.push(`/ingredients/${params.id}`)
+                                    window.history.back();
                                     setOnPageChange(true)
                                 }} className='ml-2 px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>
