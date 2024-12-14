@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import { PlusIcon } from 'lucide-react';
+import { FileUp, PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { DateRange } from 'react-day-picker';
 import SearchBar from '@/components/searchbar/searchbar';
@@ -18,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import ExportPageBreadcrumb from '@/app/(admin)/export/breadcrumb';
+import Swal from 'sweetalert2';
+import crypto from 'crypto';
+import { ToastAction } from '@/components/ui/toast';
 
 export default function ExportTable() {
     const router = useRouter();
@@ -46,6 +49,7 @@ export default function ExportTable() {
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
     const { setBreadcrumb } = useBreadcrumbStore()
+    const processedFileHashes = new Set<string>();
 
     useEffect(() => {
         setBreadcrumb(<ExportPageBreadcrumb />)
@@ -113,6 +117,144 @@ export default function ExportTable() {
         setCurrentSearch({ field, query });
     };
 
+    const calculateFileHash = async (file: File): Promise<string> => {
+        const arrayBuffer = await file.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const hash = crypto.createHash('sha256').update(uint8Array).digest('hex');
+        return hash;
+    };
+
+    const showAlert = (file: File, fileHash: string, fileInput: HTMLInputElement) => {
+        Swal.fire({
+            title: 'Xác nhận xuất danh sách sản phẩm',
+            text: 'Bạn có chắc chắn muốn xuất danh sách sản phẩm này?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Có, xuất!',
+            cancelButtonText: 'Không',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                handleSubmit(file, fileHash, fileInput);
+            } else {
+                fileInput.value = '';
+            }
+        });
+    };
+
+    const handleSubmit = async (data: File, fileHash: string, fileInput: HTMLInputElement) => {
+        setOnPageChange(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", data);
+            const response = await api.post(`/products/export/excel`, formData);
+            if (response.status >= 200 && response.status < 300) {
+                getData(currentPage);
+                toast({
+                    variant: 'default',
+                    title: 'Tạo thành công',
+                    style: {
+                        backgroundColor: '#4caf50',
+                        color: '#fff',
+                    },
+                    description: `Lô hàng đã được tạo thành công`,
+                    duration: 3000,
+                })
+                processedFileHashes.add(fileHash);
+                setOnPageChange(false);
+                fileInput.value = '';
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Tạo thất bại',
+                    description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                    duration: 3000,
+                })
+                setOnPageChange(false);
+                fileInput.value = '';
+            }
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại',
+                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000,
+            })
+            setOnPageChange(false);
+            fileInput.value = '';
+        }
+    }
+
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            const file = event.target.files?.[0];
+            if (!file) {
+                throw new Error("Chưa có file nào được chọn");
+            }
+
+            const fileHash = await calculateFileHash(file);
+            if (processedFileHashes.has(fileHash)) {
+                Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng chờ, dữ liệu đang được xử lí.',
+                allowOutsideClick: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            showAlert(file, fileHash, event.target);
+        } catch (error) {
+            Swal.fire('Lỗi khi xử lý file', 'error');
+        }
+    };
+
+    const downloadTemplateExcel = async () => {
+        try {
+            const response = await api.get('/products/generateExportTemplate', {
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([response.data], {
+                type: response.headers['content-type'],
+            });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const contentDisposition = response.headers['content-disposition'];
+            const filename = contentDisposition
+                ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+                : 'template.xlsx';
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading the template:', error);
+        }
+    };
+
+    const handleShowDownloadMaterial = () => {
+        Swal.fire({
+            title: 'Bạn đã có mẫu file excel chưa?',
+            text: "Nếu chưa, bạn có thể tải xuống ở bên dưới.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Tải xuống mẫu',
+            cancelButtonText: 'Không',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                downloadTemplateExcel();
+            } else {
+                document.getElementById("fileInput")?.click();
+            }
+        });
+    };
+
     return (
         <div className='mx-5'>
             <section className='col-span-4'>
@@ -169,21 +311,21 @@ export default function ExportTable() {
                                             Tạo phiếu xuất
                                             <PlusIcon />
                                         </Button>
-                                        {/* <Button
+                                        <Button
                                             className="px-3 py-3 text-[14px] hover:bg-green-500"
-                                            onClick={() => document.getElementById('fileInput')?.click()}
+                                            onClick={handleShowDownloadMaterial}
                                         >
-                                            Import
-                                        </Button> */}
+                                            Xuất từ file <FileUp />
+                                        </Button>
                                     </>
                                 )}
-                                {/* <input
+                                <input
                                     type="file"
                                     id="fileInput"
                                     accept=".xlsx, .xls"
                                     style={{ display: 'none' }}
                                     onChange={handleFileUpload}
-                                /> */}
+                                />
                             </div>
                         </div>
                         <div className='overflow-x-auto'>

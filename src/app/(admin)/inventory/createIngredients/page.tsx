@@ -389,7 +389,7 @@ const Page = () => {
                                         <>
                                             <Button onClick={() => {
                                                 setOnPageChange(true)
-                                                router.push("/inventory")
+                                                window.history.back();
                                             }} className='px-4 py-3 text-[14px] bg-red-600 hover:bg-red-500'>
                                                 Trở về
                                             </Button>
