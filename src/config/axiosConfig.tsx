@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const LOCAL_URL = 'http://localhost:8080';
+const LOCAL_URL = 'https://api.camgaothanhquang.com';
 
 export default axios.create({
     baseURL: LOCAL_URL,
