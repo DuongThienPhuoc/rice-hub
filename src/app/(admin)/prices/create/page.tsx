@@ -4,7 +4,6 @@
 
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import api from "@/config/axiosConfig";
 import { Trash2, X } from 'lucide-react';
 import { Autocomplete, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, Skeleton, TextField } from '@mui/material';
@@ -22,7 +21,6 @@ interface RowData {
 
 const Page = () => {
     const { toast } = useToast();
-    const router = useRouter();
     const [prices, setPrices] = useState<RowData[]>([]);
     const [customers, setCustomers] = useState<RowData[]>([]);
     const [priceName, setPriceName] = useState('');
