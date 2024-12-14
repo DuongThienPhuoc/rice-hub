@@ -20,6 +20,7 @@ import CustomerDetailPageBreadcrumb from '@/app/(admin)/customers/[id]/breadcrum
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
     const [customer, setCustomer] = useState<any>(null);
+    const [customerDetail, setCustomerDetail] = useState<any>(null);
     const router = useRouter();
     const [choice, setChoice] = useState(true);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -27,6 +28,10 @@ const Page = ({ params }: { params: { id: number } }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [onPageChange, setOnPageChange] = useState(false);
     const { setBreadcrumb } = useBreadcrumbStore();
+
+    const formatCurrency = (value: any) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value));
+    };
 
     useEffect(() => {
         setBreadcrumb(<CustomerDetailPageBreadcrumb customerId={params.id.toString()} />);
@@ -134,9 +139,29 @@ const Page = ({ params }: { params: { id: number } }) => {
         }
     };
 
+
+    const getCustomerDetail = async () => {
+        try {
+            const url = `/customer/${params.id}/order-summary`;
+            const response = await api.get(url);
+            const data = response.data;
+            setCustomerDetail(data[0]);
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
+                description: 'Xin vui lòng thử lại sau',
+                duration: 3000
+            })
+        } finally {
+            setLoadingData(false);
+        }
+    };
+
     useEffect(() => {
         if (params.id) {
             getCustomer();
+            getCustomerDetail();
         }
     }, [params.id]);
 
@@ -293,15 +318,15 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <div className='flex-1'>
                                         <div className='lg:m-10 mb-10 mx-10 mt-0 flex flex-col lg:flex-row'>
                                             <span className='font-bold flex-1'>Tổng đơn hàng: </span>
-                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalOrders || '0'}</span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customerDetail?.totalOrders || '0'}</span>
                                         </div>
                                         <div className='m-10 flex flex-col lg:flex-row'>
                                             <span className='font-bold flex-1'>Tổng nợ: </span>
-                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customer?.totalDebt || '0'}</span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{formatCurrency(customerDetail?.totalRemainingDeposit || 0)}</span>
                                         </div>
                                         <div className='m-10 flex flex-col lg:flex-row'>
                                             <span className='font-bold flex-1'>Lần cuối mua hàng: </span>
-                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{renderDate(customer?.lastPurchase)}</span>
+                                            <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>{customerDetail ? renderDate(customerDetail?.latestOrder) : '../../....'}</span>
                                         </div>
                                     </div>
                                 </>
@@ -438,7 +463,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         <strong>Sửa</strong>
                                     </Button>
                                     <Button type='button' onClick={() => {
-                                        router.push("/customers")
+                                        window.history.back();
                                         setOnPageChange(true);
                                     }} className='px-5 ml-2 py-3 text-[14px] hover:bg-green-500'>
                                         <strong>Trở về</strong>

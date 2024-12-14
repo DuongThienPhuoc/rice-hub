@@ -567,7 +567,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     </Button>
                                 )}
                                 <Button type='button' onClick={() => {
-                                    router.push('/production')
+                                    window.history.back();
                                     setOnPageChange(true)
                                 }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                     <strong>Trở về</strong>

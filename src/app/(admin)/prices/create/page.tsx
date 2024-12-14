@@ -541,7 +541,7 @@ const Page = () => {
                             <Skeleton animation="wave" variant="rectangular" height={40} className='w-[80px] px-5 py-3 rounded-lg' />
                         ) : (
                             <Button type='button' onClick={() => {
-                                router.push("/prices")
+                                window.history.back();
                                 setOnPageChange(true);
                             }} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                 <strong>Trở về</strong>
