@@ -36,7 +36,7 @@ export default function NotificationSheetProvider({
     children,
 }: NotificationSheetProviderProps) {
     const stompClient = Stomp.over(
-        () => new SockJS('http://localhost:8080/ws'),
+        () => new SockJS('https://api.camgaothanhquang.com/ws'),
     );
     const [notifications, setNotifications] = React.useState<Notification[]>(
         [],
