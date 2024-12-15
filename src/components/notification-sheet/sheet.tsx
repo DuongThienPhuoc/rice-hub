@@ -20,7 +20,7 @@ import { cn } from '@/lib/utils';
 import { getUserInformation } from '@/data/user';
 import { User as UserInterface } from '@/type/user';
 
-const SOCKET_URL = process.env.SOCKET_URL || 'http://localhost:8080/ws';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:8080/ws';
 
 interface NotificationSheetProviderProps {
     children: React.ReactNode;
