@@ -188,7 +188,7 @@ export default function OrderDetailPage({
                 amount: paymentData.amount,
                 description: paymentData.description,
                 cancelUrl: 'https://example.com/cancel',
-                returnUrl: `http://localhost:3000/order/detail/${params.id}`,
+                returnUrl: `${RETURN_URL}/order/detail/${params.id}`,
                 signature: checksum,
             }),
         });
@@ -491,7 +491,7 @@ export default function OrderDetailPage({
                                                                 orderCode: generateOrderCode(),
                                                                 description: 'RiceHubQR',
                                                                 cancelUrl: 'https://example.com/cancel',
-                                                                returnUrl: `http://localhost:3000/order/detail/${params.id}`,
+                                                                returnUrl: `${RETURN_URL}/order/detail/${params.id}`,
                                                             };
                                                             if (amount > 2000) {
                                                                 handleGetPaymentLink(paymentData)
