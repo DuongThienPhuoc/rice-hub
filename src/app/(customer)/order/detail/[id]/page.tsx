@@ -51,6 +51,7 @@ export default function OrderDetailPage({
         id: string;
     };
 }) {
+    const RETURN_URL = process.env.NEXT_PUBLIC_RETURN_URL;
     const [amount, setAmount] = useState<number>(0);
     const [description, setDescription] = useState<string>('');
     const API_KEY = process.env.NEXT_PUBLIC_PAYOS_API_KEY;
@@ -137,7 +138,7 @@ export default function OrderDetailPage({
     }
 
     const [payOSConfig, setPayOSConfig] = useState({
-        RETURN_URL: `http://localhost:3000/order/detail/${params.id}`,
+        RETURN_URL: `${RETURN_URL}/order/detail/${params.id}`,
         ELEMENT_ID: "payosEmbedded",
         CHECKOUT_URL: '',
         embedded: true,
