@@ -230,6 +230,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                             defaultValue={product.quantity}
                                             onChange={(e) => handleChangeProductQuantity(e, product.cartId)}
                                             className='w-fit'
+                                            disabled={selectedProduct.some((p) => p.cartId === product.cartId)}
                                             type='number' />
                                     </TableCell>
                                     <TableCell>{`${product.quantity * product.type}kg`}</TableCell>
