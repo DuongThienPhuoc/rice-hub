@@ -37,6 +37,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import CartPageBreadcrumb from '@/app/(customer)/cart/breadcrumb';
+import { cn } from '@/lib/utils';
 
 export interface CartProduct {
     cartId: number;
@@ -51,6 +52,7 @@ export interface CartProduct {
 
 export default function CartTable({ customerID }: { customerID: string }) {
     const { toast } = useToast();
+    const [error, setError] = useState<string>('');
     const [products, setProducts] = useState<CartProduct[]>([]);
     const [refresh, setRefresh] = useState<boolean>(false);
     const [phone, setPhone] = useState<string>('');
@@ -174,6 +176,11 @@ export default function CartTable({ customerID }: { customerID: string }) {
         setRefresh(!refresh);
     }
 
+    function validatePhone(phone: string) {
+        const regex = /^(0[1|2|3|4|5|6|7|8|9])[0-9]{8}$/;
+        return regex.test(phone);
+    }
+
     return (
         <section className="grid gap-5">
             <div className="bg-white p-3 rounded-lg border">
@@ -287,7 +294,19 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                                 className="w-full"
                                                 placeholder="Số điện thoại"
                                                 value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
+                                                onChange={(e) => {
+                                                    if (e.target.value === '') {
+                                                        setPhone(e.target.value);
+                                                        setError('Số điện thoại không được để trống');
+                                                    }else if (!validatePhone(e.target.value)) {
+                                                        setPhone(e.target.value);
+                                                        setError('Số điện thoại không hợp lệ');
+                                                    }
+                                                    else {
+                                                        setPhone(e.target.value);
+                                                        setError('');
+                                                    }
+                                                }}
                                             />
                                         </div>
                                         <div>
@@ -297,14 +316,28 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                                 className="w-full"
                                                 placeholder="Địa chỉ"
                                                 value={address}
-                                                onChange={(e) => setAddress(e.target.value)}
+                                                onChange={(e) => {
+                                                    if (e.target.value === '') {
+                                                        setAddress(e.target.value);
+                                                        setError('Địa chỉ không được để trống');
+                                                    }else {
+                                                        setAddress(e.target.value);
+                                                        setError('');
+                                                    }
+                                                }}
                                             />
                                         </div>
+                                        {error && (
+                                            <div className='bg-destructive rounded text-center py-2'>
+                                                <p className='text-white text-sm font-semibold'>{error}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
                                     <AlertDialogAction
+                                        className={cn(error ? 'pointer-events-none opacity-50 hover:cursor-not-allowed' : '')}
                                         onClick={() => {
                                             handleOrder().catch((error) => {
                                                 toast({
