@@ -18,8 +18,9 @@ type AlertDeleteProps = {
     setOrderUpdatePending: (order: Order) => void;
     refreshData: boolean;
     setRefreshData: (refreshData: boolean) => void;
+    toastMessage: (message: string) => void;
 }
-export default function AlertChangeStatus({ setRefreshData,refreshData,orderUpdatePending,setOrderUpdatePending, isOpen, setIsOpen }: AlertDeleteProps) {
+export default function AlertChangeStatus({ setRefreshData,refreshData,orderUpdatePending,setOrderUpdatePending, isOpen, setIsOpen, toastMessage }: AlertDeleteProps) {
     async function handleUpdateStatus() {
         if(orderUpdatePending){
             const body: AdminUpdateOrderRequest = {
@@ -32,10 +33,12 @@ export default function AlertChangeStatus({ setRefreshData,refreshData,orderUpda
             }
             try {
                 const response = await adminUpdateOrder(body, orderUpdatePending.id)
-                if (response) {
+                if (response.status === 200) {
                     setIsOpen(false)
                     setOrderUpdatePending({} as Order)
                     setRefreshData(!refreshData)
+                }else if (response.status === 400) {
+                    toastMessage(response.data.message)
                 }
             }catch (e) {
                 console.error(e)

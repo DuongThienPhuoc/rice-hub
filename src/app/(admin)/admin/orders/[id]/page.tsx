@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Package2, Calendar, User, Truck, ArrowLeft, Pencil } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import OrderDetailTable from '@/app/(customer)/order/detail/[id]/table';
+import OrderDetailTable from '@/app/(admin)/admin/orders/[id]/table';
 import { useEffect, useState } from 'react';
 import { adminUpdateOrderQuantity, getOrderDetail } from '@/data/order';
 import { AdminUpdateOrderRequest, Order } from '@/type/order';

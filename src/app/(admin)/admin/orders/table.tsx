@@ -12,6 +12,7 @@ import PaginationComponent from '@/components/pagination/pagination';
 import ActionDropdownProvider from '@/app/(admin)/admin/orders/action-dropdown';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import OrderPageBreadcrumb from '@/app/(admin)/admin/orders/breadcrumb';
+import { useToast } from '@/hooks/use-toast';
 
 type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
@@ -34,6 +35,7 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
     setCurrentPage,
     totalPage,
 }) => {
+    const { toast } = useToast();
     const [isAlertOpen, setIsAlertOpen] = React.useState(false);
     const [orderUpdatePending, setOrderUpdatePending] = React.useState<Order | undefined>();
     const { setBreadcrumb } = useBreadcrumbStore()
@@ -42,6 +44,14 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
         setBreadcrumb(<OrderPageBreadcrumb />)
         return () => setBreadcrumb(null)
     }, [setBreadcrumb]);
+
+    function toastMessage(message: string) {
+        toast({
+            variant: 'destructive',
+            title: message,
+            duration: 3000,
+        })
+    }
     return (
         <div className="bg-white p-5 mx-5 rounded-md space-y-4">
             <div className="space-y-2">
@@ -164,6 +174,7 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                 setOrderUpdatePending={setOrderUpdatePending}
                 refreshData={refreshData}
                 setRefreshData={setRefreshData}
+                toastMessage={toastMessage}
             />
         </div>
     );
