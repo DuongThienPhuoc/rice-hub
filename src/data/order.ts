@@ -105,9 +105,10 @@ export async function getAdminOrders<T>(
 
 export async function adminCreateOrder(order: AdminCreateOrderRequest) {
     try {
-        return await axiosConfig.post('/order/admin/CreateOrder', order);
+        return await axiosConfig.post('/order/admin/CreateOrder', order, {
+            validateStatus: (status) => status < 500,
+        });
     } catch (e) {
-        console.error('Error creating order', e);
         throw e;
     }
 }
@@ -117,11 +118,13 @@ export async function adminUpdateOrder(
     orderId: number,
 ) {
     try {
-        const response = await axiosConfig.post(
+        return await axiosConfig.post(
             `/order/admin/UpdateOrder/${orderId}`,
             order,
+            {
+                validateStatus: (status) => status < 500,
+            },
         );
-        return response.data;
     } catch (e) {
         throw e;
     }

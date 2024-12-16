@@ -180,15 +180,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     });
                     setIsOpen(false);
                     setNewOrder(!newOrder);
+                } else if (response.status === 400) {
+                    setError(response.data.message)
                 } else {
                     setError('Đã có lỗi xảy ra, vui lòng thử lại');
                 }
             } catch (e) {
-                if (e instanceof Error) {
-                    throw new Error(
-                        `An error occurred while creating order: ${e.message}`,
-                    );
-                }
+                console.log(e);
             }
         }
     }
