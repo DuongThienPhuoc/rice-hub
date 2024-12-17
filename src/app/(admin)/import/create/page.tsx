@@ -170,52 +170,51 @@ const Page = () => {
         }
     };
 
-    const [errors, setErrors] = useState<string[]>([]);
-
     const handleAddItemToForm = () => {
+        const tempErrors: string[] = [];
 
         if (productName === '') {
-            setErrors((prevErrors) => [...prevErrors, 'Tên sản phẩm không được bỏ trống!']);
+            tempErrors.push('Tên sản phẩm không được bỏ trống!');
             setProductNameValidate(false);
         }
 
         if (importPrice === 0) {
-            setErrors((prevErrors) => [...prevErrors, 'Giá nhập không hợp lệ!']);
+            tempErrors.push('Giá nhập không hợp lệ!');
             setImportPriceValidate(false);
         }
 
-        if (weight === 0) {
-            setErrors((prevErrors) => [...prevErrors, 'Trọng lượng không hợp lệ!']);
+        if (weight <= 0) {
+            tempErrors.push('Trọng lượng không hợp lệ!');
             setWeightValidate(false);
         }
 
-        if (quantity === 0) {
-            setErrors((prevErrors) => [...prevErrors, 'Số lượng không hợp lệ!']);
+        if (quantity <= 0) {
+            tempErrors.push('Số lượng không hợp lệ!');
             setQuantityValidate(false);
         }
 
         if (!type) {
-            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn quy cách!']);
+            tempErrors.push('Vui lòng chọn quy cách!');
             setTypeValidate(false);
         }
 
         if (!selectedCategory) {
-            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn danh mục!']);
+            tempErrors.push('Vui lòng chọn danh mục!');
             setCategoryValidate(false);
         }
 
         if (!selectedSupplier) {
-            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn nhà cung cấp!']);
+            tempErrors.push('Vui lòng chọn nhà cung cấp!');
             setSupplierValidate(false);
         }
 
-        if (errors.length > 0) {
+        if (tempErrors.length > 0) {
             toast({
                 variant: 'destructive',
                 title: 'Có lỗi xảy ra!',
                 description: (
                     <ul>
-                        {errors.map((error, index) => (
+                        {tempErrors.map((error, index) => (
                             <li key={index}>{error}</li>
                         ))}
                     </ul>
@@ -225,7 +224,7 @@ const Page = () => {
             return;
         }
 
-        setTotalPrice(totalPrice + (quantity * importPrice * weight));
+        setTotalPrice(totalPrice + quantity * importPrice * weight);
 
         const newItem: FormDataItem = {
             name: productName,
@@ -243,6 +242,7 @@ const Page = () => {
             warehouseName: selectedWarehouse?.name,
             warehouseId: selectedWarehouse?.id
         };
+
         setFormData(prevFormData => [...prevFormData, newItem]);
         setSelectedProduct(null);
         setSelectedCategory(null);
@@ -253,7 +253,7 @@ const Page = () => {
         setQuantity(0);
         setWeight(0);
         setType('');
-    }
+    };
 
     useEffect(() => {
         if (selectedWarehouse) {

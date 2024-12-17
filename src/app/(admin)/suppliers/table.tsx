@@ -72,12 +72,6 @@ export default function SupplierTable() {
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setSuppliers([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy nhà cung cấp!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setSuppliers(data._embedded.supplierList);
             }

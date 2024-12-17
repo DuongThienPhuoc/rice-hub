@@ -73,12 +73,6 @@ export default function ProductionTable() {
                 setTotalPages(data.totalPages);
             } else {
                 setReceipts([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy phiếu sản xuất!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             }
         } catch (error) {
             toast({

@@ -120,42 +120,41 @@ const Page = () => {
         }
     };
 
-    const [errors, setErrors] = useState<string[]>([]);
-
     const handleAddItemToForm = () => {
+        const tempErrors: string[] = [];
 
         if (productName === '') {
-            setErrors((prevErrors) => [...prevErrors, 'Tên sản phẩm không được bỏ trống!']);
+            tempErrors.push('Tên sản phẩm không được bỏ trống!');
             setProductNameValidate(false);
         }
 
         if (weight === 0) {
-            setErrors((prevErrors) => [...prevErrors, 'Trọng lượng không hợp lệ!']);
+            tempErrors.push('Trọng lượng không hợp lệ!');
             setWeightValidate(false);
         }
 
         if (quantity === 0) {
-            setErrors((prevErrors) => [...prevErrors, 'Số lượng không hợp lệ!']);
+            tempErrors.push('Số lượng không hợp lệ!');
             setQuantityValidate(false);
         }
 
         if (!type) {
-            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn quy cách!']);
+            tempErrors.push('Vui lòng chọn quy cách!');
             setTypeValidate(false);
         }
 
         if (!selectedCategory) {
-            setErrors((prevErrors) => [...prevErrors, 'Vui lòng chọn danh mục!']);
+            tempErrors.push('Vui lòng chọn danh mục!');
             setCategoryValidate(false);
         }
 
-        if (errors.length > 0) {
+        if (tempErrors.length > 0) {
             toast({
                 variant: 'destructive',
                 title: 'Có lỗi xảy ra!',
                 description: (
                     <ul>
-                        {errors.map((error, index) => (
+                        {tempErrors.map((error, index) => (
                             <li key={index}>{error}</li>
                         ))}
                     </ul>

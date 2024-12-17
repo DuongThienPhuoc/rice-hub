@@ -56,6 +56,9 @@ const Page = () => {
     const [selectedRow, setSelectedRow] = useState<any>(null);
     const [onPageChange, setOnPageChange] = useState(false);
     const { setBreadcrumb } = useBreadcrumbStore()
+    const [productValidate, setProductValidate] = useState(true);
+    const [typeValidate, setTypeValidate] = useState(true);
+    const [quantityValidate, setQuantityValidate] = useState(true);
 
     useEffect(() => {
         setBreadcrumb(<ExportPageBreadcrumb />)
@@ -100,30 +103,31 @@ const Page = () => {
         }
     };
 
-    const errors: string[] = [];
-
     const handleAddItemToForm = () => {
+        const tempErrors: string[] = [];
 
         if (!selectedProduct) {
-            errors.push('Vui lòng chọn sản phẩm!');
+            tempErrors.push('Vui lòng chọn sản phẩm!');
+            setProductValidate(false);
         }
 
-        if (quantity === 0) {
-            errors.push('Số lượng không hợp lệ!');
+        if (quantity <= 0) {
+            tempErrors.push('Số lượng không hợp lệ!');
+            setQuantityValidate(false);
         }
 
         if (!selectedUnit) {
-            errors.push('Vui lòng chọn quy cách!');
-
+            tempErrors.push('Vui lòng chọn quy cách!');
+            setTypeValidate(false);
         }
 
-        if (errors.length > 0) {
+        if (tempErrors.length > 0) {
             toast({
                 variant: 'destructive',
                 title: 'Có lỗi xảy ra!',
                 description: (
                     <ul>
-                        {errors.map((error, index) => (
+                        {tempErrors.map((error, index) => (
                             <li key={index}>{error}</li>
                         ))}
                     </ul>
@@ -264,11 +268,15 @@ const Page = () => {
                                         },
                                     }}
                                     value={selectedProduct}
-                                    onChange={(event, newValue) => setSelectedProduct(newValue)}
+                                    onChange={(event, newValue) => {
+                                        setSelectedProduct(newValue)
+                                        setProductValidate(true)
+                                    }}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
                                             variant="standard"
+                                            error={!productValidate}
                                             sx={{
                                                 "& .MuiInputBase-root": {
                                                     paddingX: "10px",
@@ -345,10 +353,6 @@ const Page = () => {
                                                     InputProps={{
                                                         readOnly: true,
                                                     }}
-                                                    InputLabelProps={{
-                                                        shrink: selectedProduct !== null,
-                                                    }}
-                                                    onChange={(e) => setProductName(e.target.value)}
                                                     value={productName}
                                                     variant="standard" />
                                             </TableCell>
@@ -369,9 +373,6 @@ const Page = () => {
                                                             readOnly: true,
                                                         }}
                                                         className='w-full'
-                                                        InputLabelProps={{
-                                                            shrink: selectedProduct !== null,
-                                                        }}
                                                         value={selectedCategory?.name}
                                                         variant="standard" />
                                                 )}
@@ -391,9 +392,6 @@ const Page = () => {
                                                         className='w-full'
                                                         InputProps={{
                                                             readOnly: true,
-                                                        }}
-                                                        InputLabelProps={{
-                                                            shrink: selectedProduct !== null,
                                                         }}
                                                         value={selectedSupplier?.name}
                                                         variant="standard" />
@@ -421,9 +419,10 @@ const Page = () => {
                                                     value={selectedUnit}
                                                     onChange={(event, newValue) => {
                                                         setSelectedUnit(newValue)
+                                                        setTypeValidate(true);
                                                     }}
                                                     getOptionLabel={(option: any) => `${option.unit} ${option.weightPerUnit}kg`}
-                                                    renderInput={(params) => <TextField {...params}
+                                                    renderInput={(params) => <TextField error={!typeValidate} {...params}
                                                         variant='standard' />}
                                                 />
                                             </TableCell>
@@ -438,11 +437,11 @@ const Page = () => {
                                                         const numericValue = Number(value);
                                                         if (!isNaN(numericValue) && Number(value) >= 0) {
                                                             setQuantity(Number(value))
-                                                            // setQuantityValidate(true)
+                                                            setQuantityValidate(true)
                                                         }
                                                     }}
                                                     value={quantity || ''}
-                                                    // error={isNaN(quantity) || !quantityValidate}
+                                                    error={isNaN(quantity) || !quantityValidate}
                                                     variant="standard" />
                                             </TableCell>
                                             <TableCell className='p-2'>

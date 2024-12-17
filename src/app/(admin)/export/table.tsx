@@ -80,12 +80,6 @@ export default function ExportTable() {
                 setTotalPages(data.page.totalPages);
             } else {
                 setReceipts([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy phiếu xuất kho!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             }
         } catch (error) {
             toast({

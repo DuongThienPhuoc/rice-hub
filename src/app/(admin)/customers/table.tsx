@@ -56,12 +56,6 @@ export default function CustomerTable() {
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setCustomers([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy khách hàng!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setCustomers(data._embedded.customerList);
             }
