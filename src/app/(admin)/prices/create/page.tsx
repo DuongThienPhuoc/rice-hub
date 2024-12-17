@@ -4,7 +4,6 @@
 
 import { Button } from '@/components/ui/button';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import api from "@/config/axiosConfig";
 import { Trash2, X } from 'lucide-react';
 import { Autocomplete, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, ListItemText, MenuItem, Select, SelectChangeEvent, Skeleton, TextField } from '@mui/material';
@@ -22,7 +21,6 @@ interface RowData {
 
 const Page = () => {
     const { toast } = useToast();
-    const router = useRouter();
     const [prices, setPrices] = useState<RowData[]>([]);
     const [customers, setCustomers] = useState<RowData[]>([]);
     const [priceName, setPriceName] = useState('');
@@ -124,8 +122,8 @@ const Page = () => {
                 duration: 3000,
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
             })
-            return;
             setOnPageChange(false);
+            return;
         }
 
         const formData = ({
@@ -138,6 +136,7 @@ const Page = () => {
         try {
             const response = await api.post(`/price/admin/AddPrice`, formData);
             if (response.status >= 200 && response.status < 300) {
+                setOnPageChange(false);
                 toast({
                     variant: 'default',
                     title: 'Tạo thành công',
@@ -148,10 +147,10 @@ const Page = () => {
                     },
                     duration: 3000
                 })
-                setOnPageChange(false);
                 setPriceName('');
                 getPrices();
             } else {
+                setOnPageChange(false);
                 toast({
                     variant: 'destructive',
                     title: 'Tạo thất bại',
@@ -159,9 +158,9 @@ const Page = () => {
                     action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                     duration: 3000
                 })
-                setOnPageChange(false);
             }
         } catch (error: any) {
+            setOnPageChange(false);
             toast({
                 variant: 'destructive',
                 title: 'Tạo thất bại',
@@ -169,7 +168,6 @@ const Page = () => {
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
                 duration: 3000
             })
-            setOnPageChange(false);
         }
     }
 

@@ -17,8 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
     const router = useRouter();
+    const [isSubmit, setIsSubmit] = useState(false);
     const [currentDate, setCurrentDate] = useState('');
-    const [hiddenButton, setHiddenButton] = useState(false);
     const [duration, setDuration] = useState(1);
     const [location, setLocation] = useState('');
     const [fromDate, setFromDate] = useState('');
@@ -55,6 +55,12 @@ const Page = ({ params }: { params: { id: number } }) => {
         setCurrentDate(`Ngày ${date} tháng ${month} năm ${year}`);
         getUser();
     }, []);
+
+    useEffect(() => {
+        if (isSubmit === true) {
+            handleSubmit();
+        }
+    }, [isSubmit])
 
     const getUser = async () => {
         try {
@@ -120,12 +126,25 @@ const Page = ({ params }: { params: { id: number } }) => {
     }, [params.id]);
 
     const handleSubmit = async () => {
-        setHiddenButton(true);
+        if (duration < 1) {
+            setIsSubmit(false);
+            setOnPageChange(false);
+            toast({
+                variant: 'destructive',
+                title: 'Tạo thất bại!',
+                description: 'Hợp đồng phải có thời hạn ít nhất là 1 tháng.',
+                duration: 3000
+            });
+            return;
+        }
+
         setOnPageChange(true);
 
         const storage = getStorage(firebase);
         const element = document.getElementById('contract');
         if (!element) {
+            setIsSubmit(false);
+            setOnPageChange(false);
             return;
         }
         const canvas = await html2canvas(element, { scale: 2 });
@@ -136,7 +155,7 @@ const Page = ({ params }: { params: { id: number } }) => {
         const padding = 10;
 
         const contentWidth = pdfWidth - 2 * padding;
-        const contentHeight = pdfHeight - 2 * padding;
+        const contentHeight = pdfHeight - 8 * padding;
 
         const canvasHeight = canvas.height;
         const canvasWidth = canvas.width;
@@ -151,6 +170,8 @@ const Page = ({ params }: { params: { id: number } }) => {
 
             const ctx = canvasSlice.getContext('2d');
             if (!ctx) {
+                setIsSubmit(false);
+                setOnPageChange(false);
                 return;
             }
             ctx.drawImage(canvas, 0, -position, canvasWidth, canvasHeight);
@@ -177,17 +198,6 @@ const Page = ({ params }: { params: { id: number } }) => {
             pdfFilePath: downloadURL,
         }
 
-        if (duration < 1) {
-            setHiddenButton(false);
-            setOnPageChange(false);
-            toast({
-                variant: 'destructive',
-                title: 'Tạo thất bại!',
-                description: 'Hợp đồng phải có thời hạn ít nhất là 1 tháng.',
-                duration: 3000
-            });
-            return;
-        }
         setOnPageChange(true);
         try {
             const response = await api.post(`/contracts/createContract`, formData);
@@ -204,9 +214,10 @@ const Page = ({ params }: { params: { id: number } }) => {
                 });
                 router.push(`/customers/${params.id}`);
                 setOnPageChange(false);
+                setIsSubmit(false);
             } else {
-                setHiddenButton(false);
                 setOnPageChange(false);
+                setIsSubmit(false);
                 toast({
                     variant: 'destructive',
                     title: 'Tạo thất bại!',
@@ -215,8 +226,8 @@ const Page = ({ params }: { params: { id: number } }) => {
                 });
             }
         } catch (error: any) {
-            setHiddenButton(false);
             setOnPageChange(false);
+            setIsSubmit(false);
             const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
             toast({
                 variant: 'destructive',
@@ -253,7 +264,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     };
 
     return (
-        <div className="w-full flex justify-center">
+        <div className="w-full flex flex-col items-center">
             <div id='contract' className="my-[20px] p-[20px] max-w-[1134px] bg-white">
                 <div className="text-center mb-[20px]">
                     <h1 className='text-[18px] uppercase font-bold'>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</h1>
@@ -267,12 +278,16 @@ const Page = ({ params }: { params: { id: number } }) => {
                         <p>- Căn cứ Bộ Luật Dân sự được Quốc hội nước Cộng hoà xã hội chủ nghĩa Việt Nam thông qua ngày 14 tháng 6 năm 2005;</p>
                         <p>- Căn cứ nhu cầu và khả năng của hai bên.</p>
                         <div className='flex items-center'>Hôm nay, {currentDate}, tại
-                            <TextField
-                                type={'text'}
-                                value={location || ''}
-                                onChange={(e) => setLocation(e.target.value)}
-                                className='mx-2'
-                                variant="standard" />
+                            {isSubmit ? (
+                                <p className='mx-4 w-[200px]'>{location}</p>
+                            ) : (
+                                <TextField
+                                    type={'text'}
+                                    value={location || ''}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                    className='mx-4'
+                                    variant="standard" />
+                            )}
                             Chúng tôi gồm có:</div>
 
                         <div className='flex mt-5 space-x-2'>
@@ -281,66 +296,94 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <h3 className='font-bold mb-2 text-[18px]'>BÊN BÁN:</h3>
                                     <div className='flex justify-between items-center'>
                                         Địa chỉ:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.address || ''}
-                                            onChange={(e) => handleSellerChange('address', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.address}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.address || ''}
+                                                onChange={(e) => handleSellerChange('address', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Điện thoại:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.phone || ''}
-                                            onChange={(e) => handleSellerChange('phone', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.phone}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.phone || ''}
+                                                onChange={(e) => handleSellerChange('phone', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Đại diện bởi:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.name || ''}
-                                            onChange={(e) => handleSellerChange('name', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.name}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.name || ''}
+                                                onChange={(e) => handleSellerChange('name', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Chức vụ:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.position || ''}
-                                            onChange={(e) => handleSellerChange('position', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.position}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.position || ''}
+                                                onChange={(e) => handleSellerChange('position', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Mã số thuế:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.taxCode || ''}
-                                            onChange={(e) => handleSellerChange('taxCode', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.taxCode}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.taxCode || ''}
+                                                onChange={(e) => handleSellerChange('taxCode', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Tài khoản số:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.bankNumber || ''}
-                                            onChange={(e) => handleSellerChange('bankNumber', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.bankNumber}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.bankNumber || ''}
+                                                onChange={(e) => handleSellerChange('bankNumber', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Ngân hàng:
-                                        <TextField
-                                            type={'text'}
-                                            value={seller?.bank || ''}
-                                            onChange={(e) => handleSellerChange('bank', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{seller?.bank}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={seller?.bank || ''}
+                                                onChange={(e) => handleSellerChange('bank', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <p className='pt-5'><strong>Sau đây gọi tắt là Bên A</strong></p>
                                 </div>
@@ -350,66 +393,94 @@ const Page = ({ params }: { params: { id: number } }) => {
                                     <h3 className='font-bold mb-2 text-[18px]'>BÊN MUA:</h3>
                                     <div className='flex justify-between items-center'>
                                         Địa chỉ:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.address || ''}
-                                            onChange={(e) => handleBuyerChange('address', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.address}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.address || ''}
+                                                onChange={(e) => handleBuyerChange('address', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Điện thoại:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.phone || ''}
-                                            onChange={(e) => handleBuyerChange('phone', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.phone}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.phone || ''}
+                                                onChange={(e) => handleBuyerChange('phone', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Đại diện bởi:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.name || ''}
-                                            onChange={(e) => handleBuyerChange('name', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.name}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.name || ''}
+                                                onChange={(e) => handleBuyerChange('name', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Chức vụ:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.position || ''}
-                                            onChange={(e) => handleBuyerChange('position', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.position}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.position || ''}
+                                                onChange={(e) => handleBuyerChange('position', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Mã số thuế:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.taxCode || ''}
-                                            onChange={(e) => handleBuyerChange('taxCode', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.taxCode}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.taxCode || ''}
+                                                onChange={(e) => handleBuyerChange('taxCode', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Tài khoản số:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.bankNumber || ''}
-                                            onChange={(e) => handleBuyerChange('bankNumber', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.bankNumber}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.bankNumber || ''}
+                                                onChange={(e) => handleBuyerChange('bankNumber', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <div className='flex justify-between items-center'>
                                         Ngân hàng:
-                                        <TextField
-                                            type={'text'}
-                                            value={buyer?.bank || ''}
-                                            onChange={(e) => handleBuyerChange('bank', e.target.value)}
-                                            className='mx-2'
-                                            variant="standard" />
+                                        {isSubmit ? (
+                                            <p className='mx-2'>{buyer?.bank}</p>
+                                        ) : (
+                                            <TextField
+                                                type={'text'}
+                                                value={buyer?.bank || ''}
+                                                onChange={(e) => handleBuyerChange('bank', e.target.value)}
+                                                className='mx-2'
+                                                variant="standard" />
+                                        )}
                                     </div>
                                     <p className='pt-5'><strong>Sau đây gọi tắt là Bên B</strong></p>
                                 </div>
@@ -432,27 +503,39 @@ const Page = ({ params }: { params: { id: number } }) => {
                     <h3 className='font-bold mb-2 mt-4 text-[18px]'>ĐIỀU 2: THỜI HẠN HỢP ĐỒNG</h3>
                     <div className='px-5'>
                         <div className='flex items-center'>Thời hạn Hợp đồng là:
-                            <TextField
-                                type={'number'}
-                                value={duration}
-                                onChange={(e) => setDuration(Number(e.target.value))}
-                                inputProps={{ min: 1 }}
-                                className='mx-4 max-w-[100px]'
-                                variant="standard" />
+                            {isSubmit ? (
+                                <p className='mx-4 min-w-[50px] max-w-[100px]'>{duration}</p>
+                            ) : (
+                                <TextField
+                                    type={'number'}
+                                    value={duration}
+                                    onChange={(e) => setDuration(Number(e.target.value))}
+                                    inputProps={{ min: 1, style: { textAlign: 'center' } }}
+                                    className='mx-4 max-w-[100px]'
+                                    variant="standard" />
+                            )}
                             tháng kể từ ngày
-                            <TextField
-                                type={'date'}
-                                value={fromDate}
-                                onChange={(e) => setFromDate(e.target.value)}
-                                className='mx-4'
-                                variant="standard" />
+                            {isSubmit ? (
+                                <p className='mx-4 w-[150px]'>{fromDate}</p>
+                            ) : (
+                                <TextField
+                                    type={'date'}
+                                    value={fromDate}
+                                    onChange={(e) => setFromDate(e.target.value)}
+                                    className='mx-4'
+                                    variant="standard" />
+                            )}
                             đến hết ngày
-                            <TextField
-                                type={'date'}
-                                value={toDate}
-                                onChange={(e) => setToDate(e.target.value)}
-                                className='mx-4'
-                                variant="standard" />
+                            {isSubmit ? (
+                                <p className='mx-4 w-[150px]'>{toDate}</p>
+                            ) : (
+                                <TextField
+                                    type={'date'}
+                                    value={toDate}
+                                    onChange={(e) => setToDate(e.target.value)}
+                                    className='mx-4'
+                                    variant="standard" />
+                            )}
                         </div>
                         <p>Hai bên có thể thỏa thuận gia hạn hợp đồng trước khi hết hạn.</p>
                     </div>
@@ -521,20 +604,28 @@ const Page = ({ params }: { params: { id: number } }) => {
                     <div className='px-5'>
                         <p>Hợp đồng này có hiệu lực kể từ ngày ký, và chỉ được coi là kết thúc khi các Bên đã hoàn thành các nghĩa vụ của mình trong Hợp đồng. Trong trường hợp một Bên muốn sửa đổi các điều khoản trong hợp đồng thì phải thông báo cho Bên kia biết trước ít nhất là 03 ngày và cùng nhau thoả thuận lại những điểm cần thay đổi với sự đồng ý của hai Bên.</p>
                         <div className='flex items-center'>Hợp đồng này được lập thành
-                            <TextField
-                                type={'number'}
-                                value={count}
-                                onChange={(e) => setCount(Number(e.target.value))}
-                                inputProps={{ min: 2 }}
-                                className='mx-4 max-w-[100px]'
-                                variant="standard" />
+                            {isSubmit ? (
+                                <p className='w-[50px] mx-4 text-center'>{count}</p>
+                            ) : (
+                                <TextField
+                                    type={'number'}
+                                    value={count}
+                                    onChange={(e) => setCount(Number(e.target.value))}
+                                    inputProps={{ min: 2, style: { textAlign: 'center' } }}
+                                    className='mx-4 max-w-[100px]'
+                                    variant="standard" />
+                            )}
                             bản, mỗi Bên giữ
-                            <TextField
-                                type={'number'}
-                                value={Math.floor(count / 2)}
-                                inputProps={{ min: 1 }}
-                                className='mx-4 max-w-[100px]'
-                                variant="standard" />
+                            {isSubmit ? (
+                                <p className='w-[50px] mx-4 text-center'>{Math.floor(count / 2)}</p>
+                            ) : (
+                                <TextField
+                                    type={'number'}
+                                    value={Math.floor(count / 2)}
+                                    inputProps={{ min: 1, style: { textAlign: 'center' } }}
+                                    className='mx-4 max-w-[100px]'
+                                    variant="standard" />
+                            )}
                             bản, các bản có giá trị pháp lý như nhau. </div>
                     </div>
                 </div>
@@ -550,20 +641,19 @@ const Page = ({ params }: { params: { id: number } }) => {
                         </div>
                     </div>
                 </div>
-
-                <div className='flex justify-end space-x-5'>
-                    <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold", hiddenButton && 'hidden')}
-                        onClick={() => {
-                            window.history.back();
-                            setOnPageChange(true)
-                        }}>Trở về
-                    </button>
-                    <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold", hiddenButton && 'hidden')}
-                        onClick={() => {
-                            handleSubmit();
-                        }}>Tạo hợp đồng
-                    </button>
-                </div>
+            </div>
+            <div className='flex w-full justify-end space-x-5 mb-10 px-[20%]'>
+                <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold")}
+                    onClick={() => {
+                        window.history.back();
+                        setOnPageChange(true)
+                    }}>Trở về
+                </button>
+                <button className={cn("rounded-lg px-4 py-2 bg-[#4ba94d] hover:bg-green-500 text-white font-semibold")}
+                    onClick={() => {
+                        setIsSubmit(true);
+                    }}>Tạo hợp đồng
+                </button>
             </div>
             {onPageChange === true && (
                 <div className='fixed z-[1000] top-0 left-0 bg-black bg-opacity-40 w-full'>

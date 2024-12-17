@@ -35,19 +35,26 @@ export default function MonthlyEmployeeDialog({
 }: MonthlyEmployeeDialogProps) {
     const [dayActive, setDayActive] = React.useState<DayActive[]>([]);
     const router = useRouter();
-
     async function getMonthlyEmployeeActiveDay() {
         try {
             const response = await getActiveDay(employeeId, month + 1, year);
-            setDayActive(response.data);
+
+            const updatedData = response.data.map((item: DayActive) => ({
+                ...item,
+                amountByTons: item.amountByTons !== undefined && item.amountByTons !== 0
+                    ? item.amountByTons
+                    : 12000,
+            }));
+
+            setDayActive(updatedData);
         } catch (e) {
+            console.error("Error fetching data:", e);
             throw e;
         }
     }
 
     const [selectedDayActive, setSelectedDayActive] = React.useState<any>([]);
     const hasUnaddedDayActive = dayActive.some((day) => !day.spend);
-    const [amountByTon, setAmountByTon] = React.useState<any>(12000);
     const [totalAmount, setTotalAmount] = React.useState<any>(0);
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = React.useState(false);
@@ -56,7 +63,7 @@ export default function MonthlyEmployeeDialog({
         setOnPageChange(true);
         const formattedData = selectedDayActive.map((day: any) => ({
             dayActiveId: day.id,
-            amountByTon: amountByTon,
+            amountByTon: day.amountByTons,
         }));
         try {
             const response = await api.post(`/ExpenseVoucher/payEmployeeSalaryByDate`, formattedData);
@@ -105,6 +112,20 @@ export default function MonthlyEmployeeDialog({
         }
     }
 
+    const handleFieldChange = (field: any, value: string | number | boolean, index: number) => {
+        setDayActive((prevData: any) => {
+            return prevData.map((item: any, i: any) => {
+                if (i === index) {
+                    return {
+                        ...item,
+                        [field]: value,
+                    };
+                }
+                return item;
+            });
+        });
+    };
+
     React.useEffect(() => {
         getMonthlyEmployeeActiveDay().catch((e) =>
             console.error(`Error: ${e}`),
@@ -125,11 +146,11 @@ export default function MonthlyEmployeeDialog({
         } else {
             setTotalAmount(0);
         }
-    }, [selectedDayActive, amountByTon])
+    }, [selectedDayActive, dayActive])
 
     const calculateTotal = () => {
         const total = selectedDayActive.reduce((sum: number, item: any) => {
-            return sum + item.mass * amountByTon;
+            return sum + item.mass * item.amountByTons;
         }, 0);
 
         return total;
@@ -236,7 +257,7 @@ export default function MonthlyEmployeeDialog({
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {dayActive.map((day) => (
+                            {dayActive.map((day, index) => (
                                 <TableRow key={day.id}>
                                     <TableCell>
                                         {day.spend === false && (
@@ -253,7 +274,15 @@ export default function MonthlyEmployeeDialog({
                                     </TableCell>
                                     <TableCell>{day.mass}</TableCell>
                                     <TableCell>
-                                        <Input type="number" value={day.amountPerMass || amountByTon} onChange={(e) => setAmountByTon(e.target.value)} />
+                                        {day.spend === true ? `${Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(day.amountPerMass) || 0)}` : (
+                                            <Input type="number" value={day.amountByTons || 0}
+                                                disabled={selectedDayActive.some((selected: DayActive) => selected.id === day.id)}
+                                                onChange={(e) => {
+                                                    if (Number(e.target.value) >= 0) {
+                                                        handleFieldChange("amountByTons", e.target.value, index)
+                                                    }
+                                                }} />
+                                        )}
                                     </TableCell>
                                     {day.spend === false ? (
                                         <TableCell>
