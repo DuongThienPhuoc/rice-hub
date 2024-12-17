@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -72,7 +72,15 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
     };
 
     const [selectedRow, setSelectedRow] = useState<RowData | null>(null);
+    const [role, setRole] = useState<string | null>(null);
 
+    useEffect(() => {
+        if(typeof window === 'undefined') return;
+        const rawRole = localStorage.getItem('role');
+        if (rawRole) {
+            setRole(rawRole);
+        }
+    }, []);
     const handleDelete = async (row: any) => {
         setOnPageChange(true);
         try {
@@ -488,7 +496,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                             ) : (
                                                                 row?.batchProductDtos?.some((item: any) => item.isAdded === true) ? (
                                                                     <div className="relative group">
-                                                                        {tableName === 'import' && row?.isPay === false ? (
+                                                                        {tableName === 'import' && row?.isPay === false && role === 'ROLE_ADMIN' ? (
                                                                             <>
                                                                                 <button onClick={() => handlePaySupplier(row)}>
                                                                                     <DollarSign size={18} />

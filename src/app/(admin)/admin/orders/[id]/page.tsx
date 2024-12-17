@@ -162,7 +162,7 @@ export default function OrderDetailPage({
                             <span className="font-semibold">
                                 Số điện thoại:
                             </span>
-                            <span>{order.customer.phone}</span>
+                            <span>{order.orderPhone}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Email:</span>
@@ -172,7 +172,7 @@ export default function OrderDetailPage({
                             <span className="font-semibold">Địa chỉ:</span>
                             <br />
                             <span className="text-sm">
-                                {order.customer.address}
+                                {order.orderAddress}
                             </span>
                         </div>
                     </CardContent>

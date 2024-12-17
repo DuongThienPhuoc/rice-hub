@@ -29,6 +29,7 @@ const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
     const [onPageChange, setOnPageChange] = useState(false);
     const { setBreadcrumb } = useBreadcrumbStore();
+    const [role, setRole] = useState<string | null>(null);
 
     useEffect(() => {
         setBreadcrumb(<InventoryDetailPageBreadcrumb inventoryId={params.id.toString()} />)
@@ -36,6 +37,11 @@ const Page = ({ params }: { params: { id: number } }) => {
     }, [setBreadcrumb]);
 
     useEffect(() => {
+        if(typeof window === 'undefined') return;
+        const rawRole = localStorage.getItem('role');
+        if (rawRole) {
+            setRole(rawRole);
+        }
         getInventory();
     }, []);
 
@@ -301,7 +307,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                         <TableCell><p className='font-semibold text-white'>Số lượng thực tế</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Số lượng chênh lệch</p></TableCell>
                                                         <TableCell className='w-[150px]'><p className='font-semibold text-white'>Mô tả</p></TableCell>
-                                                        {inventory?.status !== 'CANCELED' && (
+                                                        {(inventory?.status !== 'CANCELED' && role === 'ROLE_ADMIN') && (
                                                             <TableCell align="center"><p className='font-semibold text-white'>Hành động</p></TableCell>
                                                         )}
                                                     </TableRow>
@@ -377,7 +383,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                     {(product?.quantity - product?.systemQuantity) > 0 && <p className='text-blue-500 font-semibold'>{`Thừa ${Math.abs(product?.quantity - product?.systemQuantity)} ${product?.unit}`}</p>}
                                                                 </TableCell>
                                                                 <TableCell>{product?.description || 'N/A'}</TableCell>
-                                                                {inventory?.status !== 'CANCELED' && (
+                                                                {(inventory?.status !== 'CANCELED' && role === 'ROLE_ADMIN') && (
                                                                     <TableCell align="center">
                                                                         <div className='flex justify-center items-center'>
                                                                             <div className='relative group'>
@@ -403,7 +409,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                 <CircleX />
                                             </Button>
                                         )}
-                                        {inventory?.status === 'PENDING' && (
+                                        {(inventory?.status === 'PENDING' && role === 'ROLE_ADMIN') && (
                                             <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                                 Xác nhận phiếu
                                                 <CheckSquare />
