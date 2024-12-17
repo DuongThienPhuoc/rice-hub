@@ -309,6 +309,7 @@ export default function AppSidebar() {
             await api.post(url);
             localStorage.removeItem('role');
             localStorage.removeItem('username');
+            document.cookie = `userID=; path=/; max-age=0`;
             window.location.href = '/'
         } catch (error) {
             console.error('Đăng xuất thất bại:', error);

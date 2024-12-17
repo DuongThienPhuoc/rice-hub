@@ -23,6 +23,7 @@ import {
     updateEmployeeActiveDay,
 } from '@/data/employee';
 import { isAxiosError } from 'axios';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SalaryPopoverProvider({
     day,
@@ -44,7 +45,7 @@ export default function SalaryPopoverProvider({
     setRefreshActiveDays: (value: boolean) => void;
 }) {
     const [active, setActive] = React.useState<boolean>(variant === 'active');
-    const [inputDetail, setInputDetail] = React.useState<number>();
+    const [inputDetail, setInputDetail] = React.useState<number>(0);
     const [note, setNote] = React.useState<string>();
     const [popoverActive, setPopoverActive] = React.useState<boolean>(false);
 
@@ -104,6 +105,7 @@ export default function SalaryPopoverProvider({
                     refreshActiveDays={refreshActiveDays}
                     setRefreshActiveDays={setRefreshActiveDays}
                     handlePopoverActive={handlePopoverActive}
+                    getEmployeeActiveDate={getEmployeeActiveDate}
                 />
             </PopoverContent>
         </Popover>
@@ -125,6 +127,7 @@ function EmployeePopoverContent({
     refreshActiveDays,
     setRefreshActiveDays,
     handlePopoverActive,
+    getEmployeeActiveDate,
 }: {
     detail: number | undefined;
     setDetail: (value: number) => void;
@@ -140,15 +143,35 @@ function EmployeePopoverContent({
     refreshActiveDays: boolean;
     setRefreshActiveDays: (value: boolean) => void;
     handlePopoverActive: () => void;
+    getEmployeeActiveDate: (date: string) => DayActive | undefined;
 }) {
+    const { toast } = useToast();
     async function handleCreateEmployeeActiveDay(
         bodyRequest: EmployeeDayActiveBodyRequest,
     ) {
         startTransition(async () => {
             try {
-                await createEmployeeActiveDay(bodyRequest);
-                setRefreshActiveDays(!refreshActiveDays);
-                handlePopoverActive();
+                if(new Date(bodyRequest.dayActive) > new Date() && role === 'DAILY') {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Thất bại',
+                        description: 'Không thể tạo ngày đi làm trong tương lai',
+                        duration: 3000,
+                    });
+                    return;
+                }else if((bodyRequest.mass === 0 || isNaN(bodyRequest.mass as number)) && role === 'DAILY') {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Thất bại',
+                        description: 'Không thể tạo ngày đi làm với số lượng bằng 0',
+                        duration: 3000,
+                    });
+                    return;
+                }else {
+                    await createEmployeeActiveDay(bodyRequest);
+                    setRefreshActiveDays(!refreshActiveDays);
+                    handlePopoverActive();
+                }
             } catch (e) {
                 if (isAxiosError(e)) {
                     throw e;
@@ -156,15 +179,25 @@ function EmployeePopoverContent({
             }
         });
     }
-
     async function handleDeleteEmployeeActiveDay(
         bodyRequest: DeleteActiveDayBodyRequest,
     ) {
         startTransition(async () => {
             try {
-                await deleteActiveDay(bodyRequest);
-                setRefreshActiveDays(!refreshActiveDays);
-                handlePopoverActive();
+                if(getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString('en-US'))?.spend === true) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Thất bại',
+                        description: 'Không thể xoá ngày đi làm đã chi tiền',
+                        duration: 3000,
+                    });
+                    handlePopoverActive();
+                    return;
+                }else {
+                    await deleteActiveDay(bodyRequest);
+                    setRefreshActiveDays(!refreshActiveDays);
+                    handlePopoverActive();
+                }
             } catch (e) {
                 if (isAxiosError(e)) {
                     throw e;
@@ -301,7 +334,7 @@ function EmployeePopoverContent({
                                             day.localDate,
                                         ).toLocaleDateString('en-US'),
                                         amountPerMass: 0.0,
-                                        mass: detail || null,
+                                        mass: detail || 0,
                                         note: note,
                                     };
                                     handleCreateEmployeeActiveDay(

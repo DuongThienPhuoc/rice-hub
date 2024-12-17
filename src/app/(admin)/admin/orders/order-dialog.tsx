@@ -180,15 +180,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     });
                     setIsOpen(false);
                     setNewOrder(!newOrder);
+                } else if (response.status === 400) {
+                    setError(response.data.message)
                 } else {
                     setError('Đã có lỗi xảy ra, vui lòng thử lại');
                 }
             } catch (e) {
-                if (e instanceof Error) {
-                    throw new Error(
-                        `An error occurred while creating order: ${e.message}`,
-                    );
-                }
+                console.log(e);
             }
         }
     }
@@ -243,6 +241,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         <Select
                             value={selectedCustomer}
                             onValueChange={(e) => {
+                                setError('');
                                 setSelectedCustomer(e);
                                 setAddress(
                                     customers.find(
@@ -573,7 +572,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         >
                             Huỷ
                         </Button>
-                        <Button onClick={() => setAlertSubmitOrder(true)}>
+                        <Button onClick={() => {
+                            if(selectedCustomer === '') {
+                                setError('Vui lòng chọn khách hàng')
+                                return
+                            }
+                            setAlertSubmitOrder(true)
+                        }}>
                             Tạo đơn hàng
                         </Button>
                     </div>

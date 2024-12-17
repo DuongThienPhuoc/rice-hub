@@ -31,7 +31,6 @@ export default function OrderPageDialog({
     product: ProductDtoList;
 }) {
     const { toast } = useToast();
-
     const type = useCartDialogStore((state) => state.type);
     const quantity = useCartDialogStore((state) => state.quantity);
     const setType = useCartDialogStore((state) => state.setType);
@@ -51,10 +50,18 @@ export default function OrderPageDialog({
             price: product.customerPrice,
             type: type,
         };
-        if (order.type === 0 || order.quantity === 0) {
+        if (order.type === 0 || order.quantity <= 0) {
             toast({
                 variant: 'destructive',
                 title: 'Xin hãy nhập đầy đủ thông tin',
+                duration: 3000,
+                action: <ToastAction altText="Try again">OK!</ToastAction>,
+            })
+        }
+        else if (isNaN(order.quantity)) {
+            toast({
+                variant: 'destructive',
+                title: 'Số lượng không được để trống',
                 duration: 3000,
                 action: <ToastAction altText="Try again">OK!</ToastAction>,
             })
@@ -108,6 +115,10 @@ export default function OrderPageDialog({
                 </DialogHeader>
                 <section className="grid gap-4 gap-y-4">
                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label>Tên hàng hoá</Label>
+                        <p className='font-bold text-base'>{product.name}</p>
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
                         <Label>Loại</Label>
                         <Select onValueChange={(e) => {
                             const value = JSON.parse(e)
@@ -145,7 +156,7 @@ export default function OrderPageDialog({
                             <Input
                                 id="mass"
                                 type="number"
-                                value={quantity * type}
+                                value={isNaN(quantity) ? 0 : quantity * type}
                                 disabled
                                 className="col-span-3"
                             />
