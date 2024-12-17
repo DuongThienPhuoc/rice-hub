@@ -17,6 +17,7 @@ export interface DayActive {
     id: number;
     amountPerMass: number | null;
     dayActive: Date;
+    amountByTons: number | 0;
     mass: number;
     note: string | null;
     spend: boolean;

@@ -147,14 +147,7 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             setCustomerDetail(data[0]);
         } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Hệ thống gặp sự cố khi lấy thông tin khách hàng!',
-                description: 'Xin vui lòng thử lại sau',
-                duration: 3000
-            })
-        } finally {
-            setLoadingData(false);
+            console.log(error);
         }
     };
 
