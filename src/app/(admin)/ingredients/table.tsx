@@ -70,12 +70,6 @@ export default function ProductTable() {
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setProducts([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy nguyên liệu!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setProducts(data._embedded.adminProductDtoList);
             }
@@ -162,7 +156,6 @@ export default function ProductTable() {
                         <Separator orientation="horizontal" />
                         <div className='flex flex-col lg:flex-row justify-between items-center lg:items-middle my-5'>
                             <div className='flex lg:space-y-0 space-y-2 lg:space-x-2 lg:flex-row flex-col'>
-
                                 <SearchBar
                                     onSearch={handleSearch}
                                     loadingData={loadingData}

@@ -114,12 +114,6 @@ export default function InventoryTable() {
                 setTotalPages(data.page.totalPages);
             } else {
                 setInventory([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy phiếu kiểm kho!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             }
         } catch (error) {
             toast({

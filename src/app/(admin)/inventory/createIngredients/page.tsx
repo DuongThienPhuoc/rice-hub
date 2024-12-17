@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import FloatingButton from '@/components/floating/floatingButton';
 import { Checkbox, Paper, Skeleton, TextField } from '@mui/material';
 import { Button } from '@/components/ui/button';
-import { CircleMinus, Plus } from 'lucide-react';
+import { Check, CircleMinus, CirclePlus, Plus, Search, X } from 'lucide-react';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
@@ -22,6 +22,9 @@ import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import InventoryPageBreadcrumb from '@/app/(admin)/inventory/createIngredients/breadcrumb';
 import Paging from '@/components/paging/paging';
 import SearchBar from '@/components/searchbar/searchbar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { getSuppliers, Supplier } from '@/data/supplier';
+import { Category, getCategories } from '@/data/category';
 
 interface RowData {
     [key: string]: any;
@@ -37,6 +40,10 @@ const Page = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState<RowData[]>([]);
     const [totalPages, setTotalPages] = useState(0);
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [productSupplier, setProductSupplier] = useState<Supplier[]>([]);
+    const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+    const [productCategories, setProductCategories] = useState<Category[]>([]);
     const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
         field: '',
         query: ''
@@ -47,8 +54,8 @@ const Page = () => {
     }, [setBreadcrumb]);
 
     useEffect(() => {
-        getProducts(currentPage, currentSearch);
-    }, [currentPage, currentSearch]);
+        getProducts(currentPage, currentSearch, selectedCategory, selectedSupplier);
+    }, [currentPage, currentSearch, selectedCategory, selectedSupplier]);
 
     const handleSearch = (field: string, query: string) => {
         setCurrentPage(1);
@@ -59,7 +66,31 @@ const Page = () => {
         setCurrentPage(page);
     };
 
-    const getProducts = async (page?: number, search?: { field?: string, query?: string }) => {
+    async function fetchCategories() {
+        try {
+            const response = await getCategories<Category[]>();
+            setProductCategories(response);
+        } catch (e) {
+            if (e instanceof Error) {
+                throw new Error(`An error occurred while fetching categories: ${e.message}`)
+            }
+            throw new Error('An error occurred while fetching categories')
+        }
+    }
+
+    async function fetchSuppliers() {
+        try {
+            const response = await getSuppliers<Supplier[]>();
+            setProductSupplier(response);
+        } catch (e) {
+            if (e instanceof Error) {
+                throw new Error(`An error occurred while fetching supplier: ${e.message}`)
+            }
+            throw new Error('An error occurred while fetching supplier')
+        }
+    }
+
+    const getProducts = async (page?: number, search?: { field?: string, query?: string }, category?: Category | null, supplier?: Supplier | null) => {
         try {
             const params = new URLSearchParams();
             params.append("pageSize", "5");
@@ -69,18 +100,18 @@ const Page = () => {
             if (search?.field && search?.query) {
                 params.append(search.field, search.query);
             }
+            if (category) {
+                params.append("categoryId", category.id.toString());
+            }
+            if (supplier) {
+                params.append("supplierId", supplier.id.toString());
+            }
             params.append("warehouseId", '1');
             const url = `/productwarehouse/getAllProductsWarehouse?${params.toString()}`;
             const response = await api.get(url);
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setProducts([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy sản phẩm!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setProducts(data._embedded.productWarehouseDtoList);
             }
@@ -102,6 +133,13 @@ const Page = () => {
             prevData.filter((_, i) => i !== index)
         );
     };
+
+    useEffect(() => {
+        fetchCategories()
+            .catch((e) => console.error(e));
+        fetchSuppliers()
+            .catch((e) => console.error(e));
+    }, []);
 
     const handleSubmit = async () => {
         const productData = selectedProducts.map((product: any) => ({
@@ -188,14 +226,162 @@ const Page = () => {
                             )}
                             <Separator orientation="horizontal" />
                             <div className='flex flex-col lg:flex-row items-center lg:items-middle my-5'>
-                                <SearchBar
-                                    onSearch={handleSearch}
-                                    loadingData={loadingData}
-                                    selectOptions={[
-                                        { value: 'productName', label: 'Tên sản phẩm' },
-                                        { value: 'productCode', label: 'Mã sản phẩm' },
-                                    ]}
-                                />
+                                <div className='flex lg:space-y-0 space-y-2 lg:space-x-2 lg:flex-row flex-col'>
+                                    <SearchBar
+                                        onSearch={handleSearch}
+                                        loadingData={loadingData}
+                                        selectOptions={[
+                                            { value: 'productName', label: 'Tên sản phẩm' },
+                                            { value: 'productCode', label: 'Mã sản phẩm' },
+                                        ]}
+                                    />
+                                    {loadingData ? (
+                                        <>
+                                            <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                            <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <div className="h-[38px] px-5 rounded-md border border-[#4ba94d] bg-[#4ba94d] flex items-center gap-1 hover:cursor-pointer">
+                                                        <CirclePlus className="h-4 w-4 text-white" />
+                                                        <span className="text-sm font-semibold text-white">
+                                                            Danh mục
+                                                        </span>
+                                                        {selectedCategory !== null && (
+                                                            <>
+                                                                <Separator
+                                                                    orientation="vertical"
+                                                                    className="h-4 mx-2"
+                                                                />
+                                                                <div className="h-auto text-sm font-medium leading-none bg-[#f4f4f5] px-[4px] py-[5px] rounded-md  items-center inline-flex whitespace-nowrap">
+                                                                    {selectedCategory?.name}
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    align="start"
+                                                    className="p-0 w-50"
+                                                >
+                                                    <div className="p-2 border-b">
+                                                        <div className="relative">
+                                                            <Search className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                            <input
+                                                                type="text"
+                                                                className="pl-6 h-full rounded outline-0 focus:outline-0"
+                                                                placeholder="Danh mục"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-2">
+                                                        <ul>
+                                                            {productCategories?.map(
+                                                                (category, index) => (
+                                                                    <li
+                                                                        key={index}
+                                                                        className="relative flex items-center gap-x-1 hover:bg-gray-100 p-2 rounded-lg hover:cursor-pointer text-sm font-medium"
+                                                                        onClick={() => {
+                                                                            setCurrentPage(1);
+                                                                            setSelectedCategory(
+                                                                                category
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        {selectedCategory ===
+                                                                            category && (
+                                                                                <Check className="h-4 w-4 absolute left-2" />
+                                                                            )}
+                                                                        <span className="pl-5">
+                                                                            {category.name}
+                                                                        </span>
+                                                                    </li>
+                                                                ),
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <div className="h-[38px] px-5 rounded-md border border-[#4ba94d] bg-[#4ba94d] flex items-center gap-1 hover:cursor-pointer">
+                                                        <CirclePlus className="h-4 w-4 text-white" />
+                                                        <span className="text-sm font-semibold text-white">
+                                                            Nhà cung cấp
+                                                        </span>
+                                                        {selectedSupplier !== null && (
+                                                            <>
+                                                                <Separator
+                                                                    orientation="vertical"
+                                                                    className="h-4 mx-2"
+                                                                />
+                                                                <div className="h-auto text-sm font-medium leading-none bg-[#f4f4f5] px-[4px] py-[5px] rounded-md  items-center inline-flex whitespace-nowrap">
+                                                                    {selectedSupplier?.name}
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    align="start"
+                                                    className="p-0 w-50"
+                                                >
+                                                    <div className="p-2 border-b">
+                                                        <div className="relative">
+                                                            <Search className="absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                            <input
+                                                                type="text"
+                                                                className="pl-6 h-full rounded outline-0 focus:outline-0"
+                                                                placeholder="Nhà cung cấp"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-2">
+                                                        <ul>
+                                                            {productSupplier?.map(
+                                                                (supplier, index) => (
+                                                                    <li
+                                                                        key={index}
+                                                                        className="relative flex items-center gap-x-1 hover:bg-gray-100 p-2 rounded-lg hover:cursor-pointer text-sm font-medium"
+                                                                        onClick={() => {
+                                                                            setCurrentPage(1);
+                                                                            setSelectedSupplier(
+                                                                                supplier
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        {selectedSupplier ===
+                                                                            supplier && (
+                                                                                <Check className="h-4 w-4 absolute left-2" />
+                                                                            )}
+                                                                        <span className="pl-5">
+                                                                            {supplier.name}
+                                                                        </span>
+                                                                    </li>
+                                                                ),
+                                                            )}
+                                                        </ul>
+                                                    </div>
+                                                </PopoverContent>
+                                            </Popover>
+                                            {(selectedSupplier !== null || selectedCategory !== null) && (
+                                                <div
+                                                    className="whitespace-nowrap text-sm font-medium leading-none flex items-center bg-red-600 gap-1 cursor-pointer hover:bg-red-500 px-4 rounded-md"
+                                                    onClick={() => {
+                                                        setCurrentPage(1);
+                                                        setSelectedSupplier(null)
+                                                        setSelectedCategory(null)
+                                                    }}
+                                                >
+                                                    <span className='text-white'>Bỏ lọc</span>
+                                                    <X className="h-4 w-4 text-white" />
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
                             </div>
                             <div className='overflow-hidden'>
                                 <div className='w-full overflow-x-auto'>

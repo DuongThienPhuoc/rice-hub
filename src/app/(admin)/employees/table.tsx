@@ -61,12 +61,6 @@ export default function EmployeeTable() {
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setEmployees([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy nhân viên!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setEmployees(data._embedded.employeeList);
             }

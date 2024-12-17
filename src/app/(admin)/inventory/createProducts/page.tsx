@@ -70,12 +70,6 @@ const Page = () => {
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setProducts([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy sản phẩm!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setProducts(data._embedded.productWarehouseDtoList);
             }

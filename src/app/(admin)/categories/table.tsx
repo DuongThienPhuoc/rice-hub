@@ -68,12 +68,6 @@ export default function CategoryTable() {
             const data = response.data;
             if (data.page.totalElements === 0) {
                 setCategories([]);
-                toast({
-                    variant: 'destructive',
-                    title: 'Không tìm thấy danh mục!',
-                    description: 'Xin vui lòng thử lại',
-                    duration: 3000,
-                })
             } else {
                 setCategories(data._embedded.categoryList);
             }

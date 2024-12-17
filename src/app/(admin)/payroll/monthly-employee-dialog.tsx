@@ -242,7 +242,7 @@ export default function MonthlyEmployeeDialog({
                                             checked={selectedDayActive.length === dayActive.filter((day) => !day.spend).length}
                                             onChange={(e) => {
                                                 if (e.target.checked) {
-                                                    setSelectedDayActive(dayActive.filter((day) => day.spend === false));
+                                                    setSelectedDayActive(dayActive.filter((day) => day.spend === false && day.amountByTons > 0));
                                                 } else {
                                                     setSelectedDayActive([]);
                                                 }
@@ -263,7 +263,18 @@ export default function MonthlyEmployeeDialog({
                                         {day.spend === false && (
                                             <Checkbox
                                                 checked={selectedDayActive.includes(day)}
-                                                onChange={() => handleSelectDayActive(day)}
+                                                onChange={() => {
+                                                    if (day.amountByTons > 0) {
+                                                        handleSelectDayActive(day)
+                                                    } else {
+                                                        toast({
+                                                            variant: 'destructive',
+                                                            title: 'Số tiền không hợp lệ!',
+                                                            description: 'Vui lòng nhập số tiền lớn hơn 0',
+                                                            duration: 3000,
+                                                        });
+                                                    }
+                                                }}
                                             />
                                         )}
                                     </TableCell>
@@ -275,7 +286,7 @@ export default function MonthlyEmployeeDialog({
                                     <TableCell>{day.mass}</TableCell>
                                     <TableCell>
                                         {day.spend === true ? `${Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(day.amountPerMass) || 0)}` : (
-                                            <Input type="number" value={day.amountByTons || 0}
+                                            <Input type="number" value={day.amountByTons || ''}
                                                 disabled={selectedDayActive.some((selected: DayActive) => selected.id === day.id)}
                                                 onChange={(e) => {
                                                     if (Number(e.target.value) >= 0) {
