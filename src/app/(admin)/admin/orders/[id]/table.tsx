@@ -48,8 +48,8 @@ export default function OrderDetailTable({
             </TableHeader>
             <TableBody>
                 {order.orderDetails?.map((item, index) => (
-                    <TableRow key={index} className='hover:cursor-pointer' onClick={() => router.push(`/products/${item.productId}`)}>
-                        <TableCell className="font-semibold">
+                    <TableRow key={index}>
+                        <TableCell className='font-semibold hover:cursor-pointer' onClick={() => router.push(`/products/${item.productId}`)}>
                             {item.name}
                         </TableCell>
                         <TableCell>{`${item.weightPerUnit} KG`}</TableCell>
