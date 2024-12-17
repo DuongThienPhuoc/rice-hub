@@ -85,14 +85,11 @@ const Page = ({ params }: { params: { id: number } }) => {
             const data = response.data;
             if (Array.isArray(data)) {
                 setBatchProducts(data);
+            } else {
+                setBatchProducts([]);
             }
         } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách lô hàng!',
-                description: 'Xin vui lòng thử lại',
-                duration: 3000
-            })
+            console.log(error);
         }
     };
 
@@ -250,7 +247,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                         return filteredItems.length > 0 ? (
                                                             filteredItems.map((filteredItem: any, index: number) => (
                                                                 <span key={index}>
-                                                                    {index > 0 && ','} {filteredItem.unit} {filteredItem.weightPerUnit}kg
+                                                                    {index > 0 && ','} {filteredItem.unit} {filteredItem.weightPerUnit + 'kg'}
                                                                 </span>
                                                             ))
                                                         ) : (

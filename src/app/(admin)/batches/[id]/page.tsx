@@ -53,7 +53,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     const { setBreadcrumb } = useBreadcrumbStore()
 
     function getRoleFromLocalStorage() {
-        if(typeof window === 'undefined') return;
+        if (typeof window === 'undefined') return;
         const rawRole = localStorage.getItem('role');
         setRole(rawRole || '');
     }
@@ -68,8 +68,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     }, [setBreadcrumb]);
 
     const handleUpdate = async (product: any, reload: boolean) => {
-        console.log(product);
-        console.log(batch);
         try {
             setOnPageChange(true);
             const response = await api.put(`/batchproducts/update/${product.id}`, {
@@ -296,7 +294,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                             },
                             duration: 3000
                         })
-                        router.push("/products");
+                        getProducts();
+                        getBatch();
                     } else {
                         setOnPageChange(false);
                         toast({
