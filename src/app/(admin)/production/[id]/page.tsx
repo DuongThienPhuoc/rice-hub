@@ -535,15 +535,14 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </>
                             )}
                         </div>
-                        {role === ALLOW_ROLE && (
                             <div className='flex justify-center lg:justify-end lg:flex-row flex-col items-end lg:items-center space-y-2 lg:space-y-0 lg:space-x-2 mx-5 lg:mx-10 mt-5'>
-                                {(production?.status === 'PENDING' || production?.status === 'CANCELED') && (
+                                {(production?.status === 'PENDING' || production?.status === 'CANCELED' && role === ALLOW_ROLE) && (
                                     <Button onClick={() => showAlert()} className='px-5 py-3 text-[14px] bg-red-600 hover:bg-red-500'>
                                         {production?.status === 'CANCELED' ? ('Xóa phiếu') : ('Hủy phiếu')}
                                         <CircleX />
                                     </Button>
                                 )}
-                                {production?.status === 'PENDING' && (
+                                {(production?.status === 'PENDING' && role === ALLOW_ROLE) && (
                                     <Button onClick={() => handleSubmit()} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                         Xác nhận sản xuất
                                         <CheckSquare />
@@ -555,14 +554,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         <Upload />
                                     </Button>
                                 )}
-                                {production?.status === 'COMPLETED' && (
+                                {(production?.status === 'COMPLETED' && role === ALLOW_ROLE) && (
                                     <Button onClick={handleConfirm} className='px-5 py-3 text-[14px] hover:bg-green-500'>
                                         Xác nhận hoàn thành
                                         <CheckSquare />
                                     </Button>
                                 )}
                             </div>
-                        )}
                     </div>
                     <div className='w-full flex justify-center items-center my-10 space-x-2'>
                         {loadingData ? (

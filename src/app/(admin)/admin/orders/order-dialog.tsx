@@ -241,6 +241,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         <Select
                             value={selectedCustomer}
                             onValueChange={(e) => {
+                                setError('');
                                 setSelectedCustomer(e);
                                 setAddress(
                                     customers.find(
@@ -571,7 +572,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         >
                             Huỷ
                         </Button>
-                        <Button onClick={() => setAlertSubmitOrder(true)}>
+                        <Button onClick={() => {
+                            if(selectedCustomer === '') {
+                                setError('Vui lòng chọn khách hàng')
+                                return
+                            }
+                            setAlertSubmitOrder(true)
+                        }}>
                             Tạo đơn hàng
                         </Button>
                     </div>
