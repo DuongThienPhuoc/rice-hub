@@ -63,6 +63,8 @@ export interface OrderDetail {
     productUnit: string;
     discount: number;
     totalPrice: number;
+    supplierName?: string;
+    remainQuantity?: number;
 }
 
 export interface Customer {
@@ -96,16 +98,16 @@ export interface Contract {
     confirmationDate: Date;
 }
 
-export interface OrderDetail {
-    id:            number;
-    product:       ProductClass | number;
-    quantity:      number;
-    discount:      number;
-    productUnit:   string;
-    weightPerUnit: number;
-    unitPrice:     number;
-    totalPrice:    number;
-}
+// export interface OrderDetail {
+//     id:            number;
+//     product:       ProductClass | number;
+//     quantity:      number;
+//     discount:      number;
+//     productUnit:   string;
+//     weightPerUnit: number;
+//     unitPrice:     number;
+//     totalPrice:    number;
+// }
 
 export interface ProductClass {
     id:                number;

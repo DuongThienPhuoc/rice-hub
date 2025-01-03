@@ -110,13 +110,13 @@ export default function OrderDetailPage({
                     <CardContent className="space-y-4">
                         <div className="flex justify-between">
                             <span className="font-semibold">Mã đơn hàng:</span>
-                            <span>{order?.orderCode}</span>
+                            <span className='font-bold'>{order?.orderCode}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Ngày tạo đơn:</span>
                             <span className="flex gap-1 items-center">
                                 <Calendar className="w-4 h-4" />
-                                <span>
+                                <span className='font-semibold'>
                                     {new Date(
                                         order?.orderDate || '',
                                     ).toLocaleDateString()}

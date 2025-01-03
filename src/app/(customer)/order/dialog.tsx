@@ -45,6 +45,7 @@ export default function OrderPageDialog({
             productID: product.id,
             productCode: product.productCode,
             name: product.name,
+            supplierName: product.supplierName,
             productUnit: productUnit,
             quantity: quantity,
             price: product.customerPrice,

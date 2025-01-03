@@ -31,6 +31,9 @@ export default function OrderDetailTable({
                         <p className="font-semibold text-white">Sản Phẩm</p>
                     </TableHead>
                     <TableHead>
+                        <p className="font-semibold text-white">Nhà Cung Cấp</p>
+                    </TableHead>
+                    <TableHead>
                         <p className="font-semibold text-white">Quy cách</p>
                     </TableHead>
                     <TableHead>
@@ -50,18 +53,20 @@ export default function OrderDetailTable({
                         <TableCell className="font-semibold">
                             {item.name}
                         </TableCell>
+                        <TableCell>{item.supplierName}</TableCell>
                         <TableCell>{`${item.weightPerUnit} KG`}</TableCell>
                         {editMode && setOrder ? (
                             <TableCell>
                                 <Input
-                                    className='w-20'
+                                    className="w-20"
                                     value={item.quantity}
                                     onChange={(e) => {
                                         const newOrder = { ...order };
-                                        newOrder.orderDetails[index].quantity = parseInt(e.target.value);
+                                        newOrder.orderDetails[index].quantity =
+                                            parseInt(e.target.value);
                                         setOrder(newOrder);
                                     }}
-                                    type='number'
+                                    type="number"
                                 />
                             </TableCell>
                         ) : (
