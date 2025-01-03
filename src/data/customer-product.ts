@@ -20,6 +20,7 @@ export interface ProductDtoList {
     categoryId: string;
     categoryName: string;
     supplierId: number;
+    supplierName?: string;
     unitOfMeasureId: number;
     warehouseId: null;
     unitWeightPairsList: UnitWeightPairsList[];

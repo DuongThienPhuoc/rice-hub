@@ -41,7 +41,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
 }) => {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
-
+    const [warehouseQuantity, setWarehouseQuantity] = React.useState<number>(0);
     function handleSubmit() {
         if (type === '') {
             setError('Vui lòng chọn quy cách');
@@ -59,9 +59,12 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
     }
 
     return (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen} onOpenChange={() => {
+            setIsOpen(!isOpen)
+            setWarehouseQuantity(0)
+        }}>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent className='w-80'>
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <h4 className="font-medium leading-none">Quy cách</h4>
@@ -76,6 +79,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                 const weightPerUnit: UnitWeightPairsList = JSON.parse(value)
                                 setType(weightPerUnit.weightPerUnit.toString())
                                 setProductUnit(weightPerUnit.productUnit)
+                                setWarehouseQuantity(weightPerUnit.quantity)
                             }}>
                                 <SelectTrigger id="type" className="w-[165px]">
                                     <SelectValue placeholder="Chọn quy cách" />
@@ -97,6 +101,12 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                 </SelectContent>
                             </Select>
                         </div>
+                        {warehouseQuantity > 0 && (
+                            <div className='grid grid-cols-3 items-center gap-4'>
+                                <Label>Số lượng còn trong kho</Label>
+                                <span>{`${warehouseQuantity} Bao`}</span>
+                            </div>
+                        )}
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="quantity">Số lượng</Label>
                             <Input
