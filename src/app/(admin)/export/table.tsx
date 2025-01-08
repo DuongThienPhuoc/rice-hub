@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import { FileUp, PlusIcon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { DateRange } from 'react-day-picker';
 import SearchBar from '@/components/searchbar/searchbar';
@@ -206,49 +206,6 @@ export default function ExportTable() {
         }
     };
 
-    const downloadTemplateExcel = async () => {
-        try {
-            const response = await api.get('/products/generateExportTemplate', {
-                responseType: 'blob',
-            });
-
-            const blob = new Blob([response.data], {
-                type: response.headers['content-type'],
-            });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            const contentDisposition = response.headers['content-disposition'];
-            const filename = contentDisposition
-                ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-                : 'template.xlsx';
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Error downloading the template:', error);
-        }
-    };
-
-    const handleShowDownloadMaterial = () => {
-        Swal.fire({
-            title: 'Bạn đã có mẫu file excel chưa?',
-            text: "Nếu chưa, bạn có thể tải xuống ở bên dưới.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Tải xuống mẫu',
-            cancelButtonText: 'Không',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                downloadTemplateExcel();
-            } else {
-                document.getElementById("fileInput")?.click();
-            }
-        });
-    };
-
     return (
         <div className='mx-5'>
             <section className='col-span-4'>
@@ -291,7 +248,6 @@ export default function ExportTable() {
                                 {loadingData ? (
                                     <>
                                         <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
-                                        <Skeleton animation="wave" variant="rectangular" height={40} width={80} className='rounded-lg ml-0 mt-4 lg:ml-2 lg:mt-0' />
                                     </>
                                 ) : (
                                     <>
@@ -304,12 +260,6 @@ export default function ExportTable() {
                                         >
                                             Tạo phiếu xuất
                                             <PlusIcon />
-                                        </Button>
-                                        <Button
-                                            className="px-3 py-3 text-[14px] hover:bg-green-500"
-                                            onClick={handleShowDownloadMaterial}
-                                        >
-                                            Xuất từ file <FileUp />
                                         </Button>
                                     </>
                                 )}

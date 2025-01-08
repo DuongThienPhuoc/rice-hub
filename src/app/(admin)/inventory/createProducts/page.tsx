@@ -77,7 +77,7 @@ const Page = () => {
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nguyên liệu!',
+                title: 'Lỗi khi lấy danh sách sản phẩm!',
                 description: 'Xin vui lòng thử lại',
                 duration: 3000
             })
@@ -174,9 +174,9 @@ const Page = () => {
                                 </div>
                             ) : (
                                 <div className="space-y-2 mb-5">
-                                    <div className='font-bold text-[1.25rem]'>Bán hàng</div>
+                                    <div className='font-bold text-[1.25rem]'>Sản phẩm</div>
                                     <p className="text-sm text-muted-foreground">
-                                        Tạo phiếu kiểm kho bán hàng
+                                        Tạo phiếu kiểm kho sản phẩm
                                     </p>
                                 </div>
                             )}

@@ -82,6 +82,7 @@ export async function getProductListByAdmin({
     pageSize = 5,
     forceFirstAndLastRels = true,
     categoryName = null,
+    supplierName = null,
     id = null,
     name
 }: {
@@ -89,6 +90,7 @@ export async function getProductListByAdmin({
     pageSize?: number;
     forceFirstAndLastRels?: boolean;
     categoryName?: string | null;
+    supplierName?: string | null;
     id?: number | null;
     name?: string | null;
 }) {
@@ -98,6 +100,7 @@ export async function getProductListByAdmin({
                 pageNumber,
                 pageSize,
                 categoryName,
+                supplierName,
                 forceFirstAndLastRels,
                 id,
                 name
@@ -110,3 +113,41 @@ export async function getProductListByAdmin({
         throw new Error('Something went wrong');
     }
 }
+
+export async function getProductAndIngredientListByAdmin({
+    pageNumber = 1,
+    pageSize = 5,
+    forceFirstAndLastRels = true,
+    categoryName = null,
+    supplierName = null,
+    id = null,
+    name
+}: {
+    pageNumber?: number;
+    pageSize?: number;
+    forceFirstAndLastRels?: boolean;
+    categoryName?: string | null;
+    supplierName?: string | null;
+    id?: number | null;
+    name?: string | null;
+}) {
+    try {
+        return axios.get('/products/admin/order/productsAndIngredients', {
+            params: {
+                pageNumber,
+                pageSize,
+                categoryName,
+                supplierName,
+                forceFirstAndLastRels,
+                id,
+                name
+            },
+        });
+    } catch (e) {
+        if (e instanceof Error) {
+            throw new Error(e.message);
+        }
+        throw new Error('Something went wrong');
+    }
+}
+

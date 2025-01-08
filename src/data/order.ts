@@ -1,6 +1,6 @@
 import axiosConfig from '@/config/axiosConfig';
 import axios, { AxiosResponse } from 'axios';
-import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
+import { AdminCreateImportRequest, AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
 import {
     CustomerOrderHistoryResponse,
     CustomerUpdateOrderRequest,
@@ -110,6 +110,18 @@ export async function adminCreateOrder(order: AdminCreateOrderRequest) {
         });
     } catch (e) {
         throw e;
+    }
+}
+
+export async function adminCreateImport(order: AdminCreateImportRequest) {
+    try {
+        const response = await axiosConfig.post('products/generateTemplate', order, {
+            responseType: 'arraybuffer',
+            validateStatus: (status) => status < 500,
+        });
+        return response;
+    } catch (error) {
+        throw new Error('Không thể kết nối tới máy chủ. Vui lòng thử lại sau.');
     }
 }
 
