@@ -409,7 +409,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                         </TableHead>
                                         <TableHead>
                                             <p className="text-white font-semibold">
-                                                Giá nhập (kg)
+                                                Giá nhập trước đó (kg)
                                             </p>
                                         </TableHead>
                                         <TableHead className="text-center">
@@ -429,10 +429,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 {product.categoryName}
                                             </TableCell>
                                             <TableCell>
-                                                {product.supplierId}
+                                                {product.supplierName}
                                             </TableCell>
                                             <TableCell>
-                                                {product.customerPrice}
+                                                {currencyHandleProvider(product.importPrice || 0)}
                                             </TableCell>
                                             <TableCell className="flex justify-center">
                                                 <OrderPopoverProvider
@@ -461,6 +461,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                                 weightPerUnit: 0,
                                                                 name: product.name,
                                                                 categoryName: product.categoryName,
+                                                                supplierName: product.supplierName,
                                                                 unitPrice:
                                                                     product.customerPrice,
                                                             })
@@ -510,6 +511,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
+                                                        Nhà cung cấp
+                                                    </p>
+                                                </TableHead>
+                                                <TableHead>
+                                                    <p className="font-semibold text-white">
                                                         Loại
                                                     </p>
                                                 </TableHead>
@@ -520,7 +526,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
-                                                        Đơn giá
+                                                        Giá nhập trước đó (kg)
                                                     </p>
                                                 </TableHead>
                                                 <TableHead className="text-center">
@@ -541,6 +547,9 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         </TableCell>
                                                         <TableCell className="font-semibold h-12">
                                                             {product.categoryName}
+                                                        </TableCell>
+                                                        <TableCell className="font-semibold h-12">
+                                                            {product.supplierName}
                                                         </TableCell>
                                                         <TableCell>
                                                             {`${product.productUnit} ${product.weightPerUnit} KG`}

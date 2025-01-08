@@ -209,6 +209,7 @@ export interface ProductOrderRequest {
     productId?: number;
     name?: string;
     categoryName?: string;
+    supplierName?: string;
     quantity?: number;
     unitPrice?: number
     weightPerUnit?: number;
