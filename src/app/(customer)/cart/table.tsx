@@ -45,6 +45,7 @@ export interface CartProduct {
     productCode: string;
     productUnit: string;
     name: string;
+    supplierName: string;
     quantity: number;
     price: number;
     type: number;
@@ -198,6 +199,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                 />
                             </TableHead>
                             <TableHead>Tên sản phẩm</TableHead>
+                            <TableHead>Nhà cung cấp</TableHead>
                             <TableHead>Loại</TableHead>
                             <TableHead>Số lượng</TableHead>
                             <TableHead>Tổng trọng lượng</TableHead>
@@ -231,6 +233,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                         />
                                     </TableCell>
                                     <TableCell>{product.name}</TableCell>
+                                    <TableCell>{product.supplierName}</TableCell>
                                     <TableCell>{`${product.type}kg`}</TableCell>
                                     <TableCell>
                                         <Input

@@ -95,7 +95,10 @@ export default function OrderPage(): React.JSX.Element {
                             <div className="flex gap-1">
                                 <Input
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setCurrentPage(0);
+                                    }}
                                     type="text"
                                     className="bg-white"
                                     placeholder="Lọc tên hàng hoá"
@@ -188,7 +191,8 @@ export default function OrderPage(): React.JSX.Element {
                                     <TableRow>
                                         <TableHead>Tên hàng hoá</TableHead>
                                         <TableHead>Loại</TableHead>
-                                        <TableHead>Đơn giá</TableHead>
+                                        <TableHead>Đơn giá (kg)</TableHead>
+                                        <TableHead>Nhà cung cấp</TableHead>
                                         <TableHead className="text-center w-36">
                                             Thêm vào giỏ hàng
                                         </TableHead>
@@ -212,6 +216,9 @@ export default function OrderPage(): React.JSX.Element {
                                                     ),
                                                 )}
                                             </TableCell>
+                                            <TableCell>
+                                                {product.supplierName}
+                                            </TableCell>
                                             <TableCell className="flex justify-center">
                                                 <span>
                                                     <ShoppingCart
@@ -233,6 +240,7 @@ export default function OrderPage(): React.JSX.Element {
                                                                     product.categoryId,
                                                                 supplierId:
                                                                     product.supplierId,
+                                                                supplierName: product.supplierName,
                                                                 unitOfMeasureId:
                                                                     product.unitOfMeasureId,
                                                                 unitWeightPairsList:

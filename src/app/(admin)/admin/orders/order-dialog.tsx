@@ -237,7 +237,6 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 <section className="max-h-[650px] overflow-y-auto">
                     <div>
                         <Label htmlFor="customer">Khách hàng</Label>
-
                         <Select
                             value={selectedCustomer}
                             onValueChange={(e) => {
@@ -285,6 +284,9 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                             <div className="text-md font-semibold">
                                                 {customer.name}
                                             </div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {`Địa chỉ: ${customer.address}`}
+                                            </div>
                                             <div className="text-sm text-muted-foreground">{`SDT: ${customer.phone}`}</div>
                                         </SelectItem>
                                     ))}
@@ -300,7 +302,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         <div className="flex gap-1">
                             <Input
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(0);
+                                }}
                                 type="text"
                                 className="bg-white w-52"
                                 placeholder="Lọc tên hàng hoá"
@@ -395,6 +400,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 Đơn giá (kg)
                                             </p>
                                         </TableHead>
+                                        <TableHead>
+                                            <p className="text-white font-semibold">
+                                                Nhà cung cấp
+                                            </p>
+                                        </TableHead>
                                         <TableHead className="text-center">
                                             <p className="text-white font-semibold">
                                                 Thêm
@@ -412,7 +422,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 {product.categoryName}
                                             </TableCell>
                                             <TableCell>
-                                                {product.customerPrice}
+                                                {currencyHandleProvider(product.customerPrice)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {product.supplierName}
                                             </TableCell>
                                             <TableCell className="flex justify-center">
                                                 <OrderPopoverProvider

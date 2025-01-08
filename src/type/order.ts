@@ -63,6 +63,8 @@ export interface OrderDetail {
     productUnit: string;
     discount: number;
     totalPrice: number;
+    supplierName?: string;
+    remainQuantity?: number;
 }
 
 export interface Customer {
