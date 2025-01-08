@@ -40,7 +40,7 @@ export default function OrderDetailTable({
                         <p className="font-semibold text-white">Số lượng</p>
                     </TableHead>
                     <TableHead>
-                        <p className="font-semibold text-white">Giá</p>
+                        <p className="font-semibold text-white">Giá(kg)</p>
                     </TableHead>
                     <TableHead className="text-right">
                         <p className="font-semibold text-white">Thành tiền</p>
