@@ -518,9 +518,6 @@ const Page = () => {
                                             <TableCell colSpan={2} className='px-2 py-4'>
                                                 <TextField
                                                     type={'text'}
-                                                    InputProps={{
-                                                        readOnly: selectedProduct !== null,
-                                                    }}
                                                     className='w-full'
                                                     onChange={(e) => {
                                                         setProductName(e.target.value)

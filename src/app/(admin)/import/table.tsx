@@ -10,40 +10,36 @@ import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import crypto from 'crypto';
-import { ButtonGroup, ClickAwayListener, Grow, MenuItem, MenuList, Paper, Popper, Skeleton } from '@mui/material';
+import { Menu, MenuItem, Skeleton } from '@mui/material';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
 import { DateRange } from 'react-day-picker';
 import { Separator } from '@/components/ui/separator';
 import SearchBar from '@/components/searchbar/searchbar';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from '@radix-ui/react-toast';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import ImportPageBreadcrumb from '@/app/(admin)/import/breadcrumb';
-import { FileUp } from 'lucide-react';
+import { FileUp, Plus } from 'lucide-react';
+import OrderDialogProvider from './order-dialog';
 
 export default function ImportTable() {
     const router = useRouter();
-    const anchorRef = React.useRef<HTMLDivElement>(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
-    const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const { setBreadcrumb } = useBreadcrumbStore()
 
     useEffect(() => {
         setBreadcrumb(<ImportPageBreadcrumb />)
         return () => setBreadcrumb(null)
     }, [setBreadcrumb]);
-    const options = ['Tạo phiếu nhập từ sản xuất', 'Tạo phiếu nhập từ nhà cung cấp'];
-    const handleClick = () => {
-        if (options[selectedIndex] === 'Tạo phiếu nhập từ nhà cung cấp') {
-            setOnPageChange(true);
-            router.push("/import/create");
-        } else {
-            setOnPageChange(true);
-            router.push("/import/createFromProduction");
-        }
-    };
+
     const columns = [
         { name: 'id', displayName: 'Mã phiếu' },
         { name: 'batchCode', displayName: 'Lô hàng' },
@@ -60,11 +56,12 @@ export default function ImportTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
+    const [newOrder, setNewOrder] = useState<boolean>(false);
     const { toast } = useToast();
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const processedFileHashes = new Set<string>();
+    const processedFileHashes = new Set<string>(JSON.parse(sessionStorage.getItem('processedFileHashes') || '[]'));
     const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
         field: '',
         query: ''
@@ -75,29 +72,6 @@ export default function ImportTable() {
         const uint8Array = new Uint8Array(arrayBuffer);
         const hash = crypto.createHash('sha256').update(uint8Array).digest('hex');
         return hash;
-    };
-
-    const handleMenuItemClick = (
-        event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-        index: number,
-    ) => {
-        setSelectedIndex(index);
-        setOpen(false);
-    };
-
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
-
-    const handleClose = (event: Event) => {
-        if (
-            anchorRef.current &&
-            anchorRef.current.contains(event.target as HTMLElement)
-        ) {
-            return;
-        }
-
-        setOpen(false);
     };
 
     const getData = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
@@ -167,46 +141,7 @@ export default function ImportTable() {
     };
 
     const handleShowDownloadMaterial = () => {
-        Swal.fire({
-            title: 'Bạn đã có mẫu file excel chưa?',
-            text: "Nếu chưa, bạn có thể tải xuống ở bên dưới.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Tải xuống mẫu',
-            cancelButtonText: 'Không',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                downloadTemplateExcel();
-            } else {
-                document.getElementById("fileInput")?.click();
-            }
-        });
-    };
-
-    const downloadTemplateExcel = async () => {
-        try {
-            const response = await api.get('/products/generateTemplate', {
-                responseType: 'blob',
-            });
-
-            const blob = new Blob([response.data], {
-                type: response.headers['content-type'],
-            });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            const contentDisposition = response.headers['content-disposition'];
-            const filename = contentDisposition
-                ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-                : 'template.xlsx';
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Error downloading the template:', error);
-        }
+        document.getElementById("fileInput")?.click();
     };
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -218,7 +153,7 @@ export default function ImportTable() {
 
             const fileHash = await calculateFileHash(file);
             if (processedFileHashes.has(fileHash)) {
-                Swal.fire('File đã được nhập', 'Vui lòng chọn file khác', 'warning');
+                Swal.fire('File này đã được nhập', 'Vui lòng chọn file khác', 'warning');
                 return;
             }
 
@@ -260,27 +195,33 @@ export default function ImportTable() {
                     duration: 3000,
                 })
                 processedFileHashes.add(fileHash);
+                sessionStorage.setItem('processedFileHashes', JSON.stringify(Array.from(processedFileHashes)));
                 setOnPageChange(false);
                 fileInput.value = '';
             } else {
+                setOnPageChange(false);
                 toast({
                     variant: 'destructive',
                     title: 'Tạo thất bại',
                     description: 'Đã xảy ra lỗi, vui lòng thử lại.',
                     duration: 3000,
                 })
-                setOnPageChange(false);
                 fileInput.value = '';
             }
-        } catch (error) {
+        } catch (error: any) {
+            setOnPageChange(false);
+            const messages = error?.response?.data?.message || ['Đã xảy ra lỗi, vui lòng thử lại.'];
             toast({
                 variant: 'destructive',
                 title: 'Tạo thất bại',
-                description: 'Đã xảy ra lỗi, vui lòng thử lại.',
+                description: (
+                    <div>
+                        <div>{messages}</div>
+                    </div>
+                ),
                 action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
-                duration: 3000,
-            })
-            setOnPageChange(false);
+                duration: 3000
+            });
             fileInput.value = '';
         }
     }
@@ -329,68 +270,43 @@ export default function ImportTable() {
                                     </>
                                 ) : (
                                     <>
-                                        <ButtonGroup
-                                            variant="contained"
-                                            sx={{
-                                                backgroundColor: '#4ba94d',
-                                                '& .MuiButton-root': {
-                                                    border: 'none',
-                                                    '&:hover': {
-                                                        backgroundColor: '#22c55e',
-                                                    },
-                                                },
-                                            }}
-                                            ref={anchorRef}
+                                        <Button
+                                            className='hover:bg-green-500'
+                                            id="basic-button"
+                                            aria-controls={open ? 'basic-menu' : undefined}
+                                            aria-haspopup="true"
+                                            aria-expanded={open ? 'true' : undefined}
+                                            onClick={handleClick}
                                         >
-                                            <Button
-                                                className='hover:bg-green-500'
-                                                onClick={handleClick}>{options[selectedIndex]}</Button>
-                                            <Button
-                                                className='hover:bg-green-500 rounded-r-lg rounded-l-none'
-                                                aria-controls={open ? 'split-button-menu' : undefined}
-                                                aria-expanded={open ? 'true' : undefined}
-                                                aria-label="select merge strategy"
-                                                aria-haspopup="menu"
-                                                onClick={handleToggle}
-                                            >
-                                                <ArrowDropDownIcon />
-                                            </Button>
-                                        </ButtonGroup>
-                                        <Popper
-                                            sx={{ zIndex: 1 }}
+                                            Tạo phiếu nhập kho <Plus />
+                                        </Button>
+                                        <Menu
+                                            id="basic-menu"
+                                            anchorEl={anchorEl}
                                             open={open}
-                                            anchorEl={anchorRef.current}
-                                            role={undefined}
-                                            transition
-                                            disablePortal
+                                            onClose={handleClose}
+                                            MenuListProps={{
+                                                'aria-labelledby': 'basic-button',
+                                            }}
                                         >
-                                            {({ TransitionProps, placement }) => (
-                                                <Grow
-                                                    {...TransitionProps}
-                                                    style={{
-                                                        transformOrigin:
-                                                            placement === 'bottom' ? 'center top' : 'center bottom',
-                                                    }}
-                                                >
-                                                    <Paper >
-                                                        <ClickAwayListener onClickAway={handleClose}>
-                                                            <MenuList id="split-button-menu" autoFocusItem>
-                                                                {options.map((option, index) => (
-                                                                    <MenuItem
-                                                                        key={option}
-                                                                        disabled={index === 2}
-                                                                        selected={index === selectedIndex}
-                                                                        onClick={(event) => handleMenuItemClick(event, index)}
-                                                                    >
-                                                                        {option}
-                                                                    </MenuItem>
-                                                                ))}
-                                                            </MenuList>
-                                                        </ClickAwayListener>
-                                                    </Paper>
-                                                </Grow>
-                                            )}
-                                        </Popper>
+                                            <MenuItem onClick={() => {
+                                                setOnPageChange(true);
+                                                router.push("/import/create")
+                                            }}>Nhập từ nhà cung cấp</MenuItem>
+                                            <MenuItem onClick={() => {
+                                                setOnPageChange(true);
+                                                router.push("/import/createFromProduction")
+                                            }}>Nhập từ kho sản xuất</MenuItem>
+                                        </Menu>
+                                        <OrderDialogProvider
+                                            newOrder={newOrder}
+                                            setNewOrder={setNewOrder}
+                                        >
+                                            <Button className="ml-0 lg:ml-4 mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500">
+                                                <span>Tạo phiếu nhập hàng</span>
+                                                <Plus />
+                                            </Button>
+                                        </OrderDialogProvider>
                                         <Button
                                             className="p-3 text-[14px] hover:bg-green-500 lg:mt-0 mt-2"
                                             onClick={handleShowDownloadMaterial}

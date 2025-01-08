@@ -315,14 +315,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Hình thức</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-white'>Ngày nhập/xuất</p></TableCell>
                                                             </TableRow>
                                                         ) : (
                                                             <TableRow>
                                                                 <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
-                                                                <TableCell><p className='font-semibold text-white'>Giá nhập hiện tại (kg)</p></TableCell>
                                                             </TableRow>
                                                         )}
                                                     </TableHead>
@@ -340,7 +339,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                         <TableCell>{row?.unit + ' ' + row?.weightPerUnit} kg</TableCell>
                                                                         <TableCell>{row?.quantity || 0} {row?.unit || 'kg'}</TableCell>
                                                                         <TableCell>{row?.receiptType === 'IMPORT' ? 'Nhập kho' : 'Xuất kho'}</TableCell>
-                                                                        <TableCell>{row?.description || 'N/A'}</TableCell>
+                                                                        <TableCell>{renderDate(row?.date)}</TableCell>
                                                                     </TableRow>
                                                                 ))
                                                             ) : (
@@ -359,14 +358,11 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                         <TableCell>{rowIndex + 1}</TableCell>
                                                                         <TableCell>{(row.weightPerUnit > 1 && row.unit) ? row.unit + " " + row.weightPerUnit + " kg" : 'Chưa đóng gói'}</TableCell>
                                                                         <TableCell>{row?.quantity > 0 && row?.quantity} {row?.unit || 'kg'}</TableCell>
-                                                                        <TableCell>
-                                                                            {Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(row?.importPrice || 0))}
-                                                                        </TableCell>
                                                                     </TableRow>
                                                                 ))
                                                             ) : (
                                                                 <TableRow>
-                                                                    <TableCell colSpan={4}>
+                                                                    <TableCell colSpan={3}>
                                                                         <div className="my-10 mx-4 text-center text-gray-500">
                                                                             Không có dữ liệu
                                                                         </div>

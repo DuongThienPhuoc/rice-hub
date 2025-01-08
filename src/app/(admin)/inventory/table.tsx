@@ -8,14 +8,9 @@ import { useEffect, useState } from "react";
 import FloatingButton from "@/components/floating/floatingButton";
 import api from "@/config/axiosConfig";
 import { useRouter } from 'next/navigation';
-import { ButtonGroup, Button, Skeleton } from '@mui/material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Grow from '@mui/material/Grow';
-import Paper from '@mui/material/Paper';
-import Popper from '@mui/material/Popper';
+import { Button } from '@/components/ui/button';
+import { Skeleton, Menu } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
-import MenuList from '@mui/material/MenuList';
 import { Separator } from '@/components/ui/separator';
 import { DateRange } from 'react-day-picker';
 import { DatePickerWithRange } from '../expenditures/date-range-picker';
@@ -23,6 +18,7 @@ import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
 import { useToast } from '@/hooks/use-toast';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import InventoryPageBreadcrumb from '@/app/(admin)/inventory/breadcrumb';
+import { Plus } from 'lucide-react';
 
 export default function InventoryTable() {
     const router = useRouter();
@@ -36,7 +32,6 @@ export default function InventoryTable() {
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const options = ['Tạo phiếu kiểm kho bán hàng', 'Tạo phiếu kiểm kho nguyên liệu'];
     const [loadingData, setLoadingData] = useState(true);
     const [inventory, setInventory] = useState([]);
     const [totalPages, setTotalPages] = useState(0);
@@ -48,49 +43,21 @@ export default function InventoryTable() {
     const titles = [
         { name: '', displayName: '', type: '' },
     ];
-    const [open, setOpen] = React.useState(false);
-    const anchorRef = React.useRef<HTMLDivElement>(null);
-    const [selectedIndex, setSelectedIndex] = React.useState(1);
     const { toast } = useToast();
-
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const { setBreadcrumb } = useBreadcrumbStore()
 
     useEffect(() => {
         setBreadcrumb(<InventoryPageBreadcrumb />)
         return () => setBreadcrumb(null)
     }, [setBreadcrumb]);
-
-    const handleClick = () => {
-        setOnPageChange(true);
-        if (options[selectedIndex] === 'Tạo phiếu kiểm kho bán hàng') {
-            router.push("/inventory/createProducts");
-        } else {
-            router.push("/inventory/createIngredients");
-        }
-    };
-
-    const handleMenuItemClick = (
-        event: React.MouseEvent<HTMLLIElement, MouseEvent>,
-        index: number,
-    ) => {
-        setSelectedIndex(index);
-        setOpen(false);
-    };
-
-    const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
-    };
-
-    const handleClose = (event: Event) => {
-        if (
-            anchorRef.current &&
-            anchorRef.current.contains(event.target as HTMLElement)
-        ) {
-            return;
-        }
-
-        setOpen(false);
-    };
 
     const getInventory = async (page?: number, search?: { field?: string, query?: string }, startDate?: any, endDate?: any) => {
         try {
@@ -186,69 +153,34 @@ export default function InventoryTable() {
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={300} className='rounded-lg' />
                                 ) : (
                                     <>
-                                        <ButtonGroup
-                                            variant="contained"
-                                            sx={{
-                                                backgroundColor: '#4ba94d',
-                                                '& .MuiButton-root': {
-                                                    border: 'none',
-                                                    '&:hover': {
-                                                        backgroundColor: '#22c55e',
-                                                    },
-                                                },
-                                            }}
-                                            ref={anchorRef}
+                                        <Button
+                                            className='hover:bg-green-500'
+                                            id="basic-button"
+                                            aria-controls={open ? 'basic-menu' : undefined}
+                                            aria-haspopup="true"
+                                            aria-expanded={open ? 'true' : undefined}
+                                            onClick={handleClick}
                                         >
-                                            <Button
-                                                className='bg-[#4ba94d] hover:bg-green-500'
-                                                onClick={handleClick}>{options[selectedIndex]}</Button>
-                                            <Button
-                                                className='bg-[#4ba94d] hover:bg-green-500'
-                                                size="small"
-                                                aria-controls={open ? 'split-button-menu' : undefined}
-                                                aria-expanded={open ? 'true' : undefined}
-                                                aria-label="select merge strategy"
-                                                aria-haspopup="menu"
-                                                onClick={handleToggle}
-                                            >
-                                                <ArrowDropDownIcon />
-                                            </Button>
-                                        </ButtonGroup>
-                                        <Popper
-                                            sx={{ zIndex: 1 }}
+                                            Tạo phiếu kiểm kho <Plus />
+                                        </Button>
+                                        <Menu
+                                            id="basic-menu"
+                                            anchorEl={anchorEl}
                                             open={open}
-                                            anchorEl={anchorRef.current}
-                                            role={undefined}
-                                            transition
-                                            disablePortal
+                                            onClose={handleClose}
+                                            MenuListProps={{
+                                                'aria-labelledby': 'basic-button',
+                                            }}
                                         >
-                                            {({ TransitionProps, placement }) => (
-                                                <Grow
-                                                    {...TransitionProps}
-                                                    style={{
-                                                        transformOrigin:
-                                                            placement === 'bottom' ? 'center top' : 'center bottom',
-                                                    }}
-                                                >
-                                                    <Paper >
-                                                        <ClickAwayListener onClickAway={handleClose}>
-                                                            <MenuList id="split-button-menu" autoFocusItem>
-                                                                {options.map((option, index) => (
-                                                                    <MenuItem
-                                                                        key={option}
-                                                                        disabled={index === 2}
-                                                                        selected={index === selectedIndex}
-                                                                        onClick={(event) => handleMenuItemClick(event, index)}
-                                                                    >
-                                                                        {option}
-                                                                    </MenuItem>
-                                                                ))}
-                                                            </MenuList>
-                                                        </ClickAwayListener>
-                                                    </Paper>
-                                                </Grow>
-                                            )}
-                                        </Popper>
+                                            <MenuItem onClick={() => {
+                                                setOnPageChange(true);
+                                                router.push("/inventory/createProducts");
+                                            }}>Kiểm kho sản phẩm</MenuItem>
+                                            <MenuItem onClick={() => {
+                                                setOnPageChange(true);
+                                                router.push("/inventory/createIngredients");
+                                            }}>Kiểm kho nguyên liệu</MenuItem>
+                                        </Menu>
                                     </>
                                 )}
                             </div>
