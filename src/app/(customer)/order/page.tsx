@@ -148,6 +148,7 @@ export default function OrderPage(): React.JSX.Element {
                                                                 setSelectedCategory(
                                                                     category
                                                                 );
+                                                                setCurrentPage(0);
                                                             }}
                                                         >
                                                             {selectedCategory ===
@@ -256,20 +257,22 @@ export default function OrderPage(): React.JSX.Element {
                                         </TableRow>
                                     ))}
                                 </TableBody>
-                                <TableFooter className="bg-white">
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={5}
-                                            className="hover:bg-white"
-                                        >
-                                            <PaginationComponent
-                                                totalPages={totalPages}
-                                                currentPage={currentPage}
-                                                setCurrentPage={setCurrentPage}
-                                            />
-                                        </TableCell>
-                                    </TableRow>
-                                </TableFooter>
+                                {totalPages > 1 && (
+                                    <TableFooter className="bg-white">
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={5}
+                                                className="hover:bg-white"
+                                            >
+                                                <PaginationComponent
+                                                    totalPages={totalPages}
+                                                    currentPage={currentPage}
+                                                    setCurrentPage={setCurrentPage}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableFooter>
+                                )}
                             </Table>
                         </section>
                     </section>
