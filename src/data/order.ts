@@ -91,11 +91,25 @@ export async function getOrderDetail(orderId: string) {
 export async function getAdminOrders<T>(
     pageNumber: number = 1,
     pageSize: number = 10,
+    orderStatus: string | undefined
 ): Promise<T> {
     try {
+        if(orderStatus === 'ALL') {
+            orderStatus = undefined;
+        }
+        console.log({
+            pageNumber,
+            pageSize,
+            status: orderStatus
+        });
         const response: AxiosResponse<T> = await axiosConfig.get(
-            `/order/admin/orders?pageNumber=${pageNumber}&pageSize=${pageSize}`,
-        );
+            `/order/admin/orders`,{
+                params: {
+                    pageNumber,
+                    pageSize,
+                    status: orderStatus
+                }
+        });
         return response.data;
     } catch (e) {
         console.error('Error fetching admin orders', e);

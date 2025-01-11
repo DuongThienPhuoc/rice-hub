@@ -61,7 +61,9 @@ export default function ImportTable() {
     const [date, setDate] = React.useState<DateRange | undefined>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    const processedFileHashes = new Set<string>(JSON.parse(sessionStorage.getItem('processedFileHashes') || '[]'));
+    const processedFileHashes = new Set<string>(JSON.parse(typeof window !== 'undefined'
+        ? sessionStorage.getItem('processedFileHashes') || '[]'
+        : '[]'));
     const [currentSearch, setCurrentSearch] = useState<{ field?: string, query?: string }>({
         field: '',
         query: ''
@@ -195,7 +197,9 @@ export default function ImportTable() {
                     duration: 3000,
                 })
                 processedFileHashes.add(fileHash);
-                sessionStorage.setItem('processedFileHashes', JSON.stringify(Array.from(processedFileHashes)));
+                if(typeof window !== undefined){
+                    sessionStorage.setItem('processedFileHashes', JSON.stringify(Array.from(processedFileHashes)));
+                }
                 setOnPageChange(false);
                 fileInput.value = '';
             } else {

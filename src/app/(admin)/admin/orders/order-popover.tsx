@@ -93,7 +93,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                                     value={JSON.stringify(weightPerUnit)}
                                                     key={_index}
                                                 >
-                                                    {`${weightPerUnit.weightPerUnit} KG`}
+                                                    {`${weightPerUnit.productUnit} ${weightPerUnit.weightPerUnit} KG`}
                                                 </SelectItem>
                                             ),
                                         )}

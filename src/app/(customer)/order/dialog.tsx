@@ -117,7 +117,7 @@ export default function OrderPageDialog({
                 <section className="grid gap-4 gap-y-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label>Tên hàng hoá</Label>
-                        <p className='font-bold text-base'>{product.name}</p>
+                        <p className='font-bold text-base col-span-3'>{product.name}</p>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label>Loại</Label>

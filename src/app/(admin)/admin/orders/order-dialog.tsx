@@ -355,6 +355,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                             setSelectedCategory(
                                                                 category,
                                                             );
+                                                            setCurrentPage(0);
                                                         }}
                                                     >
                                                         {selectedCategory ===
@@ -422,7 +423,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 {product.categoryName}
                                             </TableCell>
                                             <TableCell>
-                                                {currencyHandleProvider(product.customerPrice)}
+                                                {`${currencyHandleProvider(product.customerPrice)}/kg`}
                                             </TableCell>
                                             <TableCell>
                                                 {product.supplierName}
@@ -455,6 +456,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                                 name: product.name,
                                                                 unitPrice:
                                                                     product.customerPrice,
+                                                                supplierName:
+                                                                    product.supplierName,
                                                             })
                                                         }
                                                     >
@@ -469,11 +472,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             </Table>
                         </div>
                         <div>
-                            <PaginationComponent
-                                currentPage={currentPage}
-                                setCurrentPage={setCurrentPage}
-                                totalPages={totalPages}
-                            />
+                            {totalPages > 1 && (
+                                <PaginationComponent
+                                    currentPage={currentPage}
+                                    setCurrentPage={setCurrentPage}
+                                    totalPages={totalPages}
+                                />
+                            )}
                         </div>
                     </div>
                     {selectedProducts.length > 0 && (
@@ -502,12 +507,17 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
-                                                        Số lượng (Bao)
+                                                        Số lượng
                                                     </p>
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
                                                         Đơn giá
+                                                    </p>
+                                                </TableHead>
+                                                <TableHead>
+                                                    <p className="font-semibold text-white">
+                                                        Nhà cung cấp
                                                     </p>
                                                 </TableHead>
                                                 <TableHead className="text-center">
@@ -530,13 +540,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                             {`${product.weightPerUnit} KG`}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {product.quantity}
+                                                            {`${product.quantity} ${product.productUnit}`}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {currencyHandleProvider(
-                                                                product.unitPrice ||
-                                                                0,
-                                                            )}
+                                                            {`${currencyHandleProvider(product.unitPrice || 0)}/kg`}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {product.supplierName}
                                                         </TableCell>
                                                         <TableCell className="flex justify-center">
                                                             <Button
