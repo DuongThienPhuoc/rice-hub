@@ -522,7 +522,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                         <TableCell rowSpan={2}><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
                                                         <TableCell rowSpan={2}><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell rowSpan={2}><p className='font-semibold text-white'>Danh mục</p></TableCell>
-                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Nhà sản xuất</p></TableCell>
                                                         {batch?.receiptType === 'IMPORT' && (
                                                             <TableCell rowSpan={2}><p className='font-semibold text-white'>Giá nhập</p> </TableCell>
                                                         )}

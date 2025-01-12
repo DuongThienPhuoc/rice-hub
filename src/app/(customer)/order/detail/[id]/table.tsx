@@ -31,7 +31,7 @@ export default function OrderDetailTable({
                         <p className="font-semibold text-white">Sản Phẩm</p>
                     </TableHead>
                     <TableHead>
-                        <p className="font-semibold text-white">Nhà Cung Cấp</p>
+                        <p className="font-semibold text-white">Nhà sản xuất</p>
                     </TableHead>
                     <TableHead>
                         <p className="font-semibold text-white">Quy cách</p>

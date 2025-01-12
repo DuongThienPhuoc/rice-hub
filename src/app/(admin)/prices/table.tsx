@@ -347,7 +347,7 @@ export default function PriceTable() {
                                                 <div className="h-[38px] px-5 rounded-md border border-[#4ba94d] bg-[#4ba94d] flex items-center gap-1 hover:cursor-pointer">
                                                     <CirclePlus className="h-4 w-4 text-white" />
                                                     <span className="text-sm font-semibold text-white">
-                                                        Nhà cung cấp
+                                                        Nhà sản xuất
                                                     </span>
                                                     {selectedSupplier !== null && (
                                                         <>
@@ -372,7 +372,7 @@ export default function PriceTable() {
                                                         <input
                                                             type="text"
                                                             className="pl-6 h-full rounded outline-0 focus:outline-0"
-                                                            placeholder="Nhà cung cấp"
+                                                            placeholder="Nhà sản xuất"
                                                         />
                                                     </div>
                                                 </div>
@@ -485,7 +485,7 @@ export default function PriceTable() {
                                                     </TableCell>
                                                     <TableCell>
                                                         <p className={`font-semibold text-white`}>
-                                                            Nhà cung cấp
+                                                            Nhà sản xuất
                                                         </p>
                                                     </TableCell>
                                                     <TableCell>

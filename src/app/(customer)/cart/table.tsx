@@ -199,7 +199,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                 />
                             </TableHead>
                             <TableHead>Tên sản phẩm</TableHead>
-                            <TableHead>Nhà cung cấp</TableHead>
+                            <TableHead>Nhà sản xuất</TableHead>
                             <TableHead>Loại</TableHead>
                             <TableHead>Số lượng</TableHead>
                             <TableHead>Tổng trọng lượng</TableHead>

@@ -21,7 +21,7 @@ export default function SupplierPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage className='text-white'>Nhà cung cấp</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Nhà sản xuất</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

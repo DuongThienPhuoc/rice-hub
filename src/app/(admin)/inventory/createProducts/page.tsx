@@ -210,7 +210,7 @@ const Page = () => {
                                                         <TableCell><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Danh mục</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Nhà sản xuất</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                         <TableCell align='center'><p className='font-semibold text-white'>Thêm vào danh sách</p></TableCell>
                                                     </TableRow>
@@ -284,7 +284,7 @@ const Page = () => {
                                                         <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Danh mục</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Nhà sản xuất</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>

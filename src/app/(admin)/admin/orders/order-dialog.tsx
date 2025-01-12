@@ -403,7 +403,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                         </TableHead>
                                         <TableHead>
                                             <p className="text-white font-semibold">
-                                                Nhà cung cấp
+                                                Nhà sản xuất
                                             </p>
                                         </TableHead>
                                         <TableHead className="text-center">
@@ -517,7 +517,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
-                                                        Nhà cung cấp
+                                                        Nhà sản xuất
                                                     </p>
                                                 </TableHead>
                                                 <TableHead className="text-center">

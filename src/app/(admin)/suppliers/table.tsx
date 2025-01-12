@@ -79,7 +79,7 @@ export default function SupplierTable() {
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
+                title: 'Lỗi khi lấy danh sách nhà sản xuất!',
                 description: 'Xin vui lòng thử lại',
                 duration: 3000
             })
@@ -119,9 +119,9 @@ export default function SupplierTable() {
                             </div>
                         ) : (
                             <div className="space-y-2 mb-5">
-                                <div className='font-bold text-[1.25rem]'>Nhà cung cấp</div>
+                                <div className='font-bold text-[1.25rem]'>Nhà sản xuất</div>
                                 <p className="text-sm text-muted-foreground">
-                                    Quản lý danh sách nhà cung cấp
+                                    Quản lý danh sách nhà sản xuất
                                 </p>
                             </div>
                         )}
@@ -131,7 +131,7 @@ export default function SupplierTable() {
                                 onSearch={handleSearch}
                                 loadingData={loadingData}
                                 selectOptions={[
-                                    { value: 'name', label: 'Tên nhà cung cấp' },
+                                    { value: 'name', label: 'Tên nhà sản xuất' },
                                     { value: 'email', label: 'Email' },
                                     { value: 'phoneNumber', label: 'Số điện thoại' }
                                 ]}
@@ -141,14 +141,14 @@ export default function SupplierTable() {
                                     <Skeleton animation="wave" variant="rectangular" height={40} width={150} className='rounded-lg' />
                                 ) : (
                                     <Button onClick={openPopup} className='ml-0 mt-4 lg:ml-4 lg:mt-0 px-3 py-3 text-[14px] bg-[#4ba94d] font-semibold hover:bg-green-500'>
-                                        Thêm nhà cung cấp
+                                        Thêm nhà sản xuất
                                         <PlusIcon />
                                     </Button>
                                 )}
                             </div>
                         </div>
                         <div className='overflow-hidden'>
-                            <SupplierList name="Nhà cung cấp" editUrl="/suppliers/updateSupplier" titles={titles} loadingData={loadingData} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
+                            <SupplierList name="Nhà sản xuất" editUrl="/suppliers/updateSupplier" titles={titles} loadingData={loadingData} columns={columns} data={suppliers} tableName="suppliers" handleClose={closeEdit} />
                         </div>
                         {totalPages > 1 && (
                             <Paging
@@ -160,7 +160,7 @@ export default function SupplierTable() {
                     </div>
                 </div>
             </section>
-            {isPopupVisible && <PopupCreate tableName="Nhà cung cấp" url="/suppliers/createSupplier" titles={titles} handleClose={closeCreate} />}
+            {isPopupVisible && <PopupCreate tableName="Nhà sản xuất" url="/suppliers/createSupplier" titles={titles} handleClose={closeCreate} />}
             <FloatingButton />
         </div>
     );

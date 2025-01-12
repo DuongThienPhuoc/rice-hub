@@ -309,7 +309,7 @@ const Page = () => {
                                                     <div className="h-[38px] px-5 rounded-md border border-[#4ba94d] bg-[#4ba94d] flex items-center gap-1 hover:cursor-pointer">
                                                         <CirclePlus className="h-4 w-4 text-white" />
                                                         <span className="text-sm font-semibold text-white">
-                                                            Nhà cung cấp
+                                                            Nhà sản xuất
                                                         </span>
                                                         {selectedSupplier !== null && (
                                                             <>
@@ -334,7 +334,7 @@ const Page = () => {
                                                             <input
                                                                 type="text"
                                                                 className="pl-6 h-full rounded outline-0 focus:outline-0"
-                                                                placeholder="Nhà cung cấp"
+                                                                placeholder="Nhà sản xuất"
                                                             />
                                                         </div>
                                                     </div>
@@ -412,7 +412,7 @@ const Page = () => {
                                                             <p className="font-semibold text-white">Danh mục</p>
                                                         </TableCell>
                                                         <TableCell>
-                                                            <p className="font-semibold text-white">Nhà cung cấp</p>
+                                                            <p className="font-semibold text-white">Nhà sản xuất</p>
                                                         </TableCell>
                                                         <TableCell>
                                                             <p className="font-semibold text-white">Quy cách</p>
@@ -500,7 +500,7 @@ const Page = () => {
                                                         <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Danh mục</p></TableCell>
-                                                        <TableCell><p className='font-semibold text-white'>Nhà cung cấp</p></TableCell>
+                                                        <TableCell><p className='font-semibold text-white'>Nhà sản xuất</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
                                                         <TableCell><p className='font-semibold text-white'>Mô tả</p></TableCell>
