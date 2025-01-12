@@ -159,7 +159,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
         }
 
         if (!selectedSupplier) {
-            setError('Chưa chọn nhà cung cấp. Vui lòng chọn nhà cung cấp.');
+            setError('Chưa chọn nhà sản xuất. Vui lòng chọn nhà sản xuất.');
             return;
         }
 
@@ -255,7 +255,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 </DialogHeader>
                 <section className="max-h-[650px] overflow-y-auto">
                     <div>
-                        <Label htmlFor="customer">Nhà cung cấp</Label>
+                        <Label htmlFor="customer">Nhà sản xuất</Label>
 
                         <Select
                             value={selectedSupplier}
@@ -269,13 +269,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 id="customer"
                                 className="w-[280px] bg-[#4ba94d] text-white"
                             >
-                                <SelectValue placeholder="Chọn nhà cung cấp" />
+                                <SelectValue placeholder="Chọn nhà sản xuất" />
                             </SelectTrigger>
                             <SelectContent>
                                 <div className="relative">
                                     <Search className="absolute w-4 h-4 left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                     <Input
-                                        placeholder="Tìm kiếm nhà cung cấp"
+                                        placeholder="Tìm kiếm nhà sản xuất"
                                         className="pl-8 h-8"
                                         onChange={(e) =>
                                             handleSupplierSearch(e)
@@ -283,7 +283,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                     />
                                 </div>
                                 <SelectGroup>
-                                    <SelectLabel>Chọn nhà cung cấp</SelectLabel>
+                                    <SelectLabel>Chọn nhà sản xuất</SelectLabel>
                                     {filterSuppliers
                                         ?.filter((supplier) => supplier.id !== 1)
                                         .map((supplier) => (
@@ -404,7 +404,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                         </TableHead>
                                         <TableHead>
                                             <p className="text-white font-semibold">
-                                                Nhà cung cấp
+                                                Nhà sản xuất
                                             </p>
                                         </TableHead>
                                         <TableHead>
@@ -511,7 +511,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
-                                                        Nhà cung cấp
+                                                        Nhà sản xuất
                                                     </p>
                                                 </TableHead>
                                                 <TableHead>
@@ -612,7 +612,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                         </Button>
                         <Button onClick={() => {
                             if (selectedSupplier === '') {
-                                setError('Vui lòng chọn nhà cung cấp')
+                                setError('Vui lòng chọn nhà sản xuất')
                                 return
                             }
                             createImport();

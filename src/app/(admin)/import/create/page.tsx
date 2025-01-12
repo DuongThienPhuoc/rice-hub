@@ -113,7 +113,7 @@ const Page = () => {
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
+                title: 'Lỗi khi lấy danh sách nhà sản xuất!',
                 description: 'Xin vui lòng thử lại',
                 duration: 3000
             })
@@ -204,7 +204,7 @@ const Page = () => {
         }
 
         if (!selectedSupplier) {
-            tempErrors.push('Vui lòng chọn nhà cung cấp!');
+            tempErrors.push('Vui lòng chọn nhà sản xuất!');
             setSupplierValidate(false);
         }
 
@@ -488,7 +488,7 @@ const Page = () => {
                                                 <p className='font-semibold text-white'>Danh mục</p>
                                             </TableCell>
                                             <TableCell rowSpan={2} className={`w-[15%]`}>
-                                                <p className='font-semibold text-white'>Nhà cung cấp</p>
+                                                <p className='font-semibold text-white'>Nhà sản xuất</p>
                                             </TableCell>
                                             <TableCell align='center' colSpan={2} className={`w-[20%]`}>
                                                 <p className='font-semibold text-white'>Quy cách</p>

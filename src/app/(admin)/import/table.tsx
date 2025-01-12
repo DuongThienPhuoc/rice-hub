@@ -296,7 +296,7 @@ export default function ImportTable() {
                                             <MenuItem onClick={() => {
                                                 setOnPageChange(true);
                                                 router.push("/import/create")
-                                            }}>Nhập từ nhà cung cấp</MenuItem>
+                                            }}>Nhập từ nhà sản xuất</MenuItem>
                                             <MenuItem onClick={() => {
                                                 setOnPageChange(true);
                                                 router.push("/import/createFromProduction")

@@ -162,7 +162,7 @@ const categories: SidebarItem[] = [
                 role: ['ROLE_ADMIN',],
             },
             {
-                title: 'Nhà cung cấp',
+                title: 'Nhà sản xuất',
                 url: '/suppliers',
                 icon: <UserPen />,
                 role: ['ROLE_ADMIN'],

@@ -193,7 +193,7 @@ export default function OrderPage(): React.JSX.Element {
                                         <TableHead>Tên hàng hoá</TableHead>
                                         <TableHead>Loại</TableHead>
                                         <TableHead>Đơn giá (kg)</TableHead>
-                                        <TableHead>Nhà cung cấp</TableHead>
+                                        <TableHead>Nhà sản xuất</TableHead>
                                         <TableHead className="text-center w-36">
                                             Thêm vào giỏ hàng
                                         </TableHead>

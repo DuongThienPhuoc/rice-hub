@@ -323,7 +323,7 @@ const Page = () => {
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%]`}>
                                                 <p className='font-semibold text-white'>
-                                                    Nhà cung cấp
+                                                    Nhà sản xuất
                                                 </p>
                                             </TableCell>
                                             <TableCell align='center' className={`w-[15%]`}>

@@ -77,7 +77,7 @@ const Page = ({ params }: { params: { id: number } }) => {
         } catch (error) {
             toast({
                 variant: 'destructive',
-                title: 'Lỗi khi lấy danh sách nhà cung cấp!',
+                title: 'Lỗi khi lấy danh sách nhà sản xuất!',
                 description: 'Xin vui lòng thử lại',
                 duration: 3000
             })
@@ -389,7 +389,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 </div>
 
                                 <div className='m-10 flex flex-col lg:flex-row'>
-                                    <span className='font-bold flex-1 pt-4'>Nhà cung cấp: </span>
+                                    <span className='font-bold flex-1 pt-4'>Nhà sản xuất: </span>
                                     <Autocomplete
                                         className='flex-[2]'
                                         disablePortal
@@ -397,7 +397,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                         value={selectedSupplier}
                                         getOptionLabel={(option) => option.name}
                                         onChange={(event, newValue) => setSelectedSupplier(newValue)}
-                                        renderInput={(params) => <TextField {...params} variant='standard' label="Chọn nhà cung cấp" />}
+                                        renderInput={(params) => <TextField {...params} variant='standard' label="Chọn nhà sản xuất" />}
                                     />
                                 </div>
 
