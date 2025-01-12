@@ -138,8 +138,8 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                             (order) => (
                                 <TableRow key={order.id}>
                                     <TableCell className='font-semibold'>
-                                        <span style={{
-                                            fontWeight: 600
+                                        <span className='hover:cursor-pointer' style={{
+                                            fontWeight: 600,
                                         }}
                                               onClick={() => {
                                                   router.push(

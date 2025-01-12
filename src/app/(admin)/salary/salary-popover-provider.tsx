@@ -151,7 +151,7 @@ function EmployeePopoverContent({
     ) {
         startTransition(async () => {
             try {
-                if(new Date(bodyRequest.dayActive) > new Date() && role === 'DAILY') {
+                if(new Date(bodyRequest.dayActive) > new Date()) {
                     toast({
                         variant: 'destructive',
                         title: 'Thất bại',
