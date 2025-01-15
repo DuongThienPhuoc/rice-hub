@@ -197,7 +197,7 @@ export default function ImportTable() {
                     duration: 3000,
                 })
                 processedFileHashes.add(fileHash);
-                if(typeof window !== undefined){
+                if (typeof window !== undefined) {
                     sessionStorage.setItem('processedFileHashes', JSON.stringify(Array.from(processedFileHashes)));
                 }
                 setOnPageChange(false);
@@ -282,7 +282,7 @@ export default function ImportTable() {
                                             aria-expanded={open ? 'true' : undefined}
                                             onClick={handleClick}
                                         >
-                                            Tạo phiếu nhập kho <Plus />
+                                            Nhập kho <Plus />
                                         </Button>
                                         <Menu
                                             id="basic-menu"

@@ -173,7 +173,7 @@ const Page = () => {
                         ) : (
                             <>
                                 <img
-                                    src={image || "https://via.placeholder.com/150"}
+                                    src={image || "https://placehold.co/150"}
                                     alt='Avatar'
                                     className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                 />
