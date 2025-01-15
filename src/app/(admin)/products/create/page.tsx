@@ -281,7 +281,7 @@ const Page = () => {
                             <div className='flex-1'>
                                 <div className='mt-10 flex flex-col items-center'>
                                     <img
-                                        src={image || "https://via.placeholder.com/400"}
+                                        src={image || "https://placehold.co/400"}
                                         alt='Avatar'
                                         className="w-[80%] h-[auto] border-[5px] border-black object-cover"
                                     />

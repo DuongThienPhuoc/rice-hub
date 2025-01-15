@@ -180,6 +180,17 @@ const Page = ({ params }: { params: { id: number } }) => {
         }
     }, [employee, params.id]);
 
+    function isValidImageUrl(url: string) {
+        try {
+            const validUrl = new URL(url);
+            console.log("test");
+            console.log(/\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname));
+            return /\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname);
+        } catch {
+            return false;
+        }
+    }
+
     return (
         <div>
             <form onSubmit={handleSubmit} className='flex my-10 justify-center w-full'>
@@ -214,7 +225,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                         ) : (
                             <>
                                 <img
-                                    src={image || "https://via.placeholder.com/150"}
+                                    src={isValidImageUrl(image) ? image : "https://placehold.co/150"}
                                     alt='Avatar'
                                     className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                 />

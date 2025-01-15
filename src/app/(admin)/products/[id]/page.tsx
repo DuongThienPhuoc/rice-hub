@@ -123,6 +123,17 @@ const Page = ({ params }: { params: { id: number } }) => {
         };
     }, [isOpen]);
 
+    function isValidImageUrl(url: string) {
+        try {
+            const validUrl = new URL(url);
+            console.log("test");
+            console.log(/\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname));
+            return /\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname);
+        } catch {
+            return false;
+        }
+    }
+
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
@@ -188,7 +199,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <div className='flex-1'>
                                     <div className='mt-10 xl:px-10 flex flex-col items-center'>
                                         <img
-                                            src={product?.image || "https://via.placeholder.com/400"}
+                                            src={isValidImageUrl(product?.image) ? product.image : "https://placehold.co/400"}
                                             alt='Image'
                                             className="w-[80%] h-[auto] border-[5px] border-black object-cover"
                                         />

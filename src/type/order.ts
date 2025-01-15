@@ -59,6 +59,8 @@ export interface OrderDetail {
     description: string;
     quantity: number;
     unitPrice: number;
+    inProgressOrder: number;
+    missingQuantity: number;
     weightPerUnit: number;
     productUnit: string;
     discount: number;

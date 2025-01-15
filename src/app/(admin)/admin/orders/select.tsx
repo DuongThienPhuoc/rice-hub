@@ -110,7 +110,7 @@ export default function SelectComponent({
     return (
         <Select value={order.status} onValueChange={(value) => handleUpdateStatus(value)}>
             <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Chọn trạng thái"/>
+                <SelectValue placeholder="Chọn trạng thái" />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>

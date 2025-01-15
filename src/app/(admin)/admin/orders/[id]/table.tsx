@@ -21,10 +21,10 @@ import Link from 'next/link';
 import React from 'react';
 
 export default function OrderDetailTable({
-                                             order,
-                                             editMode,
-                                             setOrder,
-                                         }: {
+    order,
+    editMode,
+    setOrder,
+}: {
     order: Order;
     editMode?: boolean;
     setOrder?: (order: Order) => void;
