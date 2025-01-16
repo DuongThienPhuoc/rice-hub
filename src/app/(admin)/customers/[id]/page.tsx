@@ -180,6 +180,17 @@ const Page = ({ params }: { params: { id: number } }) => {
         return isExpired;
     });
 
+    function isValidImageUrl(url: string) {
+        try {
+            const validUrl = new URL(url);
+            console.log("test");
+            console.log(/\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname));
+            return /\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname);
+        } catch {
+            return false;
+        }
+    }
+
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
@@ -211,7 +222,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <Skeleton animation="wave" variant="circular" height={'8rem'} width={'8rem'} />
                             ) : (
                                 <img
-                                    src={customer?.image || "https://via.placeholder.com/150"}
+                                    src={isValidImageUrl(customer?.image) ? customer?.image : "https://placehold.co/150"}
                                     alt='Avatar'
                                     className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                 />
@@ -370,7 +381,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                             <img
                                                 key={index}
                                                 onClick={() => setSelectedImageIndex(Math.max(0, selectedImageIndex - 1) + index)}
-                                                src={contract.imageFilePath || 'https://via.placeholder.com/150'}
+                                                src={contract.imageFilePath || 'https://placehold.co/150'}
                                                 alt={`Small ${Math.max(0, selectedImageIndex - 1) + index}`}
                                                 className={`w-20 h-20 object-cover cursor-pointer border-[3px] ${Math.max(0, selectedImageIndex - 1) + index === selectedImageIndex ? 'border-blue-500' : 'border-black'
                                                     }`}

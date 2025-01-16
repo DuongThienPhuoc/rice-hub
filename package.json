@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker": "docker build -t phuockingboy/rice-hub-fe:v1.0 ."
   },
   "dependencies": {
     "@babel/runtime": "^7.25.6",

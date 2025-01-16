@@ -10,7 +10,7 @@ import { Order } from '@/type/order'
 import { currencyHandleProvider } from '@/utils/currency-handle';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
-import { EllipsisVertical, Info, Package } from 'lucide-react';
+import { EllipsisVertical, Info } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,20 +18,17 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Link from 'next/link';
+import React from 'react';
 
 export default function OrderDetailTable({
-                                             order,
-                                             editMode,
-                                             setOrder,
-                                         }: {
+    order,
+    editMode,
+    setOrder,
+}: {
     order: Order;
     editMode?: boolean;
     setOrder?: (order: Order) => void;
 }) {
-    const formater = new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    })
     const router = useRouter();
     return (
         <>
@@ -42,7 +39,7 @@ export default function OrderDetailTable({
                             <p className="font-semibold text-white">Sản Phẩm</p>
                         </TableHead>
                         <TableHead>
-                            <p className="font-semibold text-white">Nhà cung cấp</p>
+                            <p className="font-semibold text-white">Nhà sản xuất</p>
                         </TableHead>
                         <TableHead>
                             <p className="font-semibold text-white">Quy cách</p>
@@ -106,7 +103,7 @@ export default function OrderDetailTable({
                                 {currencyHandleProvider(item.unitPrice || 0)}
                             </TableCell>
                             <TableCell className="text-right font-semibold">
-                                {formater.format(item.totalPrice || 0)}
+                                {currencyHandleProvider(item.totalPrice || 0)}
                             </TableCell>
                             <TableCell className="flex items-center justify-end">
                                 {/*Dropdown menu*/}

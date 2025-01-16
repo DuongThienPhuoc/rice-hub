@@ -28,23 +28,20 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getProductListByAdmin, ProductDtoList } from '@/data/customer-product';
+import { getProductAndIngredientListByAdmin, ProductDtoList } from '@/data/customer-product';
 import { Button } from '@/components/ui/button';
 import { ProductOrderRequest } from '@/type/order';
 import { Check, CirclePlus, Search, Trash2, X } from 'lucide-react';
-import OrderPopoverProvider from '@/app/(admin)/admin/orders/order-popover';
 import { currencyHandleProvider } from '@/utils/currency-handle';
-import { CustomerResponse, Customer } from '@/type/customer';
-import { getCustomerList } from '@/data/customer';
 import { Input } from '@/components/ui/input';
-import { AdminCreateOrderRequest } from '@/type/order';
-import { adminCreateOrder } from '@/data/order';
+import { adminCreateImport } from '@/data/order';
 import { useToast } from '@/hooks/use-toast';
 import AlertDelete from '@/app/(admin)/admin/orders/alert-delete';
-import AlertSubmitOrder from '@/app/(admin)/admin/orders/alert-submit-order';
 import PaginationComponent from '@/components/pagination/pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Category, getCategories } from '@/data/category';
+import { getSuppliers, Supplier } from '@/data/supplier';
+import OrderPopoverProvider from './order-popover';
 
 type OrderDialogProps = {
     children: React.ReactNode;
@@ -66,21 +63,17 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const [type, setType] = React.useState<string>('');
     const [productUnit, setProductUnit] = React.useState<string>('');
     const [quantity, setQuantity] = React.useState<number>(1);
-    const [customers, setCustomers] = React.useState<Customer[]>([]);
-    const [filterCustomers, setFilterCustomers] = React.useState<Customer[]>(
+    const [supplier, setSupplier] = React.useState<Supplier[]>([]);
+    const [filterSuppliers, setFilterSuppliers] = React.useState<Supplier[]>(
         [],
     );
-    const [selectedCustomer, setSelectedCustomer] = React.useState<string>('');
+    const [selectedSupplier, setSelectedSupplier] = React.useState<string>('');
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
     const [alertDelete, setAlertDelete] = React.useState<boolean>(false);
-    const [alertSubmitOrder, setAlertSubmitOrder] =
-        React.useState<boolean>(false);
     const [indexItemDelete, setIndexItemDelete] = React.useState<number>(0);
     const [currentPage, setCurrentPage] = React.useState<number>(0);
     const [totalPages, setTotalPages] = React.useState<number>(0);
-    const [phoneNumber, setPhoneNumber] = React.useState<string>('');
-    const [address, setAddress] = React.useState<string>('');
     const { toast } = useToast();
     const [productCategories, setProductCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
@@ -100,9 +93,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
     async function getProduct() {
         try {
-            const response = await getProductListByAdmin({
+            console.log(selectedSupplier);
+            const response = await getProductAndIngredientListByAdmin({
                 pageSize: 5,
-                id: selectedCustomer !== '' ? parseInt(selectedCustomer) : null,
+                supplierName: selectedSupplier,
                 pageNumber: currentPage + 1,
                 categoryName: selectedCategory?.name,
                 name: search,
@@ -119,15 +113,15 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
         }
     }
 
-    async function fetchCustomerList() {
+    async function fetchSupplierList() {
         try {
-            const response = await getCustomerList<CustomerResponse>();
-            setCustomers(response._embedded?.customerList);
-            setFilterCustomers(response._embedded?.customerList);
+            const response = await getSuppliers<Supplier[]>();
+            setSupplier(response);
+            setFilterSuppliers(response);
         } catch (e) {
             if (e instanceof Error) {
                 throw new Error(
-                    `An error occurred while fetching customers: ${e.message}`,
+                    `An error occurred while fetching suppliers: ${e.message}`,
                 );
             }
         }
@@ -135,9 +129,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
     function addProductToOrder() {
         const prevProduct = [...selectedProducts];
+        setError("");
         prevProduct.forEach((product) => {
-            if(!product.quantity) product.quantity = 0;
-            if (product.productId === selectedProduct?.productId && product.weightPerUnit === selectedProduct?.weightPerUnit) {
+            if (!product.quantity) product.quantity = 0;
+            if (product.productId === selectedProduct?.productId && product.productUnit === selectedProduct?.productUnit && product.weightPerUnit === selectedProduct?.weightPerUnit) {
                 product.quantity += selectedProduct?.quantity || 0;
                 updated = true;
             }
@@ -149,53 +144,77 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
         }
     }
 
-    async function createOrder() {
+    const getCurrentDateTime = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${day}/${month}/${year}`;
+    };
+
+    async function createImport() {
         if (selectedProducts.length === 0) {
-            setError('Vui lòng chọn sản phẩm');
+            setError('Chưa chọn sản phẩm. Vui lòng thêm sản phẩm trước khi tiếp tục.');
             return;
-        } else if (selectedCustomer === '') {
-            setError('Vui lòng chọn khách hàng');
+        }
+
+        if (!selectedSupplier) {
+            setError('Chưa chọn nhà sản xuất. Vui lòng chọn nhà sản xuất.');
             return;
-        } else {
-            const orderRequest: AdminCreateOrderRequest = {
-                customerId: parseInt(selectedCustomer),
-                orderPhone: phoneNumber,
-                orderAddress: address,
-                orderDetails: selectedProducts,
-            };
-            try {
-                const response = await adminCreateOrder(orderRequest);
-                if (response.status === 200) {
-                    setError('');
-                    setSelectedProducts([]);
-                    setSelectedCustomer('');
-                    toast({
-                        title: 'Tạo đơn hàng thành công',
-                        description: 'Đơn hàng đã được tạo thành công',
-                        style: {
-                            backgroundColor: '#4caf50',
-                            color: '#fff',
-                        },
-                        duration: 3000
-                    });
-                    setIsOpen(false);
-                    setNewOrder(!newOrder);
-                } else if (response.status === 400) {
-                    setError(response.data.message)
-                } else {
-                    setError('Đã có lỗi xảy ra, vui lòng thử lại');
-                }
-            } catch (e) {
-                console.log(e);
+        }
+
+        const orderRequest = {
+            orderDetails: selectedProducts,
+        };
+
+        try {
+            const response = await adminCreateImport(orderRequest);
+
+            if (response.status === 200) {
+                const blob = new Blob([response.data], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                });
+
+                const contentDisposition = response.headers['content-disposition'];
+                const filename = contentDisposition && contentDisposition.includes('filename=')
+                    ? contentDisposition.split('filename=')[1].split(';')[0].replace(/"/g, '').trim()
+                    : `PhieuNhapHang_${getCurrentDateTime()}.xlsx`;
+
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+                setError('');
+                setSelectedProducts([]);
+                setSelectedSupplier('');
+                setIsOpen(false);
+                setNewOrder(!newOrder);
+                toast({
+                    title: 'Tạo phiếu nhập hàng thành công',
+                    description: 'Phiếu nhập hàng đã được tạo thành công.',
+                    style: { backgroundColor: '#4caf50', color: '#fff' },
+                    duration: 3000,
+                });
+            } else {
+                setError(response.data.message || 'Đã có lỗi xảy ra, vui lòng thử lại.');
             }
+        } catch (e) {
+            console.error('Lỗi khi tạo phiếu nhập hàng:', e);
+            setError('Đã có lỗi xảy ra khi tạo phiếu nhập hàng. Vui lòng thử lại.');
         }
     }
 
-    function handleCustomerSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleSupplierSearch(e: React.ChangeEvent<HTMLInputElement>) {
         const searchValue = e.target.value;
-        setFilterCustomers(
-            customers.filter((customer) =>
-                customer.name.toLowerCase().includes(searchValue.toLowerCase()),
+        setFilterSuppliers(
+            supplier.filter((supplier) =>
+                supplier.name.toLowerCase().includes(searchValue.toLowerCase()),
             ),
         );
     }
@@ -208,8 +227,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
     useEffect(() => {
         getProduct().catch((e) => console.error(e));
-        fetchCustomerList().catch((e) => console.error(e));
-    }, [selectedCustomer, currentPage, selectedCategory, search]);
+        fetchSupplierList().catch((e) => console.error(e));
+    }, [selectedSupplier, currentPage, selectedCategory, search]);
 
     useEffect(() => {
         setSelectedProduct((prev) => ({
@@ -230,30 +249,19 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
             <DialogContent className="bg-white sm:max-w-[60vw] w-[100vw]">
                 <DialogHeader>
                     <DialogTitle className="scroll-m-20 font-roboto border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0">
-                        Tạo đơn hàng
+                        Tạo phiếu nhập hàng
                     </DialogTitle>
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <section className="max-h-[650px] overflow-y-auto">
                     <div>
-                        <Label htmlFor="customer">Khách hàng</Label>
+                        <Label htmlFor="customer">Nhà sản xuất</Label>
+
                         <Select
-                            value={selectedCustomer}
+                            value={selectedSupplier}
                             onValueChange={(e) => {
                                 setError('');
-                                setSelectedCustomer(e);
-                                setAddress(
-                                    customers.find(
-                                        (customer) =>
-                                            customer.id.toString() === e,
-                                    )?.address || '',
-                                );
-                                setPhoneNumber(
-                                    customers.find(
-                                        (customer) =>
-                                            customer.id.toString() === e,
-                                    )?.phone || '',
-                                );
+                                setSelectedSupplier(e);
                                 setSelectedProducts([]);
                             }}
                         >
@@ -261,35 +269,37 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                 id="customer"
                                 className="w-[280px] bg-[#4ba94d] text-white"
                             >
-                                <SelectValue placeholder="Chọn khách hàng" />
+                                <SelectValue placeholder="Chọn nhà sản xuất" />
                             </SelectTrigger>
                             <SelectContent>
                                 <div className="relative">
                                     <Search className="absolute w-4 h-4 left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                     <Input
-                                        placeholder="Tìm kiếm khách hàng"
+                                        placeholder="Tìm kiếm nhà sản xuất"
                                         className="pl-8 h-8"
                                         onChange={(e) =>
-                                            handleCustomerSearch(e)
+                                            handleSupplierSearch(e)
                                         }
                                     />
                                 </div>
                                 <SelectGroup>
-                                    <SelectLabel>Chọn khách hàng</SelectLabel>
-                                    {filterCustomers?.map((customer) => (
-                                        <SelectItem
-                                            key={customer.id}
-                                            value={customer.id.toString()}
-                                        >
-                                            <div className="text-md font-semibold">
-                                                {customer.name}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">
-                                                {`Địa chỉ: ${customer.address}`}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">{`SDT: ${customer.phone}`}</div>
-                                        </SelectItem>
-                                    ))}
+                                    <SelectLabel>Chọn nhà sản xuất</SelectLabel>
+                                    {filterSuppliers
+                                        ?.filter((supplier) => supplier.id !== 1)
+                                        .map((supplier) => (
+                                            <SelectItem key={supplier.id} value={supplier.name.toString()}>
+                                                <div className="text-md font-semibold">{supplier.name}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {`SĐT: ${supplier.phoneNumber}`}
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {`Email: ${supplier.email}`}
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {`Người liên hệ: ${supplier.contactPerson}`}
+                                                </div>
+                                            </SelectItem>
+                                        ))}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
@@ -297,15 +307,12 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     <Separator orientation="horizontal" className="my-4" />
                     <div className="space-y-2">
                         <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                            Sản phẩm
+                            Sản phẩm / Nguyên liệu
                         </h1>
                         <div className="flex gap-1">
                             <Input
                                 value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setCurrentPage(0);
-                                }}
+                                onChange={(e) => setSearch(e.target.value)}
                                 type="text"
                                 className="bg-white w-52"
                                 placeholder="Lọc tên hàng hoá"
@@ -355,7 +362,6 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                             setSelectedCategory(
                                                                 category,
                                                             );
-                                                            setCurrentPage(0);
                                                         }}
                                                     >
                                                         {selectedCategory ===
@@ -398,12 +404,12 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                         </TableHead>
                                         <TableHead>
                                             <p className="text-white font-semibold">
-                                                Đơn giá (kg)
+                                                Nhà sản xuất
                                             </p>
                                         </TableHead>
                                         <TableHead>
                                             <p className="text-white font-semibold">
-                                                Nhà sản xuất
+                                                Giá nhập trước đó (kg)
                                             </p>
                                         </TableHead>
                                         <TableHead className="text-center">
@@ -423,10 +429,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 {product.categoryName}
                                             </TableCell>
                                             <TableCell>
-                                                {`${currencyHandleProvider(product.customerPrice)}/kg`}
+                                                {product.supplierName}
                                             </TableCell>
                                             <TableCell>
-                                                {product.supplierName}
+                                                {currencyHandleProvider(product.importPrice || 0)}
                                             </TableCell>
                                             <TableCell className="flex justify-center">
                                                 <OrderPopoverProvider
@@ -454,10 +460,10 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                                 quantity: 0,
                                                                 weightPerUnit: 0,
                                                                 name: product.name,
+                                                                categoryName: product.categoryName,
+                                                                supplierName: product.supplierName,
                                                                 unitPrice:
                                                                     product.customerPrice,
-                                                                supplierName:
-                                                                    product.supplierName,
                                                             })
                                                         }
                                                     >
@@ -472,13 +478,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             </Table>
                         </div>
                         <div>
-                            {totalPages > 1 && (
-                                <PaginationComponent
-                                    currentPage={currentPage}
-                                    setCurrentPage={setCurrentPage}
-                                    totalPages={totalPages}
-                                />
-                            )}
+                            <PaginationComponent
+                                currentPage={currentPage}
+                                setCurrentPage={setCurrentPage}
+                                totalPages={totalPages}
+                            />
                         </div>
                     </div>
                     {selectedProducts.length > 0 && (
@@ -489,7 +493,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             />
                             <div className="space-y-2">
                                 <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                                    Giỏ hàng
+                                    Danh sách hàng cần nhập
                                 </h1>
                                 <div className="border rounded-md">
                                     <Table>
@@ -498,6 +502,16 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
                                                         Tên hàng hoá
+                                                    </p>
+                                                </TableHead>
+                                                <TableHead>
+                                                    <p className="font-semibold text-white">
+                                                        Danh mục
+                                                    </p>
+                                                </TableHead>
+                                                <TableHead>
+                                                    <p className="font-semibold text-white">
+                                                        Nhà sản xuất
                                                     </p>
                                                 </TableHead>
                                                 <TableHead>
@@ -512,12 +526,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
-                                                        Đơn giá
-                                                    </p>
-                                                </TableHead>
-                                                <TableHead>
-                                                    <p className="font-semibold text-white">
-                                                        Nhà sản xuất
+                                                        Giá nhập trước đó (kg)
                                                     </p>
                                                 </TableHead>
                                                 <TableHead className="text-center">
@@ -536,17 +545,23 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <TableCell className="font-semibold h-12">
                                                             {product.name}
                                                         </TableCell>
-                                                        <TableCell>
-                                                            {`${product.weightPerUnit} KG`}
+                                                        <TableCell className="font-semibold h-12">
+                                                            {product.categoryName}
                                                         </TableCell>
-                                                        <TableCell>
-                                                            {`${product.quantity} ${product.productUnit}`}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            {`${currencyHandleProvider(product.unitPrice || 0)}/kg`}
-                                                        </TableCell>
-                                                        <TableCell>
+                                                        <TableCell className="font-semibold h-12">
                                                             {product.supplierName}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {`${product.productUnit} ${product.weightPerUnit} KG`}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {product.quantity} {product.productUnit}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {currencyHandleProvider(
+                                                                product.unitPrice ||
+                                                                0,
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="flex justify-center">
                                                             <Button
@@ -589,20 +604,20 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             onClick={() => {
                                 setError('');
                                 setSelectedProducts([]);
-                                setSelectedCustomer('');
+                                setSelectedSupplier('');
                                 setIsOpen(false);
                             }}
                         >
                             Huỷ
                         </Button>
                         <Button onClick={() => {
-                            if(selectedCustomer === '') {
-                                setError('Vui lòng chọn khách hàng')
+                            if (selectedSupplier === '') {
+                                setError('Vui lòng chọn nhà sản xuất')
                                 return
                             }
-                            setAlertSubmitOrder(true)
+                            createImport();
                         }}>
-                            Tạo đơn hàng
+                            Tạo phiếu nhập hàng
                         </Button>
                     </div>
                 </section>
@@ -610,15 +625,6 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     isOpen={alertDelete}
                     setIsOpen={setAlertDelete}
                     deleteItem={deleteCartItem}
-                />
-                <AlertSubmitOrder
-                    isOpen={alertSubmitOrder}
-                    setIsOpen={setAlertSubmitOrder}
-                    createOrder={createOrder}
-                    phoneNumber={phoneNumber}
-                    setPhone={setPhoneNumber}
-                    address={address}
-                    setAddress={setAddress}
                 />
             </DialogContent>
         </Dialog>

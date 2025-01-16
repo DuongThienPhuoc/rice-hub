@@ -8,18 +8,18 @@ import {
     CardFooter,
 } from '@/components/ui/card';
 import { Package2, Calendar, User, Truck, ArrowLeft, Pencil } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import OrderDetailTable from '@/app/(admin)/admin/orders/[id]/table';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { adminUpdateOrderQuantity, getOrderDetail } from '@/data/order';
 import { AdminUpdateOrderRequest, Order } from '@/type/order';
-import { statusProvider } from '@/utils/status-provider';
 import { currencyHandleProvider } from '@/utils/currency-handle';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import OrderDetailPageBreadcrumb from '@/app/(admin)/admin/orders/[id]/breadcrumb';
 import { useToast } from '@/hooks/use-toast';
+import AlertChangeStatus from '@/app/(admin)/admin/orders/alert-change-status';
+import SelectComponent from '@/app/(admin)/admin/orders/select';
 
 export default function OrderDetailPage({
     params,
@@ -29,10 +29,21 @@ export default function OrderDetailPage({
     };
 }) {
     const router = useRouter();
-    const [order, setOrder] = useState<Order>();
-    const [isEditMode, setIsEditMode] = useState(false);
     const { toast } = useToast();
     const { setBreadcrumb } = useBreadcrumbStore()
+    const [order, setOrder] = useState<Order>();
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [refreshOrderData, setRefreshOrderData] = useState<boolean>(false);
+    const [isAlertOpen, setIsAlertOpen] = React.useState<boolean>(false);
+    const [orderUpdatePending, setOrderUpdatePending] = React.useState<Order | undefined>();
+
+    function toastMessage(message: string) {
+        toast({
+            variant: 'destructive',
+            title: message,
+            duration: 3000,
+        })
+    }
 
     async function updateOrderQuantity() {
         if (!order) return;
@@ -90,7 +101,7 @@ export default function OrderDetailPage({
         fetchOrderDetail().catch((e) => console.error(e));
         setBreadcrumb(<OrderDetailPageBreadcrumb orderID={params.id} />);
         return () => setBreadcrumb(null);
-    }, []);
+    }, [refreshOrderData]);
 
     if (!order) {
         //Todo: Add skeleton loader
@@ -126,14 +137,13 @@ export default function OrderDetailPage({
                         <div className="flex justify-between">
                             <span className="font-semibold">Trạng thái:</span>
                             <span>
-                                <Badge
-                                    className="bg-[#4ba94d] hover:bg-green-500 text-white"
-                                    variant={
-                                        statusProvider(order.status).variant
+                                <SelectComponent
+                                    order={order}
+                                    setOrderUpdatePending={
+                                        setOrderUpdatePending
                                     }
-                                >
-                                    {statusProvider(order?.status).text}
-                                </Badge>
+                                    setIsAlertOpen={setIsAlertOpen}
+                                />
                             </span>
                         </div>
                         <div className="flex justify-between">
@@ -264,6 +274,15 @@ export default function OrderDetailPage({
                     <span>Quay lại</span>
                 </Button>
             </div>
+            <AlertChangeStatus
+                isOpen={isAlertOpen}
+                setIsOpen={setIsAlertOpen}
+                orderUpdatePending={orderUpdatePending}
+                setOrderUpdatePending={setOrderUpdatePending}
+                refreshData={refreshOrderData}
+                setRefreshData={setRefreshOrderData}
+                toastMessage={toastMessage}
+            />
         </section>
     );
 }

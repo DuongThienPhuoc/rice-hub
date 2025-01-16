@@ -14,14 +14,15 @@ const AdminOrdersPage: React.FC = () => {
     const [refreshData, setRefreshData] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPage, setTotalPage] = useState<number>(0);
+    const [orderStatus, setOrderStatus] = React.useState<string | undefined>();
     useEffect(() => {
-        getAdminOrders<AdminOrderResponse>(currentPage + 1, 5)
+        getAdminOrders<AdminOrderResponse>(currentPage + 1, 5,orderStatus)
             .then((response) => {
                 setAdminOrderResponse(response)
                 setTotalPage(response.page.totalPages)
             })
             .catch((error) => console.error(error));
-    }, [newOrder, refreshData, currentPage]);
+    }, [newOrder, refreshData, currentPage, orderStatus]);
 
     return (
         <>
@@ -38,6 +39,7 @@ const AdminOrdersPage: React.FC = () => {
                             currentPage={currentPage}
                             setCurrentPage={setCurrentPage}
                             totalPage={totalPage}
+                            setOrderStatus={setOrderStatus}
                         />
                     </>
                 ) : (

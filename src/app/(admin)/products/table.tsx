@@ -29,7 +29,7 @@ export default function ProductTable() {
         { name: 'productCode', displayName: 'Mã sản phẩm' },
         { name: 'productName', displayName: 'Tên sản phẩm' },
         { name: 'categoryName', displayName: 'Danh mục' },
-        { name: 'supplierName', displayName: 'Nhà cung cấp' },
+        { name: 'supplierName', displayName: 'Nhà sản xuất' },
         { name: 'importDate', displayName: 'Ngày tạo' },
         { name: 'updateAt', displayName: 'Ngày sửa' },
     ];
@@ -239,7 +239,7 @@ export default function ProductTable() {
                                                 <div className="h-[38px] px-5 rounded-md border border-[#4ba94d] bg-[#4ba94d] flex items-center gap-1 hover:cursor-pointer">
                                                     <CirclePlus className="h-4 w-4 text-white" />
                                                     <span className="text-sm font-semibold text-white">
-                                                        Nhà cung cấp
+                                                        Nhà sản xuất
                                                     </span>
                                                     {selectedSupplier !== null && (
                                                         <>
@@ -264,7 +264,7 @@ export default function ProductTable() {
                                                         <input
                                                             type="text"
                                                             className="pl-6 h-full rounded outline-0 focus:outline-0"
-                                                            placeholder="Nhà cung cấp"
+                                                            placeholder="Nhà sản xuất"
                                                         />
                                                     </div>
                                                 </div>

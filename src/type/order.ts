@@ -1,52 +1,52 @@
 export interface AdminOrderResponse {
     _embedded: Embedded;
-    _links:    Links;
-    page:      Page;
+    _links: Links;
+    page: Page;
 }
 
 export interface AdminUpdateOrderRequest {
-    customerId:      number;
-    status:          string;
-    totalAmount:     number;
-    deposit:         number;
+    customerId: number;
+    status: string;
+    totalAmount: number;
+    deposit: number;
     remainingAmount: number;
-    orderPhone?:     string;
-    orderAddress?:   string;
-    orderDetails:    OrderDetail[];
+    orderPhone?: string;
+    orderAddress?: string;
+    orderDetails: OrderDetail[];
 }
 
 export interface Order {
-    id:              number;
-    orderCode:       string;
-    customer:        Customer;
-    orderDate:       string;
-    orderPhone:      string;
-    orderAddress:    string;
-    totalAmount:     number;
-    deposit:         number;
+    id: number;
+    orderCode: string;
+    customer: Customer;
+    orderDate: string;
+    orderPhone: string;
+    orderAddress: string;
+    totalAmount: number;
+    deposit: number;
     remainingAmount: number;
-    status:          string;
-    orderDetails:    OrderDetail[];
-    receiptVoucher:  ReceiptVoucher;
+    status: string;
+    orderDetails: OrderDetail[];
+    receiptVoucher: ReceiptVoucher;
 }
 
 export interface ReceiptVoucher {
-    id:           number;
-    receiptCode:  string;
-    receiptDate:  Date;
-    dueDate:      null;
-    totalAmount:  number;
-    paidAmount:   number;
+    id: number;
+    receiptCode: string;
+    receiptDate: Date;
+    dueDate: null;
+    totalAmount: number;
+    paidAmount: number;
     remainAmount: number;
     transactions: Transaction[];
 }
 
 export interface Transaction {
-    id:              number;
-    amount:          number;
+    id: number;
+    amount: number;
     transactionDate: Date;
-    paymentMethod:   string;
-    status:          string;
+    paymentMethod: string;
+    status: string;
 }
 
 export interface Embedded {
@@ -59,6 +59,8 @@ export interface OrderDetail {
     description: string;
     quantity: number;
     unitPrice: number;
+    inProgressOrder: number;
+    missingQuantity: number;
     weightPerUnit: number;
     productUnit: string;
     discount: number;
@@ -68,125 +70,125 @@ export interface OrderDetail {
 }
 
 export interface Customer {
-    id:        number;
-    fullName:  string;
-    image:     null | string;
-    username:  string;
-    password:  string;
-    phone:     string;
-    email:     string;
-    address:   string;
-    createAt:  Date;
-    updateAt:  Date | null;
-    active:    boolean;
-    userType:  string;
-    dob:       Date;
-    gender:    boolean;
-    name:      string;
+    id: number;
+    fullName: string;
+    image: null | string;
+    username: string;
+    password: string;
+    phone: string;
+    email: string;
+    address: string;
+    createAt: Date;
+    updateAt: Date | null;
+    active: boolean;
+    userType: string;
+    dob: Date;
+    gender: boolean;
+    name: string;
     contracts: Contract[];
     supporter: boolean;
 }
 
 export interface Contract {
-    id:               number;
-    contractNumber:   string;
-    contractTime:     Date;
-    amount:           number;
-    pdfFilePath:      string;
-    imageFilePath:    string;
-    confirmed:        boolean;
+    id: number;
+    contractNumber: string;
+    contractTime: Date;
+    amount: number;
+    pdfFilePath: string;
+    imageFilePath: string;
+    confirmed: boolean;
     confirmationDate: Date;
 }
 
-// export interface OrderDetail {
-//     id:            number;
-//     product:       ProductClass | number;
-//     quantity:      number;
-//     discount:      number;
-//     productUnit:   string;
-//     weightPerUnit: number;
-//     unitPrice:     number;
-//     totalPrice:    number;
-// }
+export interface OrderDetail {
+    id: number;
+    product: ProductClass | number;
+    quantity: number;
+    discount: number;
+    productUnit: string;
+    weightPerUnit: number;
+    unitPrice: number;
+    totalPrice: number;
+}
 
 export interface ProductClass {
-    id:                number;
-    name:              string;
-    description:       string;
-    price:             number;
-    image:             string;
-    productCode:       string;
-    supplier:          Supplier;
-    category:          Category;
-    unitOfMeasure:     UnitOfMeasure;
-    createAt:          Date;
-    updateAt:          Date;
-    isDeleted:         boolean;
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    image: string;
+    productCode: string;
+    supplier: Supplier;
+    category: Category;
+    unitOfMeasure: UnitOfMeasure;
+    createAt: Date;
+    updateAt: Date;
+    isDeleted: boolean;
     productWarehouses: ProductWarehouse[];
-    batchProducts:     BatchProduct[];
-    importPrice:       number;
+    batchProducts: BatchProduct[];
+    importPrice: number;
 }
 
 export interface BatchProduct {
-    id:            number;
-    quantity:      number;
-    price:         number;
-    weight:        number;
+    id: number;
+    quantity: number;
+    price: number;
+    weight: number;
     weightPerUnit: number;
-    unit:          string;
-    description:   string;
-    product:       number;
-    discount:      Discount;
+    unit: string;
+    description: string;
+    product: number;
+    discount: Discount;
 }
 
 export interface Discount {
-    id:            number;
-    description:   string;
+    id: number;
+    description: string;
     amountPerUnit: number;
-    startDate:     Date;
-    endDate:       Date;
-    active:        boolean;
+    startDate: Date;
+    endDate: Date;
+    active: boolean;
 }
 
 export interface Category {
-    id:          number;
-    name:        string;
+    id: number;
+    name: string;
     description: string;
-    active:      boolean;
+    active: boolean;
 }
 
 export interface ProductWarehouse {
-    id:            number;
-    quantity:      number;
-    batchCode:     string;
-    importPrice:   number;
-    sellPrice:     number;
-    weight:        number;
+    id: number;
+    quantity: number;
+    batchCode: string;
+    importPrice: number;
+    sellPrice: number;
+    weight: number;
     weightPerUnit: number;
-    unit:          string;
-    product:       number;
-    warehouse:     Warehouse;
+    unit: string;
+    product: number;
+    warehouse: Warehouse;
 }
 
 export interface Warehouse {
-    id:       number;
-    name:     string;
+    id: number;
+    name: string;
     location: Location;
 }
 
 export interface Supplier {
-    id:            number;
-    name:          string;
+    id: number;
+    name: string;
     contactPerson: string;
-    email:         string;
-    phoneNumber:   string;
-    address:       string;
-    active:        boolean;
+    email: string;
+    phoneNumber: string;
+    address: string;
+    active: boolean;
 }
 
 export interface UnitOfMeasure {
-    id:               number;
-    unitName:         string;
+    id: number;
+    unitName: string;
     conversionFactor: number;
 }
 
@@ -199,15 +201,17 @@ export interface Self {
 }
 
 export interface Page {
-    size:          number;
+    size: number;
     totalElements: number;
-    totalPages:    number;
-    number:        number;
+    totalPages: number;
+    number: number;
 }
 
 export interface ProductOrderRequest {
     productId?: number;
     name?: string;
+    categoryName?: string;
+    supplierName?: string;
     quantity?: number;
     unitPrice?: number
     weightPerUnit?: number;
@@ -218,5 +222,9 @@ export interface AdminCreateOrderRequest {
     customerId: number;
     orderPhone?: string;
     orderAddress?: string;
+    orderDetails: ProductOrderRequest[];
+}
+
+export interface AdminCreateImportRequest {
     orderDetails: ProductOrderRequest[];
 }

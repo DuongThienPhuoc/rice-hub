@@ -1,6 +1,6 @@
 import axiosConfig from '@/config/axiosConfig';
 import axios, { AxiosResponse } from 'axios';
-import { AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
+import { AdminCreateImportRequest, AdminCreateOrderRequest, AdminUpdateOrderRequest } from '@/type/order';
 import {
     CustomerOrderHistoryResponse,
     CustomerUpdateOrderRequest,
@@ -91,11 +91,25 @@ export async function getOrderDetail(orderId: string) {
 export async function getAdminOrders<T>(
     pageNumber: number = 1,
     pageSize: number = 10,
+    orderStatus: string | undefined
 ): Promise<T> {
     try {
+        if(orderStatus === 'ALL') {
+            orderStatus = undefined;
+        }
+        console.log({
+            pageNumber,
+            pageSize,
+            status: orderStatus
+        });
         const response: AxiosResponse<T> = await axiosConfig.get(
-            `/order/admin/orders?pageNumber=${pageNumber}&pageSize=${pageSize}`,
-        );
+            `/order/admin/orders`,{
+                params: {
+                    pageNumber,
+                    pageSize,
+                    status: orderStatus
+                }
+        });
         return response.data;
     } catch (e) {
         console.error('Error fetching admin orders', e);
@@ -110,6 +124,18 @@ export async function adminCreateOrder(order: AdminCreateOrderRequest) {
         });
     } catch (e) {
         throw e;
+    }
+}
+
+export async function adminCreateImport(order: AdminCreateImportRequest) {
+    try {
+        const response = await axiosConfig.post('products/generateTemplate', order, {
+            responseType: 'arraybuffer',
+            validateStatus: (status) => status < 500,
+        });
+        return response;
+    } catch (error) {
+        throw new Error('Không thể kết nối tới máy chủ. Vui lòng thử lại sau.');
     }
 }
 

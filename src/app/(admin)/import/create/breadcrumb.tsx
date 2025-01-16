@@ -27,7 +27,7 @@ export default function CreateImportPageBreadcrumb() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className='text-white' />
                 <BreadcrumbItem>
-                    <BreadcrumbPage className='text-white'>Thêm phiếu nhập từ nhà cung cấp</BreadcrumbPage>
+                    <BreadcrumbPage className='text-white'>Thêm phiếu nhập từ nhà sản xuất</BreadcrumbPage>
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>

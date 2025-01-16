@@ -495,7 +495,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                 <TableHead className='bg-[#0090d9]'>
                                                     <TableRow>
                                                         <TableCell rowSpan={2} padding="checkbox">
-                                                            {hasUnaddedProducts && (
+                                                            {hasUnaddedProducts && role === ALLOW_ROLE && (
                                                                 <Checkbox
                                                                     sx={{
                                                                         color: 'white',
@@ -521,6 +521,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                         </TableCell>
                                                         <TableCell rowSpan={2}><p className='font-semibold text-white'>Mã sản phẩm</p></TableCell>
                                                         <TableCell rowSpan={2}><p className='font-semibold text-white'>Tên sản phẩm</p></TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Danh mục</p></TableCell>
+                                                        <TableCell rowSpan={2}><p className='font-semibold text-white'>Nhà sản xuất</p></TableCell>
                                                         {batch?.receiptType === 'IMPORT' && (
                                                             <TableCell rowSpan={2}><p className='font-semibold text-white'>Giá nhập</p> </TableCell>
                                                         )}
@@ -549,7 +551,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                {product.added === true ? (
+                                                                {role === ALLOW_ROLE && product.added === true ? (
                                                                     <TableCell></TableCell>
                                                                 ) : (
                                                                     <TableCell padding="checkbox">
@@ -562,21 +564,24 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 <TableCell onClick={() => router.push(`/products/${product.productId}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product.productCode}
                                                                 </TableCell>
-                                                                <TableCell>{product.name}</TableCell>
+                                                                <TableCell>{product.productName}</TableCell>
+                                                                <TableCell>{product.categoryName}</TableCell>
+                                                                <TableCell>{product.supplierName}</TableCell>
                                                                 {batch?.receiptType === 'IMPORT' && (
                                                                     <TableCell>
                                                                         <TextField
-                                                                            type={'number'}
+                                                                            type={'text'}
                                                                             className='w-[100px]'
-                                                                            inputProps={{ min: 1 }}
                                                                             onChange={(e) => {
-                                                                                setTempPrice(Number(e.target.value))
+                                                                                const value = e.target.value;
+                                                                                const numericValue = Number(value);
+                                                                                if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                                    setTempPrice(Number(value));
+                                                                                } else {
+                                                                                    setTempPrice('')
+                                                                                }
                                                                             }}
                                                                             value={tempPrice || product.price}
-                                                                            InputLabelProps={{
-                                                                                shrink: true,
-                                                                            }}
-                                                                            label={'Giá nhập'}
                                                                             variant="standard" />
                                                                     </TableCell>
                                                                 )}
@@ -584,62 +589,54 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                     <TextField
                                                                         type={'text'}
                                                                         className='w-[100px]'
-                                                                        inputProps={{ min: 1 }}
                                                                         onChange={(e) => {
                                                                             setTempUnit(e.target.value)
                                                                         }}
                                                                         value={tempUnit || product.unit}
-                                                                        InputLabelProps={{
-                                                                            shrink: true,
-                                                                        }}
-                                                                        label={'Loại'}
                                                                         variant="standard" />
                                                                 </TableCell>
                                                                 <TableCell align="center">
                                                                     <TextField
-                                                                        type={'number'}
+                                                                        type={'text'}
                                                                         className='w-[100px]'
-                                                                        inputProps={{ min: 1 }}
                                                                         onChange={(e) => {
-                                                                            setTempWeightPerUnit(Number(e.target.value))
+                                                                            const value = e.target.value;
+                                                                            const numericValue = Number(value);
+                                                                            if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                                setTempWeightPerUnit(Number(value));
+                                                                            } else {
+                                                                                setTempWeightPerUnit('')
+                                                                            }
                                                                         }}
                                                                         value={tempWeightPerUnit || product.weightPerUnit}
-                                                                        InputLabelProps={{
-                                                                            shrink: true,
-                                                                        }}
-                                                                        label={'Trọng lượng'}
-                                                                        variant="standard" />
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <TextField
-                                                                        type={'number'}
-                                                                        className='w-[100px]'
-                                                                        inputProps={{ min: 1 }}
-                                                                        onChange={(e) => {
-                                                                            setTempQuantity(Number(e.target.value))
-                                                                        }}
-                                                                        value={tempQuantity || product.quantity}
-                                                                        InputLabelProps={{
-                                                                            shrink: true,
-                                                                        }}
-                                                                        label={'Số lượng'}
                                                                         variant="standard" />
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <TextField
                                                                         type={'text'}
-                                                                        className='w-[120px]'
-                                                                        inputProps={{ min: 1 }}
+                                                                        className='w-[100px]'
+                                                                        onChange={(e) => {
+                                                                            const value = e.target.value;
+                                                                            const numericValue = Number(value);
+                                                                            if (!isNaN(numericValue) && Number(value) >= 0) {
+                                                                                setTempQuantity(Number(value));
+                                                                            } else {
+                                                                                setTempQuantity('')
+                                                                            }
+                                                                        }}
+                                                                        value={tempQuantity || product.quantity}
+                                                                        variant="standard" />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <TextField
+                                                                        type={'text'}
+                                                                        className='w-[200px]'
                                                                         onChange={(e) => {
                                                                             setTempDescription(e.target.value)
                                                                         }}
                                                                         value={tempDescription || product.description}
-                                                                        InputLabelProps={{
-                                                                            shrink: true,
-                                                                        }}
                                                                         multiline
                                                                         rows={2}
-                                                                        label={'Mô tả'}
                                                                         variant="standard" />
                                                                 </TableCell>
                                                                 <TableCell align="center">
@@ -664,7 +661,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                {product.added === true ? (
+                                                                {role === ALLOW_ROLE && product.added === true ? (
                                                                     <TableCell></TableCell>
                                                                 ) : (
                                                                     <TableCell padding="checkbox">
@@ -678,6 +675,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                     {product.productCode}
                                                                 </TableCell>
                                                                 <TableCell>{product.productName}</TableCell>
+                                                                <TableCell>{product.categoryName}</TableCell>
+                                                                <TableCell>{product.supplierName}</TableCell>
                                                                 {batch?.receiptType === 'IMPORT' && (
                                                                     <TableCell align="center">{Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(product.price))}</TableCell>
                                                                 )}

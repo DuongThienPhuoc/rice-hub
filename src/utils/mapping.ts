@@ -168,19 +168,19 @@ export const mappingActivity: Record<string, ActivityInfor> = {
         color: '#34d399',
     },
     CREATE_SUPPLIER: {
-        text: 'Tạo nhà cung cấp',
+        text: 'Tạo nhà sản xuất',
         color: '#4ade80',
     },
     UPDATE_SUPPLIER: {
-        text: 'Cập nhật nhà cung cấp',
+        text: 'Cập nhật nhà sản xuất',
         color: '#60a5fa',
     },
     DISABLE_SUPPLIER: {
-        text: 'Vô hiệu hóa nhà cung cấp',
+        text: 'Vô hiệu hóa nhà sản xuất',
         color: '#f87171',
     },
     ENABLE_SUPPLIER: {
-        text: 'Kích hoạt nhà cung cấp',
+        text: 'Kích hoạt nhà sản xuất',
         color: '#34d399',
     },
     CREATE_TRANSACTION: {

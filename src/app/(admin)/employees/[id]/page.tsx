@@ -77,6 +77,17 @@ const Page = ({ params }: { params: { id: number } }) => {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value));
     };
 
+    function isValidImageUrl(url: string) {
+        try {
+            const validUrl = new URL(url);
+            console.log("test");
+            console.log(/\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname));
+            return /\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname);
+        } catch {
+            return false;
+        }
+    }
+
     return (
         <div>
             <div className='flex my-10 justify-center w-full'>
@@ -138,7 +149,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <div className='flex-[3]'>
                                     <div className='m-10 flex justify-center'>
                                         <img
-                                            src={employee?.image || "https://via.placeholder.com/150"}
+                                            src={isValidImageUrl(employee?.image) ? employee?.image : "https://placehold.co/150"}
                                             alt="Avatar"
                                             className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                         />
@@ -184,7 +195,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                             <div className='flex-[3]'>
                                 <div className='m-10 flex justify-center'>
                                     <img
-                                        src={employee?.image || "https://via.placeholder.com/150"}
+                                        src={employee?.image || "https://placehold.co/150"}
                                         alt="Avatar"
                                         className="w-32 h-32 rounded-full border-[5px] border-black object-cover"
                                     />
