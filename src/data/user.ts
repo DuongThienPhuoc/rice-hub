@@ -15,7 +15,7 @@ export async function getUserInformation<T>(userName: string): Promise<T> {
 
 export async function updateUserInformation(user: User) {
     try {
-        return await axios.put(`/user/edit/${user.username}`, user);
+        return await axios.put('/user/editByUsername', user);
     } catch (e) {
         throw e;
     }
