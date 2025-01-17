@@ -27,6 +27,20 @@ export interface ProductDtoList {
     unitWeightPairsList: UnitWeightPairsList[];
 }
 
+export interface MissingProductDtoList {
+    id: number;
+    name: string;
+    productCode: string;
+    importPrice?: number;
+    categoryId: string;
+    categoryName: string;
+    supplierId: number;
+    supplierName?: string;
+    missingQuantity: number;
+    unit: string;
+    weightPerUnit: number;
+}
+
 export interface UnitWeightPairsList {
     productUnit: string;
     weightPerUnit: number;
@@ -142,6 +156,40 @@ export async function getProductAndIngredientListByAdmin({
                 supplierName,
                 forceFirstAndLastRels,
                 id,
+                name
+            },
+        });
+    } catch (e) {
+        if (e instanceof Error) {
+            throw new Error(e.message);
+        }
+        throw new Error('Something went wrong');
+    }
+}
+
+export async function getMissingProductListByAdmin({
+    pageNumber = 1,
+    pageSize = 5,
+    forceFirstAndLastRels = true,
+    categoryName = null,
+    supplierName = null,
+    name
+}: {
+    pageNumber?: number;
+    pageSize?: number;
+    forceFirstAndLastRels?: boolean;
+    categoryName?: string | null;
+    supplierName?: string | null;
+    name?: string | null;
+}) {
+    try {
+        return axios.get('/products/admin/order/missingProducts', {
+            params: {
+                pageNumber,
+                pageSize,
+                categoryName,
+                supplierName,
+                forceFirstAndLastRels,
                 name
             },
         });
