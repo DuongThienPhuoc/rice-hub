@@ -28,7 +28,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { getProductAndIngredientListByAdmin, ProductDtoList } from '@/data/customer-product';
+import { getMissingProductListByAdmin, getProductAndIngredientListByAdmin, MissingProductDtoList, ProductDtoList } from '@/data/customer-product';
 import { Button } from '@/components/ui/button';
 import { ProductOrderRequest } from '@/type/order';
 import { Check, CirclePlus, Search, Trash2, X } from 'lucide-react';
@@ -42,6 +42,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Category, getCategories } from '@/data/category';
 import { getSuppliers, Supplier } from '@/data/supplier';
 import OrderPopoverProvider from './order-popover';
+import SelectComponent from './select';
+import OrderPopoverProvider2 from './order-popover2';
 
 type OrderDialogProps = {
     children: React.ReactNode;
@@ -55,6 +57,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     newOrder,
 }) => {
     const [products, setProducts] = React.useState<ProductDtoList[]>([]);
+    const [missingProducts, setMissingProducts] = React.useState<MissingProductDtoList[]>([]);
     const [selectedProducts, setSelectedProducts] = React.useState<
         ProductOrderRequest[]
     >([]);
@@ -67,7 +70,8 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     const [filterSuppliers, setFilterSuppliers] = React.useState<Supplier[]>(
         [],
     );
-    const [selectedSupplier, setSelectedSupplier] = React.useState<string>('');
+    const [defaultValue, setDefault] = React.useState<string>('NORMAL');
+    const [selectedSupplier, setSelectedSupplier] = React.useState<string | null>('');
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
     const [alertDelete, setAlertDelete] = React.useState<boolean>(false);
@@ -93,7 +97,6 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
 
     async function getProduct() {
         try {
-            console.log(selectedSupplier);
             const response = await getProductAndIngredientListByAdmin({
                 pageSize: 5,
                 supplierName: selectedSupplier,
@@ -102,6 +105,27 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                 name: search,
             });
             setProducts(response.data._embedded?.productDtoList || []);
+            setTotalPages(response.data.page.totalPages);
+        } catch (e) {
+            if (e instanceof Error) {
+                throw new Error(
+                    `An error occurred while fetching products: ${e.message}`,
+                );
+            }
+            throw new Error('An error occurred while fetching products');
+        }
+    }
+
+    async function getMissingProduct() {
+        try {
+            const response = await getMissingProductListByAdmin({
+                pageSize: 5,
+                supplierName: selectedSupplier || null,
+                pageNumber: currentPage + 1,
+                categoryName: selectedCategory?.name,
+                name: search || null,
+            });
+            setMissingProducts(response.data._embedded?.missingProductDtoList || []);
             setTotalPages(response.data.page.totalPages);
         } catch (e) {
             if (e instanceof Error) {
@@ -226,9 +250,13 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
     }
 
     useEffect(() => {
-        getProduct().catch((e) => console.error(e));
+        if (defaultValue === 'NORMAL') {
+            getProduct().catch((e) => console.error(e));
+        } else {
+            getMissingProduct().catch((e) => console.error(e));
+        }
         fetchSupplierList().catch((e) => console.error(e));
-    }, [selectedSupplier, currentPage, selectedCategory, search]);
+    }, [selectedSupplier, defaultValue, currentPage, selectedCategory, search]);
 
     useEffect(() => {
         setSelectedProduct((prev) => ({
@@ -254,60 +282,74 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                     <DialogDescription></DialogDescription>
                 </DialogHeader>
                 <section className="max-h-[650px] overflow-y-auto">
-                    <div>
-                        <Label htmlFor="customer">Nhà sản xuất</Label>
+                    <>
+                        <div>
+                            <Label htmlFor="customer">Nhà sản xuất</Label>
 
-                        <Select
-                            value={selectedSupplier}
-                            onValueChange={(e) => {
-                                setError('');
-                                setSelectedSupplier(e);
-                                setSelectedProducts([]);
-                            }}
-                        >
-                            <SelectTrigger
-                                id="customer"
-                                className="w-[280px] bg-[#4ba94d] text-white"
+                            <Select
+                                value={selectedSupplier || ''}
+                                onValueChange={(e) => {
+                                    setError('');
+                                    setSelectedSupplier(e);
+                                    setSelectedProducts([]);
+                                }}
                             >
-                                <SelectValue placeholder="Chọn nhà sản xuất" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <div className="relative">
-                                    <Search className="absolute w-4 h-4 left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                    <Input
-                                        placeholder="Tìm kiếm nhà sản xuất"
-                                        className="pl-8 h-8"
-                                        onChange={(e) =>
-                                            handleSupplierSearch(e)
-                                        }
-                                    />
-                                </div>
-                                <SelectGroup>
-                                    <SelectLabel>Chọn nhà sản xuất</SelectLabel>
-                                    {filterSuppliers
-                                        ?.filter((supplier) => supplier.id !== 1)
-                                        .map((supplier) => (
-                                            <SelectItem key={supplier.id} value={supplier.name.toString()}>
-                                                <div className="text-md font-semibold">{supplier.name}</div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {`SĐT: ${supplier.phoneNumber}`}
-                                                </div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {`Email: ${supplier.email}`}
-                                                </div>
-                                                <div className="text-sm text-muted-foreground">
-                                                    {`Người liên hệ: ${supplier.contactPerson}`}
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <Separator orientation="horizontal" className="my-4" />
+                                <SelectTrigger
+                                    id="customer"
+                                    className="w-[280px] bg-[#4ba94d] text-white"
+                                >
+                                    <SelectValue placeholder="Chọn nhà sản xuất" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <div className="relative">
+                                        <Search className="absolute w-4 h-4 left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                        <Input
+                                            placeholder="Tìm kiếm nhà sản xuất"
+                                            className="pl-8 h-8"
+                                            onChange={(e) =>
+                                                handleSupplierSearch(e)
+                                            }
+                                        />
+                                    </div>
+                                    <SelectGroup>
+                                        <SelectLabel>Chọn nhà sản xuất</SelectLabel>
+                                        {filterSuppliers
+                                            ?.filter((supplier) => supplier.id !== 1)
+                                            .map((supplier) => (
+                                                <SelectItem key={supplier.id} value={supplier.name.toString()}>
+                                                    <div className="text-md font-semibold">{supplier.name}</div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        {`SĐT: ${supplier.phoneNumber}`}
+                                                    </div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        {`Email: ${supplier.email}`}
+                                                    </div>
+                                                    <div className="text-sm text-muted-foreground">
+                                                        {`Người liên hệ: ${supplier.contactPerson}`}
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <Separator orientation="horizontal" className="my-4" />
+                    </>
                     <div className="space-y-2">
                         <h1 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                            Sản phẩm / Nguyên liệu
+                            <div className="flex justify-between">
+                                <span>
+                                    <SelectComponent
+                                        isShowing={defaultValue}
+                                        setStatusUpdate={
+                                            setDefault
+                                        }
+                                        setCurrentPage={
+                                            setCurrentPage
+                                        }
+                                    />
+                                </span>
+                            </div>
                         </h1>
                         <div className="flex gap-1">
                             <Input
@@ -322,7 +364,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                     <div className="h-[36px] px-5 bg-white rounded-md border border-dashed flex items-center gap-1 hover:cursor-pointer">
                                         <CirclePlus className="h-4 w-4" />
                                         <span className="text-sm font-semibold">
-                                            Loại
+                                            Danh mục
                                         </span>
                                         {selectedCategory !== null && (
                                             <>
@@ -347,7 +389,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                             <input
                                                 type="text"
                                                 className="pl-6 h-full rounded outline-0 focus:outline-0"
-                                                placeholder="Loại"
+                                                placeholder="Danh mục"
                                             />
                                         </div>
                                     </div>
@@ -381,7 +423,9 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             {selectedCategory !== null && (
                                 <div
                                     className="whitespace-nowrap text-sm font-medium leading-none flex items-center gap-1 hover:cursor-pointer hover:bg-white px-4 rounded-md"
-                                    onClick={() => setSelectedCategory(null)}
+                                    onClick={() => {
+                                        setSelectedCategory(null)
+                                    }}
                                 >
                                     <span>Bỏ lọc</span>
                                     <X className="h-4 w-4" />
@@ -389,101 +433,218 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             )}
                         </div>
                         <div className="border rounded-md">
-                            <Table>
-                                <TableHeader className="bg-[#0090d9]">
-                                    <TableRow>
-                                        <TableHead>
-                                            <p className="text-white font-semibold">
-                                                Tên hàng hoá
-                                            </p>
-                                        </TableHead>
-                                        <TableHead>
-                                            <p className="text-white font-semibold">
-                                                Danh mục
-                                            </p>
-                                        </TableHead>
-                                        <TableHead>
-                                            <p className="text-white font-semibold">
-                                                Nhà sản xuất
-                                            </p>
-                                        </TableHead>
-                                        <TableHead>
-                                            <p className="text-white font-semibold">
-                                                Giá nhập trước đó (kg)
-                                            </p>
-                                        </TableHead>
-                                        <TableHead className="text-center">
-                                            <p className="text-white font-semibold">
-                                                Thêm
-                                            </p>
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {products.map((product) => (
-                                        <TableRow key={product.id}>
-                                            <TableCell className="font-semibold">
-                                                {product.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                {product.categoryName}
-                                            </TableCell>
-                                            <TableCell>
-                                                {product.supplierName}
-                                            </TableCell>
-                                            <TableCell>
-                                                {currencyHandleProvider(product.importPrice || 0)}
-                                            </TableCell>
-                                            <TableCell className="flex justify-center">
-                                                <OrderPopoverProvider
-                                                    unitWeightPairsList={
-                                                        product.unitWeightPairsList
-                                                    }
-                                                    type={type}
-                                                    setType={setType}
-                                                    quantity={quantity}
-                                                    setProductUnit={
-                                                        setProductUnit
-                                                    }
-                                                    setQuantity={setQuantity}
-                                                    addProductToOrder={
-                                                        addProductToOrder
-                                                    }
-                                                >
-                                                    <Button
-                                                        variant="outline"
-                                                        className="flex items-center justify-between"
-                                                        onClick={() =>
-                                                            setSelectedProduct({
-                                                                productId:
-                                                                    product.id,
-                                                                quantity: 0,
-                                                                weightPerUnit: 0,
-                                                                name: product.name,
-                                                                categoryName: product.categoryName,
-                                                                supplierName: product.supplierName,
-                                                                unitPrice:
-                                                                    product.customerPrice,
-                                                            })
+                            {defaultValue === 'NORMAL' ? (
+                                <Table>
+                                    <TableHeader className="bg-[#0090d9]">
+                                        <TableRow>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Tên hàng hoá
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Danh mục
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Nhà sản xuất
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Giá nhập trước đó (kg)
+                                                </p>
+                                            </TableHead>
+                                            <TableHead className="text-center">
+                                                <p className="text-white font-semibold">
+                                                    Thêm
+                                                </p>
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {products.length > 0 ? products.map((product) => (
+                                            <TableRow key={product.id}>
+                                                <TableCell className="font-semibold">
+                                                    {product.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {product.categoryName}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {product.supplierName}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {currencyHandleProvider(product.importPrice || 0)}
+                                                </TableCell>
+                                                <TableCell className="flex justify-center">
+                                                    <OrderPopoverProvider
+                                                        unitWeightPairsList={
+                                                            product.unitWeightPairsList
+                                                        }
+                                                        type={type}
+                                                        setType={setType}
+                                                        quantity={quantity}
+                                                        setProductUnit={
+                                                            setProductUnit
+                                                        }
+                                                        setQuantity={setQuantity}
+                                                        addProductToOrder={
+                                                            addProductToOrder
                                                         }
                                                     >
-                                                        <CirclePlus className="w-4 h-4" />
-                                                        Thêm
-                                                    </Button>
-                                                </OrderPopoverProvider>
-                                            </TableCell>
+                                                        <Button
+                                                            variant="outline"
+                                                            className="flex items-center justify-between"
+                                                            onClick={() =>
+                                                                setSelectedProduct({
+                                                                    productId:
+                                                                        product.id,
+                                                                    quantity: 0,
+                                                                    weightPerUnit: 0,
+                                                                    name: product.name,
+                                                                    categoryName: product.categoryName,
+                                                                    supplierName: product.supplierName,
+                                                                    unitPrice:
+                                                                        product.customerPrice,
+                                                                })
+                                                            }
+                                                        >
+                                                            <CirclePlus className="w-4 h-4" />
+                                                            Thêm
+                                                        </Button>
+                                                    </OrderPopoverProvider>
+                                                </TableCell>
+                                            </TableRow>
+                                        )) : (
+                                            <TableRow>
+                                                <TableCell colSpan={7} className="font-semibold">
+                                                    <div className='flex justify-center items-center w-full h-[200px]'>
+                                                        Không có sản phẩm
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            ) : (
+                                <Table>
+                                    <TableHeader className="bg-[#0090d9]">
+                                        <TableRow>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Tên hàng hoá
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Danh mục
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Nhà sản xuất
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Quy cách
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Số lượng thiếu
+                                                </p>
+                                            </TableHead>
+                                            <TableHead>
+                                                <p className="text-white font-semibold">
+                                                    Giá nhập trước đó (kg)
+                                                </p>
+                                            </TableHead>
+                                            <TableHead className="text-center">
+                                                <p className="text-white font-semibold">
+                                                    Thêm
+                                                </p>
+                                            </TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {missingProducts.length > 0 ? missingProducts.map((missingProduct) => (
+                                            <TableRow key={missingProduct.id}>
+                                                <TableCell className="font-semibold">
+                                                    {missingProduct.name}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {missingProduct.categoryName}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {missingProduct.supplierName}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {missingProduct.unit} {missingProduct.weightPerUnit} kg
+                                                </TableCell>
+                                                <TableCell>
+                                                    {missingProduct.missingQuantity} {missingProduct.unit}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {currencyHandleProvider(missingProduct.importPrice || 0)}
+                                                </TableCell>
+                                                <TableCell className="flex justify-center">
+                                                    <OrderPopoverProvider2
+                                                        type={missingProduct.weightPerUnit.toString()}
+                                                        setType={setType}
+                                                        quantity={missingProduct.missingQuantity}
+                                                        setQuantity={setQuantity}
+                                                        addProductToOrder={
+                                                            addProductToOrder
+                                                        }
+                                                    >
+                                                        <Button
+                                                            variant="outline"
+                                                            className="flex items-center justify-between"
+                                                            onClick={() =>
+                                                                setSelectedProduct({
+                                                                    productId:
+                                                                        missingProduct.id,
+                                                                    quantity: missingProduct.missingQuantity,
+                                                                    weightPerUnit: missingProduct.weightPerUnit,
+                                                                    name: missingProduct.name,
+                                                                    categoryName: missingProduct.categoryName,
+                                                                    supplierName: missingProduct.supplierName,
+                                                                    unitPrice: missingProduct.importPrice,
+                                                                })
+                                                            }
+                                                        >
+                                                            <CirclePlus className="w-4 h-4" />
+                                                            Thêm
+                                                        </Button>
+                                                    </OrderPopoverProvider2>
+                                                </TableCell>
+                                            </TableRow>
+                                        )) : (
+                                            <TableRow>
+                                                <TableCell colSpan={7} className="font-semibold">
+                                                    <div className='flex justify-center items-center w-full h-[200px]'>
+                                                        Không có sản phẩm
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
-                        <div>
-                            <PaginationComponent
-                                currentPage={currentPage}
-                                setCurrentPage={setCurrentPage}
-                                totalPages={totalPages}
-                            />
-                        </div>
+                        {totalPages > 1 && (
+                            <div>
+                                <PaginationComponent
+                                    currentPage={currentPage}
+                                    setCurrentPage={setCurrentPage}
+                                    totalPages={totalPages}
+                                />
+                            </div>
+                        )}
                     </div>
                     {selectedProducts.length > 0 && (
                         <>
@@ -611,7 +772,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                             Huỷ
                         </Button>
                         <Button onClick={() => {
-                            if (selectedSupplier === '') {
+                            if (selectedSupplier === '' || selectedSupplier === null) {
                                 setError('Vui lòng chọn nhà sản xuất')
                                 return
                             }

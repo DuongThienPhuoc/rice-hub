@@ -484,14 +484,16 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
                                                                 tableName === 'production' && row.status !== 'PENDING' ? (
                                                                     <></>
                                                                 ) : (
-                                                                    <div className="relative group">
-                                                                        <button onClick={() => showAlert(row)}>
-                                                                            <Trash2 size={18} />
-                                                                        </button>
-                                                                        <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
-                                                                            Xóa
-                                                                        </span>
-                                                                    </div>
+                                                                    tableName !== 'customers' && (
+                                                                        <div className="relative group">
+                                                                            <button onClick={() => showAlert(row)}>
+                                                                                <Trash2 size={18} />
+                                                                            </button>
+                                                                            <span className="absolute text-center w-[50px] left-1/2 transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                Xóa
+                                                                            </span>
+                                                                        </div>
+                                                                    )
                                                                 )
                                                             ) : (
                                                                 row?.batchProductDtos?.some((item: any) => item.isAdded === true) ? (
