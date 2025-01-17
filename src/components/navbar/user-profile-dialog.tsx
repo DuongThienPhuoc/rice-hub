@@ -119,7 +119,7 @@ export default function UserProfileDialog({
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                disabled={!isEdit}
+                                                disabled={true}
                                                 className="pl-8"
                                             />
                                         </FormControl>
@@ -169,12 +169,13 @@ export default function UserProfileDialog({
                             </Button>
                             {isEdit && <Button>Lưu</Button>}
                         </div>
-                        <div>
-                            <Button type='button' className='w-full' variant='outline'>
-                                <Lock className="mr-2 w-4 h-4" />
-                                Đổi mật khẩu
-                            </Button>
-                        </div>
+                        {/*Todo: Add change password feature*/}
+                        {/*<div>*/}
+                        {/*    <Button type='button' className='w-full' variant='outline'>*/}
+                        {/*        <Lock className="mr-2 w-4 h-4" />*/}
+                        {/*        Đổi mật khẩu*/}
+                        {/*    </Button>*/}
+                        {/*</div>*/}
                     </form>
                 </Form>
             </DialogContent>
