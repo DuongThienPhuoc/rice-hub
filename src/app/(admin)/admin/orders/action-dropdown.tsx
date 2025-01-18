@@ -35,19 +35,21 @@ export default function ActionDropdownProvider({
                     <Search className="w-4 h-4 text-muted-foreground" />
                     Xem chi Tiết
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                    className="flex items-center gap-2"
-                    onClick={() => {
-                        window.open(
-                            `/document/invoice?orderId=${order.id}`,
-                            '_blank',
-                            'noopener,noreferrer',
-                        );
-                    }}
-                >
-                    <Printer className="w-4 h-4 text-muted-foreground" />
-                    In hoá đơn
-                </DropdownMenuItem>
+                {order.status === 'COMPLETE' && (
+                    <DropdownMenuItem
+                        className="flex items-center gap-2"
+                        onClick={() => {
+                            window.open(
+                                `/document/invoice?orderId=${order.id}`,
+                                '_blank',
+                                'noopener,noreferrer',
+                            );
+                        }}
+                    >
+                        <Printer className="w-4 h-4 text-muted-foreground" />
+                        In hoá đơn
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );

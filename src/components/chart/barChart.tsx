@@ -55,7 +55,7 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                     const today = dayjs();
                     const startOfWeek = today.startOf('week');
                     periodData = weekLabels.map((label, index) => {
-                        const targetDate = startOfWeek.add(index, 'day');
+                        const targetDate = startOfWeek.add(index + 1, 'day');
                         const matchingData = data?.find((item: any) => {
                             const date = new Date(item.timePeriod);
                             const day = date.getDate();

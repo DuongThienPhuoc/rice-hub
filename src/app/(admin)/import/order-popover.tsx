@@ -61,14 +61,14 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
 
     useEffect(() => {
         if (isOpen == false) {
-            setNewWeight('');
+            setNewWeight(0);
             setNewUnit('');
             setIsAdding(false)
         }
     }, [isOpen])
 
     const [isAdding, setIsAdding] = useState(false);
-    const [newWeight, setNewWeight] = useState('');
+    const [newWeight, setNewWeight] = useState(0);
     const [newUnit, setNewUnit] = useState('');
 
     return (
@@ -148,22 +148,24 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                         }}
                                     >
                                         <option value="" disabled>Chọn quy cách</option>
-                                        <option value="BAO">BAO</option>
-                                        <option value="TÚI">TÚI</option>
+                                        <option value="Bao">Bao</option>
+                                        <option value="Túi">Túi</option>
                                     </select>
-                                    <input
-                                        type="text"
+                                    <Input
+                                        type="number"
+                                        min={1}
                                         placeholder="Nhập trọng lượng (kg)"
                                         className="w-full mb-2 p-2 border border-gray-300 rounded"
                                         value={newWeight}
                                         onChange={(e) => {
-                                            setType(e.target.value)
-                                            setNewWeight(e.target.value)
+                                            setType(parseFloat(e.target.value).toString())
+                                            setNewWeight(parseFloat(e.target.value))
                                         }}
                                     />
                                     <Input
                                         id="quantity"
                                         value={quantity}
+                                        placeholder="Nhập số lượng"
                                         onChange={(event) =>
                                             setQuantity(parseInt(event.target.value))
                                         }
@@ -185,7 +187,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                                 setError2("")
                                                 setError("")
                                                 setNewUnit("")
-                                                setNewWeight("")
+                                                setNewWeight(0)
                                                 setIsAdding(false)
                                             }}
                                         >
@@ -197,7 +199,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
                                                 if (newUnit === '') {
                                                     setError2('Vui lòng chọn quy cách');
                                                 }
-                                                else if (newWeight === '') {
+                                                else if (newWeight === 0) {
                                                     setError2('Vui lòng nhập trọng lượng cho quy cách');
                                                 }
                                                 else if (quantity === 0) {

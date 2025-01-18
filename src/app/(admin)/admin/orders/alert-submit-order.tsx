@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import React from 'react';
+import { Button } from '@/components/ui/button';
 
 type AlertDeleteProps = {
     isOpen: boolean;
@@ -31,6 +32,11 @@ export default function AlertSubmitOrder({
     setPhone,
     setAddress
 }: AlertDeleteProps) {
+    const [error, setError] = React.useState<string>('');
+    function validatePhone(phone: string) {
+        const regex = /^(0[1|2|3|4|5|6|7|8|9])[0-9]{8}$/;
+        return regex.test(phone);
+    }
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogContent className="bg-white">
@@ -61,6 +67,11 @@ export default function AlertSubmitOrder({
                                     onChange={(e) => setAddress(e.target.value)}
                                 />
                             </div>
+                            {error && (
+                                <div className='bg-red-500 text-center rounded py-1'>
+                                    <p className='text-white font-semibold text-sm'>{error}</p>
+                                </div>
+                            )}
                         </div>
                     </AlertDialogHeader>
                 </AlertDialogHeader>
@@ -68,9 +79,19 @@ export default function AlertSubmitOrder({
                     <AlertDialogCancel onClick={() => setIsOpen(false)}>
                         Huỷ bỏ
                     </AlertDialogCancel>
-                    <AlertDialogAction onClick={createOrder}>
+                    <Button onClick={
+                        () => {
+                            if(phoneNumber === '' || address === '') {
+                                setError('Vui lòng nhập đầy đủ thông tin')
+                            } else if(!validatePhone(phoneNumber)) {
+                                setError('Số điện thoại không hợp lệ')
+                            } else {
+                                createOrder()
+                            }
+                        }
+                    }>
                         Tiếp tục
-                    </AlertDialogAction>
+                    </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

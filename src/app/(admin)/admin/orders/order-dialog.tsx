@@ -408,7 +408,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                         </TableHead>
                                         <TableHead className="text-center">
                                             <p className="text-white font-semibold">
-                                                Thêm
+                                                Hành động
                                             </p>
                                         </TableHead>
                                     </TableRow>
@@ -512,7 +512,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableHead>
                                                 <TableHead>
                                                     <p className="font-semibold text-white">
-                                                        Đơn giá
+                                                        Đơn giá (kg)
                                                     </p>
                                                 </TableHead>
                                                 <TableHead>

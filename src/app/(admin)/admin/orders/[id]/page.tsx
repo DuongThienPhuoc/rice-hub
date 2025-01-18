@@ -124,13 +124,16 @@ export default function OrderDetailPage({
                             <span className='font-bold'>{order?.orderCode}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Ngày tạo đơn:</span>
+                            <span className="font-semibold">Ngày tạo đơn (Ngày-tháng-năm):</span>
                             <span className="flex gap-1 items-center">
                                 <Calendar className="w-4 h-4" />
                                 <span className='font-semibold'>
                                     {new Date(
                                         order?.orderDate || '',
-                                    ).toLocaleDateString()}
+                                    ).toLocaleDateString('vi-VN', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
                                 </span>
                             </span>
                         </div>
@@ -211,16 +214,25 @@ export default function OrderDetailPage({
                                                 </Button>
                                                 <Button
                                                     onClick={() => {
-                                                        setIsEditMode(false);
-                                                        updateOrderQuantity().catch((e) => {
+                                                        if(order?.orderDetails.some((item) => item.quantity <= 0)) {
                                                             toast({
                                                                 variant: 'destructive',
                                                                 title: 'Cập nhật thất bại',
-                                                                description: 'Có lỗi xảy ra khi cập nhật số lượng đơn hàng',
+                                                                description: 'Số lượng sản phẩm phải lớn hơn 0',
                                                                 duration: 3000
                                                             })
-                                                            console.error('Error updating order quantity: ', e);
-                                                        });
+                                                        } else {
+                                                            setIsEditMode(false);
+                                                            updateOrderQuantity().catch((e) => {
+                                                                toast({
+                                                                    variant: 'destructive',
+                                                                    title: 'Cập nhật thất bại',
+                                                                    description: 'Có lỗi xảy ra khi cập nhật số lượng đơn hàng',
+                                                                    duration: 3000
+                                                                })
+                                                                console.error('Error updating order quantity: ', e);
+                                                            });
+                                                        }
                                                     }}
                                                 >
                                                     <span>Xác Nhận</span>
@@ -254,12 +266,12 @@ export default function OrderDetailPage({
                                 Tổng cộng:{' '}
                                 {currencyHandleProvider(order?.totalAmount)}
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                                {`Phụ phí: ${currencyHandleProvider(0)}`}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                {`Thuế: ${currencyHandleProvider(0)}`}
-                            </p>
+                            {/*<p className="text-sm text-muted-foreground">*/}
+                            {/*    {`Phụ phí: ${currencyHandleProvider(0)}`}*/}
+                            {/*</p>*/}
+                            {/*<p className="text-sm text-muted-foreground">*/}
+                            {/*    {`Thuế: ${currencyHandleProvider(0)}`}*/}
+                            {/*</p>*/}
                             <p className="mt-2 font-bold">{`Tổng tiền: ${currencyHandleProvider(order?.totalAmount)}`}</p>
                         </div>
                     </CardFooter>

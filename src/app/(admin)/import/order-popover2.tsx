@@ -10,37 +10,27 @@ import { Button } from '@/components/ui/button';
 
 type OrderPopoverProviderProps = {
     children: React.ReactNode;
-    type: string;
-    setType: (type: string) => void;
     quantity: number;
     setQuantity: (quantity: number) => void;
-    addProductToOrder: () => void;
+    addProductToOrder: () => void; // Thêm prop để nhận hàm xử lý
 };
 
 const OrderPopoverProvider2: React.FC<OrderPopoverProviderProps> = ({
     children,
-    type,
-    setType,
     quantity,
     setQuantity,
-    addProductToOrder,
+    addProductToOrder, // Nhận hàm xử lý
 }) => {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
 
     function handleSubmit() {
-        if (type === '') {
-            setError('Vui lòng chọn quy cách');
-        }
-        else if (quantity === 0) {
-            setError('Số lượng không được để trống');
-        }
-        else {
-            setType('');
-            setQuantity(1);
+        if (quantity <= 0 || isNaN(quantity)) {
+            setError('Số lượng không được để trống hoặc nhỏ hơn 1');
+        } else {
             setError('');
-            addProductToOrder();
-            setIsOpen(false);
+            addProductToOrder(); // Gọi hàm thêm sản phẩm
+            setIsOpen(false); // Đóng Popover
         }
     }
 
@@ -65,7 +55,7 @@ const OrderPopoverProvider2: React.FC<OrderPopoverProviderProps> = ({
                         </div>
                         <div>
                             {error && (
-                                <div className='p-1 bg-destructive text-white text-sm font-semibold text-center rounded'>
+                                <div className="p-1 bg-destructive text-white text-sm font-semibold text-center rounded">
                                     <span>{error}</span>
                                 </div>
                             )}

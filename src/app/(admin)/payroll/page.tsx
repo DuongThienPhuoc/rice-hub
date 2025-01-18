@@ -74,7 +74,7 @@ export default function PayrollPage() {
                             }}
                         >
                             <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
-                                Nhân viên thời vụ
+                                Thời vụ
                             </h1>
                         </div>
                         <div
@@ -87,7 +87,7 @@ export default function PayrollPage() {
                             }}
                         >
                             <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
-                                Nhân viên chính thức
+                                Chính thức
                             </h1>
                         </div>
                     </div>

@@ -57,13 +57,13 @@ export default function AlertChangeStatus({ setRefreshData,refreshData,orderUpda
                     <AlertDialogHeader>
                         <AlertDialogTitle>Cảnh báo</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Đang có những đơn hàng có sản phẩm này đang được xử lý, bạn có chắc chắn muốn thay đổi trạng thái?
+                            Đơn hàng có sản phẩm đã được xác nhận, bạn có chắc chắn muốn thay đổi trạng thái?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <div>
                             {orderUpdatePending?.orderDetails?.filter((orderDetail) => orderDetail.inProgressOrder > 0).map((orderDetail) => (
                                 <div key={orderDetail.id}>
-                                    <p><span className='font-semibold'>{orderDetail.name}</span> - {orderDetail.inProgressOrder} đơn hàng đã được xác nhận!</p>
+                                    <p><span className='font-semibold'>{orderDetail.name} - {orderDetail.productUnit} {orderDetail.weightPerUnit} kg</span></p>
                                 </div>
                             ))}
                     </div>
