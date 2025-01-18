@@ -3,7 +3,6 @@ import { AdminOrderResponse, Order } from '@/type/order';
 import { Calendar, Plus, Ellipsis } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OrderDialogProvider from '@/app/(admin)/admin/orders/order-dialog';
-import SelectComponent from '@/app/(admin)/admin/orders/select';
 import AlertChangeStatus from '@/app/(admin)/admin/orders/alert-change-status';
 import { Separator } from '@/components/ui/separator';
 import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
@@ -14,6 +13,7 @@ import OrderPageBreadcrumb from '@/app/(admin)/admin/orders/breadcrumb';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import OrderStatusSelect from '@/app/(admin)/admin/orders/order-status-select';
+import { statusProvider } from '@/utils/status-provider';
 
 type AdminOrdersTableProps = {
     adminOrderResponse: AdminOrderResponse;
@@ -160,13 +160,14 @@ const AdminOrdersTable: React.FC<AdminOrdersTableProps> = ({
                                     </TableCell>
                                     <TableCell>{order.customer.name}</TableCell>
                                     <TableCell>
-                                        <SelectComponent
-                                            order={order}
-                                            setOrderUpdatePending={
-                                                setOrderUpdatePending
-                                            }
-                                            setIsAlertOpen={setIsAlertOpen}
-                                        />
+                                        <span className='p-2 rounded bg-gray-400 text-[12px] font-medium leading-none'
+                                                style={{
+                                                    color: statusProvider(order.status).textColor,
+                                                    backgroundColor: statusProvider(order.status).bgColor,
+                                                }}
+                                        >
+                                            {statusProvider(order.status).text}
+                                        </span>
                                     </TableCell>
                                     <TableCell>
                                         <div className='flex justify-center'>

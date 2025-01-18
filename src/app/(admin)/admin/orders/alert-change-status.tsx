@@ -49,7 +49,8 @@ export default function AlertChangeStatus({ setRefreshData,refreshData,orderUpda
             return
         }
     }
-    if (orderUpdatePending?.orderDetails?.some((orderDetail) => orderDetail.inProgressOrder > 0)) {
+
+    if (orderUpdatePending?.orderDetails?.some((orderDetail) => orderDetail.inProgressOrder > 0) && orderUpdatePending?.status === 'CONFIRMED') {
         return (
             <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
                 <AlertDialogContent className='bg-white'>
