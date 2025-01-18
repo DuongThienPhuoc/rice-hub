@@ -20,7 +20,7 @@ interface BarChartProps {
 
 const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType, data, loading }) => {
     const [chartData, setChartData] = useState<{ label: string; revenue: number }[]>([]);
-    const [period, setPeriod] = useState("tuần");
+    const [period, setPeriod] = useState("tháng");
     const [dropdown, setDropdown] = useState(false);
     const navbarRef = useRef<HTMLDivElement>(null);
 
@@ -221,15 +221,15 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                             >
                                 Tháng này
                             </li>
-                            <li
-                                className="hover:bg-gray-200 p-2 font-semibold border-b-[1px]"
-                                onClick={() => {
-                                    setPeriod('tuần');
-                                    setType('week');
-                                }}
-                            >
-                                Tuần này
-                            </li>
+                            {/*<li*/}
+                            {/*    className="hover:bg-gray-200 p-2 font-semibold border-b-[1px]"*/}
+                            {/*    onClick={() => {*/}
+                            {/*        setPeriod('tuần');*/}
+                            {/*        setType('week');*/}
+                            {/*    }}*/}
+                            {/*>*/}
+                            {/*    Tuần này*/}
+                            {/*</li>*/}
                             <li
                                 className="hover:bg-gray-200 p-2 font-semibold border-b-[1px]"
                                 onClick={() => {

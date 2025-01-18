@@ -221,9 +221,9 @@ const Page = () => {
                             <div className='flex-1 mx-2'>
                                 <StackBarChart chartName='Hóa đơn' color1='#2eb88a' loading={loadingData} data={orderReport} color2='#e88c30' />
                             </div>
-                            <div className='flex-1 ml-2'>
-                                <DonutChart chartName='Nguồn thu' data={topCategoryReport} loading={loadingData} />
-                            </div>
+                            {/*<div className='flex-1 ml-2'>*/}
+                            {/*    <DonutChart chartName='Nguồn thu' data={topCategoryReport} loading={loadingData} />*/}
+                            {/*</div>*/}
                         </div>
 
                         <h1 className='text-black text-[20px] font-bold mt-10'>Báo cáo định kỳ</h1>
