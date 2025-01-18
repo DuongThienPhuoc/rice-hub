@@ -168,6 +168,33 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
         }
     }
 
+    function addProductToOrder2(missingProduct: MissingProductDtoList) {
+        const prevProduct = [...selectedProducts];
+        setError("");
+        prevProduct.forEach((product) => {
+            if (!product.quantity) product.quantity = 0;
+            if (product.productId === missingProduct?.id && product.productUnit === missingProduct?.unit && product.weightPerUnit === missingProduct?.weightPerUnit) {
+                product.quantity += quantity || 0;
+                updated = true;
+            }
+        })
+        if (!updated) {
+            setSelectedProducts((prev) => [...prev, {
+                productId:
+                    missingProduct.id,
+                productUnit: missingProduct.unit,
+                quantity: quantity,
+                weightPerUnit: missingProduct.weightPerUnit,
+                name: missingProduct.name,
+                categoryName: missingProduct.categoryName,
+                supplierName: missingProduct.supplierName,
+                unitPrice: missingProduct.importPrice,
+            }]);
+        } else {
+            setSelectedProducts(prevProduct);
+        }
+    }
+
     const getCurrentDateTime = () => {
         const now = new Date();
         const year = now.getFullYear();
@@ -595,40 +622,18 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                     <OrderPopoverProvider2
                                                         quantity={quantity}
                                                         setQuantity={setQuantity}
-                                                        addProductToOrder={
-                                                            addProductToOrder
-                                                        }
-                                                        type={missingProduct.weightPerUnit.toString()}
-                                                        setType={
-                                                            setType
-                                                        }
-                                                        productUnit={missingProduct.unit}
-                                                        setProductUnit={
-                                                            setProductUnit
-                                                        }
+                                                        addProductToOrder={() => addProductToOrder2(missingProduct)}
                                                     >
                                                         <Button
                                                             variant="outline"
                                                             className="flex items-center justify-between"
-                                                            onClick={() => {
-                                                                setSelectedProduct({
-                                                                    productId:
-                                                                        missingProduct.id,
-                                                                    productUnit: missingProduct.unit,
-                                                                    quantity: quantity,
-                                                                    weightPerUnit: missingProduct.weightPerUnit,
-                                                                    name: missingProduct.name,
-                                                                    categoryName: missingProduct.categoryName,
-                                                                    supplierName: missingProduct.supplierName,
-                                                                    unitPrice: missingProduct.importPrice,
-                                                                })
-                                                            }}
                                                         >
                                                             <CirclePlus className="w-4 h-4" />
                                                             Thêm
                                                         </Button>
                                                     </OrderPopoverProvider2>
                                                 </TableCell>
+
                                             </TableRow>
                                         )) : (
                                             <TableRow>
