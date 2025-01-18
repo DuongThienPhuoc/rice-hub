@@ -33,7 +33,7 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                     }}
                 >
                     <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        Nhân viên thời vụ
+                        Thời vụ
                     </h1>
                 </div>
                 <div
@@ -45,8 +45,8 @@ const UserCardContainer: React.FC<UserCardContainerProps> = ({
                         setTab(1);
                     }}
                 >
-                    <h1 className="text-sm px-1 font-medium leading-none overflow-hidden text-ellipsis whitespace-nowrap">
-                        Nhân viên chính thức
+                    <h1 className="text-sm px-1 font-medium leading-none overflow-hidden whitespace-nowrap">
+                        Chính thức
                     </h1>
                 </div>
             </div>

@@ -30,10 +30,10 @@ export default function SelectComponent({
             value: 'NORMAL',
             label: 'Danh sách sản phẩm và nguyên liệu',
         },
-        {
-            value: 'MISSING',
-            label: 'Danh sách sản phẩm đang thiếu hàng',
-        }
+        // {
+        //     value: 'MISSING',
+        //     label: 'Danh sách sản phẩm đang thiếu hàng',
+        // }
     ];
     const status = () => {
         return type;

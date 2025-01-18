@@ -88,6 +88,12 @@ export default function SelectComponent({
             label: 'Đã nhận hàng',
         }
     ]
+    const failedStatus = [
+        {
+            value: 'FAILED',
+            label: 'Thất bại',
+        }
+    ]
     const status = (orderStatus: string) => {
         if (orderStatus === 'PENDING') {
             return pendingStatus;
@@ -97,8 +103,9 @@ export default function SelectComponent({
             return confirmedStatus;
         } else if (orderStatus === 'COMPLETE') {
             return completeStatus;
-        }
-        else {
+        }else if (orderStatus === 'FAILED') {
+            return failedStatus;
+        } else {
             return orderStatus === 'COMPLETED' ? completedStatus : canceledStatus;
         }
     }

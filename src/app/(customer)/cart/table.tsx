@@ -194,7 +194,18 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                         selectedProduct.length === products.length && products.length !== 0
                                     }
                                     onCheckedChange={() => {
-                                        updateSelectedAllProduct(products);
+                                        for (const product of products) {
+                                            if (product.quantity <= 0) {
+                                                toast({
+                                                    variant: 'destructive',
+                                                    title: 'Số lượng sản phẩm không hợp lệ',
+                                                    description: 'Số lượng sản phẩm phải lớn hơn 0',
+                                                    duration: 3000
+                                                })
+                                                return;
+                                            }
+                                        }
+                                        updateSelectedAllProduct(products)
                                     }}
                                 />
                             </TableHead>
@@ -227,9 +238,19 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                                         product.cartId,
                                                 )
                                             }
-                                            onCheckedChange={() =>
-                                                updateSelectedProduct(product)
-                                            }
+                                            onCheckedChange={() =>{
+                                                if(product.quantity <= 0){
+                                                    toast({
+                                                        variant: 'destructive',
+                                                        title: 'Số lượng sản phẩm không hợp lệ',
+                                                        description: 'Số lượng sản phẩm phải lớn hơn 0',
+                                                        duration: 3000
+                                                    })
+                                                    return;
+                                                }else {
+                                                    updateSelectedProduct(product)
+                                                }
+                                            }}
                                         />
                                     </TableCell>
                                     <TableCell>{product.name}</TableCell>
@@ -320,7 +341,7 @@ export default function CartTable({ customerID }: { customerID: string }) {
                                                 placeholder="Địa chỉ"
                                                 value={address}
                                                 onChange={(e) => {
-                                                    if (e.target.value === '') {
+                                                    if (e.target.value.trim() === '') {
                                                         setAddress(e.target.value);
                                                         setError('Địa chỉ không được để trống');
                                                     }else {
