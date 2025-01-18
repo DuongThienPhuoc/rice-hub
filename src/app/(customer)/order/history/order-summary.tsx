@@ -18,7 +18,7 @@ export default function OrderSummary({ userID }: { userID: string }) {
         });
     }, [userID]);
     const totalAmount =
-        customerOrderHistoryResponse?._embedded?.orderList.reduce(
+        customerOrderHistoryResponse?._embedded?.orderList.filter((order) => order.status === 'COMPLETED').reduce(
             (acc, order) => acc + order.totalAmount,
             0,
         );
