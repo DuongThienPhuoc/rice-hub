@@ -5,7 +5,7 @@ import BarChart from '@/components/chart/barChart';
 import MultipleBarChart from '@/components/chart/MultipleBarChart';
 import StackBarChart from '@/components/chart/StackBarChart';
 import FloatingButton from '@/components/floating/floatingButton';
-import DonutChart from '@/components/chart/PieChart';
+// import DonutChart from '@/components/chart/PieChart';
 import HorizontalChart from '@/components/chart/HorizontalChart';
 import api from "@/config/axiosConfig";
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ const Page = () => {
     const [quantityType, setQuantityType] = useState<any>('week');
     const [topProductType, setTopProductType] = useState('month');
     const [topProductReport, setTopProductReport] = useState<any>([]);
-    const [topCategoryReport, setTopCategoryReport] = useState<any>([]);
+    // const [topCategoryReport, setTopCategoryReport] = useState<any>([]);
     const [orderReport, setOrderReport] = useState<any>([]);
     const { setBreadcrumb } = useBreadcrumbStore()
 
@@ -126,23 +126,23 @@ const Page = () => {
         }
     };
 
-    const getTopCategoryReport = async () => {
-        try {
-            const url = `/categories/top5`;
-            const response = await api.get(url);
-            const data = response.data;
-            setTopCategoryReport(data);
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Lỗi khi lấy báo cáo nguồn thu!',
-                description: 'Xin vui lòng thử lại',
-                duration: 3000
-            })
-        } finally {
-            setLoadingData(false);
-        }
-    };
+    // const getTopCategoryReport = async () => {
+    //     try {
+    //         const url = `/categories/top5`;
+    //         const response = await api.get(url);
+    //         const data = response.data;
+    //         setTopCategoryReport(data);
+    //     } catch (error) {
+    //         toast({
+    //             variant: 'destructive',
+    //             title: 'Lỗi khi lấy báo cáo nguồn thu!',
+    //             description: 'Xin vui lòng thử lại',
+    //             duration: 3000
+    //         })
+    //     } finally {
+    //         setLoadingData(false);
+    //     }
+    // };
 
     const getDailyReport = async () => {
         try {
@@ -199,7 +199,7 @@ const Page = () => {
 
     useEffect(() => {
         getDailyReport();
-        getTopCategoryReport();
+        // getTopCategoryReport();
         getOrderReport();
     }, [])
 
