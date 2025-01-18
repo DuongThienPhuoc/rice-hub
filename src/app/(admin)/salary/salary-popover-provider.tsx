@@ -87,7 +87,7 @@ export default function SalaryPopoverProvider({
             <PopoverContent className="w-80 space-y-4">
                 <div>
                     <p className="font-medium leading-none">
-                        Ngày: {new Date(day.localDate).toLocaleDateString('en-US')}{' '}
+                        Ngày: {new Date(day.localDate).toLocaleDateString('vi-VN')}{' '}
                     </p>
                 </div>
                 <EmployeePopoverContent

@@ -46,8 +46,8 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
         if (type === '') {
             setError('Vui lòng chọn quy cách');
         }
-        else if (quantity === 0) {
-            setError('Số lượng không được để trống');
+        else if (quantity <= 0) {
+            setError('Số lượng phải lớn hơn 0');
         }
         else {
             setType('');
@@ -62,6 +62,7 @@ const OrderPopoverProvider: React.FC<OrderPopoverProviderProps> = ({
         <Popover open={isOpen} onOpenChange={() => {
             setIsOpen(!isOpen)
             setWarehouseQuantity(0)
+            setQuantity(1)
         }}>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
             <PopoverContent className='w-80'>
