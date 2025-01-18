@@ -132,7 +132,7 @@ export default function OrderPageDialog({
                             <SelectContent>
                                 {product.unitWeightPairsList.map((weight, index) => (
                                     <SelectItem key={index} value={JSON.stringify(weight)}>
-                                        {weight.weightPerUnit} Kg
+                                        {weight.productUnit} {weight.weightPerUnit} Kg
                                     </SelectItem>
                                 ))}
                             </SelectContent>

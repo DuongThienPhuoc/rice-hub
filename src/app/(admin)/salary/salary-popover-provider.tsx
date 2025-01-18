@@ -159,7 +159,7 @@ function EmployeePopoverContent({
                         duration: 3000,
                     });
                     return;
-                }else if((bodyRequest.mass === 0 || isNaN(bodyRequest.mass as number)) && role === 'DAILY') {
+                }else if((bodyRequest.mass == null || bodyRequest.mass <= 0 || isNaN(bodyRequest.mass as number)) && role === 'DAILY') {
                     toast({
                         variant: 'destructive',
                         title: 'Thất bại',
@@ -167,7 +167,7 @@ function EmployeePopoverContent({
                         duration: 3000,
                     });
                     return;
-                }else {
+                } else {
                     await createEmployeeActiveDay(bodyRequest);
                     setRefreshActiveDays(!refreshActiveDays);
                     handlePopoverActive();
@@ -213,9 +213,29 @@ function EmployeePopoverContent({
     ) {
         startTransition(async () => {
             try {
-                await updateEmployeeActiveDay(bodyRequest);
-                setRefreshActiveDays(!refreshActiveDays);
-                handlePopoverActive();
+                if (bodyRequest.mass == null || bodyRequest.mass <= 0 || isNaN(bodyRequest.mass as number)) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Thất bại',
+                        description: 'Không thể cập nhật ngày đi làm với số lượng nhỏ hơn hoặc bằng 0',
+                        duration: 3000,
+                    });
+                    handlePopoverActive();
+                    return;
+                } else if(getEmployeeActiveDate(new Date(day.localDate).toLocaleDateString('en-US'))?.spend === true) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Thất bại',
+                        description: 'Không thể cập nhật ngày đi làm đã chi tiền',
+                        duration: 3000,
+                    });
+                    handlePopoverActive();
+                    return;
+                } else {
+                    await updateEmployeeActiveDay(bodyRequest);
+                    setRefreshActiveDays(!refreshActiveDays);
+                    handlePopoverActive();
+                }
             } catch (e) {
                 if (isAxiosError(e)) {
                     throw e;
@@ -252,8 +272,10 @@ function EmployeePopoverContent({
                         className="col-span-2"
                         value={detail}
                         type="number"
+                        step='0.01'
+                        min='0'
                         onChange={(value) =>
-                            setDetail(parseInt(value.target.value))
+                            setDetail(parseFloat(value.target.value))
                         }
                         disabled={!active}
                     />

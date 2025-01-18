@@ -5,10 +5,12 @@ import { cn } from '@/lib/utils';
 import style from '@/style/landing-page.module.css';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import api from '@/config/axiosConfig';
 
 export default function Navbar() {
     const [userName, setUserName] = useState<string>('');
     const [role, setRole] = useState<string>('');
+    const [isShow, setIsShow] = useState<boolean>(false);
     const category = [
         {
             name: 'Trang chủ',
@@ -36,6 +38,20 @@ export default function Navbar() {
             link: '/login',
         },
     ];
+
+    const handleLogout = async () => {
+        try {
+            const url = `/logout/logoutRequest`;
+            await api.post(url);
+            localStorage.removeItem('role');
+            localStorage.removeItem('username');
+            document.cookie = `userID=; path=/; max-age=0`;
+            window.location.href = '/'
+        } catch (error) {
+            console.error('Đăng xuất thất bại:', error);
+        }
+    };
+
 
     useEffect(() => {
         if(typeof window === 'undefined') return;
@@ -75,7 +91,6 @@ export default function Navbar() {
                                     item.name !== 'Trang chủ' &&
                                         style.category_container,
                                     item.role.includes(role) && 'flex',
-
                                 )}
                                 onClick={() => router.push(item.link)}
                             >
@@ -94,11 +109,27 @@ export default function Navbar() {
                 </div>
             </div>
             {userName && (
-                <div className='pr-5'>
-                    <p className={cn('font-amatic font-bold text-[25px]')}>
+                <div className="pr-5 relative">
+                    <p
+                        className="font-amatic font-bold text-[25px] hover:cursor-pointer"
+                        onClick={() => setIsShow(!isShow)}
+                    >
                         Xin chào{' '}
                         <span className="font-bold">{`${userName}!`}</span>
                     </p>
+                    <div
+                        className={cn(
+                            'absolute bg-white w-44 top-12 text-center rounded border space-y-2',
+                            !isShow && 'hidden',
+                        )}
+                    >
+                        <p
+                            className="font-amatic font-bold text-[25px] hover:cursor-pointer"
+                            onClick={() => handleLogout()}
+                        >
+                            Đăng xuất
+                        </p>
+                    </div>
                 </div>
             )}
         </section>
