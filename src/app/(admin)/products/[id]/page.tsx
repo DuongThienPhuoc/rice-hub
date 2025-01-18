@@ -10,9 +10,11 @@ import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead
 import { useToast } from '@/hooks/use-toast';
 import FloatingButton from '@/components/floating/floatingButton';
 import LinearIndeterminate from '@/components/ui/LinearIndeterminate';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import ProductDetailPageBreadcrumb from '@/app/(admin)/products/[id]/breadcrumb';
+import Swal from 'sweetalert2';
+import { ToastAction } from '@/components/ui/toast';
 
 const Page = ({ params }: { params: { id: number } }) => {
     const { toast } = useToast();
@@ -131,6 +133,48 @@ const Page = ({ params }: { params: { id: number } }) => {
             return /\.(jpg|jpeg|png|gif|webp|svg)$/.test(validUrl.pathname);
         } catch {
             return false;
+        }
+    }
+
+    const showAlert = async (row: any) => {
+        Swal.fire({
+            title: 'Xác nhận xóa',
+            text: `Bạn có chắc chắn muốn xóa quy cách này?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có, xóa!',
+            cancelButtonText: 'Không',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleDelete(row);
+            }
+        });
+    };
+
+    const handleDelete = async (row: any) => {
+        setOnPageChange(true);
+        try {
+            await api.delete(`/productwarehouse/delete/${row.id}`);
+            setOnPageChange(false);
+            toast({
+                variant: 'default',
+                title: 'Xóa thành công',
+                description: `Quy cách đã đã được xóa thành công`,
+                style: {
+                    backgroundColor: '#4caf50',
+                    color: '#fff',
+                },
+                duration: 3000
+            })
+        } catch (error: any) {
+            setOnPageChange(false);
+            toast({
+                variant: 'destructive',
+                title: 'Xóa thất bại',
+                description: error?.response?.data?.message || 'Đã xảy ra lỗi, vui lòng thử lại.',
+                action: <ToastAction altText="Vui lòng thử lại">OK!</ToastAction>,
+                duration: 3000
+            })
         }
     }
 
@@ -333,6 +377,7 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                 <TableCell><p className='font-semibold text-white'>STT</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Quy cách</p></TableCell>
                                                                 <TableCell><p className='font-semibold text-white'>Số lượng</p></TableCell>
+                                                                <TableCell><p className='font-semibold text-center text-white'>Hành động</p></TableCell>
                                                             </TableRow>
                                                         )}
                                                     </TableHead>
@@ -368,7 +413,19 @@ const Page = ({ params }: { params: { id: number } }) => {
                                                                     <TableRow key={rowIndex} className={`font-semibold bg-white`}>
                                                                         <TableCell>{rowIndex + 1}</TableCell>
                                                                         <TableCell>{(row.weightPerUnit > 1 && row.unit) ? row.unit + " " + row.weightPerUnit + " kg" : 'Chưa đóng gói'}</TableCell>
-                                                                        <TableCell>{row?.quantity > 0 && row?.quantity} {row?.unit || 'kg'}</TableCell>
+                                                                        <TableCell>{row?.quantity} {row?.unit}</TableCell>
+                                                                        <TableCell className='w-[150px]'>
+                                                                            <div className="flex justify-center space-x-3">
+                                                                                <div className="relative group w-fit">
+                                                                                    <button onClick={() => showAlert(row)}>
+                                                                                        <Trash2 size={18} />
+                                                                                    </button>
+                                                                                    <span className="absolute text-center w-[50px] transform -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-800 text-white text-xs rounded py-1 px-2">
+                                                                                        Xóa
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </TableCell>
                                                                     </TableRow>
                                                                 ))
                                                             ) : (

@@ -314,7 +314,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                     <SelectGroup>
                                         <SelectLabel>Chọn nhà sản xuất</SelectLabel>
                                         {filterSuppliers
-                                            ?.filter((supplier) => supplier.id !== 1)
+                                            ?.filter((supplier) => supplier.id !== 1 && supplier.active === true)
                                             .map((supplier) => (
                                                 <SelectItem key={supplier.id} value={supplier.name.toString()}>
                                                     <div className="text-md font-semibold">{supplier.name}</div>

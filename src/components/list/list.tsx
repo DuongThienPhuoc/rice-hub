@@ -81,6 +81,7 @@ const List: React.FC<DataTableProps> = ({ name, editUrl, titles, columns, data, 
             setRole(rawRole);
         }
     }, []);
+
     const handleDelete = async (row: any) => {
         setOnPageChange(true);
         try {
