@@ -595,7 +595,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                     <OrderPopoverProvider2
                                                         type={missingProduct.weightPerUnit.toString()}
                                                         setType={setType}
-                                                        quantity={missingProduct.missingQuantity}
+                                                        quantity={quantity}
                                                         setQuantity={setQuantity}
                                                         addProductToOrder={
                                                             addProductToOrder
@@ -609,7 +609,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                                     productId:
                                                                         missingProduct.id,
                                                                     productUnit: missingProduct.unit,
-                                                                    quantity: missingProduct.missingQuantity,
+                                                                    quantity: quantity,
                                                                     weightPerUnit: missingProduct.weightPerUnit,
                                                                     name: missingProduct.name,
                                                                     categoryName: missingProduct.categoryName,
@@ -714,7 +714,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                             {product.supplierName}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {`${product.productUnit} ${product.weightPerUnit} KG`}
+                                                            {`${product.productUnit} ${product.weightPerUnit} kg`}
                                                         </TableCell>
                                                         <TableCell>
                                                             {product.quantity} {product.productUnit}
