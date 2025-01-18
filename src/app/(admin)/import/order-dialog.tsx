@@ -595,7 +595,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                     <OrderPopoverProvider2
                                                         type={missingProduct.weightPerUnit.toString()}
                                                         setType={setType}
-                                                        quantity={missingProduct.missingQuantity}
+                                                        quantity={quantity}
                                                         setQuantity={setQuantity}
                                                         addProductToOrder={
                                                             addProductToOrder
@@ -604,18 +604,19 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <Button
                                                             variant="outline"
                                                             className="flex items-center justify-between"
-                                                            onClick={() =>
+                                                            onClick={() => {
                                                                 setSelectedProduct({
                                                                     productId:
                                                                         missingProduct.id,
-                                                                    quantity: missingProduct.missingQuantity,
+                                                                    productUnit: missingProduct.unit,
+                                                                    quantity: quantity,
                                                                     weightPerUnit: missingProduct.weightPerUnit,
                                                                     name: missingProduct.name,
                                                                     categoryName: missingProduct.categoryName,
                                                                     supplierName: missingProduct.supplierName,
                                                                     unitPrice: missingProduct.importPrice,
                                                                 })
-                                                            }
+                                                            }}
                                                         >
                                                             <CirclePlus className="w-4 h-4" />
                                                             Thêm
@@ -713,7 +714,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                             {product.supplierName}
                                                         </TableCell>
                                                         <TableCell>
-                                                            {`${product.productUnit} ${product.weightPerUnit} KG`}
+                                                            {`${product.productUnit} ${product.weightPerUnit} kg`}
                                                         </TableCell>
                                                         <TableCell>
                                                             {product.quantity} {product.productUnit}

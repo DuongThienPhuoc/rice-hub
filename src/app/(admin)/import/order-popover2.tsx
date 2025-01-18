@@ -36,7 +36,7 @@ const OrderPopoverProvider2: React.FC<OrderPopoverProviderProps> = ({
             setError('Số lượng không được để trống');
         }
         else {
-            setType('');
+            setType(type);
             setQuantity(1);
             setError('');
             addProductToOrder();

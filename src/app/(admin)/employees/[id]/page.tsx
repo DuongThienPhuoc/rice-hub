@@ -214,13 +214,13 @@ const Page = ({ params }: { params: { id: number } }) => {
                                 <div className='m-10 flex flex-col lg:flex-row'>
                                     <span className='font-bold flex-1'>Chức vụ: </span>
                                     <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
-                                        {employee?.role?.employeeRole?.roleName === 'STOCK_EMPLOYEE' && 'Nhân viên quản kho'}
-                                        {employee?.role?.employeeRole?.roleName === 'DRIVER_EMPLOYEE' && 'Nhân viên giao hàng'}
-                                        {employee?.role?.employeeRole?.roleName === 'PORTER_EMPLOYEE' && 'Nhân viên bốc/dỡ hàng'}
+                                        {employee?.role?.employeeRole?.roleName === 'WAREHOUSE_MANAGER' && 'Nhân viên quản kho'}
+                                        {employee?.role?.employeeRole?.roleName === 'DRIVER' && 'Nhân viên giao hàng'}
+                                        {employee?.role?.employeeRole?.roleName === 'PORTER' && 'Nhân viên bốc/dỡ hàng'}
                                     </span>
                                 </div>
 
-                                {employee?.role?.employeeRole?.roleName !== 'PORTER_EMPLOYEE' && (
+                                {employee?.role?.employeeRole?.roleName !== 'PORTER' && (
                                     <div className='m-10 flex flex-col lg:flex-row'>
                                         <span className='font-bold flex-1'>Lương ngày: </span>
                                         <span className='flex-[2] lg:ml-5 mt-2 lg:mt-0'>
