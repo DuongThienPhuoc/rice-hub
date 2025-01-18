@@ -551,15 +551,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                {role === ALLOW_ROLE && product.added === true ? (
-                                                                    <TableCell></TableCell>
-                                                                ) : (
+                                                                {role === ALLOW_ROLE && product.added !== true ? (
                                                                     <TableCell padding="checkbox">
                                                                         <Checkbox
                                                                             checked={selectedProducts.includes(product)}
                                                                             onChange={() => handleSelectProduct(product)}
                                                                         />
                                                                     </TableCell>
+                                                                ) : (
+                                                                    <TableCell></TableCell>
                                                                 )}
                                                                 <TableCell onClick={() => router.push(`/products/${product.productId}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product.productCode}
@@ -661,15 +661,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                                                                 key={index}
                                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                             >
-                                                                {role === ALLOW_ROLE && product.added === true ? (
-                                                                    <TableCell></TableCell>
-                                                                ) : (
+                                                                {role === ALLOW_ROLE && product.added !== true ? (
                                                                     <TableCell padding="checkbox">
                                                                         <Checkbox
                                                                             checked={selectedProducts.includes(product)}
                                                                             onChange={() => handleSelectProduct(product)}
                                                                         />
                                                                     </TableCell>
+                                                                ) : (
+                                                                    <TableCell></TableCell>
                                                                 )}
                                                                 <TableCell onClick={() => router.push(`/products/${product.productId}`)} component="th" scope="row" className='text-blue-500 font-semibold hover:text-blue-300 cursor-pointer'>
                                                                     {product.productCode}
