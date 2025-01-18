@@ -604,10 +604,11 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                         <Button
                                                             variant="outline"
                                                             className="flex items-center justify-between"
-                                                            onClick={() =>
+                                                            onClick={() => {
                                                                 setSelectedProduct({
                                                                     productId:
                                                                         missingProduct.id,
+                                                                    productUnit: missingProduct.unit,
                                                                     quantity: missingProduct.missingQuantity,
                                                                     weightPerUnit: missingProduct.weightPerUnit,
                                                                     name: missingProduct.name,
@@ -615,7 +616,7 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                                     supplierName: missingProduct.supplierName,
                                                                     unitPrice: missingProduct.importPrice,
                                                                 })
-                                                            }
+                                                            }}
                                                         >
                                                             <CirclePlus className="w-4 h-4" />
                                                             Thêm
