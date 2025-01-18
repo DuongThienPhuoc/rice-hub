@@ -315,7 +315,10 @@ export default function OrderDetailPage({
                             <span className="font-semibold">Ngày tạo đơn:</span>
                             <span className="flex gap-1 items-center">
                                 <Calendar className="w-4 h-4" />
-                                <span>{new Date(order?.orderDate || '').toLocaleDateString()}</span>
+                                <span>{new Date(order?.orderDate || '').toLocaleDateString('vi-VN',{
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })}</span>
                             </span>
                         </div>
                         <div className="flex justify-between">

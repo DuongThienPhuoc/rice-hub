@@ -146,7 +146,9 @@ const Page = () => {
 
     const getDailyReport = async () => {
         try {
-            const currentDate = new Date();
+            const utc7Plus = new Date();
+            const currentDate = new Date(utc7Plus);
+            currentDate.setHours(currentDate.getHours() - 7);
             const previousDate = new Date(currentDate);
             previousDate.setDate(previousDate.getDate() - 1);
 
