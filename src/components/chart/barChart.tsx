@@ -80,7 +80,7 @@ const BarChartComponent: React.FC<BarChartProps> = ({ chartName, color, setType,
                     const currentMonthDays = dayjs().daysInMonth();
                     periodData = Array.from({ length: currentMonthDays }, (_, index) => {
                         const day = (index + 1).toString().padStart(2, '0');
-                        const matchingData = data?.find((item: any) => dayjs(item.timePeriod).format('DD') === day);
+                        const matchingData = data?.find((item: any) => dayjs(item.timePeriod).add(7,'hour').format('DD') === day);
 
                         if (chartName !== 'Doanh thu') {
                             return {
