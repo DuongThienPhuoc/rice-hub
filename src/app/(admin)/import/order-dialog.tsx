@@ -593,12 +593,18 @@ const OrderDialogProvider: React.FC<OrderDialogProps> = ({
                                                 </TableCell>
                                                 <TableCell className="flex justify-center">
                                                     <OrderPopoverProvider2
-                                                        type={missingProduct.weightPerUnit.toString()}
-                                                        setType={setType}
                                                         quantity={quantity}
                                                         setQuantity={setQuantity}
                                                         addProductToOrder={
                                                             addProductToOrder
+                                                        }
+                                                        type={missingProduct.weightPerUnit.toString()}
+                                                        setType={
+                                                            setType
+                                                        }
+                                                        productUnit={missingProduct.unit}
+                                                        setProductUnit={
+                                                            setProductUnit
                                                         }
                                                     >
                                                         <Button

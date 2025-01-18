@@ -10,33 +10,35 @@ import { Button } from '@/components/ui/button';
 
 type OrderPopoverProviderProps = {
     children: React.ReactNode;
-    type: string;
-    setType: (type: string) => void;
     quantity: number;
+    productUnit: string;
+    type: string;
     setQuantity: (quantity: number) => void;
     addProductToOrder: () => void;
+    setProductUnit: (productUnit: string) => void;
+    setType: (type: string) => void;
 };
 
 const OrderPopoverProvider2: React.FC<OrderPopoverProviderProps> = ({
     children,
+    quantity,
+    productUnit,
+    setQuantity,
+    setProductUnit,
     type,
     setType,
-    quantity,
-    setQuantity,
     addProductToOrder,
 }) => {
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
     const [error, setError] = React.useState<string>('');
 
     function handleSubmit() {
-        if (type === '') {
-            setError('Vui lòng chọn quy cách');
-        }
-        else if (quantity === 0) {
+        setProductUnit(productUnit);
+        setType(type);
+        if (quantity === 0) {
             setError('Số lượng không được để trống');
         }
         else {
-            setType(type);
             setQuantity(1);
             setError('');
             addProductToOrder();
